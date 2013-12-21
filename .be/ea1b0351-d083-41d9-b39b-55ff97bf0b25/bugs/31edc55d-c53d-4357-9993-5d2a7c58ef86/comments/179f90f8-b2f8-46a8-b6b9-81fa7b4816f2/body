@@ -1,0 +1,1 @@
+We should support Libav for transcoding, but these two bugs are blockers : https://bugzilla.libav.org/show_bug.cgi?id=595 and https://bugzilla.libav.org/show_bug.cgi?id=597

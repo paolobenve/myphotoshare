@@ -1,0 +1,50 @@
+{
+
+
+
+
+
+
+    "creator": "Jerome Charaoui <jerome@riseup.net>", 
+
+
+
+
+
+
+    "reporter": "Jerome Charaoui <jerome@riseup.net>", 
+
+
+
+
+
+
+    "severity": "minor", 
+
+
+
+
+
+
+    "status": "open", 
+
+
+
+
+
+
+    "summary": "Video gets cropped when viewport is smaller than video", 
+
+
+
+
+
+
+    "time": "Sat, 21 Dec 2013 19:42:03 +0000"
+
+
+
+
+
+
+}

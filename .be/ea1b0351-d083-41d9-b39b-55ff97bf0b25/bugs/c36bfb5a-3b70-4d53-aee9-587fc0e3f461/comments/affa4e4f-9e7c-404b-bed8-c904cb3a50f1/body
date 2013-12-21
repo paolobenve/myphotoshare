@@ -1,0 +1,1 @@
+According to Android developpers, creation_time should only be UTC, not local time. Should we therefore ignore it and use mtime (current situation) or convert it to local time? See https://code.google.com/p/android/issues/detail?id=60225#c6
