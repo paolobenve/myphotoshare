@@ -145,6 +145,7 @@ $(document).ready(function() {
 			$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
 			$("#photo-view").hide();
+			$("#video")[0].pause()
 		}
 		setTimeout(scrollToThumb, 1);
 	}
@@ -165,25 +166,43 @@ $(document).ready(function() {
 			image.css("height", "100%").css("width", "auto").css("position", "").css("bottom", "");
 	}
 	function showPhoto() {
-		var width, height, photoSrc, previousPhoto, nextPhoto, nextLink, text;
-		width = currentPhoto.size[0];
-		height = currentPhoto.size[1];
-		if (width > height) {
-			height = height / width * maxSize;
-			width = maxSize;
-		} else {
-			width = width / height * maxSize;
-			height = maxSize;
+		var width, height, photoSrc, videoSrc, previousPhoto, nextPhoto, nextLink, text;
+
+		if (currentPhoto.mediaType == "video") {
+			width = currentPhoto.size[0];
+			height = currentPhoto.size[1];
+			videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
+			 $("#video")
+				.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
+				.attr("src", videoSrc)
+				.attr("alt", currentPhoto.name);
+			 $("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
+			 $("#photo-box").hide();
+			 $("#video-box").show();
 		}
-		$(window).unbind("resize", scaleImage);
-		photoSrc = photoFloat.photoPath(currentAlbum, currentPhoto, maxSize, false);
-		$("#photo")
-			.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
-			.attr("src", photoSrc)
-			.attr("alt", currentPhoto.name)
-			.attr("title", currentPhoto.date)
-			.load(scaleImage);
-		$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
+		else {
+			width = currentPhoto.size[0];
+			height = currentPhoto.size[1];
+			if (width > height) {
+				height = height / width * maxSize;
+				width = maxSize;
+			} else {
+				width = width / height * maxSize;
+				height = maxSize;
+			}
+			$(window).unbind("resize", scaleImage);
+			photoSrc = photoFloat.photoPath(currentAlbum, currentPhoto, maxSize, false);
+			$("#photo")
+				.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
+				.attr("src", photoSrc)
+				.attr("alt", currentPhoto.name)
+				.attr("title", currentPhoto.date)
+				.load(scaleImage);
+			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
+			$("#video")[0].pause()
+			$("#video-box").hide();
+			$("#photo-box").show();
+		}
 		
 		previousPhoto = currentAlbum.photos[
 			(currentPhotoIndex - 1 < 0) ? (currentAlbum.photos.length - 1) : (currentPhotoIndex - 1)

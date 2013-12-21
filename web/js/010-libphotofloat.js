@@ -144,6 +144,9 @@
 			suffix = size.toString();
 		return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, photo) + "_" + suffix + ".jpg");
 	};
+	PhotoFloat.videoPath = function(album, video) {
+		return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".webm");
+	};
 	PhotoFloat.originalPhotoPath = function(album, photo) {
 		return "albums/" + album.path + "/" + photo.name;
 	};
@@ -176,6 +179,7 @@
 	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
 	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
+	PhotoFloat.prototype.videoPath = PhotoFloat.videoPath;
 	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
