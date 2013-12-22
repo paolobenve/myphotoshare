@@ -242,6 +242,7 @@ class Photo(object):
 		except KeyboardInterrupt:
 			raise
 		except:
+			self.is_valid = False
 			return
 		info = json.loads(p)
 		for s in info["streams"]:
@@ -279,6 +280,7 @@ class Photo(object):
 				raise
 			except:
 				message("corrupt image", os.path.basename(original_path))
+				self.is_valid = False
 				return
 		if square:
 			if image.size[0] > image.size[1]:
@@ -302,6 +304,7 @@ class Photo(object):
 		except:
 			message("save failure", os.path.basename(thumb_path))
 			os.unlink(thumb_path)
+			self.is_valid = False
 		
 	def _photo_thumbnails(self, image, thumb_path, original_path):
 		mirror = image
@@ -339,6 +342,7 @@ class Photo(object):
 		except:
 			message("couldn't extract video frame", os.path.basename(original_path))
 			os.unlink(tfn)
+			self.is_valid = False
 			return
 		try:
 			image = Image.open(tfn)
@@ -347,6 +351,7 @@ class Photo(object):
 		except:
 			message("couldn't open video thumbnail", tfn)
 			os.unlink(tfn)
+			self.is_valid = False
 			return
 		mirror = image
 		if "rotate" in self._attributes:
@@ -392,6 +397,7 @@ class Photo(object):
 				os.unlink(transcode_path)
 			except:
 				pass
+			self.is_valid = False
 			return
 		self._video_metadata(transcode_path, False)
 
