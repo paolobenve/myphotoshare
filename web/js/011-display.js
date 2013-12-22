@@ -97,7 +97,7 @@ $(document).ready(function() {
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				link = $("<a href=\"#!/" + photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
-			    image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
+				image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
 				if (currentAlbum.photos[i].mediaType == "video")
 					image.css("background-image", "url(" + image.attr("src") + ")").attr("src", "img/video-icon.png");
 				else
@@ -168,20 +168,36 @@ $(document).ready(function() {
 		else if (image.css("height") !== "100%")
 			image.css("height", "100%").css("width", "auto").css("position", "").css("bottom", "");
 	}
+	function scaleVideo() {
+		var video, container;
+		video = $("#video");
+		if (video.get(0) === this)
+			$(window).bind("resize", scaleVideo);
+		container = $("#photo-view");
+		if (video.attr("width") > container.width() && container.height() * video.attr("ratio") > container.width())
+			video.css("width", container.width()).css("height", container.width() / video.attr("ratio")).parent().css("height", container.width() / video.attr("ratio")).css("margin-top", - container.width() / video.attr("ratio") / 2).css("top", "50%");
+		else if (video.attr("height") > container.height() && container.height() * video.attr("ratio") < container.width())
+			video.css("height", container.height()).css("width", container.height() * video.attr("ratio")).parent().css("height", "100%").css("margin-top", "0").css("top", "0");
+		else
+			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
+	}
 	function showPhoto() {
 		var width, height, photoSrc, videoSrc, previousPhoto, nextPhoto, nextLink, text;
 
 		if (currentPhoto.mediaType == "video") {
 			width = currentPhoto.size[0];
 			height = currentPhoto.size[1];
+			$(window).unbind("resize", scaleVideo);
+			$(window).unbind("resize", scaleImage);
 			videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
-			 $("#video")
+			$("#video")
 				.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
 				.attr("src", videoSrc)
-				.attr("alt", currentPhoto.name);
-			 $("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
-			 $("#photo-box").hide();
-			 $("#video-box").show();
+				.attr("alt", currentPhoto.name)
+				.on('loadstart', scaleVideo);
+			$("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
+			$("#photo-box").hide();
+			$("#video-box").show();
 		}
 		else {
 			width = currentPhoto.size[0];
@@ -193,6 +209,7 @@ $(document).ready(function() {
 				width = width / height * maxSize;
 				height = maxSize;
 			}
+			$(window).unbind("resize", scaleVideo);
 			$(window).unbind("resize", scaleImage);
 			photoSrc = photoFloat.photoPath(currentAlbum, currentPhoto, maxSize, false);
 			$("#photo")
