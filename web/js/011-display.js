@@ -194,6 +194,7 @@ $(document).ready(function() {
 				.attr("src", videoSrc)
 				.attr("alt", currentPhoto.name)
 				.on('loadstart', scaleVideo);
+			$("head").append("<link rel=\"video_src\" href=\"" + videoSrc + "\" />");
 			$("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
 			$("#photo-box").hide();
 			$("#video-box").show();
@@ -305,6 +306,7 @@ $(document).ready(function() {
 	$(window).hashchange(function() {
 		$("#loading").show();
 		$("link[rel=image_src]").remove();
+		$("link[rel=video_src]").remove();
 		if (location.search.indexOf("?_escaped_fragment_=") === 0) {
 			location.hash = location.search.substring(20);
 			location.search = "";
