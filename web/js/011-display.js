@@ -100,7 +100,6 @@ $(document).ready(function() {
 				image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
 				if (currentAlbum.photos[i].mediaType == "video")
 					image.css("background-image", "url(" + image.attr("src") + ")").attr("src", "img/video-icon.png");
-				else
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);
 				photos.push(link);
