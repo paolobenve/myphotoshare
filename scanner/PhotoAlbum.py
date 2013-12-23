@@ -248,7 +248,7 @@ class Photo(object):
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
 				self._attributes["size"] = (int(s["width"]), int(s["height"]))
-				if s["duration"]:
+				if "duration" in s:
 					self._attributes["duration"] = s["duration"]
 				if "tags" in s and "rotate" in s["tags"]:
 					self._attributes["rotate"] = s["tags"]["rotate"]
