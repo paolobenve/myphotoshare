@@ -136,7 +136,6 @@ class Photo(object):
 			self._photo_metadata(image)
 			self._photo_thumbnails(image, thumb_path, path)
 		elif self._attributes["mediaType"] == "video":
-			self._video_metadata(path)
 			self._video_thumbnails(thumb_path, path)
 			self._video_transcode(thumb_path, path)
 		else:
@@ -247,18 +246,15 @@ class Photo(object):
 		info = json.loads(p)
 		for s in info["streams"]:
 			if 'codec_type' in s and s['codec_type'] == 'video':
-				if original:
-					self._attributes["mediaType"] = "video"
-					self._attributes["originalSize"] = (int(s["width"]), int(s["height"]))
+				self._attributes["mediaType"] = "video"
+				self._attributes["size"] = (int(s["width"]), int(s["height"]))
+				if s["duration"]:
 					self._attributes["duration"] = s["duration"]
-					if "tags" in s:
-						# creation_time only in UTC!
-						# https://code.google.com/p/android/issues/detail?id=60225#c6
-						#self._attributes["dateTime"] = s["tags"]["creation_time"] 
-						if "rotate" in s["tags"]:
-							self._attributes["rotate"] = s["tags"]["rotate"]
-				else:
-					self._attributes["size"] = (int(s["width"]), int(s["height"]))
+				if "tags" in s and "rotate" in s["tags"]:
+					self._attributes["rotate"] = s["tags"]["rotate"]
+				if original:
+					self._attributes["originalSize"] = (int(s["width"]), int(s["height"]))
+				break
 
 	def _thumbnail(self, image, thumb_path, original_path, size, square=False):
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
