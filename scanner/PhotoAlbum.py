@@ -369,6 +369,7 @@ class Photo(object):
 		info_string = "%s -> webm" % (os.path.basename(original_path))
 		message("transcoding", info_string)
 		if os.path.exists(transcode_path) and file_mtime(transcode_path) >= self._attributes["dateTimeFile"]:
+			self._video_metadata(transcode_path, False)
 			return
 		if "originalSize" in self._attributes and self._attributes["originalSize"][1] > 720:
 			filters.append("scale=trunc(oh*a/2)*2:min(720\,iw)")
