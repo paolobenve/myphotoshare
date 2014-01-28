@@ -199,6 +199,14 @@ a:hover {
 	font-weight: bold;
 	font-style: italic;
 }
+
+#video-unsupported {
+  background-image: url(../img/video-unsupported.png);
+  background-position: top center;
+  background-repeat: no-repeat;
+  padding-top: 96px;
+}
+
 #auth-text input {
 	color: rgb(0, 0, 0);
 	background-color: rgb(200, 200, 200);

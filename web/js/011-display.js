@@ -147,7 +147,8 @@ $(document).ready(function() {
 			$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
 			$("#photo-view").hide();
-			$("#video").remove();
+			$("#video-box-inner").empty();
+			$("#video-box").hide();
 		}
 		setTimeout(scrollToThumb, 1);
 	}
@@ -182,18 +183,26 @@ $(document).ready(function() {
 	}
 	function showPhoto() {
 		var width, height, photoSrc, videoSrc, previousPhoto, nextPhoto, nextLink, text;
+        width = currentPhoto.size[0];
+        height = currentPhoto.size[1];
 
 		if (currentPhoto.mediaType == "video") {
-			width = currentPhoto.size[0];
-			height = currentPhoto.size[1];
-			$(window).unbind("resize", scaleVideo);
-			$(window).unbind("resize", scaleImage);
-			videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
-			$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
-				.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
-				.attr("src", videoSrc)
-				.attr("alt", currentPhoto.name)
-				.on('loadstart', scaleVideo);
+            if (!Modernizr.video) {
+                $('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p><p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p></div>').appendTo('#video-box-inner');
+            }
+            else if (Modernizr.video.webm) {
+                $('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the WebM video format!</p></div>').appendTo('#video-box-inner');
+            }
+            else {
+                $(window).unbind("resize", scaleVideo);
+                $(window).unbind("resize", scaleImage);
+                videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
+                $('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
+                    .attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
+                    .attr("src", videoSrc)
+                    .attr("alt", currentPhoto.name)
+                    .on('loadstart', scaleVideo);
+            }
 			$("head").append("<link rel=\"video_src\" href=\"" + videoSrc + "\" />");
 			$("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
 			$("#photo-box").hide();
@@ -219,7 +228,7 @@ $(document).ready(function() {
 				.attr("title", currentPhoto.date)
 				.load(scaleImage);
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-			$("#video").remove();
+			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#photo-box").show();
 		}
