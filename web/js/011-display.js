@@ -147,7 +147,7 @@ $(document).ready(function() {
 			$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
 			$("#photo-view").hide();
-			$("#video")[0].pause()
+			$("#video").remove();
 		}
 		setTimeout(scrollToThumb, 1);
 	}
@@ -189,7 +189,7 @@ $(document).ready(function() {
 			$(window).unbind("resize", scaleVideo);
 			$(window).unbind("resize", scaleImage);
 			videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
-			$("#video")
+			$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
 				.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
 				.attr("src", videoSrc)
 				.attr("alt", currentPhoto.name)
@@ -219,7 +219,7 @@ $(document).ready(function() {
 				.attr("title", currentPhoto.date)
 				.load(scaleImage);
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-			$("#video")[0].pause()
+			$("#video").remove();
 			$("#video-box").hide();
 			$("#photo-box").show();
 		}
