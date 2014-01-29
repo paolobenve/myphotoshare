@@ -7,7 +7,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 import gc
 import tempfile
-import subprocess
+from VideoToolWrapper import *
 
 class Album(object):
 	def __init__(self, path):
@@ -236,11 +236,8 @@ class Photo(object):
 	_photo_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
 
 	def _video_metadata(self, path, original=True):
-		try:
-			p = subprocess.check_output(['/usr/bin/ffprobe', '-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path])
-		except KeyboardInterrupt:
-			raise
-		except:
+		p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
+		if p == False:
 			self.is_valid = False
 			return
 		info = json.loads(p)
@@ -330,12 +327,8 @@ class Photo(object):
 
 	def _video_thumbnails(self, thumb_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
-		try:
-			subprocess.check_call(['/usr/bin/ffmpeg', '-i', original_path, '-f', 'image2', '-vsync', '1', '-vframes', '1', '-an', '-loglevel', 'quiet', tfn])
-		except KeyboardInterrupt:
-			os.unlink(tfn)
-			raise
-		except:
+		p = VideoTranscodeWrapper().call('-i', original_path, '-f', 'image2', '-vsync', '1', '-vframes', '1', '-an', '-loglevel', 'quiet', tfn)
+		if p == False:
 			message("couldn't extract video frame", os.path.basename(original_path))
 			os.unlink(tfn)
 			self.is_valid = False
@@ -364,7 +357,7 @@ class Photo(object):
 
 	def _video_transcode(self, transcode_path, original_path):
 		transcode_path = os.path.join(transcode_path, cache_base(self._path) + '.webm')
-		transcode_cmd = ['/usr/bin/ffmpeg', '-i', original_path, '-c:v', 'libvpx', '-crf', '10', '-b:v', '800k', '-c:a', 'libvorbis', '-f', 'webm', '-threads', '2', '-loglevel', '0', '-y']
+		transcode_cmd = ['-i', original_path, '-c:v', 'libvpx', '-crf', '10', '-b:v', '800k', '-c:a', 'libvorbis', '-f', 'webm', '-threads', '2', '-loglevel', '0', '-y']
 		filters = []
 		info_string = "%s -> webm" % (os.path.basename(original_path))
 		message("transcoding", info_string)
@@ -384,11 +377,8 @@ class Photo(object):
 			transcode_cmd.append('-vf')
 			transcode_cmd.append(','.join(filters))
 		transcode_cmd.append(transcode_path)
-		try:
-			subprocess.call(transcode_cmd)
-		except KeyboardInterrupt:
-			raise
-		except:
+		p = VideoTranscodeWrapper().call(*transcode_cmd)
+		if p == False:
 			message("transcoding failure", os.path.basename(original_path))
 			try:
 				os.unlink(transcode_path)
