@@ -356,7 +356,7 @@ class Photo(object):
 		os.unlink(tfn)
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, cache_base(self._path) + '.webm')
+		transcode_path = os.path.join(transcode_path, video_cache(self._path))
 		transcode_cmd = ['-i', original_path, '-c:v', 'libvpx', '-crf', '10', '-b:v', '800k', '-c:a', 'libvorbis', '-f', 'webm', '-threads', '2', '-loglevel', '0', '-y']
 		filters = []
 		info_string = "%s -> webm" % (os.path.basename(original_path))
@@ -403,7 +403,7 @@ class Photo(object):
 			for size in Photo.thumb_sizes:
 				if size[1]:
 					caches.append(image_cache(self._path, size[0], size[1]))
-			caches.append(cache_base(self._path) + '.webm')
+			caches.append(video_cache(self._path))
 		else:
 			caches = [image_cache(self._path, size[0], size[1]) for size in Photo.thumb_sizes]
 		return caches
