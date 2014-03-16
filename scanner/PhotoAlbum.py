@@ -5,7 +5,15 @@ import os
 import os.path
 from PIL import Image
 from PIL.ExifTags import TAGS
+from multiprocessing import Pool
 import gc
+
+def make_thumbs(self, original_path, thumb_path, size):
+	# The pool methods use a queue.Queue to pass tasks to the worker processes.
+	# Everything that goes through the queue.Queue must be pickable, and since 
+	# self._thumbnail is not defined at the top level, it's not pickable.
+	# This is why we have this "dummy" function, so that it's pickable.
+	self._thumbnail(original_path, thumb_path, size[0], size[1])
 
 class Album(object):
 	def __init__(self, path):
@@ -120,7 +128,7 @@ class Photo(object):
 			return
 		self._attributes = {}
 		self._attributes["dateTimeFile"] = mtime
-		
+        		
 		try:
 			image = Image.open(path)
 		except KeyboardInterrupt:
@@ -128,9 +136,9 @@ class Photo(object):
 		except:
 			self.is_valid = False
 			return
-		self._metadata(image)
-		self._thumbnails(image, thumb_path, path)
-	def _metadata(self, image):
+		self._metadata(path)
+		self._thumbnails(path, thumb_path)
+	def _metadata(self, path):
 		self._attributes["size"] = image.size
 		self._orientation = 1
 		try:
@@ -225,6 +233,39 @@ class Photo(object):
 	_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
 		
 	def _thumbnail(self, image, thumb_path, original_path, size, square=False):
+    def _thumbnail(self, original_path, thumb_path, size, square=False):
+		try:
+			image = Image.open(original_path)
+		except KeyboardInterrupt:
+			raise
+		except:
+			self.is_valid = False
+			return
+		
+		mirror = image
+		if self._orientation == 2:
+			# Vertical Mirror
+			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
+		elif self._orientation == 3:
+			# Rotation 180
+			mirror = image.transpose(Image.ROTATE_180)
+		elif self._orientation == 4:
+			# Horizontal Mirror
+			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
+		elif self._orientation == 5:
+			# Horizontal Mirror + Rotation 270
+			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
+		elif self._orientation == 6:
+			# Rotation 270
+			mirror = image.transpose(Image.ROTATE_270)
+		elif self._orientation == 7:
+			# Vertical Mirror + Rotation 270
+			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
+		elif self._orientation == 8:
+      			# Rotation 90
+			mirror = image.transpose(Image.ROTATE_90)
+        image = mirror
+
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
 		info_string = "%s -> %spx" % (os.path.basename(original_path), str(size))
 		if square:
@@ -268,31 +309,15 @@ class Photo(object):
 			message("save failure", os.path.basename(thumb_path))
 			os.unlink(thumb_path)
 		
-	def _thumbnails(self, image, thumb_path, original_path):
-		mirror = image
-		if self._orientation == 2:
-			# Vertical Mirror
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
-		elif self._orientation == 3:
-			# Rotation 180
-			mirror = image.transpose(Image.ROTATE_180)
-		elif self._orientation == 4:
-			# Horizontal Mirror
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
-		elif self._orientation == 5:
-			# Horizontal Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
-		elif self._orientation == 6:
-			# Rotation 270
-			mirror = image.transpose(Image.ROTATE_270)
-		elif self._orientation == 7:
-			# Vertical Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
-		elif self._orientation == 8:
-			# Rotation 90
-			mirror = image.transpose(Image.ROTATE_90)
-		for size in Photo.thumb_sizes:
-			self._thumbnail(mirror, thumb_path, original_path, size[0], size[1])
+	def _thumbnails(self, original_path, thumb_path):
+        # get number of cores on the system, and use all minus one
+        num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+        pool = Pool(processes=num_of_cores)
+        for size in Photo.thumb_sizes:
+        	pool.apply_async(make_thumbs, args = (self, original_path, thumb_path, size))
+        pool.close()
+        pool.join()
+
 	@property
 	def name(self):
 		return os.path.basename(self._path)
