@@ -232,9 +232,8 @@ class Photo(object):
 	_metadata.scene_capture_type_list = ["Standard", "Landscape", "Portrait", "Night scene"]
 	_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
 		
-	def _thumbnail(self, image, thumb_path, original_path, size, square=False):
-    def _thumbnail(self, original_path, thumb_path, size, square=False):
-		try:
+        def _thumbnail(self, original_path, thumb_path, size, square=False):
+	        try:
 			image = Image.open(original_path)
 		except KeyboardInterrupt:
 			raise
@@ -264,7 +263,7 @@ class Photo(object):
 		elif self._orientation == 8:
       			# Rotation 90
 			mirror = image.transpose(Image.ROTATE_90)
-        image = mirror
+                image = mirror
 
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
 		info_string = "%s -> %spx" % (os.path.basename(original_path), str(size))
@@ -309,14 +308,14 @@ class Photo(object):
 			message("save failure", os.path.basename(thumb_path))
 			os.unlink(thumb_path)
 		
-	def _thumbnails(self, original_path, thumb_path):
-        # get number of cores on the system, and use all minus one
-        num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
-        pool = Pool(processes=num_of_cores)
-        for size in Photo.thumb_sizes:
-        	pool.apply_async(make_thumbs, args = (self, original_path, thumb_path, size))
-        pool.close()
-        pool.join()
+        def _thumbnails(self, original_path, thumb_path):
+                # get number of cores on the system, and use all minus one
+                num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+                pool = Pool(processes=num_of_cores)
+                for size in Photo.thumb_sizes:
+                	pool.apply_async(make_thumbs, args = (self, original_path, thumb_path, size))
+                pool.close()
+                pool.join()
 
 	@property
 	def name(self):
