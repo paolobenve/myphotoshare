@@ -153,9 +153,9 @@ class Photo(object):
 		exif = {}
 		for tag, value in info.items():
 			decoded = TAGS.get(tag, tag)
-			if isinstance(value, str):
+			if isinstance(value, str) or isinstance(value, unicode):
 				value = value.strip().partition("\x00")[0]
-				if isinstance(decoded, str) and decoded.startswith("DateTime"):
+				if (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime"):
 					try:
 						value = datetime.strptime(value, '%Y:%m:%d %H:%M:%S')
 					except KeyboardInterrupt:
@@ -302,11 +302,17 @@ class Photo(object):
 		try:
 			image.save(thumb_path, "JPEG", quality=88)
 		except KeyboardInterrupt:
-			os.unlink(thumb_path)
+			try:
+				os.unlink(thumb_path)
+			except:
+				pass
 			raise
 		except:
 			message("save failure", os.path.basename(thumb_path))
-			os.unlink(thumb_path)
+			try:
+				os.unlink(thumb_path)
+			except:
+				pass
 		
         def _thumbnails(self, original_path, thumb_path):
                 # get number of cores on the system, and use all minus one
@@ -330,14 +336,17 @@ class Photo(object):
 		return [image_cache(self._path, size[0], size[1]) for size in Photo.thumb_sizes]
 	@property
 	def date(self):
+		correct_date = None;
 		if not self.is_valid:
-			return datetime(1900, 1, 1)
+			correct_date = datetime(1900, 1, 1)
 		if "dateTimeOriginal" in self._attributes:
-			return self._attributes["dateTimeOriginal"]
+			correct_date = self._attributes["dateTimeOriginal"]
 		elif "dateTime" in self._attributes:
-			return self._attributes["dateTime"]
+			correct_date = self._attributes["dateTime"]
 		else:
-			return self._attributes["dateTimeFile"]
+			correct_date = self._attributes["dateTimeFile"]
+		return correct_date
+
 	def __cmp__(self, other):
 		date_compare = cmp(self.date, other.date)
 		if date_compare == 0:
