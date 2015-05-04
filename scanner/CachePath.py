@@ -24,14 +24,16 @@ def trim_base_custom(path, base):
 	return path
 def trim_base(path):
 	return trim_base_custom(path, trim_base.base)
-def cache_base(path):
+def cache_base(path, filepath=False):
+	if len(path) == 0:
+		return "root"
+	elif filepath and len(path.split(os.sep)) < 2:
+		path = "root-" + path
 	path = trim_base(path).replace('/', '-').replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 	while path.find("--") != -1:
 		path = path.replace("--", "-")
 	while path.find("__") != -1:
 		path = path.replace("__", "_")
-	if len(path) == 0:
-		path = "root"
 	return path
 def json_cache(path):
 	return cache_base(path) + ".json"
@@ -40,6 +42,8 @@ def image_cache(path, size, square=False):
 		suffix = str(size) + "s"
 	else:
 		suffix = str(size)
-	return cache_base(path) + "_" + suffix + ".jpg"
+	return cache_base(path, True) + "_" + suffix + ".jpg"
+def video_cache(path):
+	return cache_base(path, True) + ".webm"
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))

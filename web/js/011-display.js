@@ -98,6 +98,8 @@ $(document).ready(function() {
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				link = $("<a href=\"#!/" + photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
 				image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
+				if (currentAlbum.photos[i].mediaType == "video")
+					image.css("background-image", "url(" + image.attr("src") + ")").attr("src", "img/video-icon.png");
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);
 				photos.push(link);
@@ -145,6 +147,8 @@ $(document).ready(function() {
 			$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
 			$("#photo-view").hide();
+			$("#video-box-inner").empty();
+			$("#video-box").hide();
 		}
 		setTimeout(scrollToThumb, 1);
 	}
@@ -164,26 +168,70 @@ $(document).ready(function() {
 		else if (image.css("height") !== "100%")
 			image.css("height", "100%").css("width", "auto").css("position", "").css("bottom", "");
 	}
+	function scaleVideo() {
+		var video, container;
+		video = $("#video");
+		if (video.get(0) === this)
+			$(window).bind("resize", scaleVideo);
+		container = $("#photo-view");
+		if (video.attr("width") > container.width() && container.height() * video.attr("ratio") > container.width())
+			video.css("width", container.width()).css("height", container.width() / video.attr("ratio")).parent().css("height", container.width() / video.attr("ratio")).css("margin-top", - container.width() / video.attr("ratio") / 2).css("top", "50%");
+		else if (video.attr("height") > container.height() && container.height() * video.attr("ratio") < container.width())
+			video.css("height", container.height()).css("width", container.height() * video.attr("ratio")).parent().css("height", "100%").css("margin-top", "0").css("top", "0");
+		else
+			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
+	}
 	function showPhoto() {
-		var width, height, photoSrc, previousPhoto, nextPhoto, nextLink, text;
-		width = currentPhoto.size[0];
-		height = currentPhoto.size[1];
-		if (width > height) {
-			height = height / width * maxSize;
-			width = maxSize;
-		} else {
-			width = width / height * maxSize;
-			height = maxSize;
+		var width, height, photoSrc, videoSrc, previousPhoto, nextPhoto, nextLink, text;
+        width = currentPhoto.size[0];
+        height = currentPhoto.size[1];
+
+		if (currentPhoto.mediaType == "video") {
+            if (!Modernizr.video) {
+                $('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p><p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p></div>').appendTo('#video-box-inner');
+            }
+            else if (!Modernizr.video.webm) {
+                $('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the WebM video format!</p></div>').appendTo('#video-box-inner');
+            }
+            else {
+                $(window).unbind("resize", scaleVideo);
+                $(window).unbind("resize", scaleImage);
+                videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
+                $('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
+                    .attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
+                    .attr("src", videoSrc)
+                    .attr("alt", currentPhoto.name)
+                    .on('loadstart', scaleVideo);
+            }
+			$("head").append("<link rel=\"video_src\" href=\"" + videoSrc + "\" />");
+			$("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
+			$("#photo-box").hide();
+			$("#video-box").show();
 		}
-		$(window).unbind("resize", scaleImage);
-		photoSrc = photoFloat.photoPath(currentAlbum, currentPhoto, maxSize, false);
-		$("#photo")
-			.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
-			.attr("src", photoSrc)
-			.attr("alt", currentPhoto.name)
-			.attr("title", currentPhoto.date)
-			.load(scaleImage);
-		$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
+		else {
+			width = currentPhoto.size[0];
+			height = currentPhoto.size[1];
+			if (width > height) {
+				height = height / width * maxSize;
+				width = maxSize;
+			} else {
+				width = width / height * maxSize;
+				height = maxSize;
+			}
+			$(window).unbind("resize", scaleVideo);
+			$(window).unbind("resize", scaleImage);
+			photoSrc = photoFloat.photoPath(currentAlbum, currentPhoto, maxSize, false);
+			$("#photo")
+				.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
+				.attr("src", photoSrc)
+				.attr("alt", currentPhoto.name)
+				.attr("title", currentPhoto.date)
+				.load(scaleImage);
+			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
+			$("#video-box-inner").empty();
+			$("#video-box").hide();
+			$("#photo-box").show();
+		}
 		
 		previousPhoto = currentAlbum.photos[
 			(currentPhotoIndex - 1 < 0) ? (currentAlbum.photos.length - 1) : (currentPhotoIndex - 1)
@@ -267,6 +315,7 @@ $(document).ready(function() {
 	$(window).hashchange(function() {
 		$("#loading").show();
 		$("link[rel=image_src]").remove();
+		$("link[rel=video_src]").remove();
 		if (location.search.indexOf("?_escaped_fragment_=") === 0) {
 			location.hash = location.search.substring(20);
 			location.search = "";
