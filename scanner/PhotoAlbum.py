@@ -298,9 +298,9 @@ class Photo(object):
 			mirror = image.transpose(Image.ROTATE_90)
                 
                 image = mirror
-                self._thumbnail(image, original_path, thumb_path, original_path, size, square)
+                self._thumbnail(image, original_path, thumb_path, size, square)
 
-        def _thumbnail(image, original_path, thumb_path, original_path, size, square):
+        def _thumbnail(self, image, original_path, thumb_path, size, square):
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
 		info_string = "%s -> %spx" % (os.path.basename(original_path), str(size))
 		if square:
