@@ -17,7 +17,7 @@ class VideoToolWrapper(object):
 			except:
 				if self.cleanup:
 					self.remove(path)
-				return False
+				continue
 			return p
 		return False
 
