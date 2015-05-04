@@ -142,7 +142,7 @@ class Photo(object):
 
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
-			self._photo_thumbnails(image, thumb_path)
+			self._photo_thumbnails(path, thumb_path)
 		elif self._attributes["mediaType"] == "video":
 			self._video_thumbnails(thumb_path, path)
 			self._video_transcode(thumb_path, path)
@@ -387,7 +387,7 @@ class Photo(object):
 				mirror = image.transpose(Image.ROTATE_90)
 		for size in Photo.thumb_sizes:
 			if size[1]:
-				self._thumbnail(mirror, thumb_path, original_path, size[0], size[1])
+				self._thumbnail(mirror, original_path, thumb_path, size[0], size[1])
 		os.unlink(tfn)
 
 	def _video_transcode(self, transcode_path, original_path):
