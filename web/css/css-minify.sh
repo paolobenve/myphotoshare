@@ -8,5 +8,5 @@ ls -1 *.css|grep -Ev "min.css$" | while read cssfile; do
 done
 
 # merge all into one single file
-rm -f scripts.min.css
-cat *.min.css > scripts.min.css
+rm -f styles.min.css
+cat *.min.css > styles.min.css
