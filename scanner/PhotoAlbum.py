@@ -256,16 +256,16 @@ class Photo(object):
 
 
 	def _video_metadata(self, path, original=True):
-		p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
-		if p == False:
-			self.is_valid = False
-			return
-		info = json.loads(p)
-		for s in info["streams"]:
-			if 'codec_type' in s and s['codec_type'] == 'video':
-				self._attributes["mediaType"] = "video"
-				self._attributes["size"] = (int(s["width"]), int(s["height"]))
-				if "duration" in s:
+                p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
+                if p == False:
+                        self.is_valid = False
+                        return
+                info = json.loads(p)
+                for s in info["streams"]:
+                        if 'codec_type' in s and s['codec_type'] == 'video':
+                                self._attributes["mediaType"] = "video"
+                                self._attributes["size"] = (int(s["width"]), int(s["height"]))
+                                if "duration" in s:
 					self._attributes["duration"] = s["duration"]
 				if "tags" in s and "rotate" in s["tags"]:
 					self._attributes["rotate"] = s["tags"]["rotate"]
@@ -403,7 +403,7 @@ class Photo(object):
 		transcode_path = os.path.join(transcode_path, video_cache(self._path))
                 # get number of cores on the system, and use all minus one
                 num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
-		transcode_cmd = ['-i', original_path, '-c:v', 'libvpx', '-crf', '10', '-b:v', '800k', '-c:a', 'libvorbis', '-f', 'webm', '-threads', num_of_cores, '-loglevel', '0', '-y']
+		transcode_cmd = ['-i', original_path, '-c:v', 'libvpx', '-crf', '10', '-b:v', '4M', '-c:a', 'libvorbis', '-f', 'webm', '-threads', str(num_of_cores), '-loglevel', '0', '-y']
 		filters = []
 		info_string = "%s -> webm" % (os.path.basename(original_path))
 		message("transcoding", info_string)
@@ -411,7 +411,7 @@ class Photo(object):
 			self._video_metadata(transcode_path, False)
 			return
 		if "originalSize" in self._attributes and self._attributes["originalSize"][1] > 720:
-			filters.append("scale=trunc(oh*a/2)*2:min(720\,iw)")
+			filters.append("scale='trunc(oh*a/2)*2:min(720\,iw)'")
 		if "rotate" in self._attributes:
 			if self._attributes["rotate"] == "90":
 				filters.append('transpose=1')
