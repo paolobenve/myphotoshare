@@ -364,8 +364,13 @@ class Photo(object):
                 # get number of cores on the system, and use all minus one
                 num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
                 pool = Pool(processes=num_of_cores)
-                for size in Photo.thumb_sizes:
-                	pool.apply_async(make_photo_thumbs, args = (self, original_path, thumb_path, size))
+                
+                try:
+                        for size in Photo.thumb_sizes:
+                	        pool.apply_async(make_photo_thumbs, args = (self, original_path, thumb_path, size))
+                except:
+                        pool.terminate()
+                        
                 pool.close()
                 pool.join()
 
