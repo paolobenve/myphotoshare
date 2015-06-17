@@ -408,15 +408,34 @@ class Photo(object):
 		transcode_path = os.path.join(transcode_path, video_cache(self._path))
                 # get number of cores on the system, and use all minus one
                 num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
-		transcode_cmd = ['-i', original_path, '-c:v', 'libvpx', '-crf', '10', '-b:v', '4M', '-c:a', 'libvorbis', '-f', 'webm', '-threads', str(num_of_cores), '-loglevel', '0', '-y']
+		transcode_cmd = [	
+					'-i', original_path,		# original file to be encoded
+					'-c:v', 'libx264',		# set h264 as videocodec
+					'-preset', 'slow',		# set specific preset that provides a certain encoding speed to compression ratio
+					'-profile:v', 'baseline',	# set output to specific h264 profile
+					'-level', '3.0',		# sets highest compatibility with target devices
+					'-crf', '20',			# set quality 
+					'-b:v', '4M',			# set videobitrate to 4Mbps
+					'-strict', 'experimental',	# allow native aac codec below
+					'-c:a', 'aac',			# set aac as audiocodec
+					'-ac', '2',			# force two audiochannels
+					'-ab', '160k',			# set audiobitrate to 160Kbps
+					'-maxrate', '10000000',		# limits max rate, will degrade CRF if needed
+					'-bufsize', '10000000',		# define how much the client should buffer
+					'-f', 'mp4',			# fileformat mp4
+					'-threads', str(num_of_cores),	# number of cores (all minus one)
+					'-loglevel', '0',		# don't display anything
+					'-y' 				# don't prompt for overwrite
+				]
 		filters = []
-		info_string = "%s -> webm" % (os.path.basename(original_path))
+		info_string = "%s -> mp4, h264" % (os.path.basename(original_path))
 		message("transcoding", info_string)
 		if os.path.exists(transcode_path) and file_mtime(transcode_path) >= self._attributes["dateTimeFile"]:
 			self._video_metadata(transcode_path, False)
 			return
 		if "originalSize" in self._attributes and self._attributes["originalSize"][1] > 720:
-			filters.append("scale='trunc(oh*a/2)*2:min(720\,iw)'")
+			transcode_cmd.append('-s')
+			transcode_cmd.append('hd720')
 		if "rotate" in self._attributes:
 			if self._attributes["rotate"] == "90":
 				filters.append('transpose=1')

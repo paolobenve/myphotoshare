@@ -44,6 +44,6 @@ def image_cache(path, size, square=False):
 		suffix = str(size)
 	return cache_base(path, True) + "_" + suffix + ".jpg"
 def video_cache(path):
-	return cache_base(path, True) + ".webm"
+	return cache_base(path, True) + ".mp4"
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))

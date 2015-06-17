@@ -148,7 +148,7 @@
 		return "cache/" + hash;
 	};
 	PhotoFloat.videoPath = function(album, video) {
-		return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".webm");
+		return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".mp4");
 	};
 	PhotoFloat.originalPhotoPath = function(album, photo) {
 		return "albums/" + album.path + "/" + photo.name;
