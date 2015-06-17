@@ -384,7 +384,7 @@ class Photo(object):
                         '-an',                  # disable audio
                         '-loglevel', 'quiet',   # don't display anything
                         '-y',                   # don't prompt for overwrite
-                        tfn
+                        tfn                     # temporary file to store extracted image
                 )
 		if p == False:
 			message("couldn't extract video frame", os.path.basename(original_path))
