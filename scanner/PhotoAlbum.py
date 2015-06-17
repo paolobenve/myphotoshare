@@ -388,16 +388,26 @@ class Photo(object):
                 )
 		if p == False:
 			message("couldn't extract video frame", os.path.basename(original_path))
-			os.unlink(tfn)
+			try:
+                                os.unlink(tfn)
+                        except:
+                                pass
 			self.is_valid = False
 			return
 		try:
 			image = Image.open(tfn)
 		except KeyboardInterrupt:
+                        try:
+                                os.unlink(tfn)
+                        except:
+                                pass
 			raise
 		except:
 			message("couldn't open video thumbnail", tfn)
-			os.unlink(tfn)
+			try:
+                                os.unlink(tfn)
+                        except:
+                                pass
 			self.is_valid = False
 			return
 		mirror = image
@@ -411,7 +421,10 @@ class Photo(object):
 		for size in Photo.thumb_sizes:
 			if size[1]:
 				self._thumbnail(mirror, original_path, thumb_path, size[0], size[1])
-		os.unlink(tfn)
+		try:
+                        os.unlink(tfn)
+                except:
+                        pass
 
 	def _video_transcode(self, transcode_path, original_path):
 		transcode_path = os.path.join(transcode_path, video_cache(self._path))
@@ -460,7 +473,7 @@ class Photo(object):
 		if p == False:
 			message("transcoding failure", os.path.basename(original_path))
 			try:
-				os.unlink(transcode_path)
+			        os.unlink(transcode_path)
 			except:
 				pass
 			self.is_valid = False
