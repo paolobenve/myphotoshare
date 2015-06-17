@@ -68,9 +68,25 @@ class TreeWalker:
 				if cached_album:
 					cached_photo = cached_album.photo_from_path(entry)
 					if cached_photo and file_mtime(entry) <= cached_photo.attributes["dateTimeFile"]:
-						message("cache hit", os.path.basename(entry))
-						cache_hit = True
-						photo = cached_photo
+						cache_file = None
+						if "mediaType" in cached_photo.attributes:
+							if cached_photo.attributes["mediaType"] == "video":
+								# if video
+								cache_file = os.path.join(self.cache_path, video_cache(entry))
+							else:
+								# if image
+								cache_file = os.path.join(self.cache_path, image_cache(entry, 1024, False))
+						else:
+							# if image
+							cache_file = os.path.join(self.cache_path, image_cache(entry, 1024, False))
+
+						# at this point we have full path to cache image/video
+						# check if it actually exists
+						if os.path.exists(cache_file):
+							message("cache hit", os.path.basename(entry))
+							cache_hit = True
+							photo = cached_photo
+			
 				if not cache_hit:
 					message("metainfo", os.path.basename(entry))
 					photo = Photo(entry, self.cache_path)
