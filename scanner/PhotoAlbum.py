@@ -376,7 +376,16 @@ class Photo(object):
 
 	def _video_thumbnails(self, thumb_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
-		p = VideoTranscodeWrapper().call('-i', original_path, '-f', 'image2', '-vsync', '1', '-vframes', '1', '-an', '-loglevel', 'quiet', tfn)
+		p = VideoTranscodeWrapper().call(       
+                        '-i', original_path,    # original file to extract thumbs from
+                        '-f', 'image2',         # extract image
+                        '-vsync', '1',          # CRF
+                        '-vframes', '1',        # extrat 1 single frame
+                        '-an',                  # disable audio
+                        '-loglevel', 'quiet',   # don't display anything
+                        '-y',                   # don't prompt for overwrite
+                        tfn
+                )
 		if p == False:
 			message("couldn't extract video frame", os.path.basename(original_path))
 			os.unlink(tfn)
@@ -409,24 +418,24 @@ class Photo(object):
                 # get number of cores on the system, and use all minus one
                 num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [	
-					'-i', original_path,		# original file to be encoded
-					'-c:v', 'libx264',		# set h264 as videocodec
-					'-preset', 'slow',		# set specific preset that provides a certain encoding speed to compression ratio
-					'-profile:v', 'baseline',	# set output to specific h264 profile
-					'-level', '3.0',		# sets highest compatibility with target devices
-					'-crf', '20',			# set quality 
-					'-b:v', '4M',			# set videobitrate to 4Mbps
-					'-strict', 'experimental',	# allow native aac codec below
-					'-c:a', 'aac',			# set aac as audiocodec
-					'-ac', '2',			# force two audiochannels
-					'-ab', '160k',			# set audiobitrate to 160Kbps
-					'-maxrate', '10000000',		# limits max rate, will degrade CRF if needed
-					'-bufsize', '10000000',		# define how much the client should buffer
-					'-f', 'mp4',			# fileformat mp4
-					'-threads', str(num_of_cores),	# number of cores (all minus one)
-					'-loglevel', '0',		# don't display anything
-					'-y' 				# don't prompt for overwrite
-				]
+			'-i', original_path,		# original file to be encoded
+			'-c:v', 'libx264',		# set h264 as videocodec
+			'-preset', 'slow',		# set specific preset that provides a certain encoding speed to compression ratio
+			'-profile:v', 'baseline',	# set output to specific h264 profile
+			'-level', '3.0',		# sets highest compatibility with target devices
+			'-crf', '20',			# set quality 
+			'-b:v', '4M',			# set videobitrate to 4Mbps
+			'-strict', 'experimental',	# allow native aac codec below
+			'-c:a', 'aac',			# set aac as audiocodec
+			'-ac', '2',			# force two audiochannels
+			'-ab', '160k',			# set audiobitrate to 160Kbps
+			'-maxrate', '10000000',		# limits max rate, will degrade CRF if needed
+			'-bufsize', '10000000',		# define how much the client should buffer
+			'-f', 'mp4',			# fileformat mp4
+			'-threads', str(num_of_cores),	# number of cores (all minus one)
+			'-loglevel', 'quiet',		# don't display anything
+			'-y' 				# don't prompt for overwrite
+		]
 		filters = []
 		info_string = "%s -> mp4, h264" % (os.path.basename(original_path))
 		message("transcoding", info_string)
