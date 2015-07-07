@@ -468,17 +468,29 @@ class Photo(object):
 		if len(filters):
 			transcode_cmd.append('-vf')
 			transcode_cmd.append(','.join(filters))
+                
+                tmp_transcode_cmd = transcode_cmd[:]
 		transcode_cmd.append(transcode_path)
 		p = VideoTranscodeWrapper().call(*transcode_cmd)
 		if p == False:
-			message("transcoding failure", os.path.basename(original_path))
-			try:
-			        os.unlink(transcode_path)
-			except:
-				pass
-			self.is_valid = False
-			return
-		self._video_metadata(transcode_path, False)
+                        # add another option, try transcoding again
+                        # done to avoid this error;
+                        # x264 [error]: baseline profile doesn't support 4:2:2
+                        message("transcoding failure, trying yuv420p", os.path.basename(original_path))
+                        tmp_transcode_cmd.append('-pix_fmt')
+                        tmp_transcode_cmd.append('yuv420p')
+                        tmp_transcode_cmd.append(transcode_path)
+                        p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
+                
+                if p == False:
+                        message("transcoding failure", os.path.basename(original_path))
+                        try:
+                                os.unlink(transcode_path)
+                        except:
+                                pass
+                                self.is_valid = False
+                        return
+                self._video_metadata(transcode_path, False)
 
 	@property
 	def name(self):
