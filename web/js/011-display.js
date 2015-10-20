@@ -183,32 +183,31 @@ $(document).ready(function() {
 	}
 	function showPhoto() {
 		var width, height, photoSrc, videoSrc, previousPhoto, nextPhoto, nextLink, text;
-        width = currentPhoto.size[0];
-        height = currentPhoto.size[1];
+		width = currentPhoto.size[0];
+		height = currentPhoto.size[1];
 
 		if (currentPhoto.mediaType == "video") {
-            if (!Modernizr.video) {
-                $('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p><p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p></div>').appendTo('#video-box-inner');
-            }
-            else if (!Modernizr.video.h264) {
-                $('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the H.264 video format!</p></div>').appendTo('#video-box-inner');
-            }
-            else {
-                $(window).unbind("resize", scaleVideo);
-                $(window).unbind("resize", scaleImage);
-                videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
-                $('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
-                    .attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
-                    .attr("src", videoSrc)
-                    .attr("alt", currentPhoto.name)
-                    .on('loadstart', scaleVideo);
-            }
+			$("#video-box-inner").empty();
+			if (!Modernizr.video) {
+				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p><p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p></div>').appendTo('#video-box-inner');
+			}
+			else if (!Modernizr.video.h264) {
+				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the H.264 video format!</p></div>').appendTo('#video-box-inner');
+			} else {
+				$(window).unbind("resize", scaleVideo);
+				$(window).unbind("resize", scaleImage);
+				videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
+				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
+					.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
+					.attr("src", videoSrc)
+					.attr("alt", currentPhoto.name)
+					.on('loadstart', scaleVideo);
+			}
 			$("head").append("<link rel=\"video_src\" href=\"" + videoSrc + "\" />");
 			$("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
 			$("#photo-box").hide();
 			$("#video-box").show();
-		}
-		else {
+		} else {
 			width = currentPhoto.size[0];
 			height = currentPhoto.size[1];
 			if (width > height) {
