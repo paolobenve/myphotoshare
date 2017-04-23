@@ -39,7 +39,10 @@ class Album(object):
 			return self._photos[-1].date
 		return max(self._photos[-1].date, self._albums[-1].date)
 	def __cmp__(self, other):
-		return cmp(self.date, other.date)
+		try:
+			return cmp(self.date, other.date)
+		except TypeError:
+			return 1
 	def add_photo(self, photo):
 		self._photos.append(photo)
 		self._photos_sorted = False
@@ -104,7 +107,8 @@ class Album(object):
 		return None
 	
 class Photo(object):
-	thumb_sizes = [ (75, True), (150, True), (640, False), (800, False), (1024, False) ]
+	#thumb_sizes = [ (75, True), (150, True), (640, False), (800, False), (1024, False), (1600, False) ]
+	thumb_sizes = [ (75, True), (150, True), (1600, False) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
 		self.is_valid = True
@@ -326,7 +330,10 @@ class Photo(object):
 		return correct_date
 
 	def __cmp__(self, other):
-		date_compare = cmp(self.date, other.date)
+		try:
+			date_compare = cmp(self.date, other.date)
+		except TypeError:
+			date_compare = 1
 		if date_compare == 0:
 			return cmp(self.name, other.name)
 		return date_compare

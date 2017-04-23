@@ -13,6 +13,9 @@ class TreeWalker:
 		set_cache_path_base(self.album_path)
 		self.all_albums = list()
 		self.all_photos = list()
+		self.all_photos_by_year = list()
+		self.all_photos_by_month = list()
+		self.all_photos_by_day = list()
 		self.walk(self.album_path)
 		self.big_lists()
 		self.remove_stale()
@@ -36,6 +39,14 @@ class TreeWalker:
 					album = cached_album
 					for photo in album.photos:
 						self.all_photos.append(photo)
+						
+						photo_date = photo.date()
+						year = photo_date.year
+						
+						self.all_photos_by_year.append(photo)
+						self.all_photos_by_month.append(photo)
+						self.all_photos_by_day.append(photo)
+						
 				else:
 					message("partial cache", os.path.basename(path))
 			except KeyboardInterrupt:
