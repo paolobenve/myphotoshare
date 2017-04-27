@@ -147,10 +147,6 @@ Note that the `internal-*` paths must match that of `app.cfg`. This makes use of
 
 Both the scanner and the webpage have a `make deploy` target, and the scanner has a `make scan` target, to automatically deploy assets to a remote server and run the scanner. For use, customize `deployment-config.mk` in the root of the project, and carefully read the `Makefile`s to learn what's happening.
 
-## Mailing List & Suggestions
-
-If you have any suggestions, feel free to contact the photopaolo community via [our mailing list](http://lists.zx2c4.com/mailman/listinfo/photopaolo). We're open to adding all sorts of features and working on integration points with other pieces of software.
-
 ## License
 
 Copyright (C):
