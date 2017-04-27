@@ -1,6 +1,6 @@
 # PhotoFloat
 ### A Web 2.0 Photo Gallery Done Right via Static JSON & Dynamic Javascript
-#### by Jason A. Donenfeld (<Jason@zx2c4.com>)
+#### by Jason A. Donenfeld (<Jason@zx2c4.com>), Paolo Benvenuto (<paolobenve@gmail.com>)
 
 ![Screenshot](screenshot.jpg)
 
@@ -166,6 +166,7 @@ If you have any suggestions, feel free to contact the PhotoFloat community via [
 ## License
 
 Copyright (C) 2010 - 2014 Jason A. Donenfeld. All Rights Reserved.
+Copyright (C) 2017 - 2017 Paolo Benvenuto. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
