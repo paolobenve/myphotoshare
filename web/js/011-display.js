@@ -2,7 +2,7 @@ $(document).ready(function() {
 	
 	/* 
 	 * The display is not yet object oriented. It's procedural code
-	 * broken off into functions. It makes use of libphotofloat's
+	 * broken off into functions. It makes use of libphotopaolo's
 	 * PhotoPaolo class for the network and management logic.
 	 * 
 	 * All of this could potentially be object oriented, but presently

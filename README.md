@@ -100,34 +100,34 @@ FloatApp makes use of `X-Accel-Buffering` and `X-Accel-Redirect` to force the se
     
             include uwsgi_params;
             location /albums/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
             location /cache/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
             location /scan {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
             location /auth {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
             location /photos {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
     
             location /internal-cache/ {
                     internal;
-                    alias /var/www/uwsgi/photofloat/cache/;
+                    alias /var/www/uwsgi/photopaolo/cache/;
             }
             location /internal-albums/ {
                     internal;
-                    alias /var/www/uwsgi/photofloat/albums/;
+                    alias /var/www/uwsgi/photopaolo/albums/;
             }
     }
 
 Note that the `internal-*` paths must match that of `app.cfg`. This makes use of uwsgi for execution:
 
-    metheny ~ # cat /etc/uwsgi.d/photofloat.ini 
+    metheny ~ # cat /etc/uwsgi.d/photopaolo.ini 
     [uwsgi]
     chdir = /var/www/uwsgi/%n
     master = true
@@ -149,7 +149,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Mailing List & Suggestions
 
-If you have any suggestions, feel free to contact the photopaolo community via [our mailing list](http://lists.zx2c4.com/mailman/listinfo/photofloat). We're open to adding all sorts of features and working on integration points with other pieces of software.
+If you have any suggestions, feel free to contact the photopaolo community via [our mailing list](http://lists.zx2c4.com/mailman/listinfo/photopaolo). We're open to adding all sorts of features and working on integration points with other pieces of software.
 
 ## License
 
