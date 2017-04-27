@@ -152,6 +152,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 Copyright (C):
 * 2010 - 2014 Jason A. Donenfeld
 * 2017 - 2017 Paolo Benvenuto
+
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or
