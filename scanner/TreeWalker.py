@@ -78,7 +78,7 @@ class TreeWalker:
 				cache_hit = False
 				if cached_album:
 					cached_photo = cached_album.photo_from_path(entry)
-					if cached_photo and file_mtime(entry) <= cached_photo.attributes["dateTimeFile"]:
+					if cached_photo and file_mtime(entry) <= cached_photo.attributes["dateTimeFile"] and file_mtime(path) <= cached_photo.attributes["dateTimeFile"]:
 						message("cache hit", os.path.basename(entry))
 						cache_hit = True
 						photo = cached_photo
