@@ -1,18 +1,18 @@
-# PhotoFloat
+# photopaolo
 ### A Web 2.0 Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Paolo Benvenuto (<paolobenve@gmail.com>)
 
 ![Screenshot](screenshot.jpg)
 
-PhotoFloat is an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
+photopaolo is a Jason A. Donenfeld's Photofloat fork. It's an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
 [Check out a demo!](http://photos.jasondonenfeld.com/#santa_fe_and_telluride_8.19.10-8.27.10/western_202.jpg)
 
 ## How It Works
 
-PhotoFloat consists of two segments – a Python script and a JavaScript application.
+photopaolo consists of two segments – a Python script and a JavaScript application.
 
-The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. The scanner extracts metadata from EXIF tags in JPEG photos. PhotoFloat is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be very fast if there are few or zero changes since the last time you ran it.
+The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. The scanner extracts metadata from EXIF tags in JPEG photos. photopaolo is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be very fast if there are few or zero changes since the last time you ran it.
 
 The JavaScript application consists of a single `index.html` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface. Features include:
 
@@ -39,20 +39,8 @@ It is, essentially, the slickest and fastest, most minimal but still well-featur
 
 #### Download the source code from the git repository:
 
-    $ git clone git://git.zx2c4.com/PhotoFloat
-    $ cd PhotoFloat
-
-#### Change or delete the Google Analytics ID tracker:
-
-To delete:
-
-    $ rm web/js/999-googletracker.js
-
-To change:
-
-    $ vim web/js/999-googletracker.js
-
-Modify the part that says UA-XXXXXX-X and put your own in there.
+    $ git clone https://github.com/paolobenve/photopaolo.git
+    $ cd photopaolo
 
 #### Tweak the index.html page to have a custom title or copyright notice.
 
@@ -83,7 +71,7 @@ After it finishes, you will be all set. Simply have your web server serve pages 
 
 The JavaScript application uses a very simple API to determine if a photo can be viewed or not. If a JSON file returns error `403`, the album is hidden from view. To authenticate, `POST` a username and a password to `/auth`. If unsuccessful, `403` is returned. If successful, `200` is returned, and the previously denied json files may now be requested. If an unauthorized album is directly requested in a URL when the page loads, an authentication box is shown.
 
-PhotoFloat ships with an optional server side component called FloatApp to faciliate this, which lives in `scanner/floatapp`. It is a simple Flask-based Python web application.
+photopaolo ships with an optional server side component called FloatApp to faciliate this, which lives in `scanner/floatapp`. It is a simple Flask-based Python web application.
 
 #### Edit the app.cfg configuration file:
 
@@ -112,34 +100,34 @@ FloatApp makes use of `X-Accel-Buffering` and `X-Accel-Redirect` to force the se
     
             include uwsgi_params;
             location /albums/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
             location /cache/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
             location /scan {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
             location /auth {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
             location /photos {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloat.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
             }
     
             location /internal-cache/ {
                     internal;
-                    alias /var/www/uwsgi/photofloat/cache/;
+                    alias /var/www/uwsgi/photopaolo/cache/;
             }
             location /internal-albums/ {
                     internal;
-                    alias /var/www/uwsgi/photofloat/albums/;
+                    alias /var/www/uwsgi/photopaolo/albums/;
             }
     }
 
 Note that the `internal-*` paths must match that of `app.cfg`. This makes use of uwsgi for execution:
 
-    metheny ~ # cat /etc/uwsgi.d/photofloat.ini 
+    metheny ~ # cat /etc/uwsgi.d/photopaolo.ini 
     [uwsgi]
     chdir = /var/www/uwsgi/%n
     master = true
@@ -159,13 +147,13 @@ Note that the `internal-*` paths must match that of `app.cfg`. This makes use of
 
 Both the scanner and the webpage have a `make deploy` target, and the scanner has a `make scan` target, to automatically deploy assets to a remote server and run the scanner. For use, customize `deployment-config.mk` in the root of the project, and carefully read the `Makefile`s to learn what's happening.
 
-## Mailing List & Suggestions
-
-If you have any suggestions, feel free to contact the PhotoFloat community via [our mailing list](http://lists.zx2c4.com/mailman/listinfo/photofloat). We're open to adding all sorts of features and working on integration points with other pieces of software.
-
 ## License
 
-Copyright (C) 2010 - 2014 Jason A. Donenfeld, 2017 - 2017 Paolo Benvenuto. All Rights Reserved.
+Copyright (C):
+* 2010 - 2014 Jason A. Donenfeld
+* 2017 - 2017 Paolo Benvenuto
+
+All Rights Reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

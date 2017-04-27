@@ -2,8 +2,8 @@ $(document).ready(function() {
 	
 	/* 
 	 * The display is not yet object oriented. It's procedural code
-	 * broken off into functions. It makes use of libphotofloat's
-	 * PhotoFloat class for the network and management logic.
+	 * broken off into functions. It makes use of libphotopaolo's
+	 * PhotoPaolo class for the network and management logic.
 	 * 
 	 * All of this could potentially be object oriented, but presently
 	 * it should be pretty readable and sufficient. The only thing to
@@ -26,7 +26,7 @@ $(document).ready(function() {
 	var previousAlbum = null;
 	var previousPhoto = null;
 	var originalTitle = document.title;
-	var photoFloat = new PhotoFloat();
+	var photoPaolo = new PhotoPaolo();
 	var maxSize = 1600;
 	
 	
@@ -41,14 +41,14 @@ $(document).ready(function() {
 			components.unshift(originalTitle);
 		}
 		if (currentPhoto !== null)
-			documentTitle += photoFloat.trimExtension(currentPhoto.name);
+			documentTitle += photoPaolo.trimExtension(currentPhoto.name);
 		for (i = 0; i < components.length; ++i) {
 			if (i || currentPhoto !== null)
 				documentTitle += " \u00ab ";
 			if (i)
 				last += "/" + components[i];
 			if (i < components.length - 1 || currentPhoto !== null)
-				title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+				title += "<a href=\"#!/" + (i ? photoPaolo.cachePath(last.substring(1)) : "") + "\">";
 			title += components[i];
 			documentTitle += components[components.length - 1 - i];
 			if (i < components.length - 1 || currentPhoto !== null) {
@@ -57,7 +57,7 @@ $(document).ready(function() {
 			}
 		}
 		if (currentPhoto !== null)
-			title += photoFloat.trimExtension(currentPhoto.name);
+			title += photoPaolo.trimExtension(currentPhoto.name);
 		$("#title").html(title);
 		document.title = documentTitle;
 	}
@@ -96,8 +96,8 @@ $(document).ready(function() {
 		if (populate) {
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
-				link = $("<a href=\"#!/" + photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
-				image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
+				link = $("<a href=\"#!/" + photoPaolo.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
+				image = $("<img title=\"" + photoPaolo.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoPaolo.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoPaolo.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);
 				photos.push(link);
@@ -115,13 +115,13 @@ $(document).ready(function() {
 			
 			subalbums = [];
 			for (i = currentAlbum.albums.length - 1; i >= 0; --i) {
-				link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
+				link = $("<a href=\"#!/" + photoPaolo.albumHash(currentAlbum.albums[i]) + "\"></a>");
 				image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" + currentAlbum.albums[i].path + "</div>");
 				link.append(image);
 				subalbums.push(link);
 				(function(theContainer, theAlbum, theImage, theLink) {
-					photoFloat.albumPhoto(theAlbum, function(album, photo) {
-						theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, 150, true) + ")");
+					photoPaolo.albumPhoto(theAlbum, function(album, photo) {
+						theImage.css("background-image", "url(" + photoPaolo.photoPath(album, photo, 150, true) + ")");
 					}, function error() {
 						theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 						theLink.remove();
@@ -176,7 +176,7 @@ $(document).ready(function() {
 			height = maxSize;
 		}
 		$(window).unbind("resize", scaleImage);
-		photoSrc = photoFloat.photoPath(currentAlbum, currentPhoto, maxSize, false);
+		photoSrc = photoPaolo.photoPath(currentAlbum, currentPhoto, maxSize, false);
 		$("#photo")
 			.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
 			.attr("src", photoSrc)
@@ -191,13 +191,13 @@ $(document).ready(function() {
 		nextPhoto = currentAlbum.photos[
 			(currentPhotoIndex + 1 >= currentAlbum.photos.length) ? 0 : (currentPhotoIndex + 1)
 		];
-		$.preloadImages(photoFloat.photoPath(currentAlbum, nextPhoto, maxSize, false), photoFloat.photoPath(currentAlbum, previousPhoto, maxSize, false));
+		$.preloadImages(photoPaolo.photoPath(currentAlbum, nextPhoto, maxSize, false), photoPaolo.photoPath(currentAlbum, previousPhoto, maxSize, false));
 		
-		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextPhoto);
+		nextLink = "#!/" + photoPaolo.photoHash(currentAlbum, nextPhoto);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
-		$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousPhoto));
-		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentAlbum, currentPhoto));
+		$("#back").attr("href", "#!/" + photoPaolo.photoHash(currentAlbum, previousPhoto));
+		$("#original-link").attr("target", "_blank").attr("href", photoPaolo.originalPhotoPath(currentAlbum, currentPhoto));
 
 		text = "<table>";
 		if (typeof currentPhoto.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentPhoto.make + "</td></tr>";
@@ -267,11 +267,7 @@ $(document).ready(function() {
 	$(window).hashchange(function() {
 		$("#loading").show();
 		$("link[rel=image_src]").remove();
-		if (location.search.indexOf("?_escaped_fragment_=") === 0) {
-			location.hash = location.search.substring(20);
-			location.search = "";
-		}
-		photoFloat.parseHash(location.hash, hashParsed, die);
+		photoPaolo.parseHash(location.hash, hashParsed, die);
 	});
 	$(window).hashchange();
 	$(document).keydown(function(e){
@@ -339,7 +335,7 @@ $(document).ready(function() {
 	$("#auth-form").submit(function() {
 		var password = $("#password");
 		password.css("background-color", "rgb(128, 128, 200)");
-		photoFloat.authenticate(password.val(), function(success) {
+		photoPaolo.authenticate(password.val(), function(success) {
 			password.val("");
 			if (success) {
 				password.css("background-color", "rgb(200, 200, 200)");

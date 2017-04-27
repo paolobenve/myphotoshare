@@ -231,7 +231,7 @@ class Photo(object):
 		
 	def _thumbnail(self, image, thumb_path, original_path, size, square=False):
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
-		info_string = "%s -> %spx" % (os.path.basename(original_path), str(size))
+		info_string = "  -> %spx" % (str(size))
 		if square:
 			info_string += ", square"
 		message("thumbing", info_string)
