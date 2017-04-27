@@ -299,8 +299,10 @@ class Photo(object):
 		elif self._orientation == 8:
 			# Rotation 90
 			mirror = image.transpose(Image.ROTATE_90)
+		next_level()
 		for size in Photo.thumb_sizes:
 			self._thumbnail(mirror, thumb_path, original_path, size[0], size[1])
+		back_level()
 	@property
 	def name(self):
 		return os.path.basename(self._path)
