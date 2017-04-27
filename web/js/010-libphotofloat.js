@@ -1,11 +1,11 @@
 (function() {
 	/* constructor */
-	function PhotoFloat() {
+	function PhotoPaolo() {
 		this.albumCache = [];
 	}
 	
 	/* public member functions */
-	PhotoFloat.prototype.album = function(subalbum, callback, error) {
+	PhotoPaolo.prototype.album = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
 		if (typeof subalbum.photos !== "undefined" && subalbum.photos !== null) {
 			callback(subalbum);
@@ -14,7 +14,7 @@
 		if (Object.prototype.toString.call(subalbum).slice(8, -1) === "String")
 			cacheKey = subalbum;
 		else
-			cacheKey = PhotoFloat.cachePath(subalbum.parent.path + "/" + subalbum.path);
+			cacheKey = PhotoPaolo.cachePath(subalbum.parent.path + "/" + subalbum.path);
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
 			return;
@@ -41,7 +41,7 @@
 		}
 		$.ajax(ajaxOptions);
 	};
-	PhotoFloat.prototype.albumPhoto = function(subalbum, callback, error) {
+	PhotoPaolo.prototype.albumPhoto = function(subalbum, callback, error) {
 		var nextAlbum, self;
 		self = this;
 		nextAlbum = function(album) {
@@ -57,12 +57,12 @@
 		else
 			this.album(subalbum, nextAlbum, error);
 	};
-	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
+	PhotoPaolo.prototype.parseHash = function(hash, callback, error) {
 		var index, album, photo;
-		hash = PhotoFloat.cleanHash(hash);
+		hash = PhotoPaolo.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (!hash.length) {
-			album = PhotoFloat.cachePath("root");
+			album = PhotoPaolo.cachePath("root");
 			photo = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
 			photo = hash.substring(index + 1);
@@ -75,7 +75,7 @@
 			var i = -1;
 			if (photo !== null) {
 				for (i = 0; i < theAlbum.photos.length; ++i) {
-					if (PhotoFloat.cachePath(theAlbum.photos[i].name) === photo) {
+					if (PhotoPaolo.cachePath(theAlbum.photos[i].name) === photo) {
 						photo = theAlbum.photos[i];
 						break;
 					}
@@ -88,7 +88,7 @@
 			callback(theAlbum, photo, i);
 		}, error);
 	};
-	PhotoFloat.prototype.authenticate = function(password, result) {
+	PhotoPaolo.prototype.authenticate = function(password, result) {
 		$.ajax({
 			type: "GET",
 			dataType: "text",
@@ -103,7 +103,7 @@
 	};
 	
 	/* static functions */
-	PhotoFloat.cachePath = function(path) {
+	PhotoPaolo.cachePath = function(path) {
 		if (path === "")
 			return "root";
 		if (path.charAt(0) === "/")
@@ -128,35 +128,35 @@
 			path = path.replace(/__/g, "_");
 		return path;
 	};
-	PhotoFloat.photoHash = function(album, photo) {
-		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(photo.name);
+	PhotoPaolo.photoHash = function(album, photo) {
+		return PhotoPaolo.albumHash(album) + "/" + PhotoPaolo.cachePath(photo.name);
 	};
-	PhotoFloat.albumHash = function(album) {
+	PhotoPaolo.albumHash = function(album) {
 		if (typeof album.photos !== "undefined" && album.photos !== null)
-			return PhotoFloat.cachePath(album.path);
-		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
+			return PhotoPaolo.cachePath(album.path);
+		return PhotoPaolo.cachePath(album.parent.path + "/" + album.path);
 	};
-	PhotoFloat.photoPath = function(album, photo, size, square) {
+	PhotoPaolo.photoPath = function(album, photo, size, square) {
 		var suffix, hash;
 		if (square)
 			suffix = size.toString() + "s";
 		else
 			suffix = size.toString();
-		hash = PhotoFloat.cachePath(PhotoFloat.photoHash(album, photo) + "_" + suffix + ".jpg");
+		hash = PhotoPaolo.cachePath(PhotoPaolo.photoHash(album, photo) + "_" + suffix + ".jpg");
 		if (hash.indexOf("root-") === 0)
 			hash = hash.substring(5);
 		return "cache/" + hash;
 	};
-	PhotoFloat.originalPhotoPath = function(album, photo) {
+	PhotoPaolo.originalPhotoPath = function(album, photo) {
 		return "albums/" + album.path + "/" + photo.name;
 	};
-	PhotoFloat.trimExtension = function(name) {
+	PhotoPaolo.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
 		if (index !== -1)
 			return name.substring(0, index);
 		return name;
 	};
-	PhotoFloat.cleanHash = function(hash) {
+	PhotoPaolo.cleanHash = function(hash) {
 		while (hash.length) {
 			if (hash.charAt(0) === "#")
 				hash = hash.substring(1);
@@ -175,14 +175,14 @@
 	};
 	
 	/* make static methods callable as member functions */
-	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
-	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
-	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
-	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
-	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;
-	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
-	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
+	PhotoPaolo.prototype.cachePath = PhotoPaolo.cachePath;
+	PhotoPaolo.prototype.photoHash = PhotoPaolo.photoHash;
+	PhotoPaolo.prototype.albumHash = PhotoPaolo.albumHash;
+	PhotoPaolo.prototype.photoPath = PhotoPaolo.photoPath;
+	PhotoPaolo.prototype.originalPhotoPath = PhotoPaolo.originalPhotoPath;
+	PhotoPaolo.prototype.trimExtension = PhotoPaolo.trimExtension;
+	PhotoPaolo.prototype.cleanHash = PhotoPaolo.cleanHash;
 	
 	/* expose class globally */
-	window.PhotoFloat = PhotoFloat;
+	window.PhotoPaolo = PhotoPaolo;
 }());
