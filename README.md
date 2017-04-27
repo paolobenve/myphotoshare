@@ -165,8 +165,7 @@ If you have any suggestions, feel free to contact the PhotoFloat community via [
 
 ## License
 
-Copyright (C) 2010 - 2014 Jason A. Donenfeld. All Rights Reserved.
-Copyright (C) 2017 - 2017 Paolo Benvenuto. All Rights Reserved.
+Copyright (C) 2010 - 2014 Jason A. Donenfeld, 2017 - 2017 Paolo Benvenuto. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
