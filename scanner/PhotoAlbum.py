@@ -11,21 +11,19 @@ class Album(object):
 	def __init__(self, path):
 		self._path = trim_base(path)
 		self._photos = list()
-		self._albums = list()
-		self._photos_by_year = {}
-		self._photos_by_month = {}
-		self._photos_by_day = {}
-		self._albums_by_year = {}
-		self._albums_by_month = {}
-		self._albums_by_day = {}
+		self._albums_by_tree = list()
+		self._albums_by_date = list()
 		self._photos_sorted = True
 		self._albums_sorted = True
 	@property
 	def photos(self):
 		return self._photos
 	@property
-	def albums(self):
-		return self._albums
+	def albums_by_tree(self):
+		return self._albums_by_tree
+	@property
+	def albums_by_date(self):
+		return self._albums_by_date
 	@property
 	def path(self):
 		return self._path
@@ -37,13 +35,13 @@ class Album(object):
 	@property
 	def date(self):
 		self._sort()
-		if len(self._photos) == 0 and len(self._albums) == 0:
+		if len(self._photos) == 0 and len(self._albums_by_tree) == 0:
 			return datetime(1900, 1, 1)
 		elif len(self._photos) == 0:
-			return self._albums[-1].date
-		elif len(self._albums) == 0:
+			return self._albums_by_tree[-1].date
+		elif len(self._albums_by_tree) == 0:
 			return self._photos[-1].date
-		return max(self._photos[-1].date, self._albums[-1].date)
+		return max(self._photos[-1].date, self._albums_by_tree[-1].date)
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
@@ -51,42 +49,25 @@ class Album(object):
 			return 1
 	def add_photo(self, photo):
 		self._photos.append(photo)
-		
-		# build the structures with the photos by date
-		photo_date = photo.date
-		year = photo_date.year
-		if not year in self._photos_by_year.keys():
-			self._photos_by_year[year] = list()
-		self._photos_by_year[year].append(photo)
-		month = str(photo_date.month).zfill(2)
-		year_month = str(year) + " " + month
-		if not year_month in self._photos_by_month.keys():
-			self._photos_by_month[year_month] = list()
-		self._photos_by_month[year_month].append(photo)
-		day = str(photo_date.day).zfill(2)
-		year_month_day = year_month + " " + day
-		if not year_month in self._photos_by_day.keys():
-			self._photos_by_day[year_month_day] = list()
-		self._photos_by_day[year_month_day].append(photo)
-		
 		self._photos_sorted = False
 	def add_album(self, album):
-		self._albums.append(album)
+		self._albums_by_tree.append(album)
 		self._albums_sorted = False
 	def _sort(self):
 		if not self._photos_sorted:
 			self._photos.sort()
 			self._photos_sorted = True
 		if not self._albums_sorted:
-			self._albums.sort()
+			self._albums_by_tree.sort()
+			self._albums_by_date.sort()
 			self._albums_sorted = True
 	@property
 	def empty(self):
 		if len(self._photos) != 0:
 			return False
-		if len(self._albums) == 0:
+		if len(self._albums_by_tree) == 0:
 			return True
-		for album in self._albums:
+		for album in self._albums_by_tree:
 			if not album.empty:
 				return False
 		return True
@@ -116,7 +97,7 @@ class Album(object):
 		self._sort()
 		subalbums = []
 		if cripple:
-			for sub in self._albums:
+			for sub in self._albums_by_tree:
 				if not sub.empty:
 					subalbums.append({ "path": trim_base_custom(sub.path, self._path), "date": sub.date })
 		else:
@@ -351,7 +332,21 @@ class Photo(object):
 		else:
 			correct_date = self._attributes["dateTimeFile"]
 		return correct_date
-
+	@property
+	def year(self):
+		return self.date.year
+	@property
+	def month(self):
+		return self.date.month
+	@property
+	def day(self):
+		return self.date.day
+	@property
+	def year_month(self):
+		return self.year + " " + self.month
+	@property
+	def year_month_day(self):
+		return self.year_month + " " + self.day
 	def __cmp__(self, other):
 		try:
 			date_compare = cmp(self.date, other.date)

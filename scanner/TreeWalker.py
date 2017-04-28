@@ -6,24 +6,28 @@ from PhotoAlbum import Photo, Album, PhotoAlbumEncoder
 from CachePath import *
 import json
 import pprint
+import collections
 
 class TreeWalker:
 	def __init__(self, album_path, cache_path):
 		self.album_path = os.path.abspath(album_path).decode(sys.getfilesystemencoding())
 		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
 		set_cache_path_base(self.album_path)
-		self.all_albums = list()
-		self.all_albums_by_year = {}
-		self.all_albums_by_month = {}
-		self.all_albums_by_day = {}
+		self.all_albums_by_tree = list()
+		self.all_albums_by_date = {}
 		self.all_photos = list()
-		self.all_photos_by_year = {}
-		self.all_photos_by_month = {}
-		self.all_photos_by_day = {}
 		self.walk(self.album_path)
 		self.big_lists()
 		self.remove_stale()
 		message("complete", "")
+	def add_photo_to_date_album(self, photo):
+		if not photo.year in self.all_albums_by_date.keys():
+			self.all_albums_by_date[photo.year] = {}
+		if not photo.month in self.all_albums_by_date[photo.year].keys():
+			self.all_albums_by_date[photo.year][photo.month] = {}
+		if not photo.day in self.all_albums_by_date[photo.year][photo.month].keys():
+			self.all_albums_by_date[photo.year][photo.month][photo.day] = list()
+		self.all_albums_by_date[photo.year][photo.month][photo.day].append(photo)
 	def walk(self, path):
 		next_level()
 		if not os.access(path, os.R_OK | os.X_OK):
@@ -43,27 +47,9 @@ class TreeWalker:
 					album = cached_album
 					for photo in album.photos:
 						self.all_photos.append(photo)
-						
-						# build the structures with the photos by date
-						photo_date = photo.date
-						year = photo_date.year
-						if not year in self.all_photos_by_year.keys():
-							self.all_photos_by_year[year] = list()
-						self.all_photos_by_year[year].append(photo)
-						month = str(photo_date.month).zfill(2)
-						year_month = str(year) + " " + month
-						if not year_month in self.all_photos_by_month.keys():
-							self.all_photos_by_month[year_month] = list()
-						self.all_photos_by_month[year_month].append(photo)
-						day = str(photo_date.day).zfill(2)
-						year_month_day = year_month + " " + day
-						if not year_month in self.all_photos_by_day.keys():
-							self.all_photos_by_day[year_month_day] = list()
-						self.all_photos_by_day[year_month_day].append(photo)
+						self.add_photo_to_date_album(photo)
 				else:
 					message("partial cache", os.path.basename(path))
-			except SystemExit:
-				sys.exit("date, year = " + photo.date())
 			except KeyboardInterrupt:
 				raise
 			except (ValueError, AttributeError) as e:
@@ -102,51 +88,15 @@ class TreeWalker:
 					photo = Photo(entry, self.cache_path)
 				if photo.is_valid:
 					self.all_photos.append(photo)
-					#message ("...", photo.date.year)
-					# build the structures with the photos by date
-					photo_date = photo.date
-					year = photo_date.year
-					if not year in self.all_photos_by_year.keys():
-						self.all_photos_by_year[year] = list()
-					self.all_photos_by_year[year].append(photo)
-					month = str(photo_date.month).zfill(2)
-					year_month = str(year) + " " + month
-					if not year_month in self.all_photos_by_month.keys():
-						self.all_photos_by_month[year_month] = list()
-					self.all_photos_by_month[year_month].append(photo)
-					day = str(photo_date.day).zfill(2)
-					year_month_day = year_month + " " + day
-					if not year_month in self.all_photos_by_day.keys():
-						self.all_photos_by_day[year_month_day] = list()
-					self.all_photos_by_day[year_month_day].append(photo)
-					#message ("......", pprint.saferepr(self.all_photos_by_day[year_month_day]))
-					
 					album.add_photo(photo)
+					self.add_photo_to_date_album(photo)
 				else:
 					message("unreadable", os.path.basename(entry))
 				back_level()
 		if not album.empty:
 			message("caching", os.path.basename(path))
 			album.cache(self.cache_path)
-			self.all_albums.append(album)
-			
-			photo_date = photo.date
-			year = photo_date.year
-			message ("year", year)
-			if not year in self.all_albums_by_year.keys():
-				self.all_albums_by_year[year] = list()
-			self.all_albums_by_year[year].append(photo)
-			month = str(photo_date.month).zfill(2)
-			year_month = str(year) + " " + month
-			if not year_month in self.all_albums_by_month.keys():
-				self.all_albums_by_month[year_month] = list()
-			self.all_albums_by_month[year_month].append(photo)
-			day = str(photo_date.day).zfill(2)
-			year_month_day = year_month + " " + day
-			if not year_month in self.all_albums_by_day.keys():
-				self.all_albums_by_day[year_month_day] = list()
-			self.all_albums_by_day[year_month_day].append(photo)
-			
+			self.all_albums_by_tree.append(album)
 		else:
 			message("empty", os.path.basename(path))
 		back_level()
@@ -163,7 +113,7 @@ class TreeWalker:
 	def remove_stale(self):
 		message("cleanup", "building stale list")
 		all_cache_entries = { "all_photos.json": True, "latest_photos.json": True }
-		for album in self.all_albums:
+		for album in self.all_albums_by_tree:
 			all_cache_entries[album.cache_path] = True
 		for photo in self.all_photos:
 			for entry in photo.image_caches:
