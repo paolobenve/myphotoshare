@@ -12,6 +12,12 @@ class Album(object):
 		self._path = trim_base(path)
 		self._photos = list()
 		self._albums = list()
+		self._photos_by_year = {}
+		self._photos_by_month = {}
+		self._photos_by_day = {}
+		self._albums_by_year = {}
+		self._albums_by_month = {}
+		self._albums_by_day = {}
 		self._photos_sorted = True
 		self._albums_sorted = True
 	@property
@@ -45,6 +51,24 @@ class Album(object):
 			return 1
 	def add_photo(self, photo):
 		self._photos.append(photo)
+		
+		# build the structures with the photos by date
+		photo_date = photo.date
+		year = photo_date.year
+		if not year in self._photos_by_year.keys():
+			self._photos_by_year[year] = list()
+		self._photos_by_year[year].append(photo)
+		month = str(photo_date.month).zfill(2)
+		year_month = str(year) + " " + month
+		if not year_month in self._photos_by_month.keys():
+			self._photos_by_month[year_month] = list()
+		self._photos_by_month[year_month].append(photo)
+		day = str(photo_date.day).zfill(2)
+		year_month_day = year_month + " " + day
+		if not year_month in self._photos_by_day.keys():
+			self._photos_by_day[year_month_day] = list()
+		self._photos_by_day[year_month_day].append(photo)
+		
 		self._photos_sorted = False
 	def add_album(self, album):
 		self._albums.append(album)
