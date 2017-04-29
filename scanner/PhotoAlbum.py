@@ -12,7 +12,6 @@ class Album(object):
 		self._path = trim_base(path)
 		self._photos = list()
 		self._albums_by_tree = list()
-		self._albums_by_date = list()
 		self._photos_sorted = True
 		self._albums_sorted = True
 	@property
@@ -21,9 +20,6 @@ class Album(object):
 	@property
 	def albums_by_tree(self):
 		return self._albums_by_tree
-	@property
-	def albums_by_date(self):
-		return self._albums_by_date
 	@property
 	def path(self):
 		return self._path
@@ -59,7 +55,6 @@ class Album(object):
 			self._photos_sorted = True
 		if not self._albums_sorted:
 			self._albums_by_tree.sort()
-			self._albums_by_date.sort()
 			self._albums_sorted = True
 	@property
 	def empty(self):

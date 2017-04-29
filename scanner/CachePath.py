@@ -33,8 +33,12 @@ def cache_base(path):
 	if len(path) == 0:
 		path = "root"
 	return path
+def cache_base_by_date(path):
+	return "___" + cache_base(path)
 def json_cache(path):
 	return cache_base(path) + ".json"
+def json_cache_by_date(path):
+	return cache_base_by_date(json_cache(path))
 def image_cache(path, size, square=False):
 	if square:
 		suffix = str(size) + "s"

@@ -18,8 +18,26 @@ class TreeWalker:
 		self.all_photos = list()
 		self.walk(self.album_path)
 		self.big_lists()
+		self.generate_date_album()
 		self.remove_stale()
 		message("complete", "")
+	def generate_date_album(self)
+		root_album = Album(self.album_path)
+		for year, months in all_albums_by_date.iteritems():
+			year_path = self.album_path + "-" + year
+			root_album.add_album(year_path)
+			year_album = Album(year_path)
+			for month, days in all_albums_by_date[year].iteritems():
+				month_path = year_path + "-" + month
+				year_album.add_album(month_path)
+				month_album = Album(monthy_path)
+				for day, photos in all_albums_by_date[year][month].iteritems():
+					day_path = month_path + "-" + day
+					month_album.add_album(day_path)
+					day_album = Album(day_path)
+					for photo in photos:
+						day_album.add_album(photo)
+					
 	def add_photo_to_date_album(self, photo):
 		if not photo.year in self.all_albums_by_date.keys():
 			self.all_albums_by_date[photo.year] = {}
