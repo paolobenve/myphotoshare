@@ -11,7 +11,7 @@ class Album(object):
 	def __init__(self, path):
 		self._path = trim_base(path)
 		self._photos = list()
-		self._albums_by_tree = list()
+		self._albums = list()
 		self._photos_sorted = True
 		self._albums_sorted = True
 	@property
@@ -19,7 +19,7 @@ class Album(object):
 		return self._photos
 	@property
 	def albums_by_tree(self):
-		return self._albums_by_tree
+		return self._albums
 	@property
 	def path(self):
 		return self._path
@@ -31,13 +31,13 @@ class Album(object):
 	@property
 	def date(self):
 		self._sort()
-		if len(self._photos) == 0 and len(self._albums_by_tree) == 0:
+		if len(self._photos) == 0 and len(self._albums) == 0:
 			return datetime(1900, 1, 1)
 		elif len(self._photos) == 0:
-			return self._albums_by_tree[-1].date
-		elif len(self._albums_by_tree) == 0:
+			return self._albums[-1].date
+		elif len(self._albums) == 0:
 			return self._photos[-1].date
-		return max(self._photos[-1].date, self._albums_by_tree[-1].date)
+		return max(self._photos[-1].date, self._albums[-1].date)
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
@@ -47,22 +47,22 @@ class Album(object):
 		self._photos.append(photo)
 		self._photos_sorted = False
 	def add_album(self, album):
-		self._albums_by_tree.append(album)
+		self._albums.append(album)
 		self._albums_sorted = False
 	def _sort(self):
 		if not self._photos_sorted:
 			self._photos.sort()
 			self._photos_sorted = True
 		if not self._albums_sorted:
-			self._albums_by_tree.sort()
+			self._albums.sort()
 			self._albums_sorted = True
 	@property
 	def empty(self):
 		if len(self._photos) != 0:
 			return False
-		if len(self._albums_by_tree) == 0:
+		if len(self._albums) == 0:
 			return True
-		for album in self._albums_by_tree:
+		for album in self._albums:
 			if not album.empty:
 				return False
 		return True
@@ -92,7 +92,7 @@ class Album(object):
 		self._sort()
 		subalbums = []
 		if cripple:
-			for sub in self._albums_by_tree:
+			for sub in self._albums:
 				if not sub.empty:
 					subalbums.append({ "path": trim_base_custom(sub.path, self._path), "date": sub.date })
 		else:
