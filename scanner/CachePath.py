@@ -26,7 +26,6 @@ def trim_base_custom(path, base):
 def trim_base(path):
 	return trim_base_custom(path, trim_base.base)
 def cache_base(path):
-	message("==", path)
 	path = trim_base(path).replace('/', '-').replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 	while path.find("--") != -1:
 		path = path.replace("--", "-")
@@ -34,10 +33,8 @@ def cache_base(path):
 		path = path.replace("__", "_")
 	if len(path) == 0:
 		path = "root"
-	message("==>>", path)
 	return path
 def json_name(path, by_date = False):
-	message("json_name: path", path)
 	if False and len(path) < 10:
 		return path + ".json"
 	else:

@@ -148,7 +148,8 @@
 		return "cache/" + hash;
 	};
 	PhotoPaolo.originalPhotoPath = function(album, photo) {
-		return "albums/" + album.path + "/" + photo.name;
+		//return "albums/" + album.path + "/" + photo.name;
+		return photo.albumName;
 	};
 	PhotoPaolo.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");

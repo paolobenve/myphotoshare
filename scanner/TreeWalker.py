@@ -72,10 +72,6 @@ class TreeWalker:
 		if not by_date_album.empty:
 			#message("cache_path1", self.cache_path + "   " + os.path.basename(self.cache_path))
 			by_date_album.cache(self.cache_path, by_date)
-		message("by date path", by_date_path)
-		message("by date path", year_path)
-		message("by date path", month_path)
-		message("by date path", day_path)
 		return by_date_album
 	def add_photo_to_tree_by_date(self, photo):
 		# add the given photo to a temporary structure where photos are organazide by year, month, date
@@ -88,12 +84,9 @@ class TreeWalker:
 		self.tree_by_date[photo.year][photo.month][photo.day].append(photo)
 	def walk(self, path):
 		trimmed_path = trim_base_custom(path, self.album_path)
-		message("untrimmed", path)
-		message("trimmed", trimmed_path)
 		path_with_marker = os.path.join(self.album_path, "_folders")
 		if trimmed_path:
 			path_with_marker = os.path.join(path_with_marker, trimmed_path)
-		message("path - marked", path + " --- " + path_with_marker)
 		next_level()
 		if not os.access(path, os.R_OK | os.X_OK):
 			message("access denied", os.path.basename(path))

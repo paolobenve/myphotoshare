@@ -11,7 +11,6 @@ class Album(object):
 	# type may be: "origin" for the top root of folders and date virtual folders, "folders" for physical folders albums, "date" for date albums
 	def __init__(self, path, album_type = "folders"):
 		self._path = trim_base(path)
-		message("pathhhhh", self._path)
 		self._photos = list()
 		self._albums = list()
 		self._photos_sorted = True
@@ -94,6 +93,13 @@ class Album(object):
 				album.add_album(Album.from_dict(subalbum), cripple)
 		album._sort()
 		return album
+	def remove_marker(self, path)
+		first_slash_position = path.find("/") + 1
+		if first_slash_position >= 1 :
+			return path[first_slash_position:]
+		else:
+			return self.path
+	
 	def to_dict(self, cripple=True):
 		self._sort()
 		subalbums = []
@@ -105,7 +111,7 @@ class Album(object):
 			for sub in self._albums:
 				if not sub.empty:
 					subalbums.append(sub)
-		return { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
+		return { "path": remove_marker(self.path), "date": self.date, "albums": subalbums, "photos": self._photos }
 	def photo_from_path(self, path):
 		for photo in self._photos:
 			if trim_base(path) == photo._path:
@@ -116,6 +122,8 @@ class Photo(object):
 	thumb_sizes = [ (75, True), (150, True), (1600, False) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
+		message("self._path", self._path)
+		self.album_path = os.path.join("albums", self._path)
 		self.is_valid = True
 		try:
 			mtime = file_mtime(path)
@@ -376,7 +384,7 @@ class Photo(object):
 					pass
 		return Photo(path, None, dictionary)
 	def to_dict(self):
-		photo = { "name": self.name, "date": self.date }
+		photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
 		photo.update(self.attributes)
 		return photo
 
