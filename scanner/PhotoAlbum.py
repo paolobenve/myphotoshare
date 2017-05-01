@@ -8,8 +8,10 @@ from PIL.ExifTags import TAGS
 import gc
 
 class Album(object):
-	def __init__(self, path):
+	# type may be: "origin" for the top root of folders and date virtual folders, "folders" for physical folders albums, "date" for date albums
+	def __init__(self, path, album_type = "folders"):
 		self._path = trim_base(path)
+		message("pathhhhh", self._path)
 		self._photos = list()
 		self._albums = list()
 		self._photos_sorted = True
@@ -18,16 +20,19 @@ class Album(object):
 	def photos(self):
 		return self._photos
 	@property
-	def albums_by_tree(self):
+	def albums(self):
 		return self._albums
+	@property
+	def album_type(self):
+		return album_type
 	@property
 	def path(self):
 		return self._path
 	def __str__(self):
 		return self.path
-	@property
-	def cache_path(self):
-		return json_cache(self.path)
+	#@property
+	def json_file(self, by_date = False):
+		return json_name(self.path, by_date)
 	@property
 	def date(self):
 		self._sort()
@@ -67,9 +72,10 @@ class Album(object):
 				return False
 		return True
 		
-	def cache(self, base_dir):
+	def cache(self, base_dir, by_date = False):
 		self._sort()
-		fp = open(os.path.join(base_dir, self.cache_path), 'w')
+		#message("base_dir + self.cache_path", str(base_dir + " - " + self.cache_path + " - " + os.path.join(base_dir, self.cache_path)))
+		fp = open(os.path.join(base_dir, self.json_file(by_date)), 'w')
 		json.dump(self, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	@staticmethod
@@ -234,7 +240,9 @@ class Photo(object):
 		info_string = "  -> %spx" % (str(size))
 		if square:
 			info_string += ", square"
+		next_level()
 		message("thumbing", info_string)
+		back_level()
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
 			return
 		gc.collect()

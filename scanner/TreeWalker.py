@@ -7,6 +7,7 @@ from CachePath import *
 import json
 import pprint
 import collections
+import inspect
 
 class TreeWalker:
 	def __init__(self, album_path, cache_path):
@@ -17,32 +18,67 @@ class TreeWalker:
 		self.all_albums_by_date = list()
 		self.tree_by_date = {}
 		self.all_photos = list()
-		self.walk(self.album_path)
+		first_call = True
+		root_album = self.walk(self.album_path)
 		self.big_lists()
-		self.generate_date_album()
+		by_date_album = self.generate_date_album()
+		origin_album = Album(self.album_path)
+		origin_album.add_album(root_album)
+		origin_album.add_album(by_date_album)
+		self.all_albums.append(origin_album)
+		#origin_cache = os.path.join(self.cache_path, json_name_by_date(self.album_path))
+		if not origin_album.empty:
+			message("cache_path", "_by_date")
+			by_date = True
+			origin_album.cache(self.cache_path, by_date)
 		self.remove_stale()
 		message("complete", "")
 	def generate_date_album(self):
-		root_album = Album(self.album_path)
-		for year, months in tree_by_date.iteritems():
-			year_path = self.album_path + "-" + year
-			root_album.add_album(year_path)
+		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
+		by_date = True
+		by_date_path = os.path.join(self.album_path, "_by_date")
+		by_date_album = Album(by_date_path)
+		for year, months in self.tree_by_date.iteritems():
+			year_path = os.path.join(by_date_path, str(year))
 			year_album = Album(year_path)
-			for month, days in tree_by_date[year].iteritems():
-				month_path = year_path + "-" + month
-				year_album.add_album(month_path)
-				month_album = Album(monthy_path)
-				for day, photos in tree_by_date[year][month].iteritems():
-					day_path = month_path + "-" + day
-					month_album.add_album(day_path)
+			by_date_album.add_album(year_album)
+			for month, days in self.tree_by_date[year].iteritems():
+				month_path = os.path.join(year_path, str(month))
+				month_album = Album(month_path)
+				year_album.add_album(month_album)
+				for day, photos in self.tree_by_date[year][month].iteritems():
+					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
+					month_album.add_album(day_album)
 					for photo in photos:
 						day_album.add_photo(photo)
 					self.all_albums.append(day_album)
+					#day_cache = os.path.join(self.cache_path, json_name_by_date(day_path))
+					if not day_album.empty:
+						message("cache_path", day_path)
+						day_album.cache(self.cache_path, by_date)
 				self.all_albums.append(month_album)
+				#month_cache = os.path.join(self.cache_path, json_name_by_date(month_path))
+				if not month_album.empty:
+					message("cache_path", month_path)
+					month_album.cache(self.cache_path, by_date)
 			self.all_albums.append(year_album)
-		self.all_albums.append(root_album)
+			#year_cache = os.path.join(self.cache_path, json_name_by_date(year_path))
+			if not year_album.empty:
+				message("cache_path", year_path)
+				year_album.cache(self.cache_path, by_date)
+		self.all_albums.append(by_date_album)
+		root_cache = os.path.join(self.cache_path, json_name(self.album_path))
+		if not by_date_album.empty:
+			#message("cache_path1", self.cache_path + "   " + os.path.basename(self.cache_path))
+			by_date_album.cache(self.cache_path, by_date)
+		message("by date path", by_date_path)
+		message("by date path", year_path)
+		message("by date path", month_path)
+		message("by date path", day_path)
+		return by_date_album
 	def add_photo_to_tree_by_date(self, photo):
+		# add the given photo to a temporary structure where photos are organazide by year, month, date
 		if not photo.year in self.tree_by_date.keys():
 			self.tree_by_date[photo.year] = {}
 		if not photo.month in self.tree_by_date[photo.year].keys():
@@ -51,13 +87,20 @@ class TreeWalker:
 			self.tree_by_date[photo.year][photo.month][photo.day] = list()
 		self.tree_by_date[photo.year][photo.month][photo.day].append(photo)
 	def walk(self, path):
+		trimmed_path = trim_base_custom(path, self.album_path)
+		message("untrimmed", path)
+		message("trimmed", trimmed_path)
+		path_with_marker = os.path.join(self.album_path, "_folders")
+		if trimmed_path:
+			path_with_marker = os.path.join(path_with_marker, trimmed_path)
+		message("path - marked", path + " --- " + path_with_marker)
 		next_level()
 		if not os.access(path, os.R_OK | os.X_OK):
 			message("access denied", os.path.basename(path))
 			back_level()
 			return None
 		message("walking", os.path.basename(path))
-		cache = os.path.join(self.cache_path, json_cache(path))
+		cache = os.path.join(self.cache_path, json_name(path))
 		cached = False
 		cached_album = None
 		if os.path.exists(cache):
@@ -78,7 +121,7 @@ class TreeWalker:
 				message("corrupt cache", os.path.basename(path))
 				cached_album = None
 		if not cached:
-			album = Album(path)
+			album = Album(path_with_marker)
 		for entry in os.listdir(path):
 			if entry[0] == '.':
 				continue
@@ -136,7 +179,7 @@ class TreeWalker:
 		message("cleanup", "building stale list")
 		all_cache_entries = { "all_photos.json": True, "latest_photos.json": True }
 		for album in self.all_albums:
-			all_cache_entries[album.cache_path] = True
+			all_cache_entries[album.json_file()] = True
 		for photo in self.all_photos:
 			for entry in photo.image_caches:
 				all_cache_entries[entry] = True

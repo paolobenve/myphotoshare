@@ -1,5 +1,6 @@
 import os.path
 from datetime import datetime
+import pprint
 
 def message(category, text):
 	if message.level <= 0:
@@ -25,6 +26,7 @@ def trim_base_custom(path, base):
 def trim_base(path):
 	return trim_base_custom(path, trim_base.base)
 def cache_base(path):
+	message("==", path)
 	path = trim_base(path).replace('/', '-').replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 	while path.find("--") != -1:
 		path = path.replace("--", "-")
@@ -32,13 +34,14 @@ def cache_base(path):
 		path = path.replace("__", "_")
 	if len(path) == 0:
 		path = "root"
+	message("==>>", path)
 	return path
-def cache_base_by_date(path):
-	return "___" + cache_base(path)
-def json_cache(path):
-	return cache_base(path) + ".json"
-def json_cache_by_date(path):
-	return cache_base_by_date(json_cache(path))
+def json_name(path, by_date = False):
+	message("json_name: path", path)
+	if False and len(path) < 10:
+		return path + ".json"
+	else:
+		return cache_base(path) + ".json"
 def image_cache(path, size, square=False):
 	if square:
 		suffix = str(size) + "s"
