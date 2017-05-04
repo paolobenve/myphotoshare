@@ -108,7 +108,7 @@ class Album(object):
 				if not sub.empty:
 					subalbums.append(sub)
 		path_without_marker = self.remove_marker(self.path)
-		if path_without_marker == self.path
+		if path_without_marker == self.path:
 			return { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
 		else:
 			return { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
@@ -122,6 +122,7 @@ class Photo(object):
 	thumb_sizes = [ (75, True), (150, True), (1600, False) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
+		message("self._path", self._path)
 		self.album_path = os.path.join("albums", self._path)
 		self.is_valid = True
 		try:
@@ -351,6 +352,12 @@ class Photo(object):
 	@property
 	def day(self):
 		return self.date.day
+	@property
+	def year_month(self):
+		return self.year + " " + self.month
+	@property
+	def year_month_day(self):
+		return self.year_month + " " + self.day
 	def __cmp__(self, other):
 		try:
 			date_compare = cmp(self.date, other.date)
@@ -377,7 +384,8 @@ class Photo(object):
 					pass
 		return Photo(path, None, dictionary)
 	def to_dict(self):
-		photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
+		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
+		photo = { "name": self.name, "albumName": self.album_path, "completeName": "_folders/" + self._path, "date": self.date }
 		photo.update(self.attributes)
 		return photo
 
