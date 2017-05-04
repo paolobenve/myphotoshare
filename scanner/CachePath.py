@@ -34,11 +34,8 @@ def cache_base(path):
 	if len(path) == 0:
 		path = "root"
 	return path
-def json_name(path, by_date = False):
-	if False and len(path) < 10:
-		return path + ".json"
-	else:
-		return cache_base(path) + ".json"
+def json_name(path):
+	return cache_base(path) + ".json"
 def image_cache(path, size, square=False):
 	if square:
 		suffix = str(size) + "s"

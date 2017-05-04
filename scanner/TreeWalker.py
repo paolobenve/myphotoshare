@@ -30,7 +30,7 @@ class TreeWalker:
 		if not origin_album.empty:
 			message("cache_path", "_by_date")
 			by_date = True
-			origin_album.cache(self.cache_path, by_date)
+			origin_album.cache(self.cache_path)
 		self.remove_stale()
 		message("complete", "")
 	def generate_date_album(self):
@@ -56,22 +56,22 @@ class TreeWalker:
 					#day_cache = os.path.join(self.cache_path, json_name_by_date(day_path))
 					if not day_album.empty:
 						message("cache_path", day_path)
-						day_album.cache(self.cache_path, by_date)
+						day_album.cache(self.cache_path)
 				self.all_albums.append(month_album)
 				#month_cache = os.path.join(self.cache_path, json_name_by_date(month_path))
 				if not month_album.empty:
 					message("cache_path", month_path)
-					month_album.cache(self.cache_path, by_date)
+					month_album.cache(self.cache_path)
 			self.all_albums.append(year_album)
 			#year_cache = os.path.join(self.cache_path, json_name_by_date(year_path))
 			if not year_album.empty:
 				message("cache_path", year_path)
-				year_album.cache(self.cache_path, by_date)
+				year_album.cache(self.cache_path)
 		self.all_albums.append(by_date_album)
 		root_cache = os.path.join(self.cache_path, json_name(self.album_path))
 		if not by_date_album.empty:
 			#message("cache_path1", self.cache_path + "   " + os.path.basename(self.cache_path))
-			by_date_album.cache(self.cache_path, by_date)
+			by_date_album.cache(self.cache_path)
 		return by_date_album
 	def add_photo_to_tree_by_date(self, photo):
 		# add the given photo to a temporary structure where photos are organazide by year, month, date
@@ -114,6 +114,7 @@ class TreeWalker:
 				message("corrupt cache", os.path.basename(path))
 				cached_album = None
 		if not cached:
+			message("path with marker", path_with_marker)
 			album = Album(path_with_marker)
 		for entry in os.listdir(path):
 			if entry[0] == '.':
@@ -172,7 +173,7 @@ class TreeWalker:
 		message("cleanup", "building stale list")
 		all_cache_entries = { "all_photos.json": True, "latest_photos.json": True }
 		for album in self.all_albums:
-			all_cache_entries[album.json_file()] = True
+			all_cache_entries[album.json_file] = True
 		for photo in self.all_photos:
 			for entry in photo.image_caches:
 				all_cache_entries[entry] = True

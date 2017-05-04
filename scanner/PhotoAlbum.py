@@ -29,9 +29,9 @@ class Album(object):
 		return self._path
 	def __str__(self):
 		return self.path
-	#@property
-	def json_file(self, by_date = False):
-		return json_name(self.path, by_date)
+	@property
+	def json_file(self):
+		return json_name(self.path)
 	@property
 	def date(self):
 		self._sort()
@@ -71,10 +71,10 @@ class Album(object):
 				return False
 		return True
 		
-	def cache(self, base_dir, by_date = False):
+	def cache(self, base_dir):
 		self._sort()
 		#message("base_dir + self.cache_path", str(base_dir + " - " + self.cache_path + " - " + os.path.join(base_dir, self.cache_path)))
-		fp = open(os.path.join(base_dir, self.json_file(by_date)), 'w')
+		fp = open(os.path.join(base_dir, self.json_file), 'w')
 		json.dump(self, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	@staticmethod
@@ -93,25 +93,30 @@ class Album(object):
 				album.add_album(Album.from_dict(subalbum), cripple)
 		album._sort()
 		return album
-	def remove_marker(self, path)
-		first_slash_position = path.find("/") + 1
-		if first_slash_position >= 1 :
-			return path[first_slash_position:]
-		else:
-			return self.path
-	
+	def remove_marker(self, path):
+		marker = "_folders"
+		marker_position = path.find(marker)
+		if marker_position == 0:
+			path = path[len(marker):]
+			if len(path) > 0:
+				path = path[1:]
+		return path
 	def to_dict(self, cripple=True):
 		self._sort()
 		subalbums = []
 		if cripple:
 			for sub in self._albums:
 				if not sub.empty:
+					message("...", sub.path + " - " + self._path + " - " + trim_base_custom(sub.path, self._path))
 					subalbums.append({ "path": trim_base_custom(sub.path, self._path), "date": sub.date })
 		else:
 			for sub in self._albums:
 				if not sub.empty:
 					subalbums.append(sub)
-		return { "path": remove_marker(self.path), "date": self.date, "albums": subalbums, "photos": self._photos }
+		if self.remove_marker(self.path) == self.path
+			return { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
+		else:
+			return { "path": self.path, "physicalPath": self.remove_marker(self.path), "date": self.date, "albums": subalbums, "photos": self._photos }
 	def photo_from_path(self, path):
 		for photo in self._photos:
 			if trim_base(path) == photo._path:
