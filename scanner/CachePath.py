@@ -1,6 +1,5 @@
 import os.path
 from datetime import datetime
-import pprint
 
 def message(category, text):
 	if message.level <= 0:

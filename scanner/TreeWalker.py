@@ -5,9 +5,6 @@ from datetime import datetime
 from PhotoAlbum import Photo, Album, PhotoAlbumEncoder
 from CachePath import *
 import json
-import pprint
-import collections
-import inspect
 
 class TreeWalker:
 	def __init__(self, album_path, cache_path):
@@ -15,27 +12,22 @@ class TreeWalker:
 		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
 		set_cache_path_base(self.album_path)
 		self.all_albums = list()
-		self.all_albums_by_date = list()
 		self.tree_by_date = {}
 		self.all_photos = list()
-		first_call = True
-		root_album = self.walk(self.album_path)
+		folders_album = self.walk(self.album_path)
 		self.big_lists()
 		by_date_album = self.generate_date_album()
 		origin_album = Album(self.album_path)
-		origin_album.add_album(root_album)
+		origin_album.add_album(folders_album)
 		origin_album.add_album(by_date_album)
 		self.all_albums.append(origin_album)
 		#origin_cache = os.path.join(self.cache_path, json_name_by_date(self.album_path))
 		if not origin_album.empty:
-			message("cache_path", "_by_date")
-			by_date = True
 			origin_album.cache(self.cache_path)
 		self.remove_stale()
 		message("complete", "")
 	def generate_date_album(self):
 		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
-		by_date = True
 		by_date_path = os.path.join(self.album_path, "_by_date")
 		by_date_album = Album(by_date_path)
 		for year, months in self.tree_by_date.iteritems():

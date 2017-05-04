@@ -8,8 +8,7 @@ from PIL.ExifTags import TAGS
 import gc
 
 class Album(object):
-	# type may be: "origin" for the top root of folders and date virtual folders, "folders" for physical folders albums, "date" for date albums
-	def __init__(self, path, album_type = "folders"):
+	def __init__(self, path):
 		self._path = trim_base(path)
 		self._photos = list()
 		self._albums = list()
@@ -21,9 +20,6 @@ class Album(object):
 	@property
 	def albums(self):
 		return self._albums
-	@property
-	def album_type(self):
-		return album_type
 	@property
 	def path(self):
 		return self._path
@@ -73,7 +69,6 @@ class Album(object):
 		
 	def cache(self, base_dir):
 		self._sort()
-		#message("base_dir + self.cache_path", str(base_dir + " - " + self.cache_path + " - " + os.path.join(base_dir, self.cache_path)))
 		fp = open(os.path.join(base_dir, self.json_file), 'w')
 		json.dump(self, fp, cls=PhotoAlbumEncoder)
 		fp.close()
@@ -107,16 +102,16 @@ class Album(object):
 		if cripple:
 			for sub in self._albums:
 				if not sub.empty:
-					message("...", sub.path + " - " + self._path + " - " + trim_base_custom(sub.path, self._path))
 					subalbums.append({ "path": trim_base_custom(sub.path, self._path), "date": sub.date })
 		else:
 			for sub in self._albums:
 				if not sub.empty:
 					subalbums.append(sub)
-		if self.remove_marker(self.path) == self.path
+		path_without_marker = self.remove_marker(self.path)
+		if path_without_marker == self.path
 			return { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
 		else:
-			return { "path": self.path, "physicalPath": self.remove_marker(self.path), "date": self.date, "albums": subalbums, "photos": self._photos }
+			return { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
 	def photo_from_path(self, path):
 		for photo in self._photos:
 			if trim_base(path) == photo._path:
@@ -127,7 +122,6 @@ class Photo(object):
 	thumb_sizes = [ (75, True), (150, True), (1600, False) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
-		message("self._path", self._path)
 		self.album_path = os.path.join("albums", self._path)
 		self.is_valid = True
 		try:
@@ -357,12 +351,6 @@ class Photo(object):
 	@property
 	def day(self):
 		return self.date.day
-	@property
-	def year_month(self):
-		return self.year + " " + self.month
-	@property
-	def year_month_day(self):
-		return self.year_month + " " + self.day
 	def __cmp__(self, other):
 		try:
 			date_compare = cmp(self.date, other.date)
