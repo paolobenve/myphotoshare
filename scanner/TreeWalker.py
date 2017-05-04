@@ -106,7 +106,6 @@ class TreeWalker:
 				message("corrupt cache", os.path.basename(path))
 				cached_album = None
 		if not cached:
-			message("path with marker", path_with_marker)
 			album = Album(path_with_marker)
 		for entry in os.listdir(path):
 			if entry[0] == '.':

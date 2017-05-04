@@ -148,12 +148,19 @@
 		else
 			suffix = size.toString();
 		hash = PhotoPaolo.cachePath(PhotoPaolo.photoHash(album, photo) + "_" + suffix + ".jpg");
-		if (hash.indexOf("root-") === 0)
-			hash = hash.substring(5);
-		if (hash.indexOf("_folders-") === 0)
-			hash = hash.substring(9);
-		if (hash.indexOf("_by_date-") === 0)
-			hash = hash.substring(9);
+		var rootString = "root-";
+		if (hash.indexOf(rootString) === 0)
+			hash = hash.substring(rootString.length);
+		else {
+			var foldersString = "_folders-";
+			if (hash.indexOf(foldersString) === 0)
+				hash = hash.substring(foldersString.length);
+			else {
+				var bydateString = "_by_date-";
+				if (hash.indexOf(bydateString) === 0)
+				hash = hash.substring(bydateString.length);
+			}
+		}
 		return "cache/" + hash;
 	};
 	PhotoPaolo.originalPhotoPath = function(album, photo) {
