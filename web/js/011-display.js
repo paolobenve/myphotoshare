@@ -92,9 +92,9 @@ $(document).ready(function() {
 		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement;
 		if (currentPhoto === null && previousPhoto === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
-		
 		if (populate) {
 			photos = [];
+			console.log(currentAlbum);
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				link = $("<a href=\"#!/" + photoPaolo.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
 				image = $("<img title=\"" + photoPaolo.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoPaolo.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoPaolo.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
@@ -253,13 +253,26 @@ $(document).ready(function() {
 			return;
 		previousAlbum = currentAlbum;
 		previousPhoto = currentPhoto;
-		currentAlbum = album;
-		currentPhoto = photo;
-		currentPhotoIndex = photoIndex;
+		//if (photo !== null) console.log(photo.byDateAlbum);
+		//if (photo !== null) console.log(PhotoPaolo.cachePath(photo.byDateAlbum));
+		//console.log(album);
+		var bydateString = "_by_date/";
+		if (currentAlbum && currentAlbum.path.indexOf(bydateString) === 0) {
+			console.log(currentAlbum);
+			currentPhotoIndex = 0;
+			console.log(currentPhotoIndex);
+		}
+		else {
+			currentAlbum = album;
+			currentPhoto = photo;
+			currentPhotoIndex = photoIndex;
+		}
 		setTitle();
 		showAlbum(previousAlbum !== currentAlbum);
-		if (photo !== null)
+		if (photo !== null) {
+			//console.log(photo);
 			showPhoto();
+		}
 	}
 	
 	/* Event listeners */

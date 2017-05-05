@@ -15,7 +15,6 @@
 			cacheKey = subalbum;
 		else
 			cacheKey = PhotoPaolo.cachePath(subalbum.parent.path + "/" + subalbum.path);
-		// by_date: subalbum non ha parent
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
 			return;
@@ -131,9 +130,12 @@
 	};
 	PhotoPaolo.photoHash = function(album, photo) {
 		var hash;
-		hash = PhotoPaolo.albumHash(album) + "/" + PhotoPaolo.cachePath(photo.name);
-		if (hash.indexOf("_by_date-") === 0)
-			hash = PhotoPaolo.cachePath(photo.completeName);
+		//console.log(photo);
+		hash = PhotoPaolo.albumHash(album) + "/" +
+				PhotoPaolo.cachePath(photo.name);
+		if (hash.indexOf("_by_date-") === 0) {
+			hash = PhotoPaolo.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoPaolo.cachePath(photo.name);
+		}
 		return hash;
 	};
 	PhotoPaolo.albumHash = function(album) {
@@ -164,7 +166,6 @@
 		return "cache/" + hash;
 	};
 	PhotoPaolo.originalPhotoPath = function(album, photo) {
-		//return "albums/" + album.path + "/" + photo.name;
 		return photo.albumName;
 	};
 	PhotoPaolo.trimExtension = function(name) {

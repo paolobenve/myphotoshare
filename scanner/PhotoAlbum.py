@@ -358,6 +358,9 @@ class Photo(object):
 	@property
 	def year_month_day(self):
 		return self.year_month + " " + self.day
+	@property
+	def by_date_album_path(self):
+		return "_by_date/" + str(self.year) + "/" + str(self.month) + "/" + str(self.day)
 	def __cmp__(self, other):
 		try:
 			date_compare = cmp(self.date, other.date)
@@ -385,7 +388,7 @@ class Photo(object):
 		return Photo(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
-		photo = { "name": self.name, "albumName": self.album_path, "completeName": "_folders/" + self._path, "date": self.date }
+		photo = { "name": self.name, "albumName": self.album_path, "byDateAlbum": self.by_date_album_path, "completeName": "_folders/" + self._path, "date": self.date }
 		photo.update(self.attributes)
 		return photo
 
