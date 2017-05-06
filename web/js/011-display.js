@@ -204,12 +204,23 @@ $(document).ready(function() {
 						photoPaolo.photoPath(currentAlbum, previousPhoto, maxSize, false));
 		
 		nextLink = "#!/" + photoPaolo.photoHash(currentAlbum, nextPhoto);
-		folderToDate = "#!/" + photoPaolo.photoHash(currentAlbum, nextPhoto);
+		
+		var foldersString = "_folders";
+		var bydateString = "_by_date";
+		var newPath = "";
+		if (currentAlbum.path.indexOf(foldersString) === 0)
+			newPath = currentPhoto.byDateAlbum
+		else if (currentAlbum.path.indexOf(bydateString) === 0)
+			newPath = currentPhoto.foldersAlbum
+		var newCachePath = PhotoPaolo.cachePath(newPath);
+		var photoNameCache = PhotoPaolo.cachePath(currentPhoto.name);
+		
+		var toggleFoldersDate = "#!/" + newCachePath + "/" + photoNameCache;
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoPaolo.photoHash(currentAlbum, previousPhoto));
 		$("#original-link").attr("target", "_blank").attr("href", photoPaolo.originalPhotoPath(currentPhoto));
-		$("#toggle-folders-bydate").attr("target", "_blank").attr("href", photoPaolo.originalPhotoPath(currentPhoto));
+		$("#toggle-folders-bydate").attr("href", toggleFoldersDate);
 
 		text = "<table>";
 		if (typeof currentPhoto.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentPhoto.make + "</td></tr>";
@@ -288,7 +299,8 @@ $(document).ready(function() {
 	/* Event listeners */
 	
 	$(window).hashchange(function() {
-		$("#loading").show();
+		consol
+		currentAlbum = null;
 		$("link[rel=image_src]").remove();
 		photoPaolo.parseHash(location.hash, hashParsed, die);
 	});

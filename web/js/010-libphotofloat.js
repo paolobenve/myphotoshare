@@ -169,6 +169,12 @@
 	PhotoPaolo.originalPhotoPath = function(photo) {
 		return photo.albumName;
 	};
+	PhotoPaolo.photoFoldersAlbum = function(photo) {
+		return photo.foldersAlbum;
+	};
+	PhotoPaolo.photoByDateAlbum = function(photo) {
+		return photo.byDateAlbum;
+	};
 	PhotoPaolo.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
 		if (index !== -1)
