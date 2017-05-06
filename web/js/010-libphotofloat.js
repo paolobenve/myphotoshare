@@ -59,7 +59,6 @@
 	};
 	PhotoPaolo.prototype.parseHash = function(hash, callback, error) {
 		var index, album, photo;
-		console.log(hash);
 		hash = PhotoPaolo.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (!hash.length) {
@@ -130,9 +129,11 @@
 		return path;
 	};
 	PhotoPaolo.photoHash = function(album, photo) {
+		return PhotoPaolo.albumHash(album) + "/" + PhotoPaolo.cachePath(photo.name);
+	};
+	PhotoPaolo.photoHashFolder = function(album, photo) {
 		var hash;
-		//console.log(photo);
-		hash = PhotoPaolo.albumHash(album) + "/" + PhotoPaolo.cachePath(photo.name);
+		hash = PhotoPaolo.photoHash(album, photo);
 		if (hash.indexOf("_by_date-") === 0) {
 			hash = PhotoPaolo.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoPaolo.cachePath(photo.name);
 		}
@@ -149,7 +150,7 @@
 			suffix = size.toString() + "s";
 		else
 			suffix = size.toString();
-		hash = PhotoPaolo.cachePath(PhotoPaolo.photoHash(album, photo) + "_" + suffix + ".jpg");
+		hash = PhotoPaolo.cachePath(PhotoPaolo.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
@@ -195,6 +196,7 @@
 	/* make static methods callable as member functions */
 	PhotoPaolo.prototype.cachePath = PhotoPaolo.cachePath;
 	PhotoPaolo.prototype.photoHash = PhotoPaolo.photoHash;
+	PhotoPaolo.prototype.photoHashFolder = PhotoPaolo.photoHashFolder;
 	PhotoPaolo.prototype.albumHash = PhotoPaolo.albumHash;
 	PhotoPaolo.prototype.photoPath = PhotoPaolo.photoPath;
 	PhotoPaolo.prototype.originalPhotoPath = PhotoPaolo.originalPhotoPath;

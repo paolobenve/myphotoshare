@@ -97,7 +97,6 @@ $(document).ready(function() {
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoPaolo.photoHash(currentAlbum, currentAlbum.photos[i]);
 				thumbHash = photoPaolo.photoPath(currentAlbum, currentAlbum.photos[i], 150, true);
-				console.log("quiiiiiiiiiiiiiiiiiiii",thumbHash);
 				if (thumbHash.indexOf("_by_date-") === 0) {
 					//foldersHash = PhotoPaolo.cachePath(currentAlbum.photos[i].completeName);
 					thumbHash =
@@ -201,15 +200,12 @@ $(document).ready(function() {
 			.attr("title", currentPhoto.date)
 			.load(scaleImage);
 		$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-		console.log("PRIMA", previousPhoto);
 		previousPhoto = currentAlbum.photos[
 			(currentPhotoIndex - 1 < 0) ? (currentAlbum.photos.length - 1) : (currentPhotoIndex - 1)
 		];
-		console.log("DOPO", previousPhoto);
 		nextPhoto = currentAlbum.photos[
 			(currentPhotoIndex + 1 >= currentAlbum.photos.length) ? 0 : (currentPhotoIndex + 1)
 		];
-		console.log("PREVIOUS", previousPhoto);
 		$.preloadImages(photoPaolo.photoPath(currentAlbum, nextPhoto, maxSize, false),
 						photoPaolo.photoPath(currentAlbum, previousPhoto, maxSize, false));
 		
@@ -268,16 +264,11 @@ $(document).ready(function() {
 	
 	function hashParsed(album, photo, photoIndex) {
 		undie();
-		console.log("ALBUM", album, "prev", previousAlbum, "curr", currentAlbum, "FOTO", photo, "prev", previousPhoto, "curr", currentPhoto, "INDICE", photoIndex, currentPhotoIndex);
 		$("#loading").hide();
 		if (album === currentAlbum && photo === currentPhoto)
 			return;
-		//if (photo !== null) console.log(photo.byDateAlbum);
-		//if (photo !== null) console.log(PhotoPaolo.cachePath(photo.byDateAlbum));
-		//console.log(album);
 		var bydateString = "_by_date/";
 		if (currentAlbum && currentAlbum.path.indexOf(bydateString) === 0 && photo !== null) {
-			console.log("quiiiiiiiiiiii");
 			previousAlbum = currentAlbum;
 			album = currentAlbum;
 			previousPhoto = photo;
@@ -294,7 +285,6 @@ $(document).ready(function() {
 		setTitle();
 		showAlbum(previousAlbum !== currentAlbum);
 		if (photo !== null) {
-			console.log("__ALBUM", album, "prev", previousAlbum, "curr", currentAlbum, "FOTO", photo, "prev", previousPhoto, "curr", currentPhoto, "INDICE", photoIndex, currentPhotoIndex);
 			showPhoto();
 		}
 	}
