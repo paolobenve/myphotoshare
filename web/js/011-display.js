@@ -216,6 +216,7 @@ $(document).ready(function() {
 		var photoNameCache = PhotoPaolo.cachePath(currentPhoto.name);
 		
 		var toggleFoldersDate = "#!/" + newCachePath + "/" + photoNameCache;
+		console.log("bbbbbbbb", currentAlbum.path, toggleFoldersDate);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoPaolo.photoHash(currentAlbum, previousPhoto));
@@ -299,7 +300,7 @@ $(document).ready(function() {
 	/* Event listeners */
 	
 	$(window).hashchange(function() {
-		consol
+		$("#loading").show();
 		currentAlbum = null;
 		$("link[rel=image_src]").remove();
 		photoPaolo.parseHash(location.hash, hashParsed, die);
