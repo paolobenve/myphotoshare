@@ -122,7 +122,7 @@ class Photo(object):
 	thumb_sizes = [ (75, True), (150, True), (1600, False) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
-		message("self._path", self._path)
+		self.folders = trim_base(os.path.dirname(self._path))
 		self.album_path = os.path.join("albums", self._path)
 		self.is_valid = True
 		try:
@@ -393,6 +393,7 @@ class Photo(object):
 					"albumName": self.album_path,
 					"byDateAlbum": self.by_date_album_path,
 					"byDateName": os.path.join(self.by_date_album_path, self.name),
+					"foldersAlbum": os.path.join("_folders/", self.folders),
 					"completeName": os.path.join("_folders/", self._path),
 					"date": self.date
 				}

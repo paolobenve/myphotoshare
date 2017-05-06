@@ -204,10 +204,12 @@ $(document).ready(function() {
 						photoPaolo.photoPath(currentAlbum, previousPhoto, maxSize, false));
 		
 		nextLink = "#!/" + photoPaolo.photoHash(currentAlbum, nextPhoto);
+		folderToDate = "#!/" + photoPaolo.photoHash(currentAlbum, nextPhoto);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoPaolo.photoHash(currentAlbum, previousPhoto));
-		$("#original-link").attr("target", "_blank").attr("href", photoPaolo.originalPhotoPath(currentAlbum, currentPhoto));
+		$("#original-link").attr("target", "_blank").attr("href", photoPaolo.originalPhotoPath(currentPhoto));
+		$("#toggle-folders-bydate").attr("target", "_blank").attr("href", photoPaolo.originalPhotoPath(currentPhoto));
 
 		text = "<table>";
 		if (typeof currentPhoto.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentPhoto.make + "</td></tr>";

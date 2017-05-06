@@ -166,7 +166,7 @@
 		}
 		return "cache/" + hash;
 	};
-	PhotoPaolo.originalPhotoPath = function(album, photo) {
+	PhotoPaolo.originalPhotoPath = function(photo) {
 		return photo.albumName;
 	};
 	PhotoPaolo.trimExtension = function(name) {
