@@ -245,14 +245,17 @@ class Photo(object):
 		
 	def _thumbnail(self, image, thumb_path, original_path, size, square=False):
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
-		info_string = "  -> %spx" % (str(size))
+		info_string = "%spx" % (str(size))
 		if square:
 			info_string += ", square"
+		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
+			next_level()
+			message("existing thumb", info_string)
+			back_level()
+			return
 		next_level()
 		message("thumbing", info_string)
 		back_level()
-		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
-			return
 		gc.collect()
 		try:
 			image = image.copy()

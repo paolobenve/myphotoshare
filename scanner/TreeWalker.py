@@ -47,17 +47,14 @@ class TreeWalker:
 					self.all_albums.append(day_album)
 					#day_cache = os.path.join(self.cache_path, json_name_by_date(day_path))
 					if not day_album.empty:
-						message("cache_path", day_path)
 						day_album.cache(self.cache_path)
 				self.all_albums.append(month_album)
 				#month_cache = os.path.join(self.cache_path, json_name_by_date(month_path))
 				if not month_album.empty:
-					message("cache_path", month_path)
 					month_album.cache(self.cache_path)
 			self.all_albums.append(year_album)
 			#year_cache = os.path.join(self.cache_path, json_name_by_date(year_path))
 			if not year_album.empty:
-				message("cache_path", year_path)
 				year_album.cache(self.cache_path)
 		self.all_albums.append(by_date_album)
 		root_cache = os.path.join(self.cache_path, json_name(self.album_path))
@@ -91,7 +88,7 @@ class TreeWalker:
 		if os.path.exists(cache):
 			try:
 				cached_album = Album.from_cache(cache)
-				if file_mtime(path) <= file_mtime(cache):
+				if False and file_mtime(path) <= file_mtime(cache):
 					message("full cache", os.path.basename(path))
 					cached = True
 					album = cached_album

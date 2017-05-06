@@ -216,7 +216,6 @@ $(document).ready(function() {
 		var photoNameCache = PhotoPaolo.cachePath(currentPhoto.name);
 		
 		var toggleFoldersDate = "#!/" + newCachePath + "/" + photoNameCache;
-		console.log("bbbbbbbb", currentAlbum.path, toggleFoldersDate);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoPaolo.photoHash(currentAlbum, previousPhoto));
