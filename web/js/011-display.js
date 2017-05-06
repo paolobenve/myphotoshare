@@ -98,15 +98,10 @@ $(document).ready(function() {
 				hash = photoPaolo.photoHash(currentAlbum, currentAlbum.photos[i]);
 				thumbHash = photoPaolo.photoPath(currentAlbum, currentAlbum.photos[i], 150, true);
 				if (thumbHash.indexOf("_by_date-") === 0) {
-					//foldersHash = PhotoPaolo.cachePath(currentAlbum.photos[i].completeName);
 					thumbHash =
 						PhotoPaolo.cachePath(currentAlbum.photos[i].completeName.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
 						"/" +
 						PhotoPaolo.cachePath(currentAlbum.photos[i].name);
-					
-					//~ var foldersString = "_folders-";
-					//~ if (foldersHash.indexOf(foldersString) === 0)
-						//~ foldersHash = foldersHash.substring(foldersString.length);
 				}
 				link = $("<a href=\"#!/" + hash + "\"></a>");
 				image = $("<img title=\"" + photoPaolo.trimExtension(currentAlbum.photos[i].name) +
@@ -149,7 +144,6 @@ $(document).ready(function() {
 			subalbumsElement = $("#subalbums");
 			subalbumsElement.empty();
 			subalbumsElement.append.apply(subalbumsElement, subalbums);
-
 			if (currentAlbum.albums.length > 1)
 				subalbumsElement.insertBefore(thumbsElement);
 			else
