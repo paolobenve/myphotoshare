@@ -59,6 +59,7 @@
 	};
 	PhotoPaolo.prototype.parseHash = function(hash, callback, error) {
 		var index, album, photo;
+		console.log(hash);
 		hash = PhotoPaolo.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (!hash.length) {
@@ -131,8 +132,7 @@
 	PhotoPaolo.photoHash = function(album, photo) {
 		var hash;
 		//console.log(photo);
-		hash = PhotoPaolo.albumHash(album) + "/" +
-				PhotoPaolo.cachePath(photo.name);
+		hash = PhotoPaolo.albumHash(album) + "/" + PhotoPaolo.cachePath(photo.name);
 		if (hash.indexOf("_by_date-") === 0) {
 			hash = PhotoPaolo.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoPaolo.cachePath(photo.name);
 		}

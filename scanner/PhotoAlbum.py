@@ -388,7 +388,14 @@ class Photo(object):
 		return Photo(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
-		photo = { "name": self.name, "albumName": self.album_path, "byDateAlbum": self.by_date_album_path, "completeName": "_folders/" + self._path, "date": self.date }
+		photo = {
+					"name": self.name,
+					"albumName": self.album_path,
+					"byDateAlbum": self.by_date_album_path,
+					"byDateName": os.path.join(self.by_date_album_path, self.name),
+					"completeName": os.path.join("_folders/", self._path),
+					"date": self.date
+				}
 		photo.update(self.attributes)
 		return photo
 
