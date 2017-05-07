@@ -218,7 +218,6 @@ $(document).ready(function() {
 			newPath = currentPhoto.foldersAlbum;
 			$("#toggle-folders-bydate").text("folder view");
 		}
-		//~ var newCachePath = PhotoPaolo.cachePath(newPath);
 		var photoNameCache = PhotoPaolo.cachePath(currentPhoto.name);
 		var toggleFoldersDate = "#!/" + PhotoPaolo.cachePath(newPath) + "/" + PhotoPaolo.cachePath(currentPhoto.name);
 		$("#next-photo").attr("href", nextLink);
