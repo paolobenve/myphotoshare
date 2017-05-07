@@ -209,17 +209,18 @@ $(document).ready(function() {
 		var bydateString = "_by_date";
 		var newPath = "";
 		if (currentAlbum.path.indexOf(foldersString) === 0) {
-			newPath = currentPhoto.byDateAlbum
+			console.log(currentPhoto.byDateAlbum);
+			newPath = currentPhoto.byDateAlbum;
 			$("#toggle-folders-bydate").text("by date view");
 		}
 		else if (currentAlbum.path.indexOf(bydateString) === 0) {
-			newPath = currentPhoto.foldersAlbum
+			console.log(currentPhoto.foldersAlbum);
+			newPath = currentPhoto.foldersAlbum;
 			$("#toggle-folders-bydate").text("folder view");
 		}
-		var newCachePath = PhotoPaolo.cachePath(newPath);
+		//~ var newCachePath = PhotoPaolo.cachePath(newPath);
 		var photoNameCache = PhotoPaolo.cachePath(currentPhoto.name);
-		
-		var toggleFoldersDate = "#!/" + newCachePath + "/" + photoNameCache;
+		var toggleFoldersDate = "#!/" + PhotoPaolo.cachePath(newPath) + "/" + PhotoPaolo.cachePath(currentPhoto.name);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoPaolo.photoHash(currentAlbum, previousPhoto));

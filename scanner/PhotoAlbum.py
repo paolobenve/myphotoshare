@@ -119,7 +119,7 @@ class Album(object):
 		return None
 	
 class Photo(object):
-	thumb_sizes = [ (75, True), (150, True), (1600, False) ]
+	thumb_sizes = [ (1600, False), (1024, False), (800, False), (150, True), (75, True) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
 		self.folders = trim_base(os.path.dirname(self._path))
@@ -258,46 +258,50 @@ class Photo(object):
 		back_level()
 		gc.collect()
 		try:
-			image = image.copy()
+			image_copy = image.copy()
 		except KeyboardInterrupt:
 			raise
 		except:
 			try:
-				image = image.copy() # we try again to work around PIL bug
+				image_copy = image.copy() # we try again to work around PIL bug
 			except KeyboardInterrupt:
 				raise
 			except:
 				message("corrupt image", os.path.basename(original_path))
 				return
 		if square:
-			if image.size[0] > image.size[1]:
-				left = (image.size[0] - image.size[1]) / 2
+			if image_copy.size[0] > image_copy.size[1]:
+				left = (image_copy.size[0] - image_copy.size[1]) / 2
 				top = 0
-				right = image.size[0] - ((image.size[0] - image.size[1]) / 2)
-				bottom = image.size[1]
+				right = image_copy.size[0] - ((image_copy.size[0] - image_copy.size[1]) / 2)
+				bottom = image_copy.size[1]
 			else:
 				left = 0
-				top = (image.size[1] - image.size[0]) / 2
-				right = image.size[0]
-				bottom = image.size[1] - ((image.size[1] - image.size[0]) / 2)
-			image = image.crop((left, top, right, bottom))
+				top = (image_copy.size[1] - image_copy.size[0]) / 2
+				right = image_copy.size[0]
+				bottom = image_copy.size[1] - ((image_copy.size[1] - image_copy.size[0]) / 2)
+			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
-		image.thumbnail((size, size), Image.ANTIALIAS)
+		image_copy.thumbnail((size, size), Image.ANTIALIAS)
 		try:
-			image.save(thumb_path, "JPEG", quality=88)
+			image_copy.save(thumb_path, "JPEG", quality=88)
+			return image_copy
 		except KeyboardInterrupt:
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
 			raise
+		except IOError:
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=88)
+			return image_copy
 		except:
 			message("save failure", os.path.basename(thumb_path))
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
-		
+		return image
 	def _thumbnails(self, image, thumb_path, original_path):
 		mirror = image
 		if self._orientation == 2:
@@ -321,8 +325,9 @@ class Photo(object):
 		elif self._orientation == 8:
 			# Rotation 90
 			mirror = image.transpose(Image.ROTATE_90)
+		thumb = mirror
 		for size in Photo.thumb_sizes:
-			self._thumbnail(mirror, thumb_path, original_path, size[0], size[1])
+			thumb = self._thumbnail(thumb, thumb_path, original_path, size[0], size[1])
 	@property
 	def name(self):
 		return os.path.basename(self._path)
@@ -391,13 +396,16 @@ class Photo(object):
 		return Photo(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
+		foldersAlbum = "_folders"
+		if (self.folders):
+			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 		photo = {
 					"name": self.name,
 					"albumName": self.album_path,
 					"byDateAlbum": self.by_date_album_path,
 					"byDateName": os.path.join(self.by_date_album_path, self.name),
-					"foldersAlbum": os.path.join("_folders/", self.folders),
-					"completeName": os.path.join("_folders/", self._path),
+					"foldersAlbum": foldersAlbum,
+					"completeName": os.path.join("_folders", self._path),
 					"date": self.date
 				}
 		photo.update(self.attributes)
