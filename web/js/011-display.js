@@ -208,10 +208,14 @@ $(document).ready(function() {
 		var foldersString = "_folders";
 		var bydateString = "_by_date";
 		var newPath = "";
-		if (currentAlbum.path.indexOf(foldersString) === 0)
+		if (currentAlbum.path.indexOf(foldersString) === 0) {
 			newPath = currentPhoto.byDateAlbum
-		else if (currentAlbum.path.indexOf(bydateString) === 0)
+			$("#toggle-folders-bydate").text("by date view");
+		}
+		else if (currentAlbum.path.indexOf(bydateString) === 0) {
 			newPath = currentPhoto.foldersAlbum
+			$("#toggle-folders-bydate").text("folder view");
+		}
 		var newCachePath = PhotoPaolo.cachePath(newPath);
 		var photoNameCache = PhotoPaolo.cachePath(currentPhoto.name);
 		
