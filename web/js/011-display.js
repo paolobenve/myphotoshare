@@ -310,7 +310,6 @@ $(document).ready(function() {
 				currentAlbum.path.indexOf(bydateString) === 0 && location.hash.indexOf(foldersString) === 3
 				)
 			) {
-			console.log(currentAlbum.path, location.hash);
 			currentAlbum = null;
 		}
 		$("link[rel=image_src]").remove();
