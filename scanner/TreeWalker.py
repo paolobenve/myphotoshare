@@ -45,6 +45,7 @@ class TreeWalker:
 					month_album.add_album(day_album)
 					for photo in photos:
 						day_album.add_photo(photo)
+						month_album.add_photo(photo)
 					self.all_albums.append(day_album)
 					#day_cache = os.path.join(self.cache_path, json_name_by_date(day_path))
 					if not day_album.empty:
