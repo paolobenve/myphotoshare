@@ -119,7 +119,7 @@ class Album(object):
 		return None
 	
 class Photo(object):
-	thumb_sizes = [ (1600, False), (1024, False), (800, False), (150, True), (75, True) ]
+	thumb_sizes = [ (1600, False), (1024, False), (150, True), (75, True) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
 		self.folders = trim_base(os.path.dirname(self._path))
@@ -284,7 +284,7 @@ class Photo(object):
 			gc.collect()
 		image_copy.thumbnail((size, size), Image.ANTIALIAS)
 		try:
-			image_copy.save(thumb_path, "JPEG", quality=88)
+			image_copy.save(thumb_path, "JPEG", quality=95)
 			return image_copy
 		except KeyboardInterrupt:
 			try:
@@ -293,7 +293,7 @@ class Photo(object):
 				pass
 			raise
 		except IOError:
-			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=88)
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=95)
 			return image_copy
 		except:
 			message("save failure", os.path.basename(thumb_path))
