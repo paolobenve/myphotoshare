@@ -89,10 +89,10 @@ class Album(object):
 		album._sort()
 		return album
 	def remove_marker(self, path):
-		marker = "_folders"
-		marker_position = path.find(marker)
+		foldersString = "_folders"
+		marker_position = path.find(foldersString)
 		if marker_position == 0:
-			path = path[len(marker):]
+			path = path[len(foldersString):]
 			if len(path) > 0:
 				path = path[1:]
 		return path
@@ -399,7 +399,8 @@ class Photo(object):
 		return Photo(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
-		foldersAlbum = "_folders"
+		foldersString = "_folders"
+		foldersAlbum = foldersString
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 		photo = {
@@ -408,7 +409,7 @@ class Photo(object):
 					"byDateAlbum": self.by_date_album_path,
 					"byDateName": os.path.join(self.by_date_album_path, self.name),
 					"foldersAlbum": foldersAlbum,
-					"completeName": os.path.join("_folders", self._path),
+					"completeName": os.path.join(foldersString, self._path),
 					"date": self.date
 				}
 		photo.update(self.attributes)
