@@ -209,12 +209,10 @@ $(document).ready(function() {
 		var bydateString = "_by_date";
 		var newPath = "";
 		if (currentAlbum.path.indexOf(foldersString) === 0) {
-			console.log(currentPhoto.byDateAlbum);
 			newPath = currentPhoto.byDateAlbum;
 			$("#toggle-folders-bydate").text("by date view");
 		}
 		else if (currentAlbum.path.indexOf(bydateString) === 0) {
-			console.log(currentPhoto.foldersAlbum);
 			newPath = currentPhoto.foldersAlbum;
 			$("#toggle-folders-bydate").text("folder view");
 		}
