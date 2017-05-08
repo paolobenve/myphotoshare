@@ -1,11 +1,11 @@
 (function() {
 	/* constructor */
-	function PhotoPaolo() {
+	function PhotoFloat() {
 		this.albumCache = [];
 	}
 	
 	/* public member functions */
-	PhotoPaolo.prototype.album = function(subalbum, callback, error) {
+	PhotoFloat.prototype.album = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
 		if (typeof subalbum.photos !== "undefined" && subalbum.photos !== null) {
 			callback(subalbum);
@@ -14,7 +14,7 @@
 		if (Object.prototype.toString.call(subalbum).slice(8, -1) === "String")
 			cacheKey = subalbum;
 		else
-			cacheKey = PhotoPaolo.cachePath(subalbum.parent.path + "/" + subalbum.path);
+			cacheKey = PhotoFloat.cachePath(subalbum.parent.path + "/" + subalbum.path);
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
 			return;
@@ -41,7 +41,7 @@
 		}
 		$.ajax(ajaxOptions);
 	};
-	PhotoPaolo.prototype.albumPhoto = function(subalbum, callback, error) {
+	PhotoFloat.prototype.albumPhoto = function(subalbum, callback, error) {
 		var nextAlbum, self;
 		self = this;
 		nextAlbum = function(album) {
@@ -57,12 +57,12 @@
 		else
 			this.album(subalbum, nextAlbum, error);
 	};
-	PhotoPaolo.prototype.parseHash = function(hash, callback, error) {
+	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		var index, album, photo;
-		hash = PhotoPaolo.cleanHash(hash);
+		hash = PhotoFloat.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (!hash.length) {
-			album = PhotoPaolo.cachePath("root");
+			album = PhotoFloat.cachePath("root");
 			photo = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
 			photo = hash.substring(index + 1);
@@ -75,7 +75,7 @@
 			var i = -1;
 			if (photo !== null) {
 				for (i = 0; i < theAlbum.photos.length; ++i) {
-					if (PhotoPaolo.cachePath(theAlbum.photos[i].name) === photo) {
+					if (PhotoFloat.cachePath(theAlbum.photos[i].name) === photo) {
 						photo = theAlbum.photos[i];
 						break;
 					}
@@ -88,7 +88,7 @@
 			callback(theAlbum, photo, i);
 		}, error);
 	};
-	PhotoPaolo.prototype.authenticate = function(password, result) {
+	PhotoFloat.prototype.authenticate = function(password, result) {
 		$.ajax({
 			type: "GET",
 			dataType: "text",
@@ -103,7 +103,7 @@
 	};
 	
 	/* static functions */
-	PhotoPaolo.cachePath = function(path) {
+	PhotoFloat.cachePath = function(path) {
 		if (path === "")
 			return "root";
 		if (path.charAt(0) === "/")
@@ -128,29 +128,29 @@
 			path = path.replace(/__/g, "_");
 		return path;
 	};
-	PhotoPaolo.photoHash = function(album, photo) {
-		return PhotoPaolo.albumHash(album) + "/" + PhotoPaolo.cachePath(photo.name);
+	PhotoFloat.photoHash = function(album, photo) {
+		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(photo.name);
 	};
-	PhotoPaolo.photoHashFolder = function(album, photo) {
+	PhotoFloat.photoHashFolder = function(album, photo) {
 		var hash;
-		hash = PhotoPaolo.photoHash(album, photo);
+		hash = PhotoFloat.photoHash(album, photo);
 		if (hash.indexOf("_by_date-") === 0) {
-			hash = PhotoPaolo.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoPaolo.cachePath(photo.name);
+			hash = PhotoFloat.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoFloat.cachePath(photo.name);
 		}
 		return hash;
 	};
-	PhotoPaolo.albumHash = function(album) {
+	PhotoFloat.albumHash = function(album) {
 		if (typeof album.photos !== "undefined" && album.photos !== null)
-			return PhotoPaolo.cachePath(album.path);
-		return PhotoPaolo.cachePath(album.parent.path + "/" + album.path);
+			return PhotoFloat.cachePath(album.path);
+		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
 	};
-	PhotoPaolo.photoPath = function(album, photo, size, square) {
+	PhotoFloat.photoPath = function(album, photo, size, square) {
 		var suffix, hash;
 		if (square)
 			suffix = size.toString() + "s";
 		else
 			suffix = size.toString();
-		hash = PhotoPaolo.cachePath(PhotoPaolo.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
+		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
@@ -166,22 +166,22 @@
 		}
 		return "cache/" + hash;
 	};
-	PhotoPaolo.originalPhotoPath = function(photo) {
+	PhotoFloat.originalPhotoPath = function(photo) {
 		return photo.albumName;
 	};
-	PhotoPaolo.photoFoldersAlbum = function(photo) {
+	PhotoFloat.photoFoldersAlbum = function(photo) {
 		return photo.foldersAlbum;
 	};
-	PhotoPaolo.photoByDateAlbum = function(photo) {
+	PhotoFloat.photoByDateAlbum = function(photo) {
 		return photo.byDateAlbum;
 	};
-	PhotoPaolo.trimExtension = function(name) {
+	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
 		if (index !== -1)
 			return name.substring(0, index);
 		return name;
 	};
-	PhotoPaolo.cleanHash = function(hash) {
+	PhotoFloat.cleanHash = function(hash) {
 		while (hash.length) {
 			if (hash.charAt(0) === "#")
 				hash = hash.substring(1);
@@ -200,15 +200,15 @@
 	};
 	
 	/* make static methods callable as member functions */
-	PhotoPaolo.prototype.cachePath = PhotoPaolo.cachePath;
-	PhotoPaolo.prototype.photoHash = PhotoPaolo.photoHash;
-	PhotoPaolo.prototype.photoHashFolder = PhotoPaolo.photoHashFolder;
-	PhotoPaolo.prototype.albumHash = PhotoPaolo.albumHash;
-	PhotoPaolo.prototype.photoPath = PhotoPaolo.photoPath;
-	PhotoPaolo.prototype.originalPhotoPath = PhotoPaolo.originalPhotoPath;
-	PhotoPaolo.prototype.trimExtension = PhotoPaolo.trimExtension;
-	PhotoPaolo.prototype.cleanHash = PhotoPaolo.cleanHash;
+	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
+	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
+	PhotoFloat.prototype.photoHashFolder = PhotoFloat.photoHashFolder;
+	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
+	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
+	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;
+	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
+	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
 	
 	/* expose class globally */
-	window.PhotoPaolo = PhotoPaolo;
+	window.PhotoFloat = PhotoFloat;
 }());
