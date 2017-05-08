@@ -131,6 +131,14 @@
 	PhotoFloat.photoHash = function(album, photo) {
 		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(photo.name);
 	};
+	PhotoFloat.photoHashFolder = function(album, photo) {
+		var hash;
+		hash = PhotoFloat.photoHash(album, photo);
+		if (hash.indexOf("_by_date-") === 0) {
+			hash = PhotoFloat.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoFloat.cachePath(photo.name);
+		}
+		return hash;
+	};
 	PhotoFloat.albumHash = function(album) {
 		if (typeof album.photos !== "undefined" && album.photos !== null)
 			return PhotoFloat.cachePath(album.path);
@@ -142,13 +150,30 @@
 			suffix = size.toString() + "s";
 		else
 			suffix = size.toString();
-		hash = PhotoFloat.cachePath(PhotoFloat.photoHash(album, photo) + "_" + suffix + ".jpg");
-		if (hash.indexOf("root-") === 0)
-			hash = hash.substring(5);
+		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
+		var rootString = "root-";
+		if (hash.indexOf(rootString) === 0)
+			hash = hash.substring(rootString.length);
+		else {
+			var foldersString = "_folders-";
+			if (hash.indexOf(foldersString) === 0)
+				hash = hash.substring(foldersString.length);
+			else {
+				var bydateString = "_by_date-";
+				if (hash.indexOf(bydateString) === 0)
+				hash = hash.substring(bydateString.length);
+			}
+		}
 		return "cache/" + hash;
 	};
-	PhotoFloat.originalPhotoPath = function(album, photo) {
-		return "albums/" + album.path + "/" + photo.name;
+	PhotoFloat.originalPhotoPath = function(photo) {
+		return photo.albumName;
+	};
+	PhotoFloat.photoFoldersAlbum = function(photo) {
+		return photo.foldersAlbum;
+	};
+	PhotoFloat.photoByDateAlbum = function(photo) {
+		return photo.byDateAlbum;
 	};
 	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
@@ -177,6 +202,7 @@
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
 	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
+	PhotoFloat.prototype.photoHashFolder = PhotoFloat.photoHashFolder;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
 	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
 	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;

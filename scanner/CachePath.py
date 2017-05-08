@@ -33,7 +33,7 @@ def cache_base(path):
 	if len(path) == 0:
 		path = "root"
 	return path
-def json_cache(path):
+def json_name(path):
 	return cache_base(path) + ".json"
 def image_cache(path, size, square=False):
 	if square:

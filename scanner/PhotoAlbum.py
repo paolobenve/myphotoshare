@@ -26,8 +26,8 @@ class Album(object):
 	def __str__(self):
 		return self.path
 	@property
-	def cache_path(self):
-		return json_cache(self.path)
+	def json_file(self):
+		return json_name(self.path)
 	@property
 	def date(self):
 		self._sort()
@@ -39,7 +39,10 @@ class Album(object):
 			return self._photos[-1].date
 		return max(self._photos[-1].date, self._albums[-1].date)
 	def __cmp__(self, other):
-		return cmp(self.date, other.date)
+		try:
+			return cmp(self.date, other.date)
+		except TypeError:
+			return 1
 	def add_photo(self, photo):
 		self._photos.append(photo)
 		self._photos_sorted = False
@@ -66,7 +69,7 @@ class Album(object):
 		
 	def cache(self, base_dir):
 		self._sort()
-		fp = open(os.path.join(base_dir, self.cache_path), 'w')
+		fp = open(os.path.join(base_dir, self.json_file), 'w')
 		json.dump(self, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	@staticmethod
@@ -85,6 +88,14 @@ class Album(object):
 				album.add_album(Album.from_dict(subalbum), cripple)
 		album._sort()
 		return album
+	def remove_marker(self, path):
+		marker = "_folders"
+		marker_position = path.find(marker)
+		if marker_position == 0:
+			path = path[len(marker):]
+			if len(path) > 0:
+				path = path[1:]
+		return path
 	def to_dict(self, cripple=True):
 		self._sort()
 		subalbums = []
@@ -96,7 +107,11 @@ class Album(object):
 			for sub in self._albums:
 				if not sub.empty:
 					subalbums.append(sub)
-		return { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
+		path_without_marker = self.remove_marker(self.path)
+		if path_without_marker == self.path:
+			return { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
+		else:
+			return { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
 	def photo_from_path(self, path):
 		for photo in self._photos:
 			if trim_base(path) == photo._path:
@@ -104,9 +119,11 @@ class Album(object):
 		return None
 	
 class Photo(object):
-	thumb_sizes = [ (75, True), (150, True), (1600, False) ]
+	thumb_sizes = [ (1600, False), (1024, False), (800, False), (150, True), (75, True) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
+		self.folders = trim_base(os.path.dirname(self._path))
+		self.album_path = os.path.join("albums", self._path)
 		self.is_valid = True
 		try:
 			mtime = file_mtime(path)
@@ -228,54 +245,63 @@ class Photo(object):
 		
 	def _thumbnail(self, image, thumb_path, original_path, size, square=False):
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
-		info_string = "  -> %spx" % (str(size))
+		info_string = "%spx" % (str(size))
 		if square:
 			info_string += ", square"
-		message("thumbing", info_string)
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
+			next_level()
+			message("existing thumb", info_string)
+			back_level()
 			return
+		next_level()
+		message("thumbing", info_string)
+		back_level()
 		gc.collect()
 		try:
-			image = image.copy()
+			image_copy = image.copy()
 		except KeyboardInterrupt:
 			raise
 		except:
 			try:
-				image = image.copy() # we try again to work around PIL bug
+				image_copy = image.copy() # we try again to work around PIL bug
 			except KeyboardInterrupt:
 				raise
 			except:
 				message("corrupt image", os.path.basename(original_path))
 				return
 		if square:
-			if image.size[0] > image.size[1]:
-				left = (image.size[0] - image.size[1]) / 2
+			if image_copy.size[0] > image_copy.size[1]:
+				left = (image_copy.size[0] - image_copy.size[1]) / 2
 				top = 0
-				right = image.size[0] - ((image.size[0] - image.size[1]) / 2)
-				bottom = image.size[1]
+				right = image_copy.size[0] - ((image_copy.size[0] - image_copy.size[1]) / 2)
+				bottom = image_copy.size[1]
 			else:
 				left = 0
-				top = (image.size[1] - image.size[0]) / 2
-				right = image.size[0]
-				bottom = image.size[1] - ((image.size[1] - image.size[0]) / 2)
-			image = image.crop((left, top, right, bottom))
+				top = (image_copy.size[1] - image_copy.size[0]) / 2
+				right = image_copy.size[0]
+				bottom = image_copy.size[1] - ((image_copy.size[1] - image_copy.size[0]) / 2)
+			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
-		image.thumbnail((size, size), Image.ANTIALIAS)
+		image_copy.thumbnail((size, size), Image.ANTIALIAS)
 		try:
-			image.save(thumb_path, "JPEG", quality=88)
+			image_copy.save(thumb_path, "JPEG", quality=88)
+			return image_copy
 		except KeyboardInterrupt:
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
 			raise
+		except IOError:
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=88)
+			return image_copy
 		except:
 			message("save failure", os.path.basename(thumb_path))
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
-		
+		return image
 	def _thumbnails(self, image, thumb_path, original_path):
 		mirror = image
 		if self._orientation == 2:
@@ -300,8 +326,9 @@ class Photo(object):
 			# Rotation 90
 			mirror = image.transpose(Image.ROTATE_90)
 		next_level()
+		thumb = mirror
 		for size in Photo.thumb_sizes:
-			self._thumbnail(mirror, thumb_path, original_path, size[0], size[1])
+			thumb = self._thumbnail(thumb, thumb_path, original_path, size[0], size[1])
 		back_level()
 	@property
 	def name(self):
@@ -326,9 +353,29 @@ class Photo(object):
 		else:
 			correct_date = self._attributes["dateTimeFile"]
 		return correct_date
-
+	@property
+	def year(self):
+		return self.date.year
+	@property
+	def month(self):
+		return self.date.month
+	@property
+	def day(self):
+		return self.date.day
+	@property
+	def year_month(self):
+		return self.year + " " + self.month
+	@property
+	def year_month_day(self):
+		return self.year_month + " " + self.day
+	@property
+	def by_date_album_path(self):
+		return "_by_date/" + str(self.year) + "/" + str(self.month) + "/" + str(self.day)
 	def __cmp__(self, other):
-		date_compare = cmp(self.date, other.date)
+		try:
+			date_compare = cmp(self.date, other.date)
+		except TypeError:
+			date_compare = 1
 		if date_compare == 0:
 			return cmp(self.name, other.name)
 		return date_compare
@@ -350,7 +397,19 @@ class Photo(object):
 					pass
 		return Photo(path, None, dictionary)
 	def to_dict(self):
-		photo = { "name": self.name, "date": self.date }
+		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
+		foldersAlbum = "_folders"
+		if (self.folders):
+			foldersAlbum = os.path.join(foldersAlbum, self.folders)
+		photo = {
+					"name": self.name,
+					"albumName": self.album_path,
+					"byDateAlbum": self.by_date_album_path,
+					"byDateName": os.path.join(self.by_date_album_path, self.name),
+					"foldersAlbum": foldersAlbum,
+					"completeName": os.path.join("_folders", self._path),
+					"date": self.date
+				}
 		photo.update(self.attributes)
 		return photo
 
