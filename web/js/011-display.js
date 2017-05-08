@@ -302,7 +302,17 @@ $(document).ready(function() {
 	
 	$(window).hashchange(function() {
 		$("#loading").show();
-		currentAlbum = null;
+		var foldersString = "_folders";
+		var bydateString = "_by_date";
+		if (currentAlbum && (
+				currentAlbum.path.indexOf(foldersString) === 0 && location.hash.indexOf(bydateString) === 3
+				||
+				currentAlbum.path.indexOf(bydateString) === 0 && location.hash.indexOf(foldersString) === 3
+				)
+			) {
+			console.log(currentAlbum.path, location.hash);
+			currentAlbum = null;
+		}
 		$("link[rel=image_src]").remove();
 		photoPaolo.parseHash(location.hash, hashParsed, die);
 	});
