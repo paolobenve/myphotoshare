@@ -134,7 +134,7 @@
 	PhotoFloat.photoHashFolder = function(album, photo) {
 		var hash;
 		hash = PhotoFloat.photoHash(album, photo);
-		console.log("11111", bydateStringWithTrailingDash);
+		//console.log("11111", bydateStringWithTrailingDash);
 		if (hash.indexOf(bydateStringWithTrailingDash) === 0) {
 			hash = PhotoFloat.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoFloat.cachePath(photo.name);
 		}
