@@ -28,6 +28,10 @@ $(document).ready(function() {
 	var originalTitle = document.title;
 	var photoFloat = new PhotoFloat();
 	var maxSize = 1600;
+	bydateString = "_by_date";
+	bydateStringWithTrailingDash = bydateString + "-";
+	foldersString = "_folders";
+	foldersStringWithTrailingDash = foldersString + "-";
 	
 	
 	/* Displays */
@@ -97,7 +101,7 @@ $(document).ready(function() {
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
 				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true);
-				if (thumbHash.indexOf("_by_date-") === 0) {
+				if (thumbHash.indexOf(bydateStringWithTrailingDash) === 0) {
 					thumbHash =
 						PhotoFloat.cachePath(currentAlbum.photos[i].completeName.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
 						"/" +
@@ -204,8 +208,6 @@ $(document).ready(function() {
 		
 		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextPhoto);
 		
-		var foldersString = "_folders";
-		var bydateString = "_by_date";
 		var newPath = "";
 		if (currentAlbum.path.indexOf(foldersString) === 0) {
 			newPath = currentPhoto.byDateAlbum;
@@ -275,7 +277,6 @@ $(document).ready(function() {
 		$("#loading").hide();
 		if (album === currentAlbum && photo === currentPhoto)
 			return;
-		var bydateString = "_by_date/";
 		if (currentAlbum && currentAlbum.path.indexOf(bydateString) === 0 && photo !== null) {
 			previousAlbum = currentAlbum;
 			album = currentAlbum;

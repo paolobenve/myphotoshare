@@ -370,7 +370,7 @@ class Photo(object):
 		return self.year_month + " " + self.day
 	@property
 	def by_date_album_path(self):
-		return "_by_date/" + str(self.year) + "/" + str(self.month) + "/" + str(self.day)
+		return bydateString + "/" + str(self.year) + "/" + str(self.month) + "/" + str(self.day)
 	def __cmp__(self, other):
 		try:
 			date_compare = cmp(self.date, other.date)

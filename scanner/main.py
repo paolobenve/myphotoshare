@@ -8,7 +8,9 @@ import os
 def main():
 	reload(sys)
 	sys.setdefaultencoding("UTF-8")
-
+	
+	bydateString = "_by_date"
+	
 	if len(sys.argv) != 3:
 		print "usage: %s ALBUM_PATH CACHE_PATH" % sys.argv[0]
 		return

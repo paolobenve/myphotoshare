@@ -134,7 +134,8 @@
 	PhotoFloat.photoHashFolder = function(album, photo) {
 		var hash;
 		hash = PhotoFloat.photoHash(album, photo);
-		if (hash.indexOf("_by_date-") === 0) {
+		console.log("11111", bydateStringWithTrailingDash);
+		if (hash.indexOf(bydateStringWithTrailingDash) === 0) {
 			hash = PhotoFloat.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoFloat.cachePath(photo.name);
 		}
 		return hash;
@@ -159,9 +160,8 @@
 			if (hash.indexOf(foldersString) === 0)
 				hash = hash.substring(foldersString.length);
 			else {
-				var bydateString = "_by_date-";
-				if (hash.indexOf(bydateString) === 0)
-				hash = hash.substring(bydateString.length);
+				if (hash.indexOf(bydateStringWithTrailingDash) === 0)
+				hash = hash.substring(bydateStringWithTrailingDash.length);
 			}
 		}
 		return "cache/" + hash;
