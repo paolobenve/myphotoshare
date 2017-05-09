@@ -207,24 +207,40 @@ $(document).ready(function() {
 						photoFloat.photoPath(currentAlbum, previousPhoto, maxSize, false));
 		
 		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextPhoto);
+		if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentPhoto)) {
+			$("#folders-view-container").hide();
+			$("#day-view-container").show();
+			$("#month-view-container").show();
+			$("#year-view-container").show();
+		}
+		else if (currentAlbum.path == photoFloat.photoDayAlbum(currentPhoto)) {
+			$("#folders-view-container").show();
+			$("#day-view-container").hide();
+			$("#month-view-container").show();
+			$("#year-view-container").show();
+		}
+		else if (currentAlbum.path == photoFloat.photoMonthAlbum(currentPhoto)) {
+			$("#folders-view-container").show();
+			$("#day-view-container").show();
+			$("#month-view-container").hide();
+			$("#year-view-container").show();
+		}
+		else if (currentAlbum.path == photoFloat.photoYearAlbum(currentPhoto)) {
+			$("#folders-view-container").show();
+			$("#day-view-container").show();
+			$("#month-view-container").show();
+			$("#year-view-container").hide();
+		}
 		
-		var newPath = "";
-		if (currentAlbum.path.indexOf(foldersString) === 0) {
-			newPath = currentPhoto.byDateAlbum;
-			$("#toggle-folders-bydate").text("by date view");
-		}
-		else if (currentAlbum.path.indexOf(bydateString) === 0) {
-			newPath = currentPhoto.foldersAlbum;
-			$("#toggle-folders-bydate").text("folder view");
-		}
-		var photoNameCache = PhotoFloat.cachePath(currentPhoto.name);
-		var toggleFoldersDate = "#!/" + PhotoFloat.cachePath(newPath) + "/" + PhotoFloat.cachePath(currentPhoto.name);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousPhoto));
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentPhoto));
-		$("#toggle-folders-bydate").attr("href", toggleFoldersDate);
-
+		$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentPhoto.foldersAlbum) + "/" + PhotoFloat.cachePath(currentPhoto.name));
+		$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentPhoto.dayAlbum) + "/" + PhotoFloat.cachePath(currentPhoto.name));
+		$("#month-view").attr("href", "#!/" + PhotoFloat.cachePath(currentPhoto.monthAlbum) + "/" + PhotoFloat.cachePath(currentPhoto.name));
+		$("#year-view").attr("href", "#!/" + PhotoFloat.cachePath(currentPhoto.yearAlbum) + "/" + PhotoFloat.cachePath(currentPhoto.name));
+		
 		text = "<table>";
 		if (typeof currentPhoto.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentPhoto.make + "</td></tr>";
 		if (typeof currentPhoto.model !== "undefined") text += "<tr><td>Camera Model</td><td>" + currentPhoto.model + "</td></tr>";
@@ -277,6 +293,8 @@ $(document).ready(function() {
 		$("#loading").hide();
 		if (album === currentAlbum && photo === currentPhoto)
 			return;
+		if (album != currentAlbum)
+			currentAlbum = null;
 		if (currentAlbum && currentAlbum.path.indexOf(bydateString) === 0 && photo !== null) {
 			previousAlbum = currentAlbum;
 			album = currentAlbum;
@@ -302,16 +320,6 @@ $(document).ready(function() {
 	
 	$(window).hashchange(function() {
 		$("#loading").show();
-		var foldersString = "_folders";
-		var bydateString = "_by_date";
-		if (currentAlbum && (
-				currentAlbum.path.indexOf(foldersString) === 0 && location.hash.indexOf(bydateString) === 3
-				||
-				currentAlbum.path.indexOf(bydateString) === 0 && location.hash.indexOf(foldersString) === 3
-				)
-			) {
-			currentAlbum = null;
-		}
 		$("link[rel=image_src]").remove();
 		photoFloat.parseHash(location.hash, hashParsed, die);
 	});

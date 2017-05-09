@@ -1,3 +1,5 @@
+import locale
+locale.setlocale(locale.LC_ALL, '')
 from CachePath import *
 from datetime import datetime
 import json
@@ -355,13 +357,13 @@ class Photo(object):
 		return correct_date
 	@property
 	def year(self):
-		return self.date.year
+		return str(self.date.year)
 	@property
 	def month(self):
-		return self.date.month
+		return self.date.strftime("%B").capitalize() + " " + self.year
 	@property
 	def day(self):
-		return self.date.day
+		return str(self.date.day) + " " + self.month
 	@property
 	def year_month(self):
 		return self.year + " " + self.month
@@ -369,9 +371,15 @@ class Photo(object):
 	def year_month_day(self):
 		return self.year_month + " " + self.day
 	@property
-	def by_date_album_path(self):
+	def year_album_path(self):
 		bydateString = "_by_date"
-		return bydateString + "/" + str(self.year) + "/" + str(self.month) + "/" + str(self.day)
+		return bydateString + "/" + self.year
+	@property
+	def month_album_path(self):
+		return self.year_album_path + "/" + self.month
+	@property
+	def day_album_path(self):
+		return self.month_album_path + "/" + self.day
 	def __cmp__(self, other):
 		try:
 			date_compare = cmp(self.date, other.date)
@@ -406,8 +414,10 @@ class Photo(object):
 		photo = {
 					"name": self.name,
 					"albumName": self.album_path,
-					"byDateAlbum": self.by_date_album_path,
-					"byDateName": os.path.join(self.by_date_album_path, self.name),
+					"yearAlbum": self.year_album_path,
+					"monthAlbum": self.month_album_path,
+					"dayAlbum": self.day_album_path,
+					"byDateName": os.path.join(self.day_album_path, self.name),
 					"foldersAlbum": foldersAlbum,
 					"completeName": os.path.join(foldersString, self._path),
 					"date": self.date

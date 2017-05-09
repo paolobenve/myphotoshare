@@ -172,8 +172,14 @@
 	PhotoFloat.photoFoldersAlbum = function(photo) {
 		return photo.foldersAlbum;
 	};
-	PhotoFloat.photoByDateAlbum = function(photo) {
-		return photo.byDateAlbum;
+	PhotoFloat.photoDayAlbum = function(photo) {
+		return photo.dayAlbum;
+	};
+	PhotoFloat.photoMonthAlbum = function(photo) {
+		return photo.monthAlbum;
+	};
+	PhotoFloat.photoYearAlbum = function(photo) {
+		return photo.yearAlbum;
 	};
 	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
@@ -206,6 +212,10 @@
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
 	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
 	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;
+	PhotoFloat.prototype.photoFoldersAlbum = PhotoFloat.photoFoldersAlbum;
+	PhotoFloat.prototype.photoDayAlbum = PhotoFloat.photoDayAlbum;
+	PhotoFloat.prototype.photoMonthAlbum = PhotoFloat.photoMonthAlbum;
+	PhotoFloat.prototype.photoYearAlbum = PhotoFloat.photoYearAlbum;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
 	
