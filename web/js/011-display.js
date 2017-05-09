@@ -108,10 +108,17 @@ $(document).ready(function() {
 						PhotoFloat.cachePath(currentAlbum.photos[i].name);
 				}
 				link = $("<a href=\"#!/" + hash + "\"></a>");
-				image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-							"\" src=\"" + thumbHash +
-							"\" height=\"150\" width=\"150\" />");
+				//~ image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+							//~ "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+							//~ "\" src=\"" + thumbHash +
+							//~ "\" height=\"150\" width=\"150\" />");
+				image = $("<div title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+							"\" class=\"album-button\"" +
+							" style=\"background-image: url(&quot;" + thumbHash + "&quot;);\">" +
+							"<span style=\"white-space: nowrap;\">" +
+							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
+							"</span>" +
+							"</div>");
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);
 				photos.push(link);

@@ -31,7 +31,6 @@ a:hover {
 }
 #thumbs {
 	clear: both;
-	line-height: 0;
 }
 
 #thumbs img {
@@ -206,4 +205,8 @@ a:hover {
 
 .album-button, #thumbs img  {
 	margin: 3px
+}
+
+figure, figcaption {
+	display: inline-block;
 }
