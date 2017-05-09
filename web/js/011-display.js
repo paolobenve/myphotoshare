@@ -207,25 +207,25 @@ $(document).ready(function() {
 		if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentPhoto)) {
 			$("#folders-view-container").hide();
 			$("#day-view-container").show();
-			$("#month-view-container").show();
-			$("#year-view-container").show();
+			$("#month-view-container").hide();
+			$("#year-view-container").hide();
 		}
 		else if (currentAlbum.path == photoFloat.photoDayAlbum(currentPhoto)) {
-			$("#folders-view-container").show();
+			$("#folders-view-container").hide();
 			$("#day-view-container").hide();
 			$("#month-view-container").show();
-			$("#year-view-container").show();
+			$("#year-view-container").hide();
 		}
 		else if (currentAlbum.path == photoFloat.photoMonthAlbum(currentPhoto)) {
-			$("#folders-view-container").show();
-			$("#day-view-container").show();
+			$("#folders-view-container").hide();
+			$("#day-view-container").hide();
 			$("#month-view-container").hide();
 			$("#year-view-container").show();
 		}
 		else if (currentAlbum.path == photoFloat.photoYearAlbum(currentPhoto)) {
 			$("#folders-view-container").show();
-			$("#day-view-container").show();
-			$("#month-view-container").show();
+			$("#day-view-container").hide();
+			$("#month-view-container").hide();
 			$("#year-view-container").hide();
 		}
 		
