@@ -203,14 +203,7 @@ $(document).ready(function() {
 		$.preloadImages(photoFloat.photoPath(currentAlbum, nextPhoto, maxSize, false),
 						photoFloat.photoPath(currentAlbum, previousPhoto, maxSize, false));
 		
-		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextPhoto);
 		if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentPhoto)) {
-			$("#folders-view-container").hide();
-			$("#day-view-container").show();
-			$("#month-view-container").hide();
-			$("#year-view-container").hide();
-		}
-		else if (currentAlbum.path == photoFloat.photoDayAlbum(currentPhoto)) {
 			$("#folders-view-container").hide();
 			$("#day-view-container").hide();
 			$("#month-view-container").show();
@@ -223,12 +216,19 @@ $(document).ready(function() {
 			$("#year-view-container").show();
 		}
 		else if (currentAlbum.path == photoFloat.photoYearAlbum(currentPhoto)) {
+			$("#folders-view-container").hide();
+			$("#day-view-container").show();
+			$("#month-view-container").hide();
+			$("#year-view-container").hide();
+		}
+		else if (currentAlbum.path == photoFloat.photoDayAlbum(currentPhoto)) {
 			$("#folders-view-container").show();
 			$("#day-view-container").hide();
 			$("#month-view-container").hide();
 			$("#year-view-container").hide();
 		}
 		
+		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextPhoto);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousPhoto));
