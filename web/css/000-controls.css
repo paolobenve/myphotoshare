@@ -203,10 +203,10 @@ a:hover {
 	font-style: italic;
 }
 
-.album-button, #thumbs img  {
-	margin: 3px
-}
-
-figure, figcaption {
-	display: inline-block;
+#photo-name {
+	margin: 0 0 0 0;
+	color: lime;
+	font-weight: bold;
+	font-size: 140%;
+	font-style: italic;
 }

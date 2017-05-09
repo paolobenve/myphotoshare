@@ -57,10 +57,12 @@ $(document).ready(function() {
 			documentTitle += components[components.length - 1 - i];
 			if (i < components.length - 1 || currentPhoto !== null) {
 				title += "</a>";
+			}
+			if (i < components.length - 1) {
 				title += " &raquo; ";
 			}
 		}
-		if (currentPhoto !== null)
+		if (false && currentPhoto !== null)
 			title += photoFloat.trimExtension(currentPhoto.name);
 		$("#title").html(title);
 		document.title = documentTitle;
@@ -269,6 +271,7 @@ $(document).ready(function() {
 		$("#album-view").addClass("photo-view-container");
 		$("#subalbums").hide();
 		$("#photo-view").show();
+		$("#photo-name").html(photoFloat.trimExtension(currentPhoto.name));
 	}
 	
 	
