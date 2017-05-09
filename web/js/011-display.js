@@ -147,10 +147,7 @@ $(document).ready(function() {
 			subalbumsElement = $("#subalbums");
 			subalbumsElement.empty();
 			subalbumsElement.append.apply(subalbumsElement, subalbums);
-			if (currentAlbum.albums.length > 1)
-				subalbumsElement.insertBefore(thumbsElement);
-			else
-				thumbsElement.insertBefore(subalbumsElement);
+			subalbumsElement.insertBefore(thumbsElement);
 		}
 		
 		if (currentPhoto === null) {
