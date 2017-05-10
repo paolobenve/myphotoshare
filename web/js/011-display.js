@@ -28,6 +28,9 @@ $(document).ready(function() {
 	byYearTranslation = "per anno";
 	donwloadOriginalTranslation = "scarica originale";
 	fullscreenTranslation = "schermo intero";
+	loadingTranslation = "caricamento in corso...";
+	poweredByTranslation = "Realizzato con";
+	errorTextTranslation = "Errore :-(";
 
 	/* Globals */
 	
@@ -347,6 +350,9 @@ $(document).ready(function() {
 		if (photo !== null) {
 			showPhoto();
 		}
+		$("#powered-by-string").html(poweredByTranslation);
+		$("#loading").html(loadingTranslation);
+		$("#error-text").html(errorTextTranslation);
 	}
 	
 	/* Event listeners */
