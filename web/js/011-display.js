@@ -110,10 +110,15 @@ $(document).ready(function() {
 						PhotoFloat.cachePath(currentAlbum.photos[i].name);
 				}
 				link = $("<a href=\"#!/" + hash + "\"></a>");
-				image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+				image = $("<div class=\"thumb-container\">" +
+							"<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
 							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
 							"\" src=\"" + thumbHash +
-							"\" height=\"150\" width=\"150\" />");
+							"\" height=\"150\" width=\"150\" />" +
+							"<div class=\"thumb-caption\">" +
+							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
+							"</div>" +
+							"</div>");
 				//~ image = $("<div title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
 							//~ "\" class=\"album-button\"" +
 							//~ " style=\"background-image: url(&quot;" + thumbHash + "&quot;);\">" +
@@ -230,7 +235,8 @@ $(document).ready(function() {
 			$("#month-view-container").hide();
 			$("#year-view-container").show();
 		}
-		else if (currentAlbum.path == photoFloat.photoYearAlbum(currentPhoto)) {
+		
+		if (currentAlbum.path == photoFloat.photoYearAlbum(currentPhoto)) {
 			//~ $("#folders-view-container").show();
 			//~ $("#day-view-container").hide();
 			//~ $("#month-view-container").hide();

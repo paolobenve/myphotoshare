@@ -6,7 +6,7 @@ body {
 	color: #FFFFFF;
 }
 a {
-	color: #84AAC2;
+	color: floralwhite;
 	text-decoration: none;
 }
 a:hover {
@@ -50,7 +50,7 @@ a:hover {
 	float: left;
 	display: block;
 	width: 150px;
-	height: 60px;
+	height: 20px;
 	text-align: center;
 	font-style: italic;
 	font-size: 12px;
@@ -58,6 +58,8 @@ a:hover {
 	background-position: top;
 	padding-top: 150px;
 	background-image: url(../img/image-placeholder.png);
+	background-color: gray;
+	margin: 0 3px 30px 3px;
 }
 
 
@@ -173,6 +175,7 @@ a:hover {
 	font-weight: bold;
 	text-shadow: rgba(0,0,0,0.5) -1px 0, rgba(0,0,0,0.3) 0 -1px, rgba(255,255,255,0.5) 0 1px, rgba(0,0,0,0.3) -1px -2px;
 	color: #FFAD27;
+	margin-top: 20px;
 }
 #error-overlay, #error-text, #auth-text {
 	position: fixed;
@@ -213,6 +216,24 @@ a:hover {
 	font-style: italic;
 }
 
-.album-button, #thumbs img  {
-	margin: 3px
+#thumbs img {
+	margin: 3px;
+}
+
+.thumb-container {
+	display: inline;
+	position: relative;
+	top: 0;
+}
+.thumb-caption {
+	display: block;
+	font-size: 75%;
+	width: 155px;
+	text-align: center;
+	color: chartreuse;
+}
+
+#thumbs a {
+	display: inline-flex;
+	text-decoration: none;
 }
