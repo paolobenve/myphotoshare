@@ -89,7 +89,7 @@ $(document).ready(function() {
 				return;
 		}
 		$("#thumbs img").each(function() {
-			if (this.photo === photo) {
+			if (this.title === photo.name) {
 				thumb = $(this);
 				return false;
 			}
@@ -124,7 +124,7 @@ $(document).ready(function() {
 				}
 				link = $("<a href=\"#!/" + hash + "\"></a>");
 				image = $("<div class=\"thumb-container\">" +
-							"<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+							"<img title=\"" + currentAlbum.photos[i].name +
 							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
 							"\" src=\"" + thumbHash +
 							"\" height=\"150\" width=\"150\" />" +
