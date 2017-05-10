@@ -210,3 +210,7 @@ a:hover {
 	font-size: 140%;
 	font-style: italic;
 }
+
+album-button, #thumbs img  {
+	margin: 3px
+}
