@@ -34,12 +34,12 @@ class Album(object):
 	def date(self):
 		self._sort()
 		if len(self._photos) == 0 and len(self._albums) == 0:
-			return datetime(1900, 1, 1)
+			return datetime(1900, 1, 1).strftime("%c")
 		elif len(self._photos) == 0:
-			return self._albums[-1].date
+			return self._albums[-1].date.strftime("%c")
 		elif len(self._albums) == 0:
-			return self._photos[-1].date
-		return max(self._photos[-1].date, self._albums[-1].date)
+			return self._photos[-1].date.strftime("%c")
+		return max(self._photos[-1].date, self._albums[-1].date).strftime("%c")
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
