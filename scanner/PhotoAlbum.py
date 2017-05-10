@@ -399,7 +399,8 @@ class Photo(object):
 		for key, value in dictionary.items():
 			if key.startswith("dateTime"):
 				try:
-					dictionary[key] = datetime.strptime(dictionary[key], "%a %b %d %H:%M:%S %Y")
+					#~ dictionary[key] = datetime.strptime(dictionary[key], "%a %b %d %T %Y")
+					dictionary[key] = datetime.strptime(dictionary[key], "%c")
 				except KeyboardInterrupt:
 					raise
 				except:

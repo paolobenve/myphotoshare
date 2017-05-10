@@ -19,18 +19,18 @@ $(document).ready(function() {
 	
 	
 	/* Globals: Translations */
-	bydateTranslation = "immagini per data";
-	foldersTranslation = "immagini per cartella";
-	showMetadataTranslation = "Metadati";
-	foldersViewTranslation = "cartelle";
-	byDayTranslation = "per giorno";
-	byMonthTranslation = "per mese";
-	byYearTranslation = "per anno";
-	donwloadOriginalTranslation = "scarica originale";
-	fullscreenTranslation = "schermo intero";
-	loadingTranslation = "caricamento in corso...";
-	poweredByTranslation = "Realizzato con";
-	errorTextTranslation = "Errore :-(";
+	var bydateTranslation = "immagini per data";
+	var foldersTranslation = "immagini per cartella";
+	var showMetadataTranslation = "Metadati";
+	var foldersViewTranslation = "cartelle";
+	var byDayTranslation = "per giorno";
+	var byMonthTranslation = "per mese";
+	var byYearTranslation = "per anno";
+	var donwloadOriginalTranslation = "scarica originale";
+	var fullscreenTranslation = "schermo intero";
+	var loadingTranslation = "caricamento in corso...";
+	var poweredByTranslation = "Realizzato con";
+	var errorTextTranslation = "Errore :-(";
 
 	/* Globals */
 	
