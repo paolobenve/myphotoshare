@@ -34,7 +34,7 @@ class Album(object):
 	def date(self):
 		self._sort()
 		if len(self._photos) == 0 and len(self._albums) == 0:
-			return datetime(1900, 1, 1).strftime("%c")
+			return datetime(1900, 1, 1)
 		elif len(self._photos) == 0:
 			return self._albums[-1].date
 		elif len(self._albums) == 0:
@@ -429,7 +429,8 @@ class Photo(object):
 class PhotoAlbumEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, datetime):
-			return obj.strftime("%a %b %d %H:%M:%S %Y")
+			#~ return obj.strftime("%a %b %d %H:%M:%S %Y")
+			return obj.strftime("%c")
 		if isinstance(obj, Album) or isinstance(obj, Photo):
 			return obj.to_dict()
 		return json.JSONEncoder.default(self, obj)
