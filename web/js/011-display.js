@@ -18,6 +18,17 @@ $(document).ready(function() {
 	 */
 	
 	
+	/* Globals: Translations */
+	bydateTranslation = "immagini per data";
+	foldersTranslation = "immagini per cartella";
+	showMetadataTranslation = "Metadati";
+	foldersViewTranslation = "cartelle";
+	byDayTranslation = "per giorno";
+	byMonthTranslation = "per mese";
+	byYearTranslation = "per anno";
+	donwloadOriginalTranslation = "scarica originale";
+	fullscreenTranslation = "schermo intero";
+
 	/* Globals */
 	
 	var currentAlbum = null;
@@ -53,8 +64,8 @@ $(document).ready(function() {
 				last += "/" + components[i];
 			if (i < components.length - 1 || currentPhoto !== null)
 				title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
-			title += components[i];
-			documentTitle += components[components.length - 1 - i];
+			title += components[i].replace(bydateString, bydateTranslation).replace(foldersString, foldersTranslation);
+			documentTitle += components[components.length - 1 - i].replace(bydateString, bydateTranslation).replace(foldersString, foldersTranslation);
 			if (i < components.length - 1 || currentPhoto !== null) {
 				title += "</a>";
 			}
@@ -62,8 +73,7 @@ $(document).ready(function() {
 				title += " &raquo; ";
 			}
 		}
-		if (false && currentPhoto !== null)
-			title += photoFloat.trimExtension(currentPhoto.name);
+		
 		$("#title").html(title);
 		document.title = documentTitle;
 	}
@@ -278,6 +288,14 @@ $(document).ready(function() {
 		$("#subalbums").hide();
 		$("#photo-view").show();
 		$("#photo-name").html(photoFloat.trimExtension(currentPhoto.name));
+		
+		$("#metadata-link").html(showMetadataTranslation);
+		$("#folders-view").html(foldersViewTranslation);
+		$("#day-view").html(byDayTranslation);
+		$("#month-view").html(byMonthTranslation);
+		$("#year-view").html(byYearTranslation);
+		$("#original-link").html(donwloadOriginalTranslation);
+		$("#fullscreen").html(fullscreenTranslation);
 	}
 	
 	
