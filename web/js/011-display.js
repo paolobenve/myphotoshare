@@ -110,17 +110,17 @@ $(document).ready(function() {
 						PhotoFloat.cachePath(currentAlbum.photos[i].name);
 				}
 				link = $("<a href=\"#!/" + hash + "\"></a>");
-				//~ image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-							//~ "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-							//~ "\" src=\"" + thumbHash +
-							//~ "\" height=\"150\" width=\"150\" />");
-				image = $("<div title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-							"\" class=\"album-button\"" +
-							" style=\"background-image: url(&quot;" + thumbHash + "&quot;);\">" +
-							"<span style=\"white-space: nowrap;\">" +
-							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
-							"</span>" +
-							"</div>");
+				image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+							"\" src=\"" + thumbHash +
+							"\" height=\"150\" width=\"150\" />");
+				//~ image = $("<div title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+							//~ "\" class=\"album-button\"" +
+							//~ " style=\"background-image: url(&quot;" + thumbHash + "&quot;);\">" +
+							//~ "<span style=\"white-space: nowrap;\">" +
+							//~ currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
+							//~ "</span>" +
+							//~ "</div>");
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);
 				photos.push(link);
@@ -216,24 +216,24 @@ $(document).ready(function() {
 			$("#folders-view-container").hide();
 			$("#day-view-container").hide();
 			$("#month-view-container").show();
-			$("#year-view-container").hide();
+			$("#year-view-container").show();
 		}
 		else if (currentAlbum.path == photoFloat.photoMonthAlbum(currentPhoto)) {
 			$("#folders-view-container").hide();
-			$("#day-view-container").hide();
-			$("#month-view-container").hide();
-			$("#year-view-container").show();
-		}
-		else if (currentAlbum.path == photoFloat.photoYearAlbum(currentPhoto)) {
-			$("#folders-view-container").hide();
 			$("#day-view-container").show();
 			$("#month-view-container").hide();
-			$("#year-view-container").hide();
+			$("#year-view-container").show();
 		}
 		else if (currentAlbum.path == photoFloat.photoDayAlbum(currentPhoto)) {
 			$("#folders-view-container").show();
 			$("#day-view-container").hide();
 			$("#month-view-container").hide();
+			$("#year-view-container").show();
+		}
+		else if (currentAlbum.path == photoFloat.photoYearAlbum(currentPhoto)) {
+			//~ $("#folders-view-container").show();
+			//~ $("#day-view-container").hide();
+			//~ $("#month-view-container").hide();
 			$("#year-view-container").hide();
 		}
 		
