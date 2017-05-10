@@ -154,7 +154,9 @@ $(document).ready(function() {
 			subalbums = [];
 			for (i = currentAlbum.albums.length - 1; i >= 0; --i) {
 				link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
-				image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" + currentAlbum.albums[i].path + "</div>");
+				image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" +
+							currentAlbum.albums[i].path.replace(bydateString, bydateTranslation).replace(foldersString, foldersTranslation) +
+							"</div>");
 				link.append(image);
 				subalbums.push(link);
 				(function(theContainer, theAlbum, theImage, theLink) {
