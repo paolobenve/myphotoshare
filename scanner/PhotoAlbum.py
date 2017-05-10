@@ -36,10 +36,10 @@ class Album(object):
 		if len(self._photos) == 0 and len(self._albums) == 0:
 			return datetime(1900, 1, 1).strftime("%c")
 		elif len(self._photos) == 0:
-			return self._albums[-1].date.strftime("%c")
+			return self._albums[-1].date
 		elif len(self._albums) == 0:
-			return self._photos[-1].date.strftime("%c")
-		return max(self._photos[-1].date, self._albums[-1].date).strftime("%c")
+			return self._photos[-1].date
+		return max(self._photos[-1].date, self._albums[-1].date)
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
@@ -138,7 +138,7 @@ class Photo(object):
 			self._attributes = attributes
 			return
 		self._attributes = {}
-		self._attributes["dateTimeFile"] = mtime
+		self._attributes["dateTimeFile"] = mtime.strftime("%c")
 		
 		try:
 			image = Image.open(path)
@@ -232,9 +232,9 @@ class Photo(object):
 		if "ExposureBiasValue" in exif:
 			self._attributes["exposureCompensation"] = exif["ExposureBiasValue"]
 		if "DateTimeOriginal" in exif:
-			self._attributes["dateTimeOriginal"] = exif["DateTimeOriginal"]
+			self._attributes["dateTimeOriginal"] = exif["DateTimeOriginal"].strftime("%c")
 		if "DateTime" in exif:
-			self._attributes["dateTime"] = exif["DateTime"]
+			self._attributes["dateTime"] = exif["DateTime"].strftime("%c")
 	
 	_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
 	_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
@@ -347,7 +347,7 @@ class Photo(object):
 	def date(self):
 		correct_date = None;
 		if not self.is_valid:
-			correct_date = datetime(1900, 1, 1)
+			correct_date = datetime(1900, 1, 1).strftime("%c")
 		if "dateTimeOriginal" in self._attributes:
 			correct_date = self._attributes["dateTimeOriginal"]
 		elif "dateTime" in self._attributes:
