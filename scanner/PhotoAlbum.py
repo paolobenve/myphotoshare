@@ -251,13 +251,13 @@ class Photo(object):
 		if square:
 			info_string += ", square"
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
-			next_level()
+			#~ next_level()
 			message("existing thumb", info_string)
-			back_level()
+			#~ back_level()
 			return
-		next_level()
+		#~ next_level()
 		message("thumbing", info_string)
-		back_level()
+		#~ back_level()
 		gc.collect()
 		try:
 			image_copy = image.copy()
