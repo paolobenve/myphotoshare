@@ -19,6 +19,9 @@
 			callback(this.albumCache[cacheKey]);
 			return;
 		}
+		cacheFile = "cache/" + cacheKey + ".json";
+		if (PhotoFloat.urlDoesntExist(cacheFile))
+			cacheKey = "root";
 		self = this;
 		ajaxOptions = {
 			type: "GET",
@@ -205,6 +208,14 @@
 		return hash;
 	};
 	
+	PhotoFloat.urlDoesntExist = function(url) {
+		var http = new XMLHttpRequest();
+		http.open('HEAD', url, false);
+		http.send();
+		return http.status == 404;
+	}
+
+	
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
 	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
@@ -218,7 +229,7 @@
 	PhotoFloat.prototype.photoYearAlbum = PhotoFloat.photoYearAlbum;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
-	
+	PhotoFloat.prototype.urlDoesntExist = PhotoFloat.urlDoesntExist;
 	/* expose class globally */
 	window.PhotoFloat = PhotoFloat;
 }());
