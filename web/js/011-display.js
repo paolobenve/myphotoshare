@@ -98,7 +98,8 @@ $(document).ready(function() {
 			return;
 		if (currentPhoto !== null) {
 			var scroller = $("#album-view");
-			scroller.stop().animate({ scrollLeft: thumb.position().left + scroller.scrollLeft() - scroller.width() / 2 + thumb.width() / 2 }, "slow");
+			
+			scroller.stop().animate({ scrollLeft: thumb.parent().position().left + scroller.scrollLeft() - scroller.width() / 2 + thumb.width() / 2 }, "slow");
 		} else
 			$("html, body").stop().animate({ scrollTop: thumb.offset().top - $(window).height() / 2 + thumb.height() }, "slow");
 		
@@ -154,29 +155,34 @@ $(document).ready(function() {
 			thumbsElement.empty();
 			thumbsElement.append.apply(thumbsElement, photos);
 			
-			subalbums = [];
-			for (i = currentAlbum.albums.length - 1; i >= 0; --i) {
-				link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
-				image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" +
-							currentAlbum.albums[i].path.replace(bydateString, bydateTranslation).replace(foldersString, foldersTranslation) +
-							"</div>");
-				link.append(image);
-				subalbums.push(link);
-				(function(theContainer, theAlbum, theImage, theLink) {
-					photoFloat.albumPhoto(theAlbum, function(album, photo) {
-						theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, 150, true) + ")");
-					}, function error() {
-						theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
-						theLink.remove();
-						subalbums.splice(subalbums.indexOf(theLink), 1);
+			if (currentPhoto === null) {
+				subalbums = [];
+				for (i = currentAlbum.albums.length - 1; i >= 0; --i) {
+					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
+					image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" +
+								currentAlbum.albums[i].path.replace(bydateString, bydateTranslation).replace(foldersString, foldersTranslation) +
+								"</div>");
+					link.append(image);
+					subalbums.push(link);
+					(function(theContainer, theAlbum, theImage, theLink) {
+						photoFloat.albumPhoto(theAlbum, function(album, photo) {
+							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, 150, true) + ")");
+						}, function error() {
+							theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
+							theLink.remove();
+							subalbums.splice(subalbums.indexOf(theLink), 1);
 
-					});
-				})(currentAlbum, currentAlbum.albums[i], image, link);
+						});
+					})(currentAlbum, currentAlbum.albums[i], image, link);
+				}
+				subalbumsElement = $("#subalbums");
+				subalbumsElement.empty();
+				subalbumsElement.append.apply(subalbumsElement, subalbums);
+				if (true && currentAlbum.albums.length > 1)
+					subalbumsElement.insertBefore(thumbsElement);
+				else
+					thumbsElement.insertBefore(subalbumsElement);
 			}
-			subalbumsElement = $("#subalbums");
-			subalbumsElement.empty();
-			subalbumsElement.append.apply(subalbumsElement, subalbums);
-			subalbumsElement.insertBefore(thumbsElement);
 		}
 		
 		if (currentPhoto === null) {
