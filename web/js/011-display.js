@@ -72,10 +72,12 @@ $(document).ready(function() {
 			if (i < components.length - 1 || currentPhoto !== null) {
 				title += "</a>";
 			}
-			if (i < components.length - 1) {
+			//~ if (i < components.length - 1) {
 				title += " &raquo; ";
-			}
+			//~ }
 		}
+		if (currentPhoto !== null)
+			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentPhoto.name) + "</div>";
 		
 		$("#title").html(title);
 		document.title = documentTitle;
@@ -298,7 +300,7 @@ $(document).ready(function() {
 		$("#album-view").addClass("photo-view-container");
 		$("#subalbums").hide();
 		$("#photo-view").show();
-		$("#photo-name").html(photoFloat.trimExtension(currentPhoto.name));
+		//$("#photo-name").html(photoFloat.trimExtension(currentPhoto.name));
 		
 		$("#metadata-link").html(showMetadataTranslation);
 		$("#folders-view").html(foldersViewTranslation);
