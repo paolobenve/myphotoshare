@@ -159,7 +159,8 @@ $(document).ready(function() {
 			
 			if (currentPhoto === null) {
 				subalbums = [];
-				for (i = currentAlbum.albums.length - 1; i >= 0; --i) {
+				for (i = 0; i < currentAlbum.albums.length; ++i) {
+					
 					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 					image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" +
 								currentAlbum.albums[i].path.replace(bydateString, bydateTranslation).replace(foldersString, foldersTranslation) +
@@ -180,10 +181,7 @@ $(document).ready(function() {
 				subalbumsElement = $("#subalbums");
 				subalbumsElement.empty();
 				subalbumsElement.append.apply(subalbumsElement, subalbums);
-				if (true && currentAlbum.albums.length > 1)
-					subalbumsElement.insertBefore(thumbsElement);
-				else
-					thumbsElement.insertBefore(subalbumsElement);
+				subalbumsElement.insertBefore(thumbsElement);
 			}
 		}
 		
@@ -354,7 +352,9 @@ $(document).ready(function() {
 			currentPhotoIndex = photoIndex;
 		}
 		setTitle();
-		showAlbum(previousAlbum !== currentAlbum);
+		console.log(previousAlbum, currentAlbum, previousAlbum !== currentAlbum);
+		var populateAlbum = previousAlbum !== currentAlbum || previousPhoto !== currentPhoto;
+		showAlbum(populateAlbum);
 		if (photo !== null) {
 			showPhoto();
 		}
