@@ -352,7 +352,6 @@ $(document).ready(function() {
 			currentPhotoIndex = photoIndex;
 		}
 		setTitle();
-		console.log(previousAlbum, currentAlbum, previousAlbum !== currentAlbum);
 		var populateAlbum = previousAlbum !== currentAlbum || previousPhoto !== currentPhoto;
 		showAlbum(populateAlbum);
 		if (photo !== null) {
