@@ -35,6 +35,14 @@ The JavaScript application consists of a single `index.html` file with a single 
 * Optional server-side authentication support
 * A thousand other tweaks here and there...
 
+Enhanced features (added in photofloatenhanced):
+
+* A date tree is builded, permitting photo to be seen by year, month, date
+* Root view makes the user choose between folders view and "by date" view
+* When a photo is viewed, the user can switch between the folder the photo belongs and the year/month/date the photo was taken
+* Thumbnails generation is faster then before
+* Added customizable translation js files (011-translations.js; if you don't need any translation comment out the variable initialization statement in that file)
+
 It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
 
 ## Installation
