@@ -8,7 +8,7 @@
 
 photofloatenhanced is a Jason A. Donenfeld's Photofloat fork. It's an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
-[Check out a demo!](http://photos.jasondonenfeld.com/#santa_fe_and_telluride_8.19.10-8.27.10/western_202.jpg)
+[Check out a demo!](http://palmaro.qumran2.net/#!/_folders-giovani-biscotti_natale_2016/giovani_preparazione_biscotti_2016-12-16-17.17.27.jpg)
 
 ## How It Works
 
