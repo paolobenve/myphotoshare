@@ -1,18 +1,20 @@
-# photopaolo
+# photofloatenhanced
 ### A Web 2.0 Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Paolo Benvenuto (<paolobenve@gmail.com>)
 
 ![Screenshot](screenshot.jpg)
+![Screenshot](screenshot-root.jpg)
+![Screenshot](screenshot-bydate.jpg)
 
-photopaolo is a Jason A. Donenfeld's Photofloat fork. It's an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
+photofloatenhanced is a Jason A. Donenfeld's Photofloat fork. It's an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
 [Check out a demo!](http://photos.jasondonenfeld.com/#santa_fe_and_telluride_8.19.10-8.27.10/western_202.jpg)
 
 ## How It Works
 
-photopaolo consists of two segments – a Python script and a JavaScript application.
+photofloatenhanced consists of two segments – a Python script and a JavaScript application.
 
-The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. The scanner extracts metadata from EXIF tags in JPEG photos. photopaolo is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be very fast if there are few or zero changes since the last time you ran it.
+The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. The scanner extracts metadata from EXIF tags in JPEG photos. photofloatenhanced is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be very fast if there are few or zero changes since the last time you ran it.
 
 The JavaScript application consists of a single `index.html` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface. Features include:
 
@@ -39,8 +41,8 @@ It is, essentially, the slickest and fastest, most minimal but still well-featur
 
 #### Download the source code from the git repository:
 
-    $ git clone https://github.com/paolobenve/photopaolo.git
-    $ cd photopaolo
+    $ git clone https://github.com/paolobenve/photofloatenhanced.git
+    $ cd photofloatenhanced
 
 #### Tweak the index.html page to have a custom title or copyright notice.
 
@@ -71,7 +73,7 @@ After it finishes, you will be all set. Simply have your web server serve pages 
 
 The JavaScript application uses a very simple API to determine if a photo can be viewed or not. If a JSON file returns error `403`, the album is hidden from view. To authenticate, `POST` a username and a password to `/auth`. If unsuccessful, `403` is returned. If successful, `200` is returned, and the previously denied json files may now be requested. If an unauthorized album is directly requested in a URL when the page loads, an authentication box is shown.
 
-photopaolo ships with an optional server side component called FloatApp to faciliate this, which lives in `scanner/floatapp`. It is a simple Flask-based Python web application.
+photofloatenhanced ships with an optional server side component called FloatApp to faciliate this, which lives in `scanner/floatapp`. It is a simple Flask-based Python web application.
 
 #### Edit the app.cfg configuration file:
 
@@ -100,34 +102,34 @@ FloatApp makes use of `X-Accel-Buffering` and `X-Accel-Redirect` to force the se
     
             include uwsgi_params;
             location /albums/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloatenhanced.socket;
             }
             location /cache/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloatenhanced.socket;
             }
             location /scan {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloatenhanced.socket;
             }
             location /auth {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloatenhanced.socket;
             }
             location /photos {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photopaolo.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/photofloatenhanced.socket;
             }
     
             location /internal-cache/ {
                     internal;
-                    alias /var/www/uwsgi/photopaolo/cache/;
+                    alias /var/www/uwsgi/photofloatenhanced/cache/;
             }
             location /internal-albums/ {
                     internal;
-                    alias /var/www/uwsgi/photopaolo/albums/;
+                    alias /var/www/uwsgi/photofloatenhanced/albums/;
             }
     }
 
 Note that the `internal-*` paths must match that of `app.cfg`. This makes use of uwsgi for execution:
 
-    metheny ~ # cat /etc/uwsgi.d/photopaolo.ini 
+    metheny ~ # cat /etc/uwsgi.d/photofloatenhanced.ini 
     [uwsgi]
     chdir = /var/www/uwsgi/%n
     master = true
