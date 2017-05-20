@@ -8,7 +8,15 @@
 		display: none;
 	}
 	#title {
-		font-size: 1em;
+		font-size: .8em;
 		z-index: 1;
 	}
+	.photo-view-container {
+		display: none;
+	}
+/*
+	#photo-view[style*="display:none"] + #album-view #thumbs {
+		display: none;
+	}
+*/
 }
