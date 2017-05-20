@@ -3,7 +3,7 @@
 * in order to get it working you must insert the space between "and" and "(max-height" manually
 */
 
-@media handheld, only screen and (max-height: 700px) {
+@media (max-height: 700px) {
 	#photo-view {
 		top: 0;
 		bottom: 0;
