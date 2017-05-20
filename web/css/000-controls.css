@@ -12,13 +12,22 @@ a {
 a:hover {
 	color: #FFAD27;
 }
+#title, #title:hover {
+	position: absolute;
+	top: 0;
+	padding: 0.4em;
+	font-weight: bold;
+	font-size: medium;
+}
+
 #title {
 	position: absolute;
 	top: 0;
 	padding: 0.4em;
 	font-weight: bold;
-	font-size: 1.15em;
+	font-size: medium;
 }
+
 #loading {
 	display: none;
 }
@@ -87,12 +96,13 @@ a:hover {
 #photo-view {
 	position: absolute;
 	bottom: 150px;
-	top: 3.5em;
+	top: 0;
 	overflow: hidden;
 	margin-bottom: 0.5em;
 	left: 0;
 	right: 0;
 	text-align: center;
+	z-index: -1;
 }
 #photo-box {
 	display: inline;
@@ -212,7 +222,7 @@ a:hover {
 	margin: 0 0 0 0;
 	color: lime;
 	font-weight: bold;
-	font-size: 140%;
+	font-size: 110%;
 	font-style: italic;
 }
 
@@ -236,4 +246,17 @@ a:hover {
 #thumbs a {
 	display: inline-flex;
 	text-decoration: none;
+}
+
+#photo-box img {
+	max-height: 100%;  
+	max-width: 100%; 
+	width: auto;
+	height: auto;
+	position: absolute;  
+	top: 0;  
+	bottom: 0;  
+	left: 0;  
+	right: 0;  
+	margin: auto;
 }

@@ -311,7 +311,6 @@ $(document).ready(function() {
 		$("#album-view").addClass("photo-view-container");
 		$("#subalbums").hide();
 		$("#photo-view").show();
-		//$("#photo-name").html(photoFloat.trimExtension(currentPhoto.name));
 		
 		if (typeof showMetadataTranslation !== 'undefined')
 			$("#metadata-link").html(showMetadataTranslation);

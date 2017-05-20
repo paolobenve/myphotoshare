@@ -1,4 +1,9 @@
-@media handheld, only screen and (max-height: 640px) {
+/*
+* WARNING: MINIMIZER (i.e. running "make" in web/ folder) MAKES "and (max-height" BECOME "and(max-height": THIS WAY IT DOESN'T WORK
+* in order to get it working you must insert the space between "and" and "(max-height" manually
+*/
+
+@media handheld, only screen and (max-height: 700px) {
 	#photo-view {
 		top: 0;
 		bottom: 0;
@@ -11,12 +16,4 @@
 		font-size: .8em;
 		z-index: 1;
 	}
-	.photo-view-container {
-		display: none;
-	}
-/*
-	#photo-view[style*="display:none"] + #album-view #thumbs {
-		display: none;
-	}
-*/
 }
