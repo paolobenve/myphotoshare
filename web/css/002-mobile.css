@@ -1,8 +1,3 @@
-/*
-* WARNING: MINIMIZER (i.e. running "make" in web/ folder) MAKES "and (max-height" BECOME "and(max-height": THIS WAY IT DOESN'T WORK
-* in order to get it working you must insert the space between "and" and "(max-height" manually
-*/
-
 @media (max-height: 700px) {
 	#photo-view {
 		top: 0;
