@@ -58,15 +58,15 @@ a:hover {
 .album-button {
 	float: left;
 	display: block;
-	width: 190px;
+	width: 170px;
 	height: 40px;
 	text-align: center;
 	font-style: italic;
 	font-size: 12px;
 	background-repeat: no-repeat;
 	background-position-x: center;
-	background-position-y: 20px;
-	padding-top: 170px;
+	background-position-y: 10px;
+	padding-top: 160px;
 	background-image: url(../img/image-placeholder.png);
 	background-color: gray;
 	margin: 0 3px 30px 3px;
