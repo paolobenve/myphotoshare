@@ -7,7 +7,17 @@ import os
 import os.path
 from PIL import Image
 from PIL.ExifTags import TAGS
+from multiprocessing import Pool
 import gc
+import tempfile
+from VideoToolWrapper import *
+
+def make_photo_thumbs(self, original_path, thumb_path, size):
+	# The pool methods use a queue.Queue to pass tasks to the worker processes.
+	# Everything that goes through the queue.Queue must be pickable, and since 
+	# self._photo_thumbnail is not defined at the top level, it's not pickable.
+	# This is why we have this "dummy" function, so that it's pickable.
+	self._photo_thumbnail(original_path, thumb_path, size[0], size[1])
 
 class Album(object):
 	def __init__(self, path):
@@ -119,7 +129,7 @@ class Album(object):
 			if trim_base(path) == photo._path:
 				return photo
 		return None
-	
+
 class Photo(object):
 	thumb_sizes = [ (1600, False), (150, True) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
@@ -127,6 +137,7 @@ class Photo(object):
 		self.folders = trim_base(os.path.dirname(self._path))
 		self.album_path = os.path.join("albums", self._path)
 		self.is_valid = True
+		image = None
 		try:
 			mtime = file_mtime(path)
 		except KeyboardInterrupt:
@@ -139,17 +150,26 @@ class Photo(object):
 			return
 		self._attributes = {}
 		self._attributes["dateTimeFile"] = mtime
+		self._attributes["mediaType"] = "photo"
 		
 		try:
 			image = Image.open(path)
 		except KeyboardInterrupt:
 			raise
 		except:
+			self._video_metadata(path)
+
+		if isinstance(image, Image.Image):
+			self._photo_metadata(image)
+			self._photo_thumbnails(path, thumb_path)
+		elif self._attributes["mediaType"] == "video":
+			self._video_thumbnails(thumb_path, path)
+			self._video_transcode(thumb_path, path)
+		else:
 			self.is_valid = False
 			return
-		self._metadata(image)
-		self._thumbnails(image, thumb_path, path)
-	def _metadata(self, image):
+                        
+	def _photo_metadata(self, image):
 		self._attributes["size"] = image.size
 		self._orientation = 1
 		try:
@@ -181,8 +201,8 @@ class Photo(object):
 			self._orientation = exif["Orientation"];
 			if self._orientation in range(5, 9):
 				self._attributes["size"] = (self._attributes["size"][1], self._attributes["size"][0])
-			if self._orientation - 1 < len(self._metadata.orientation_list):
-				self._attributes["orientation"] = self._metadata.orientation_list[self._orientation - 1]
+			if self._orientation - 1 < len(self._photo_metadata.orientation_list):
+				self._attributes["orientation"] = self._photo_metadata.orientation_list[self._orientation - 1]
 		if "Make" in exif:
 			self._attributes["make"] = exif["Make"]
 		if "Model" in exif:
@@ -201,51 +221,116 @@ class Photo(object):
 			self._attributes["iso"] = exif["PhotographicSensitivity"]
 		if "ExposureTime" in exif:
 			self._attributes["exposureTime"] = exif["ExposureTime"]
-		if "Flash" in exif and exif["Flash"] in self._metadata.flash_dictionary:
+		if "Flash" in exif and exif["Flash"] in self._photo_metadata.flash_dictionary:
 			try:
-				self._attributes["flash"] = self._metadata.flash_dictionary[exif["Flash"]]
+				self._attributes["flash"] = self._photo_metadata.flash_dictionary[exif["Flash"]]
 			except KeyboardInterrupt:
 				raise
 			except:
 				pass
-		if "LightSource" in exif and exif["LightSource"] in self._metadata.light_source_dictionary:
+		if "LightSource" in exif and exif["LightSource"] in self._photo_metadata.light_source_dictionary:
 			try:
-				self._attributes["lightSource"] = self._metadata.light_source_dictionary[exif["LightSource"]]
+				self._attributes["lightSource"] = self._photo_metadata.light_source_dictionary[exif["LightSource"]]
 			except KeyboardInterrupt:
 				raise
 			except:
 				pass
-		if "ExposureProgram" in exif and exif["ExposureProgram"] < len(self._metadata.exposure_list):
-			self._attributes["exposureProgram"] = self._metadata.exposure_list[exif["ExposureProgram"]]
+		if "ExposureProgram" in exif and exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
+			self._attributes["exposureProgram"] = self._photo_metadata.exposure_list[exif["ExposureProgram"]]
 		if "SpectralSensitivity" in exif:
 			self._attributes["spectralSensitivity"] = exif["SpectralSensitivity"]
-		if "MeteringMode" in exif and exif["MeteringMode"] < len(self._metadata.metering_list):
-			self._attributes["meteringMode"] = self._metadata.metering_list[exif["MeteringMode"]]
-		if "SensingMethod" in exif and exif["SensingMethod"] < len(self._metadata.sensing_method_list):
-			self._attributes["sensingMethod"] = self._metadata.sensing_method_list[exif["SensingMethod"]]
-		if "SceneCaptureType" in exif and exif["SceneCaptureType"] < len(self._metadata.scene_capture_type_list):
-			self._attributes["sceneCaptureType"] = self._metadata.scene_capture_type_list[exif["SceneCaptureType"]]
-		if "SubjectDistanceRange" in exif and exif["SubjectDistanceRange"] < len(self._metadata.subject_distance_range_list):
-			self._attributes["subjectDistanceRange"] = self._metadata.subject_distance_range_list[exif["SubjectDistanceRange"]]
+		if "MeteringMode" in exif and exif["MeteringMode"] < len(self._photo_metadata.metering_list):
+			self._attributes["meteringMode"] = self._photo_metadata.metering_list[exif["MeteringMode"]]
+		if "SensingMethod" in exif and exif["SensingMethod"] < len(self._photo_metadata.sensing_method_list):
+			self._attributes["sensingMethod"] = self._photo_metadata.sensing_method_list[exif["SensingMethod"]]
+		if "SceneCaptureType" in exif and exif["SceneCaptureType"] < len(self._photo_metadata.scene_capture_type_list):
+			self._attributes["sceneCaptureType"] = self._photo_metadata.scene_capture_type_list[exif["SceneCaptureType"]]
+		if "SubjectDistanceRange" in exif and exif["SubjectDistanceRange"] < len(self._photo_metadata.subject_distance_range_list):
+			self._attributes["subjectDistanceRange"] = self._photo_metadata.subject_distance_range_list[exif["SubjectDistanceRange"]]
 		if "ExposureCompensation" in exif:
 			self._attributes["exposureCompensation"] = exif["ExposureCompensation"]
 		if "ExposureBiasValue" in exif:
 			self._attributes["exposureCompensation"] = exif["ExposureBiasValue"]
 		if "DateTimeOriginal" in exif:
-			self._attributes["dateTimeOriginal"] = exif["DateTimeOriginal"]
+			try:
+				self._attributes["dateTimeOriginal"] = datetime.strptime(exif["DateTimeOriginal"], '%Y:%m:%d %H:%M:%S')
+			except KeyboardInterrupt:
+				raise
+			except TypeError:
+                                self._attributes["dateTimeOriginal"] = exif["DateTimeOriginal"]
 		if "DateTime" in exif:
-			self._attributes["dateTime"] = exif["DateTime"]
+			try:
+				self._attributes["dateTime"] = datetime.strptime(exif["DateTime"], '%Y:%m:%d %H:%M:%S')
+			except KeyboardInterrupt:
+				raise
+			except TypeError:
+                                self._attributes["dateTime"] = exif["DateTime"]
+        
+	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
+	_photo_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
+	_photo_metadata.metering_list = ["Unknown", "Average", "Center-weighted average", "Spot", "Multi-spot", "Multi-segment", "Partial"]
+	_photo_metadata.exposure_list = ["Not Defined", "Manual", "Program AE", "Aperture-priority AE", "Shutter speed priority AE", "Creative (Slow speed)", "Action (High speed)", "Portrait", "Landscape", "Bulb"]
+	_photo_metadata.orientation_list = ["Horizontal (normal)", "Mirror horizontal", "Rotate 180", "Mirror vertical", "Mirror horizontal and rotate 270 CW", "Rotate 90 CW", "Mirror horizontal and rotate 90 CW", "Rotate 270 CW"]
+	_photo_metadata.sensing_method_list = ["Not defined", "One-chip color area sensor", "Two-chip color area sensor", "Three-chip color area sensor", "Color sequential area sensor", "Trilinear sensor", "Color sequential linear sensor"]
+	_photo_metadata.scene_capture_type_list = ["Standard", "Landscape", "Portrait", "Night scene"]
+	_photo_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
+
+
+	def _video_metadata(self, path, original=True):
+                p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
+                if p == False:
+                        self.is_valid = False
+                        return
+                info = json.loads(p)
+                for s in info["streams"]:
+                        if 'codec_type' in s and s['codec_type'] == 'video':
+                                self._attributes["mediaType"] = "video"
+                                self._attributes["size"] = (int(s["width"]), int(s["height"]))
+                                if "duration" in s:
+					self._attributes["duration"] = s["duration"]
+				if "tags" in s and "rotate" in s["tags"]:
+					self._attributes["rotate"] = s["tags"]["rotate"]
+				if original:
+					self._attributes["originalSize"] = (int(s["width"]), int(s["height"]))
+				break
 	
-	_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
-	_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
-	_metadata.metering_list = ["Unknown", "Average", "Center-weighted average", "Spot", "Multi-spot", "Multi-segment", "Partial"]
-	_metadata.exposure_list = ["Not Defined", "Manual", "Program AE", "Aperture-priority AE", "Shutter speed priority AE", "Creative (Slow speed)", "Action (High speed)", "Portrait", "Landscape", "Bulb"]
-	_metadata.orientation_list = ["Horizontal (normal)", "Mirror horizontal", "Rotate 180", "Mirror vertical", "Mirror horizontal and rotate 270 CW", "Rotate 90 CW", "Mirror horizontal and rotate 90 CW", "Rotate 270 CW"]
-	_metadata.sensing_method_list = ["Not defined", "One-chip color area sensor", "Two-chip color area sensor", "Three-chip color area sensor", "Color sequential area sensor", "Trilinear sensor", "Color sequential linear sensor"]
-	_metadata.scene_capture_type_list = ["Standard", "Landscape", "Portrait", "Night scene"]
-	_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
+        	
+        def _photo_thumbnail(self, original_path, thumb_path, size, square=False):
+	        try:
+			image = Image.open(original_path)
+		except KeyboardInterrupt:
+			raise
+		except:
+			self.is_valid = False
+			return
 		
-	def _thumbnail(self, image, thumb_path, original_path, size, square=False):
+		mirror = image
+		if self._orientation == 2:
+			# Vertical Mirror
+			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
+		elif self._orientation == 3:
+			# Rotation 180
+			mirror = image.transpose(Image.ROTATE_180)
+		elif self._orientation == 4:
+			# Horizontal Mirror
+			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
+		elif self._orientation == 5:
+			# Horizontal Mirror + Rotation 270
+			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
+		elif self._orientation == 6:
+			# Rotation 270
+			mirror = image.transpose(Image.ROTATE_270)
+		elif self._orientation == 7:
+			# Vertical Mirror + Rotation 270
+			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
+		elif self._orientation == 8:
+      			# Rotation 90
+			mirror = image.transpose(Image.ROTATE_90)
+                
+                image = mirror
+                self._thumbnail(image, original_path, thumb_path, size, square)
+
+        def _thumbnail(self, image, original_path, thumb_path, size, square):
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
 		info_string = "%spx" % (str(size))
 		if square:
@@ -270,6 +355,7 @@ class Photo(object):
 				raise
 			except:
 				message("corrupt image", os.path.basename(original_path))
+				self.is_valid = False
 				return
 		if square:
 			if image_copy.size[0] > image_copy.size[1]:
@@ -303,35 +389,139 @@ class Photo(object):
 				os.unlink(thumb_path)
 			except:
 				pass
-		return image
-	def _thumbnails(self, image, thumb_path, original_path):
+                                
+        def _photo_thumbnails(self, original_path, thumb_path):
+                # get number of cores on the system, and use all minus one
+                num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+                pool = Pool(processes=num_of_cores)
+                
+                try:
+                        for size in Photo.thumb_sizes:
+                	        pool.apply_async(make_photo_thumbs, args = (self, original_path, thumb_path, size))
+                except:
+                        pool.terminate()
+                        
+                pool.close()
+                pool.join()
+
+	def _video_thumbnails(self, thumb_path, original_path):
+		(tfd, tfn) = tempfile.mkstemp();
+		p = VideoTranscodeWrapper().call(       
+                        '-i', original_path,    # original file to extract thumbs from
+                        '-f', 'image2',         # extract image
+                        '-vsync', '1',          # CRF
+                        '-vframes', '1',        # extrat 1 single frame
+                        '-an',                  # disable audio
+                        '-loglevel', 'quiet',   # don't display anything
+                        '-y',                   # don't prompt for overwrite
+                        tfn                     # temporary file to store extracted image
+                )
+		if p == False:
+			message("couldn't extract video frame", os.path.basename(original_path))
+			try:
+                                os.unlink(tfn)
+                        except:
+                                pass
+			self.is_valid = False
+			return
+		try:
+			image = Image.open(tfn)
+		except KeyboardInterrupt:
+                        try:
+                                os.unlink(tfn)
+                        except:
+                                pass
+			raise
+		except:
+			message("couldn't open video thumbnail", tfn)
+			try:
+                                os.unlink(tfn)
+                        except:
+                                pass
+			self.is_valid = False
+			return
 		mirror = image
-		if self._orientation == 2:
-			# Vertical Mirror
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
-		elif self._orientation == 3:
-			# Rotation 180
-			mirror = image.transpose(Image.ROTATE_180)
-		elif self._orientation == 4:
-			# Horizontal Mirror
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
-		elif self._orientation == 5:
-			# Horizontal Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
-		elif self._orientation == 6:
-			# Rotation 270
-			mirror = image.transpose(Image.ROTATE_270)
-		elif self._orientation == 7:
-			# Vertical Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
-		elif self._orientation == 8:
-			# Rotation 90
-			mirror = image.transpose(Image.ROTATE_90)
-		next_level()
-		thumb = mirror
+		if "rotate" in self._attributes:
+			if self._attributes["rotate"] == "90":
+				mirror = image.transpose(Image.ROTATE_270)
+			elif self._attributes["rotate"] == "180":
+				mirror = image.transpose(Image.ROTATE_180)
+			elif self._attributes["rotate"] == "270":
+				mirror = image.transpose(Image.ROTATE_90)
 		for size in Photo.thumb_sizes:
-			thumb = self._thumbnail(thumb, thumb_path, original_path, size[0], size[1])
-		back_level()
+			if size[1]:
+				self._thumbnail(mirror, original_path, thumb_path, size[0], size[1])
+		try:
+                        os.unlink(tfn)
+                except:
+                        pass
+
+	def _video_transcode(self, transcode_path, original_path):
+		transcode_path = os.path.join(transcode_path, video_cache(self._path))
+                # get number of cores on the system, and use all minus one
+                num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+		transcode_cmd = [	
+			'-i', original_path,		# original file to be encoded
+			'-c:v', 'libx264',		# set h264 as videocodec
+			'-preset', 'slow',		# set specific preset that provides a certain encoding speed to compression ratio
+			'-profile:v', 'baseline',	# set output to specific h264 profile
+			'-level', '3.0',		# sets highest compatibility with target devices
+			'-crf', '20',			# set quality 
+			'-b:v', '4M',			# set videobitrate to 4Mbps
+			'-strict', 'experimental',	# allow native aac codec below
+			'-c:a', 'aac',			# set aac as audiocodec
+			'-ac', '2',			# force two audiochannels
+			'-ab', '160k',			# set audiobitrate to 160Kbps
+			'-maxrate', '10000000',		# limits max rate, will degrade CRF if needed
+			'-bufsize', '10000000',		# define how much the client should buffer
+			'-f', 'mp4',			# fileformat mp4
+			'-threads', str(num_of_cores),	# number of cores (all minus one)
+			'-loglevel', 'quiet',		# don't display anything
+			'-y' 				# don't prompt for overwrite
+		]
+		filters = []
+		info_string = "%s -> mp4, h264" % (os.path.basename(original_path))
+		message("transcoding", info_string)
+		if os.path.exists(transcode_path) and file_mtime(transcode_path) >= self._attributes["dateTimeFile"]:
+			self._video_metadata(transcode_path, False)
+			return
+		if "originalSize" in self._attributes and self._attributes["originalSize"][1] > 720:
+			transcode_cmd.append('-s')
+			transcode_cmd.append('hd720')
+		if "rotate" in self._attributes:
+			if self._attributes["rotate"] == "90":
+				filters.append('transpose=1')
+			elif self._attributes["rotate"] == "180":
+				filters.append('vflip,hflip')
+			elif self._attributes["rotate"] == "270":
+				filters.append('transpose=2')
+		if len(filters):
+			transcode_cmd.append('-vf')
+			transcode_cmd.append(','.join(filters))
+                
+                tmp_transcode_cmd = transcode_cmd[:]
+		transcode_cmd.append(transcode_path)
+		p = VideoTranscodeWrapper().call(*transcode_cmd)
+		if p == False:
+                        # add another option, try transcoding again
+                        # done to avoid this error;
+                        # x264 [error]: baseline profile doesn't support 4:2:2
+                        message("transcoding failure, trying yuv420p", os.path.basename(original_path))
+                        tmp_transcode_cmd.append('-pix_fmt')
+                        tmp_transcode_cmd.append('yuv420p')
+                        tmp_transcode_cmd.append(transcode_path)
+                        p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
+                
+                if p == False:
+                        message("transcoding failure", os.path.basename(original_path))
+                        try:
+                                os.unlink(transcode_path)
+                        except:
+                                pass
+                                self.is_valid = False
+                        return
+                self._video_metadata(transcode_path, False)
+
 	@property
 	def name(self):
 		return os.path.basename(self._path)
@@ -342,7 +532,15 @@ class Photo(object):
 		return self._path
 	@property
 	def image_caches(self):
-		return [image_cache(self._path, size[0], size[1]) for size in Photo.thumb_sizes]
+		caches = []
+		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
+			for size in Photo.thumb_sizes:
+				if size[1]:
+					caches.append(image_cache(self._path, size[0], size[1]))
+			caches.append(video_cache(self._path))
+		else:
+			caches = [image_cache(self._path, size[0], size[1]) for size in Photo.thumb_sizes]
+		return caches
 	@property
 	def date(self):
 		correct_date = None;

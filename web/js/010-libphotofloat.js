@@ -182,6 +182,8 @@
 	};
 	PhotoFloat.photoYearAlbum = function(photo) {
 		return photo.yearAlbum;
+	PhotoFloat.videoPath = function(album, video) {
+		return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".mp4");
 	};
 	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
@@ -221,6 +223,7 @@
 	PhotoFloat.prototype.photoHashFolder = PhotoFloat.photoHashFolder;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
 	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
+	PhotoFloat.prototype.videoPath = PhotoFloat.videoPath;
 	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;
 	PhotoFloat.prototype.photoFoldersAlbum = PhotoFloat.photoFoldersAlbum;
 	PhotoFloat.prototype.photoDayAlbum = PhotoFloat.photoDayAlbum;
