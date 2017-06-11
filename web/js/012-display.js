@@ -148,7 +148,7 @@ $(document).ready(function() {
 							//~ "</span>" +
 							//~ "</div>");
 
-                                //~ Tingvold:
+				//~ Tingvold:
 				//~ link = $("<a href=\"#!/" + photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
 				//~ image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
 				//~ if (currentAlbum.photos[i].mediaType == "video")
