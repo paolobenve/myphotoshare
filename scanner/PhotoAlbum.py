@@ -158,7 +158,7 @@ class Photo(object):
 			raise
 		except:
 			self._video_metadata(path)
-
+		
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
 			self._photo_thumbnails(path, thumb_path)
@@ -168,7 +168,7 @@ class Photo(object):
 		else:
 			self.is_valid = False
 			return
-
+		
 	def _photo_metadata(self, image):
 		self._attributes["size"] = image.size
 		self._orientation = 1

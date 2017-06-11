@@ -130,7 +130,12 @@ $(document).ready(function() {
 						"/" +
 						PhotoFloat.cachePath(currentAlbum.photos[i].name);
 				}
+				//link = $("<a href=\"#!/" + photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
 				link = $("<a href=\"#!/" + hash + "\"></a>");
+				//image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+				//		"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+				//		"\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) +
+				//		"\" height=\"150\" width=\"150\" />");
 				image = $("<div class=\"thumb-container\">" +
 							"<img title=\"" + currentAlbum.photos[i].name +
 							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
@@ -140,19 +145,8 @@ $(document).ready(function() {
 							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
 							"</div>" +
 							"</div>");
-				//~ image = $("<div title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-							//~ "\" class=\"album-button\"" +
-							//~ " style=\"background-image: url(&quot;" + thumbHash + "&quot;);\">" +
-							//~ "<span style=\"white-space: nowrap;\">" +
-							//~ currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
-							//~ "</span>" +
-							//~ "</div>");
-
-				//~ Tingvold:
-				//~ link = $("<a href=\"#!/" + photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
-				//~ image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) + "\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) + "\" height=\"150\" width=\"150\" />");
-				//~ if (currentAlbum.photos[i].mediaType == "video")
-				//~ 	image.css("background-image", "url(" + image.attr("src") + ")").attr("src", "img/video-icon.png");
+				if (currentAlbum.photos[i].mediaType == "video")
+					image.css("background-image", "url(" + image.attr("src") + ")").attr("src", "img/video-icon.png");
 
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);

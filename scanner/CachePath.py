@@ -27,8 +27,8 @@ def trim_base(path):
 def cache_base(path, filepath=False):
 	if len(path) == 0:
 		return "root"
-	elif filepath and len(path.split(os.sep)) < 2:
-		path = "root-" + path
+	#~ elif filepath and len(path.split(os.sep)) < 2:
+		#~ path = "root-" + path
 	path = trim_base(path).replace('/', '-').replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 	while path.find("--") != -1:
 		path = path.replace("--", "-")

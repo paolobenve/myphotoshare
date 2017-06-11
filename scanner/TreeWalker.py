@@ -149,7 +149,7 @@ class TreeWalker:
 							message("cache hit", os.path.basename(entry))
 							cache_hit = True
 							photo = cached_photo
-			
+				
 				if not cache_hit:
 					message("metainfo", os.path.basename(entry))
 					photo = Photo(entry, self.cache_path)
