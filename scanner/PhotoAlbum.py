@@ -14,7 +14,7 @@ from VideoToolWrapper import *
 
 def make_photo_thumbs(self, original_path, thumb_path, size):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
-	# Everything that goes through the queue.Queue must be pickable, and since 
+	# Everything that goes through the queue.Queue must be pickable, and since
 	# self._photo_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	self._photo_thumbnail(original_path, thumb_path, size[0], size[1])
@@ -168,7 +168,7 @@ class Photo(object):
 		else:
 			self.is_valid = False
 			return
-                        
+
 	def _photo_metadata(self, image):
 		self._attributes["size"] = image.size
 		self._orientation = 1
@@ -184,7 +184,7 @@ class Photo(object):
 		exif = {}
 		for tag, value in info.items():
 			decoded = TAGS.get(tag, tag)
-                        if (isinstance(value, tuple) or isinstance(value, list)) and (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime") and len(value) >= 1:
+			if (isinstance(value, tuple) or isinstance(value, list)) and (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime") and len(value) >= 1:
 				value = value[0]
 			if isinstance(value, str) or isinstance(value, unicode):
 				value = value.strip().partition("\x00")[0]
@@ -257,15 +257,15 @@ class Photo(object):
 			except KeyboardInterrupt:
 				raise
 			except TypeError:
-                                self._attributes["dateTimeOriginal"] = exif["DateTimeOriginal"]
+				self._attributes["dateTimeOriginal"] = exif["DateTimeOriginal"]
 		if "DateTime" in exif:
 			try:
 				self._attributes["dateTime"] = datetime.strptime(exif["DateTime"], '%Y:%m:%d %H:%M:%S')
 			except KeyboardInterrupt:
 				raise
 			except TypeError:
-                                self._attributes["dateTime"] = exif["DateTime"]
-        
+				self._attributes["dateTime"] = exif["DateTime"]
+
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
 	_photo_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
 	_photo_metadata.metering_list = ["Unknown", "Average", "Center-weighted average", "Spot", "Multi-spot", "Multi-segment", "Partial"]
@@ -277,16 +277,16 @@ class Photo(object):
 
 
 	def _video_metadata(self, path, original=True):
-                p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
-                if p == False:
-                        self.is_valid = False
-                        return
-                info = json.loads(p)
-                for s in info["streams"]:
-                        if 'codec_type' in s and s['codec_type'] == 'video':
-                                self._attributes["mediaType"] = "video"
-                                self._attributes["size"] = (int(s["width"]), int(s["height"]))
-                                if "duration" in s:
+		p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
+		if p == False:
+			self.is_valid = False
+			return
+		info = json.loads(p)
+		for s in info["streams"]:
+			if 'codec_type' in s and s['codec_type'] == 'video':
+				self._attributes["mediaType"] = "video"
+				self._attributes["size"] = (int(s["width"]), int(s["height"]))
+				if "duration" in s:
 					self._attributes["duration"] = s["duration"]
 				if "tags" in s and "rotate" in s["tags"]:
 					self._attributes["rotate"] = s["tags"]["rotate"]
@@ -294,9 +294,9 @@ class Photo(object):
 					self._attributes["originalSize"] = (int(s["width"]), int(s["height"]))
 				break
 	
-        	
-        def _photo_thumbnail(self, original_path, thumb_path, size, square=False):
-	        try:
+	
+	def _photo_thumbnail(self, original_path, thumb_path, size, square=False):
+		try:
 			image = Image.open(original_path)
 		except KeyboardInterrupt:
 			raise
@@ -324,13 +324,13 @@ class Photo(object):
 			# Vertical Mirror + Rotation 270
 			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
 		elif self._orientation == 8:
-      			# Rotation 90
+			# Rotation 90
 			mirror = image.transpose(Image.ROTATE_90)
-                
-                image = mirror
-                self._thumbnail(image, original_path, thumb_path, size, square)
 
-        def _thumbnail(self, image, original_path, thumb_path, size, square):
+		image = mirror
+		self._thumbnail(image, original_path, thumb_path, size, square)
+
+	def _thumbnail(self, image, original_path, thumb_path, size, square):
 		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
 		info_string = "%spx" % (str(size))
 		if square:
@@ -389,55 +389,55 @@ class Photo(object):
 				os.unlink(thumb_path)
 			except:
 				pass
-                                
-        def _photo_thumbnails(self, original_path, thumb_path):
-                # get number of cores on the system, and use all minus one
-                num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
-                pool = Pool(processes=num_of_cores)
-                
-                try:
-                        for size in Photo.thumb_sizes:
-                	        pool.apply_async(make_photo_thumbs, args = (self, original_path, thumb_path, size))
-                except:
-                        pool.terminate()
-                        
-                pool.close()
-                pool.join()
 
+	def _photo_thumbnails(self, original_path, thumb_path):
+		# get number of cores on the system, and use all minus one
+		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+		pool = Pool(processes=num_of_cores)
+		
+		try:
+			for size in Photo.thumb_sizes:
+				pool.apply_async(make_photo_thumbs, args = (self, original_path, thumb_path, size))
+		except:
+			pool.terminate()
+		
+		pool.close()
+		pool.join()
+	
 	def _video_thumbnails(self, thumb_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
-		p = VideoTranscodeWrapper().call(       
-                        '-i', original_path,    # original file to extract thumbs from
-                        '-f', 'image2',         # extract image
-                        '-vsync', '1',          # CRF
-                        '-vframes', '1',        # extrat 1 single frame
-                        '-an',                  # disable audio
-                        '-loglevel', 'quiet',   # don't display anything
-                        '-y',                   # don't prompt for overwrite
-                        tfn                     # temporary file to store extracted image
-                )
+		p = VideoTranscodeWrapper().call(
+			'-i', original_path,    # original file to extract thumbs from
+			'-f', 'image2',         # extract image
+			'-vsync', '1',          # CRF
+			'-vframes', '1',        # extrat 1 single frame
+			'-an',                  # disable audio
+			'-loglevel', 'quiet',   # don't display anything
+			'-y',                   # don't prompt for overwrite
+			tfn                     # temporary file to store extracted image
+		)
 		if p == False:
 			message("couldn't extract video frame", os.path.basename(original_path))
 			try:
-                                os.unlink(tfn)
-                        except:
-                                pass
+				os.unlink(tfn)
+			except:
+				pass
 			self.is_valid = False
 			return
 		try:
 			image = Image.open(tfn)
 		except KeyboardInterrupt:
-                        try:
-                                os.unlink(tfn)
-                        except:
-                                pass
+			try:
+				os.unlink(tfn)
+			except:
+				pass
 			raise
 		except:
 			message("couldn't open video thumbnail", tfn)
 			try:
-                                os.unlink(tfn)
-                        except:
-                                pass
+				os.unlink(tfn)
+			except:
+				pass
 			self.is_valid = False
 			return
 		mirror = image
@@ -452,21 +452,21 @@ class Photo(object):
 			if size[1]:
 				self._thumbnail(mirror, original_path, thumb_path, size[0], size[1])
 		try:
-                        os.unlink(tfn)
-                except:
-                        pass
+			os.unlink(tfn)
+		except:
+			pass
 
 	def _video_transcode(self, transcode_path, original_path):
 		transcode_path = os.path.join(transcode_path, video_cache(self._path))
-                # get number of cores on the system, and use all minus one
-                num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
-		transcode_cmd = [	
+		# get number of cores on the system, and use all minus one
+		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+		transcode_cmd = [
 			'-i', original_path,		# original file to be encoded
 			'-c:v', 'libx264',		# set h264 as videocodec
 			'-preset', 'slow',		# set specific preset that provides a certain encoding speed to compression ratio
 			'-profile:v', 'baseline',	# set output to specific h264 profile
 			'-level', '3.0',		# sets highest compatibility with target devices
-			'-crf', '20',			# set quality 
+			'-crf', '20',			# set quality
 			'-b:v', '4M',			# set videobitrate to 4Mbps
 			'-strict', 'experimental',	# allow native aac codec below
 			'-c:a', 'aac',			# set aac as audiocodec
@@ -498,29 +498,29 @@ class Photo(object):
 		if len(filters):
 			transcode_cmd.append('-vf')
 			transcode_cmd.append(','.join(filters))
-                
-                tmp_transcode_cmd = transcode_cmd[:]
+		
+		tmp_transcode_cmd = transcode_cmd[:]
 		transcode_cmd.append(transcode_path)
 		p = VideoTranscodeWrapper().call(*transcode_cmd)
 		if p == False:
-                        # add another option, try transcoding again
-                        # done to avoid this error;
-                        # x264 [error]: baseline profile doesn't support 4:2:2
-                        message("transcoding failure, trying yuv420p", os.path.basename(original_path))
-                        tmp_transcode_cmd.append('-pix_fmt')
-                        tmp_transcode_cmd.append('yuv420p')
-                        tmp_transcode_cmd.append(transcode_path)
-                        p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
-                
-                if p == False:
-                        message("transcoding failure", os.path.basename(original_path))
-                        try:
-                                os.unlink(transcode_path)
-                        except:
-                                pass
-                                self.is_valid = False
-                        return
-                self._video_metadata(transcode_path, False)
+			# add another option, try transcoding again
+			# done to avoid this error;
+			# x264 [error]: baseline profile doesn't support 4:2:2
+			message("transcoding failure, trying yuv420p", os.path.basename(original_path))
+			tmp_transcode_cmd.append('-pix_fmt')
+			tmp_transcode_cmd.append('yuv420p')
+			tmp_transcode_cmd.append(transcode_path)
+			p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
+		
+		if p == False:
+			message("transcoding failure", os.path.basename(original_path))
+			try:
+				os.unlink(transcode_path)
+			except:
+				pass
+				self.is_valid = False
+			return
+		self._video_metadata(transcode_path, False)
 
 	@property
 	def name(self):
@@ -632,4 +632,4 @@ class PhotoAlbumEncoder(json.JSONEncoder):
 		if isinstance(obj, Album) or isinstance(obj, Photo):
 			return obj.to_dict()
 		return json.JSONEncoder.default(self, obj)
-		
+
