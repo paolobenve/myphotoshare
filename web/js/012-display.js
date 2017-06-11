@@ -254,6 +254,7 @@ $(document).ready(function() {
 				$(window).unbind("resize", scaleVideo);
 				$(window).unbind("resize", scaleImage);
 				videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
+				//console.log(videoSrc);
 				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
 					.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
 					.attr("src", videoSrc)

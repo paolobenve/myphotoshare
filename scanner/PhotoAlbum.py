@@ -277,12 +277,17 @@ class Photo(object):
 
 
 	def _video_metadata(self, path, original=True):
+		#~ message("debug", "video metadata")
 		p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
+		#~ message("debug: p", p)
 		if p == False:
 			self.is_valid = False
 			return
 		info = json.loads(p)
 		for s in info["streams"]:
+			#~ message("debug: codec_type", 'codec_type')
+			#~ if 'codec_type' in s:
+				#~ message("debug: s[codec_type]", s['codec_type'])
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
 				self._attributes["size"] = (int(s["width"]), int(s["height"]))
@@ -336,13 +341,13 @@ class Photo(object):
 		if square:
 			info_string += ", square"
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
-			#~ next_level()
+			next_level()
 			message("existing thumb", info_string)
-			#~ back_level()
+			back_level()
 			return
-		#~ next_level()
+		next_level()
 		message("thumbing", info_string)
-		#~ back_level()
+		back_level()
 		gc.collect()
 		try:
 			image_copy = image.copy()
@@ -354,7 +359,9 @@ class Photo(object):
 			except KeyboardInterrupt:
 				raise
 			except:
+				next_level()
 				message("corrupt image", os.path.basename(original_path))
+				back_level()
 				self.is_valid = False
 				return
 		if square:
@@ -417,7 +424,9 @@ class Photo(object):
 			tfn                     # temporary file to store extracted image
 		)
 		if p == False:
+			next_level()
 			message("couldn't extract video frame", os.path.basename(original_path))
+			back_level()
 			try:
 				os.unlink(tfn)
 			except:
@@ -433,7 +442,9 @@ class Photo(object):
 				pass
 			raise
 		except:
+			next_level()
 			message("couldn't open video thumbnail", tfn)
+			back_level()
 			try:
 				os.unlink(tfn)
 			except:
@@ -481,7 +492,9 @@ class Photo(object):
 		]
 		filters = []
 		info_string = "%s -> mp4, h264" % (os.path.basename(original_path))
+		next_level()
 		message("transcoding", info_string)
+		back_level()
 		if os.path.exists(transcode_path) and file_mtime(transcode_path) >= self._attributes["dateTimeFile"]:
 			self._video_metadata(transcode_path, False)
 			return
@@ -506,14 +519,18 @@ class Photo(object):
 			# add another option, try transcoding again
 			# done to avoid this error;
 			# x264 [error]: baseline profile doesn't support 4:2:2
+			next_level()
 			message("transcoding failure, trying yuv420p", os.path.basename(original_path))
+			back_level()
 			tmp_transcode_cmd.append('-pix_fmt')
 			tmp_transcode_cmd.append('yuv420p')
 			tmp_transcode_cmd.append(transcode_path)
 			p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
 		
 		if p == False:
+			next_level()
 			message("transcoding failure", os.path.basename(original_path))
+			back_level()
 			try:
 				os.unlink(transcode_path)
 			except:
