@@ -182,6 +182,7 @@
 	};
 	PhotoFloat.photoYearAlbum = function(photo) {
 		return photo.yearAlbum;
+	};
 	PhotoFloat.videoPath = function(album, video) {
 		return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".mp4");
 	};
@@ -214,7 +215,7 @@
 		http.open('HEAD', url, false);
 		http.send();
 		return http.status == 404;
-	}
+	};
 
 	
 	/* make static methods callable as member functions */
