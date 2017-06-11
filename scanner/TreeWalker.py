@@ -138,10 +138,10 @@ class TreeWalker:
 								cache_file = os.path.join(self.cache_path, video_cache(entry))
 							else:
 								# if image
-								cache_file = os.path.join(self.cache_path, image_cache(entry, 1024, False))
+								cache_file = os.path.join(self.cache_path, image_cache(entry, 1600, False))
 						else:
 							# if image
-							cache_file = os.path.join(self.cache_path, image_cache(entry, 1024, False))
+							cache_file = os.path.join(self.cache_path, image_cache(entry, 1600, False))
 
 						# at this point we have full path to cache image/video
 						# check if it actually exists
