@@ -248,7 +248,7 @@ $(document).ready(function() {
 			if (! Modernizr.video) {
 				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p><p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p></div>').appendTo('#video-box-inner');
 			}
-			else if (!Modernizr.video.h264) {
+			else if (! Modernizr.video.h264) {
 				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the H.264 video format!</p></div>').appendTo('#video-box-inner');
 			} else {
 				$(window).unbind("resize", scaleVideo);
