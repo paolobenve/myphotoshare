@@ -20,8 +20,8 @@ $(document).ready(function() {
 	/* Globals */
 	
 	var currentAlbum = null;
-	var currentPhoto = null;
-	var currentPhotoIndex = -1;
+	var currentMedia = null;
+	var currentMediaIndex = -1;
 	var previousAlbum = null;
 	var previousPhoto = null;
 	var originalTitle = document.title;
@@ -45,14 +45,14 @@ $(document).ready(function() {
 			components = currentAlbum.path.split("/");
 			components.unshift(originalTitle);
 		}
-		if (currentPhoto !== null)
-			documentTitle += photoFloat.trimExtension(currentPhoto.name);
+		if (currentMedia !== null)
+			documentTitle += photoFloat.trimExtension(currentMedia.name);
 		for (i = 0; i < components.length; ++i) {
-			if (i || currentPhoto !== null)
+			if (i || currentMedia !== null)
 				documentTitle += " \u00ab ";
 			if (i)
 				last += "/" + components[i];
-			if (i < components.length - 1 || currentPhoto !== null)
+			if (i < components.length - 1 || currentMedia !== null)
 				title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 			var titleAdd = components[i];
 			if (typeof bydateTranslation !== 'undefined')
@@ -74,22 +74,22 @@ $(document).ready(function() {
 			else
 				documentTitleAdd = documentTitleAdd.replace(foldersString, foldersEnglishString);
 			documentTitle += documentTitleAdd;
-			if (i < components.length - 1 || currentPhoto !== null) {
+			if (i < components.length - 1 || currentMedia !== null) {
 				title += "</a>";
 			}
 			//~ if (i < components.length - 1) {
 				title += " &raquo; ";
 			//~ }
 		}
-		if (currentPhoto !== null)
-			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentPhoto.name) + "</div>";
+		if (currentMedia !== null)
+			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</div>";
 		
 		$("#title").html(title);
 		document.title = documentTitle;
 	}
 	function scrollToThumb() {
 		var photo, thumb;
-		photo = currentPhoto;
+		photo = currentMedia;
 		if (photo === null) {
 			photo = previousPhoto;
 			if (photo === null)
@@ -103,21 +103,22 @@ $(document).ready(function() {
 		});
 		if (typeof thumb === "undefined")
 			return;
-		if (currentPhoto !== null) {
+		if (currentMedia !== null) {
 			var scroller = $("#album-view");
-			
+			//~ console.log(1,currentMedia);
 			scroller.stop().animate({ scrollLeft: thumb.parent().position().left + scroller.scrollLeft() - scroller.width() / 2 + thumb.width() / 2 }, "slow");
+			//~ console.log(2,currentMedia);
 		} else
 			$("html, body").stop().animate({ scrollTop: thumb.offset().top - $(window).height() / 2 + thumb.height() }, "slow");
 		
-		if (currentPhoto !== null) {
+		if (currentMedia !== null) {
 			$("#thumbs img").removeClass("current-thumb");
 			thumb.addClass("current-thumb");
 		}
 	}
 	function showAlbum(populate) {
 		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash;
-		if (currentPhoto === null && previousPhoto === null)
+		if (currentMedia === null && previousPhoto === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
 			photos = [];
@@ -163,7 +164,7 @@ $(document).ready(function() {
 			thumbsElement.empty();
 			thumbsElement.append.apply(thumbsElement, photos);
 			
-			if (currentPhoto === null) {
+			if (currentMedia === null) {
 				subalbums = [];
 				for (i = 0; i < currentAlbum.albums.length; ++i) {
 					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
@@ -199,7 +200,7 @@ $(document).ready(function() {
 			}
 		}
 		
-		if (currentPhoto === null) {
+		if (currentMedia === null) {
 			$("#thumbs img").removeClass("current-thumb");
 			$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
@@ -238,12 +239,13 @@ $(document).ready(function() {
 		else
 			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
 	}
-	function showPhoto() {
+	function showMedia() {
 		var width, height, photoSrc, videoSrc, previousPhoto, nextPhoto, nextLink, text;
-		width = currentPhoto.size[0];
-		height = currentPhoto.size[1];
+		width = currentMedia.size[0];
+		height = currentMedia.size[1];
+		//~ console.log(1.5,currentMedia);
 
-		if (currentPhoto.mediaType == "video") {
+		if (currentMedia.mediaType == "video") {
 			$("#video-box-inner").empty();
 			if (! Modernizr.video) {
 				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p><p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p></div>').appendTo('#video-box-inner');
@@ -253,12 +255,12 @@ $(document).ready(function() {
 			} else {
 				$(window).unbind("resize", scaleVideo);
 				$(window).unbind("resize", scaleImage);
-				videoSrc = photoFloat.videoPath(currentAlbum, currentPhoto);
+				videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
 				//console.log(videoSrc);
 				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
-					.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
+					.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
 					.attr("src", videoSrc)
-					.attr("alt", currentPhoto.name)
+					.attr("alt", currentMedia.name)
 					.on('loadstart', scaleVideo);
 			}
 			$("head").append("<link rel=\"video_src\" href=\"" + videoSrc + "\" />");
@@ -266,8 +268,8 @@ $(document).ready(function() {
 			$("#photo-box").hide();
 			$("#video-box").show();
 		} else {
-			width = currentPhoto.size[0];
-			height = currentPhoto.size[1];
+			width = currentMedia.size[0];
+			height = currentMedia.size[1];
 			if (width > height) {
 				height = height / width * maxSize;
 				width = maxSize;
@@ -277,90 +279,85 @@ $(document).ready(function() {
 			}
 			$(window).unbind("resize", scaleVideo);
 			$(window).unbind("resize", scaleImage);
-			photoSrc = photoFloat.photoPath(currentAlbum, currentPhoto, maxSize, false);
+			photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, maxSize, false);
 			$("#photo")
-				.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
+				.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
 				.attr("src", photoSrc)
-				.attr("alt", currentPhoto.name)
-				.attr("title", currentPhoto.date)
+				.attr("alt", currentMedia.name)
+				.attr("title", currentMedia.date)
 				.load(scaleImage);
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#photo-box").show();
 		}
-		$(window).unbind("resize", scaleImage);
-		photoSrc = photoFloat.photoPath(currentAlbum, currentPhoto, maxSize, false);
-		$("#photo")
-			.attr("width", width).attr("height", height).attr("ratio", currentPhoto.size[0] / currentPhoto.size[1])
-			.attr("src", photoSrc)
-			.attr("alt", currentPhoto.name)
-			.attr("title", currentPhoto.date)
-			.load(scaleImage);
-		$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
 		previousPhoto = currentAlbum.photos[
-			(currentPhotoIndex - 1 < 0) ? (currentAlbum.photos.length - 1) : (currentPhotoIndex - 1)
+			(currentMediaIndex - 1 < 0) ? (currentAlbum.photos.length - 1) : (currentMediaIndex - 1)
 		];
 		nextPhoto = currentAlbum.photos[
-			(currentPhotoIndex + 1 >= currentAlbum.photos.length) ? 0 : (currentPhotoIndex + 1)
+			(currentMediaIndex + 1 >= currentAlbum.photos.length) ? 0 : (currentMediaIndex + 1)
 		];
-		$.preloadImages(photoFloat.photoPath(currentAlbum, nextPhoto, maxSize, false),
-						photoFloat.photoPath(currentAlbum, previousPhoto, maxSize, false));
-		
-		if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentPhoto)) {
-			$("#folders-view-container").hide();
-			$("#day-view-container").hide();
-			$("#month-view-container").show();
-			$("#year-view-container").show();
-		}
-		else if (currentAlbum.path == photoFloat.photoMonthAlbum(currentPhoto)) {
-			$("#folders-view-container").hide();
-			$("#day-view-container").show();
-			$("#month-view-container").hide();
-			$("#year-view-container").show();
-		}
-		else if (currentAlbum.path == photoFloat.photoDayAlbum(currentPhoto)) {
-			$("#folders-view-container").show();
-			$("#day-view-container").hide();
-			$("#month-view-container").hide();
-			$("#year-view-container").show();
-		}
-		
-		if (currentAlbum.path == photoFloat.photoYearAlbum(currentPhoto)) {
-			//~ $("#folders-view-container").show();
-			//~ $("#day-view-container").hide();
-			//~ $("#month-view-container").hide();
-			$("#year-view-container").hide();
+		if (currentMedia.mediaType == "video") {
+			$.preloadImages(photoFloat.videoPath(currentAlbum, nextPhoto),
+							photoFloat.videoPath(currentAlbum, previousPhoto));
+		} else {
+			$.preloadImages(photoFloat.photoPath(currentAlbum, nextPhoto, maxSize, false),
+							photoFloat.photoPath(currentAlbum, previousPhoto, maxSize, false));
+			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
+				$("#folders-view-container").hide();
+				$("#day-view-container").hide();
+				$("#month-view-container").show();
+				$("#year-view-container").show();
+			}
+			else if (currentAlbum.path == photoFloat.photoMonthAlbum(currentMedia)) {
+				$("#folders-view-container").hide();
+				$("#day-view-container").show();
+				$("#month-view-container").hide();
+				$("#year-view-container").show();
+			}
+			else if (currentAlbum.path == photoFloat.photoDayAlbum(currentMedia)) {
+				$("#folders-view-container").show();
+				$("#day-view-container").hide();
+				$("#month-view-container").hide();
+				$("#year-view-container").show();
+			}
+			
+			if (currentAlbum.path == photoFloat.photoYearAlbum(currentMedia)) {
+				//~ $("#folders-view-container").show();
+				//~ $("#day-view-container").hide();
+				//~ $("#month-view-container").hide();
+				$("#year-view-container").hide();
+			}
 		}
 		
 		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextPhoto);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousPhoto));
-		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentPhoto));
-		$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentPhoto.foldersAlbum) + "/" + PhotoFloat.cachePath(currentPhoto.name));
-		$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentPhoto.dayAlbum) + "/" + PhotoFloat.cachePath(currentPhoto.name));
-		$("#month-view").attr("href", "#!/" + PhotoFloat.cachePath(currentPhoto.monthAlbum) + "/" + PhotoFloat.cachePath(currentPhoto.name));
-		$("#year-view").attr("href", "#!/" + PhotoFloat.cachePath(currentPhoto.yearAlbum) + "/" + PhotoFloat.cachePath(currentPhoto.name));
+		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
+		$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+		$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+		$("#month-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.monthAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+		$("#year-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.yearAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
 		
 		text = "<table>";
-		if (typeof currentPhoto.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentPhoto.make + "</td></tr>";
-		if (typeof currentPhoto.model !== "undefined") text += "<tr><td>Camera Model</td><td>" + currentPhoto.model + "</td></tr>";
-		if (typeof currentPhoto.date !== "undefined") text += "<tr><td>Time Taken</td><td>" + currentPhoto.date + "</td></tr>";
-		if (typeof currentPhoto.size !== "undefined") text += "<tr><td>Resolution</td><td>" + currentPhoto.size[0] + " x " + currentPhoto.size[1] + "</td></tr>";
-		if (typeof currentPhoto.aperture !== "undefined") text += "<tr><td>Aperture</td><td> f/" + getDecimal(currentPhoto.aperture) + "</td></tr>";
-		if (typeof currentPhoto.focalLength !== "undefined") text += "<tr><td>Focal Length</td><td>" + getDecimal(currentPhoto.focalLength) + " mm</td></tr>";
-		if (typeof currentPhoto.subjectDistanceRange !== "undefined") text += "<tr><td>Subject Distance Range</td><td>" + currentPhoto.subjectDistanceRange + "</td></tr>";
-		if (typeof currentPhoto.iso !== "undefined") text += "<tr><td>ISO</td><td>" + currentPhoto.iso + "</td></tr>";
-		if (typeof currentPhoto.sceneCaptureType !== "undefined") text += "<tr><td>Scene Capture Type</td><td>" + currentPhoto.sceneCaptureType + "</td></tr>";
-		if (typeof currentPhoto.exposureTime !== "undefined") text += "<tr><td>Exposure Time</td><td>" + getDecimal(currentPhoto.exposureTime) + " sec</td></tr>";
-		if (typeof currentPhoto.exposureProgram !== "undefined") text += "<tr><td>Exposure Program</td><td>" + currentPhoto.exposureProgram + "</td></tr>";
-		if (typeof currentPhoto.exposureCompensation !== "undefined") text += "<tr><td>Exposure Compensation</td><td>" + getDecimal(currentPhoto.exposureCompensation) + "</td></tr>";
-		if (typeof currentPhoto.spectralSensitivity !== "undefined") text += "<tr><td>Spectral Sensitivity</td><td>" + currentPhoto.spectralSensitivity + "</td></tr>";
-		if (typeof currentPhoto.sensingMethod !== "undefined") text += "<tr><td>Sensing Method</td><td>" + currentPhoto.sensingMethod + "</td></tr>";
-		if (typeof currentPhoto.lightSource !== "undefined") text += "<tr><td>Light Source</td><td>" + currentPhoto.lightSource + "</td></tr>";
-		if (typeof currentPhoto.flash !== "undefined") text += "<tr><td>Flash</td><td>" + currentPhoto.flash + "</td></tr>";
-		if (typeof currentPhoto.orientation !== "undefined") text += "<tr><td>Orientation</td><td>" + currentPhoto.orientation + "</td></tr>";
+		if (typeof currentMedia.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentMedia.make + "</td></tr>";
+		if (typeof currentMedia.model !== "undefined") text += "<tr><td>Camera Model</td><td>" + currentMedia.model + "</td></tr>";
+		if (typeof currentMedia.date !== "undefined") text += "<tr><td>Time Taken</td><td>" + currentMedia.date + "</td></tr>";
+		if (typeof currentMedia.size !== "undefined") text += "<tr><td>Resolution</td><td>" + currentMedia.size[0] + " x " + currentMedia.size[1] + "</td></tr>";
+		if (typeof currentMedia.aperture !== "undefined") text += "<tr><td>Aperture</td><td> f/" + getDecimal(currentMedia.aperture) + "</td></tr>";
+		if (typeof currentMedia.focalLength !== "undefined") text += "<tr><td>Focal Length</td><td>" + getDecimal(currentMedia.focalLength) + " mm</td></tr>";
+		if (typeof currentMedia.subjectDistanceRange !== "undefined") text += "<tr><td>Subject Distance Range</td><td>" + currentMedia.subjectDistanceRange + "</td></tr>";
+		if (typeof currentMedia.iso !== "undefined") text += "<tr><td>ISO</td><td>" + currentMedia.iso + "</td></tr>";
+		if (typeof currentMedia.sceneCaptureType !== "undefined") text += "<tr><td>Scene Capture Type</td><td>" + currentMedia.sceneCaptureType + "</td></tr>";
+		if (typeof currentMedia.exposureTime !== "undefined") text += "<tr><td>Exposure Time</td><td>" + getDecimal(currentMedia.exposureTime) + " sec</td></tr>";
+		if (typeof currentMedia.exposureProgram !== "undefined") text += "<tr><td>Exposure Program</td><td>" + currentMedia.exposureProgram + "</td></tr>";
+		if (typeof currentMedia.exposureCompensation !== "undefined") text += "<tr><td>Exposure Compensation</td><td>" + getDecimal(currentMedia.exposureCompensation) + "</td></tr>";
+		if (typeof currentMedia.spectralSensitivity !== "undefined") text += "<tr><td>Spectral Sensitivity</td><td>" + currentMedia.spectralSensitivity + "</td></tr>";
+		if (typeof currentMedia.sensingMethod !== "undefined") text += "<tr><td>Sensing Method</td><td>" + currentMedia.sensingMethod + "</td></tr>";
+		if (typeof currentMedia.lightSource !== "undefined") text += "<tr><td>Light Source</td><td>" + currentMedia.lightSource + "</td></tr>";
+		if (typeof currentMedia.flash !== "undefined") text += "<tr><td>Flash</td><td>" + currentMedia.flash + "</td></tr>";
+		if (typeof currentMedia.orientation !== "undefined") text += "<tr><td>Orientation</td><td>" + currentMedia.orientation + "</td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
 		
@@ -408,7 +405,7 @@ $(document).ready(function() {
 	function hashParsed(album, photo, photoIndex) {
 		undie();
 		$("#loading").hide();
-		if (album === currentAlbum && photo === currentPhoto)
+		if (album === currentAlbum && photo === currentMedia)
 			return;
 		if (album != currentAlbum)
 			currentAlbum = null;
@@ -416,21 +413,23 @@ $(document).ready(function() {
 			previousAlbum = currentAlbum;
 			album = currentAlbum;
 			previousPhoto = photo;
-			currentPhoto = photo;
-			currentPhotoIndex = photoIndex;
+			currentMedia = photo;
+			currentMediaIndex = photoIndex;
 		}
 		else {
 			previousAlbum = currentAlbum;
-			previousPhoto = currentPhoto;
+			previousPhoto = currentMedia;
 			currentAlbum = album;
-			currentPhoto = photo;
-			currentPhotoIndex = photoIndex;
+			currentMedia = photo;
+			currentMediaIndex = photoIndex;
 		}
 		setTitle();
-		var populateAlbum = previousAlbum !== currentAlbum || previousPhoto !== currentPhoto;
+		var populateAlbum = previousAlbum !== currentAlbum || previousPhoto !== currentMedia;
 		showAlbum(populateAlbum);
-		if (photo !== null) {
-			showPhoto();
+		//~ if (photo !== null && photo.mediaType != "video") {
+		//~ if (photo !== null) {
+		if (currentMedia !== null) {
+			showMedia();
 		}
 		if (typeof poweredByTranslation !== 'undefined')
 			$("#powered-by-string").html(poweredByTranslation);
@@ -450,7 +449,7 @@ $(document).ready(function() {
 	});
 	$(window).hashchange();
 	$(document).keydown(function(e){
-		if (currentPhoto === null)
+		if (currentMedia === null)
 			return true;
 		if (e.keyCode === 39) {
 			window.location.href = $("#next").attr("href");
@@ -462,7 +461,7 @@ $(document).ready(function() {
 		return true;
 	});
 	$(document).mousewheel(function(event, delta) {
-		if (currentPhoto === null)
+		if (currentMedia === null)
 			return true;
 		if (delta < 0) {
 			window.location.href = $("#next").attr("href");
@@ -490,7 +489,7 @@ $(document).ready(function() {
 		$("#fullscreen").show().click(function() {
 			$("#photo").fullScreen({callback: function(isFullscreen) {
 				maxSize = isFullscreen ? 1600 : 1600;
-				showPhoto();
+				showMedia();
 			}});
 		});
 	}
