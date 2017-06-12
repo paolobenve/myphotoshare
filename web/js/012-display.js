@@ -23,7 +23,7 @@ $(document).ready(function() {
 	var currentMedia = null;
 	var currentMediaIndex = -1;
 	var previousAlbum = null;
-	var previousPhoto = null;
+	var previousMedia = null;
 	var originalTitle = document.title;
 	var photoFloat = new PhotoFloat();
 	var maxSize = 1600;
@@ -91,7 +91,7 @@ $(document).ready(function() {
 		var photo, thumb;
 		photo = currentMedia;
 		if (photo === null) {
-			photo = previousPhoto;
+			photo = previousMedia;
 			if (photo === null)
 				return;
 		}
@@ -118,7 +118,7 @@ $(document).ready(function() {
 	}
 	function showAlbum(populate) {
 		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash;
-		if (currentMedia === null && previousPhoto === null)
+		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
 			photos = [];
@@ -240,7 +240,7 @@ $(document).ready(function() {
 			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
 	}
 	function showMedia() {
-		var width, height, photoSrc, videoSrc, previousPhoto, nextPhoto, nextLink, text;
+		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
 		//~ console.log(1.5,currentMedia);
@@ -291,18 +291,18 @@ $(document).ready(function() {
 			$("#video-box").hide();
 			$("#photo-box").show();
 		}
-		previousPhoto = currentAlbum.photos[
+		previousMedia = currentAlbum.photos[
 			(currentMediaIndex - 1 < 0) ? (currentAlbum.photos.length - 1) : (currentMediaIndex - 1)
 		];
-		nextPhoto = currentAlbum.photos[
+		nextMedia = currentAlbum.photos[
 			(currentMediaIndex + 1 >= currentAlbum.photos.length) ? 0 : (currentMediaIndex + 1)
 		];
 		if (currentMedia.mediaType == "video") {
-			$.preloadImages(photoFloat.videoPath(currentAlbum, nextPhoto),
-							photoFloat.videoPath(currentAlbum, previousPhoto));
+			$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia),
+							photoFloat.videoPath(currentAlbum, previousMedia));
 		} else {
-			$.preloadImages(photoFloat.photoPath(currentAlbum, nextPhoto, maxSize, false),
-							photoFloat.photoPath(currentAlbum, previousPhoto, maxSize, false));
+			$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize, false),
+							photoFloat.photoPath(currentAlbum, previousMedia, maxSize, false));
 			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
 				$("#folders-view-container").hide();
 				$("#day-view-container").hide();
@@ -330,10 +330,10 @@ $(document).ready(function() {
 			}
 		}
 		
-		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextPhoto);
+		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
 		$("#next-photo").attr("href", nextLink);
 		$("#next").attr("href", nextLink);
-		$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousPhoto));
+		$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
 		$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
@@ -412,19 +412,19 @@ $(document).ready(function() {
 		if (currentAlbum && currentAlbum.path.indexOf(bydateString) === 0 && photo !== null) {
 			previousAlbum = currentAlbum;
 			album = currentAlbum;
-			previousPhoto = photo;
+			previousMedia = photo;
 			currentMedia = photo;
 			currentMediaIndex = photoIndex;
 		}
 		else {
 			previousAlbum = currentAlbum;
-			previousPhoto = currentMedia;
+			previousMedia = currentMedia;
 			currentAlbum = album;
 			currentMedia = photo;
 			currentMediaIndex = photoIndex;
 		}
 		setTitle();
-		var populateAlbum = previousAlbum !== currentAlbum || previousPhoto !== currentMedia;
+		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
 		//~ if (photo !== null && photo.mediaType != "video") {
 		//~ if (photo !== null) {

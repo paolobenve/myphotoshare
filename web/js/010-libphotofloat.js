@@ -131,14 +131,14 @@
 			path = path.replace(/__/g, "_");
 		return path;
 	};
-	PhotoFloat.photoHash = function(album, photo) {
-		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(photo.name);
+	PhotoFloat.photoHash = function(album, media) {
+		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(media.name);
 	};
-	PhotoFloat.photoHashFolder = function(album, photo) {
+	PhotoFloat.photoHashFolder = function(album, media) {
 		var hash;
-		hash = PhotoFloat.photoHash(album, photo);
+		hash = PhotoFloat.photoHash(album, media);
 		if (hash.indexOf(bydateStringWithTrailingDash) === 0) {
-			hash = PhotoFloat.cachePath(photo.completeName.substring(0, photo.completeName.length - photo.name.length - 1)) + "/" + PhotoFloat.cachePath(photo.name);
+			hash = PhotoFloat.cachePath(media.completeName.substring(0, media.completeName.length - media.name.length - 1)) + "/" + PhotoFloat.cachePath(media.name);
 		}
 		return hash;
 	};
