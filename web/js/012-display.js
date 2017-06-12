@@ -245,7 +245,7 @@ $(document).ready(function() {
 
 		if (currentPhoto.mediaType == "video") {
 			$("#video-box-inner").empty();
-			if (!Modernizr.video) {
+			if (! Modernizr.video) {
 				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p><p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p></div>').appendTo('#video-box-inner');
 			}
 			else if (!Modernizr.video.h264) {

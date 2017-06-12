@@ -184,7 +184,22 @@
 		return photo.yearAlbum;
 	};
 	PhotoFloat.videoPath = function(album, video) {
-		return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".mp4");
+		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, video) + ".mp4");
+		var rootString = "root-";
+		if (hash.indexOf(rootString) === 0)
+			hash = hash.substring(rootString.length);
+		else {
+			var foldersString = "_folders-";
+			if (hash.indexOf(foldersString) === 0)
+				hash = hash.substring(foldersString.length);
+			else {
+				if (hash.indexOf(bydateStringWithTrailingDash) === 0)
+				hash = hash.substring(bydateStringWithTrailingDash.length);
+			}
+		}
+		return "cache/" + hash;
+		
+		//return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".mp4");
 	};
 	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
