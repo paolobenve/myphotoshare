@@ -256,7 +256,7 @@ $(document).ready(function() {
 				$(window).unbind("resize", scaleVideo);
 				$(window).unbind("resize", scaleImage);
 				videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
-				//console.log(videoSrc);
+				//~ console.log(videoSrc);
 				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
 					.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
 					.attr("src", videoSrc)
@@ -297,12 +297,17 @@ $(document).ready(function() {
 		nextMedia = currentAlbum.photos[
 			(currentMediaIndex + 1 >= currentAlbum.photos.length) ? 0 : (currentMediaIndex + 1)
 		];
-		if (currentMedia.mediaType == "video") {
-			$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia),
-							photoFloat.videoPath(currentAlbum, previousMedia));
+		if (nextMedia.mediaType == "video") {
+			$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia));
 		} else {
-			$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize, false),
-							photoFloat.photoPath(currentAlbum, previousMedia, maxSize, false));
+			$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize, false))
+		}
+		if (previousMedia.mediaType == "video") {
+			$.preloadImages(photoFloat.videoPath(currentAlbum, previousMedia));
+		} else {
+			$.preloadImages(photoFloat.photoPath(currentAlbum, previousMedia, maxSize, false));
+		}
+		if (currentMedia.mediaType != "video") {
 			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
 				$("#folders-view-container").hide();
 				$("#day-view-container").hide();

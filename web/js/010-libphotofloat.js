@@ -92,7 +92,7 @@
 		}, error);
 	};
 	PhotoFloat.prototype.authenticate = function(password, result) {
-		$.ajax({
+		ajaxOptions = {
 			type: "GET",
 			dataType: "text",
 			url: "auth?username=photos&password=" + password,
@@ -102,7 +102,8 @@
 			error: function() {
 				result(false);
 			}
-		});
+		};
+		$.ajax(ajaxOptions);
 	};
 	
 	/* static functions */
@@ -184,7 +185,8 @@
 		return photo.yearAlbum;
 	};
 	PhotoFloat.videoPath = function(album, video) {
-		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, video) + ".mp4");
+		var hashFolder = PhotoFloat.photoHashFolder(album, video) + ".mp4";
+		hash = PhotoFloat.cachePath(hashFolder);
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
@@ -226,10 +228,19 @@
 	};
 	
 	PhotoFloat.urlDoesntExist = function(url) {
-		var http = new XMLHttpRequest();
-		http.open('HEAD', url, false);
-		http.send();
-		return http.status == 404;
+		var request = new XMLHttpRequest();
+		request.open('GET', url, true);
+		request.onreadystatechange = function(){
+		    if (request.readyState === 4){
+			if (request.status === 404) {  
+			    return true;
+			}  
+		    }
+		};
+		request.send();
+		//~ http.open('HEAD', url, false);
+		//~ http.send();
+		//~ return http.status == 404;
 	};
 
 	
