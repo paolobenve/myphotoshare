@@ -105,9 +105,7 @@ $(document).ready(function() {
 			return;
 		if (currentMedia !== null) {
 			var scroller = $("#album-view");
-			//~ console.log(1,currentMedia);
 			scroller.stop().animate({ scrollLeft: thumb.parent().position().left + scroller.scrollLeft() - scroller.width() / 2 + thumb.width() / 2 }, "slow");
-			//~ console.log(2,currentMedia);
 		} else
 			$("html, body").stop().animate({ scrollTop: thumb.offset().top - $(window).height() / 2 + thumb.height() }, "slow");
 		
@@ -131,12 +129,7 @@ $(document).ready(function() {
 						"/" +
 						PhotoFloat.cachePath(currentAlbum.photos[i].name);
 				}
-				//link = $("<a href=\"#!/" + photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]) + "\"></a>");
 				link = $("<a href=\"#!/" + hash + "\"></a>");
-				//image = $("<img title=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-				//		"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-				//		"\" src=\"" + photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true) +
-				//		"\" height=\"150\" width=\"150\" />");
 				image = $("<div class=\"thumb-container\">" +
 							"<img title=\"" + currentAlbum.photos[i].name +
 							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
@@ -200,12 +193,14 @@ $(document).ready(function() {
 		
 		if (currentMedia === null) {
 			$("#thumbs img").removeClass("current-thumb");
-			//$("#album-view").removeClass("photo-view-container");
+			$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
 			$("#photo-view").hide();
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
-		}
+			$("#thumbs").show();
+		} else if (currentAlbum.photos.length == 1)
+			$("#thumbs").hide();
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
