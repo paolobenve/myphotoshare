@@ -20,13 +20,15 @@
 			return;
 		}
 		cacheFile = "cache/" + cacheKey + ".json";
-		if (PhotoFloat.urlDoesntExist(cacheFile))
+		if (PhotoFloat.urlDoesntExist(cacheFile)) {
 			cacheKey = "root";
+			cacheFile = "cache/root.json";
+		}
 		self = this;
 		ajaxOptions = {
 			type: "GET",
 			dataType: "json",
-			url: "cache/" + cacheKey + ".json",
+			url: cacheFile,
 			success: function(album) {
 				var i;
 				for (i = 0; i < album.albums.length; ++i)
@@ -64,7 +66,7 @@
 		var index, album, photo;
 		hash = PhotoFloat.cleanHash(hash);
 		index = hash.lastIndexOf("/");
-		if (!hash.length) {
+		if (! hash.length) {
 			album = PhotoFloat.cachePath("root");
 			photo = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
@@ -148,6 +150,25 @@
 			return PhotoFloat.cachePath(album.path);
 		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
 	};
+	PhotoFloat.videoPath = function(album, video) {
+		var hashFolder = PhotoFloat.photoHashFolder(album, video) + ".mp4";
+		hash = PhotoFloat.cachePath(hashFolder);
+		var rootString = "root-";
+		if (hash.indexOf(rootString) === 0)
+			hash = hash.substring(rootString.length);
+		else {
+			var foldersString = "_folders-";
+			if (hash.indexOf(foldersString) === 0)
+				hash = hash.substring(foldersString.length);
+			else {
+				if (hash.indexOf(bydateStringWithTrailingDash) === 0)
+				hash = hash.substring(bydateStringWithTrailingDash.length);
+			}
+		}
+		return "cache/" + hash;
+		
+		//return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".mp4");
+	};
 	PhotoFloat.photoPath = function(album, photo, size, square) {
 		var suffix, hash;
 		if (square)
@@ -183,25 +204,6 @@
 	};
 	PhotoFloat.photoYearAlbum = function(photo) {
 		return photo.yearAlbum;
-	};
-	PhotoFloat.videoPath = function(album, video) {
-		var hashFolder = PhotoFloat.photoHashFolder(album, video) + ".mp4";
-		hash = PhotoFloat.cachePath(hashFolder);
-		var rootString = "root-";
-		if (hash.indexOf(rootString) === 0)
-			hash = hash.substring(rootString.length);
-		else {
-			var foldersString = "_folders-";
-			if (hash.indexOf(foldersString) === 0)
-				hash = hash.substring(foldersString.length);
-			else {
-				if (hash.indexOf(bydateStringWithTrailingDash) === 0)
-				hash = hash.substring(bydateStringWithTrailingDash.length);
-			}
-		}
-		return "cache/" + hash;
-		
-		//return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".mp4");
 	};
 	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");

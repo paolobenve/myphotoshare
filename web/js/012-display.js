@@ -146,8 +146,6 @@ $(document).ready(function() {
 							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
 							"</div>" +
 							"</div>");
-				if (currentAlbum.photos[i].mediaType == "video")
-					image.css("background-image", "url(" + image.attr("src") + ")").attr("src", "img/video-icon.png");
 
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);
@@ -202,7 +200,7 @@ $(document).ready(function() {
 		
 		if (currentMedia === null) {
 			$("#thumbs img").removeClass("current-thumb");
-			$("#album-view").removeClass("photo-view-container");
+			//$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
 			$("#photo-view").hide();
 			$("#video-box-inner").empty();
@@ -268,8 +266,6 @@ $(document).ready(function() {
 			$("#photo-box").hide();
 			$("#video-box").show();
 		} else {
-			width = currentMedia.size[0];
-			height = currentMedia.size[1];
 			if (width > height) {
 				height = height / width * maxSize;
 				width = maxSize;
@@ -340,10 +336,12 @@ $(document).ready(function() {
 		$("#next").attr("href", nextLink);
 		$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
-		$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
-		$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
-		$("#month-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.monthAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
-		$("#year-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.yearAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+		if (currentMedia.mediaType != "video") {
+			$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+			$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+			$("#month-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.monthAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+			$("#year-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.yearAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+		}
 		
 		text = "<table>";
 		if (typeof currentMedia.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentMedia.make + "</td></tr>";
