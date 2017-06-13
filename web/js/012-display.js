@@ -236,8 +236,7 @@ $(document).ready(function() {
 		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
-		//~ console.log(1.5,currentMedia);
-
+		
 		if (currentMedia.mediaType == "video") {
 			$("#video-box-inner").empty();
 			if (! Modernizr.video) {
@@ -249,7 +248,6 @@ $(document).ready(function() {
 				$(window).unbind("resize", scaleVideo);
 				$(window).unbind("resize", scaleImage);
 				videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
-				//~ console.log(videoSrc);
 				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
 					.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
 					.attr("src", videoSrc)
@@ -319,9 +317,6 @@ $(document).ready(function() {
 			}
 			
 			if (currentAlbum.path == photoFloat.photoYearAlbum(currentMedia)) {
-				//~ $("#folders-view-container").show();
-				//~ $("#day-view-container").hide();
-				//~ $("#month-view-container").hide();
 				$("#year-view-container").hide();
 			}
 		}
@@ -431,8 +426,6 @@ $(document).ready(function() {
 		setTitle();
 		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
-		//~ if (photo !== null && photo.mediaType != "video") {
-		//~ if (photo !== null) {
 		if (currentMedia !== null) {
 			showMedia();
 		}

@@ -166,8 +166,6 @@
 			}
 		}
 		return "cache/" + hash;
-		
-		//return "cache/" + PhotoFloat.cachePath(PhotoFloat.photoHash(album, video) + ".mp4");
 	};
 	PhotoFloat.photoPath = function(album, photo, size, square) {
 		var suffix, hash;
@@ -240,9 +238,6 @@
 		    }
 		};
 		request.send();
-		//~ http.open('HEAD', url, false);
-		//~ http.send();
-		//~ return http.status == 404;
 	};
 
 	
