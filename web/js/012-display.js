@@ -326,10 +326,17 @@ $(document).ready(function() {
 			}
 		}
 		
-		nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
-		$("#next-photo").attr("href", nextLink);
-		$("#next").attr("href", nextLink);
-		$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
+		if (currentAlbum.photos.length == 1) {
+			$("#next").hide();
+			$("#back").hide();
+		} else {
+			nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
+			$("#next-photo").attr("href", nextLink);
+			$("#next").attr("href", nextLink);
+			$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
+			$("#next").show();
+			$("#back").show();
+		}
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		if (currentMedia.mediaType != "video") {
 			$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
