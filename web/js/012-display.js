@@ -77,9 +77,9 @@ $(document).ready(function() {
 			if (i < components.length - 1 || currentMedia !== null) {
 				title += "</a>";
 			}
-			//~ if (i < components.length - 1) {
+			if (i < components.length - 1 || currentMedia !== null)
 				title += " &raquo; ";
-			//~ }
+
 		}
 		if (currentMedia !== null)
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</div>";
