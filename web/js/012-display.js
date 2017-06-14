@@ -423,12 +423,14 @@ $(document).ready(function() {
 			currentMedia = photo;
 			currentMediaIndex = photoIndex;
 		}
+		
 		setTitle();
-		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
-		showAlbum(populateAlbum);
 		if (currentMedia !== null) {
 			showMedia();
 		}
+		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
+		showAlbum(populateAlbum);
+		
 		if (typeof poweredByTranslation !== 'undefined')
 			$("#powered-by-string").html(poweredByTranslation);
 		if (typeof loadingTranslation !== 'undefined')
