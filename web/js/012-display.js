@@ -330,6 +330,11 @@ $(document).ready(function() {
 		if (currentAlbum.photos.length == 1) {
 			$("#next").hide();
 			$("#back").hide();
+			$("#next-photo").removeAttr("href");
+			$("#next").removeAttr("href");
+			$("#back").removeAttr("href");
+			$("#photo-view").addClass("no-bottom-space");
+			$("#album-view").addClass("no-bottom-space");
 		} else {
 			nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
 			$("#next-photo").attr("href", nextLink);
@@ -337,6 +342,8 @@ $(document).ready(function() {
 			$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
 			$("#next").show();
 			$("#back").show();
+			$("#photo-view").removeClass("no-bottom-space");
+			$("#album-view").removeClass("no-bottom-space");
 		}
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		if (currentMedia.mediaType != "video") {
@@ -467,7 +474,8 @@ $(document).ready(function() {
 		return true;
 	});
 	$(document).mousewheel(function(event, delta) {
-		if (currentMedia === null)
+		
+		if (currentMedia === null || $("#next").attr('href') === undefined)
 			return true;
 		if (delta < 0) {
 			window.location.href = $("#next").attr("href");
