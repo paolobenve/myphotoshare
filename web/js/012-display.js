@@ -490,11 +490,14 @@ $(document).ready(function() {
 		}
 		
 		setTitle();
-		if (currentMedia !== null) {
+		if (currentMedia !== null)
 			showMedia(currentAlbum);
-		}
 		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
+		if (currentMedia !== null)
+			$(".thumb-caption").hide();
+		else
+			$(".thumb-caption").show();
 		
 		if (typeof poweredByTranslation !== 'undefined')
 			$("#powered-by-string").html(poweredByTranslation);

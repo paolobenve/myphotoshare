@@ -44,13 +44,13 @@ a:hover {
 
 #thumbs img {
 	border: 0;
-	margin: 3px;
-/*
-	padding: 0;
-*/
+	margin-left: 3px;
+	margin-right: 3px;
+	margin-top: 3px;
 }
-.current-thumb {
+#thumbs img.current-thumb {
 	border-top: 3px solid #FFAD27 !important;
+	margin-top: 0;
 }
 #subalbums {
 	padding-top: 1.5em;
@@ -175,7 +175,7 @@ a:hover {
 }
 .photo-view-container {
 	position: absolute;
-	height: 150px;
+	height: 155px;
 	width: 100%;
 	bottom: 0;
 	top: auto !important;
@@ -243,10 +243,6 @@ a:hover {
 	font-weight: bold;
 	font-size: 110%;
 	font-style: italic;
-}
-
-#thumbs img {
-	margin: 3px;
 }
 
 .thumb-container {
