@@ -26,7 +26,7 @@ $(document).ready(function() {
 	var previousMedia = null;
 	var originalTitle = document.title;
 	var photoFloat = new PhotoFloat();
-	var maxSize = 1600;
+	var maxSize = 1200;
 	bydateString = "_by_date";
 	bydateStringWithTrailingDash = bydateString + "-";
 	foldersString = "_folders";
@@ -492,7 +492,7 @@ $(document).ready(function() {
 		$("#fullscreen-divider").show();
 		$("#fullscreen").show().click(function() {
 			$("#photo").fullScreen({callback: function(isFullscreen) {
-				maxSize = isFullscreen ? 1600 : 1200;
+				maxSize = isFullscreen ? 1600 : 1600;
 				showMedia();
 			}});
 		});

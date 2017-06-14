@@ -131,27 +131,26 @@ class TreeWalker:
 				if cached_album:
 					cached_photo = cached_album.photo_from_path(entry)
 					if cached_photo and file_mtime(entry) <= cached_photo.attributes["dateTimeFile"]:
-						cache_file = None
-						if "mediaType" in cached_photo.attributes:
-							if cached_photo.attributes["mediaType"] == "video":
-								# if video
-								cache_file = os.path.join(self.cache_path, video_cache(entry))
-							else:
-								# if image
-								cache_file = os.path.join(self.cache_path, image_cache(entry, 1600, False))
+						cache_files = list()
+						if "mediaType" in cached_photo.attributes and cached_photo.attributes["mediaType"] == "video":
+							# video
+							cache_files.append(os.path.join(self.cache_path, video_cache(entry)))
 						else:
-							# if image
-							cache_file = os.path.join(self.cache_path, image_cache(entry, 1600, False))
-
+							# image
+							for size in Photo.thumb_sizes:
+								cache_files.append(os.path.join(self.cache_path, image_cache(entry, size[0], False)))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
-						if os.path.exists(cache_file):
+						cache_hit = True
+						for cache_file in cache_files:
+							if not os.path.exists(cache_file):
+								cache_hit = False
+								break
+						if cache_hit:
 							message("cache hit", os.path.basename(entry))
-							cache_hit = True
 							photo = cached_photo
-				
 				if not cache_hit:
-					message("metainfo", os.path.basename(entry))
+					message("get metainfo", os.path.basename(entry))
 					photo = Photo(entry, self.cache_path)
 				if photo.is_valid:
 					self.all_photos.append(photo)
