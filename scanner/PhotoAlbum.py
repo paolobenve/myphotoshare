@@ -121,9 +121,11 @@ class Album(object):
 					subalbums.append(sub)
 		path_without_marker = self.remove_marker(self.path)
 		if path_without_marker == self.path:
-			return { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
+			dictionary = { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
 		else:
-			return { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
+			dictionary = { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
+		dictionary["thumbSizes"] = Photo.thumb_sizes
+		return dictionary
 	def photo_from_path(self, path):
 		for photo in self._photos:
 			if trim_base(path) == photo._path:
@@ -131,7 +133,7 @@ class Album(object):
 		return None
 
 class Photo(object):
-	thumb_sizes = [ (1600, False), (1200, False), (150, True) ]
+	thumb_sizes = [ (1600, False), (1200, False), (1024, False), (800, False), (150, True) ]
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
 		self.folders = trim_base(os.path.dirname(self._path))
