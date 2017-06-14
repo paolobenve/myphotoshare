@@ -266,16 +266,7 @@ $(document).ready(function() {
 		imageRatio = mediaMaxSize / mediaMinSize;
 		
 		if (fullscreen) {
-			maxSizeSet = false;
-			windowWidth = $(window).width();
-			windowHeight = $(window).height();
-			windowOrientation;
-			if (windowWidth > windowHeight)
-				windowOrientation = "landscape";
-			else
-				windowOrientation = "portrait";
-			windowMaxSize = Math.max(windowWidth, windowHeight);
-			windowMinSize = Math.min(windowWidth, windowHeight);
+			maxSize = album.thumbSizes[0][0];
 		}
 		if (! maxSizeSet) {
 			maxSize = album.thumbSizes[0][0];
