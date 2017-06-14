@@ -267,6 +267,7 @@ $(document).ready(function() {
 		
 		if (fullscreen) {
 			maxSize = album.thumbSizes[0][0];
+			maxSizeSet = true;
 		}
 		if (! maxSizeSet) {
 			maxSize = album.thumbSizes[0][0];
@@ -274,9 +275,10 @@ $(document).ready(function() {
 				if (! album.thumbSizes[i][1]) {
 					thumbnailMinSize = album.thumbSizes[i][0] / imageRatio;
 					thumbnailMaxSize = album.thumbSizes[i][0];
-					if (mediaOrientation == windowOrientation && thumbnailMinSize < windowMinSize ||
+					if (mediaOrientation == windowOrientation &&
+							(thumbnailMinSize < windowMinSize && thumbnailMaxSize < windowMaxSize) ||
 						mediaOrientation !== windowOrientation &&
-						(thumbnailMinSize < windowMaxSize || thumbnailMaxSize < windowMinSize))
+							(thumbnailMinSize < windowMaxSize && thumbnailMaxSize < windowMinSize))
 					//~ if (maxSizeSet && album.thumbSizes[i][0] < Math.max($(window).width(), $(window).height()))
 						break;
 					maxSize = album.thumbSizes[i][0];
@@ -552,16 +554,8 @@ $(document).ready(function() {
 		$("#fullscreen-divider").show();
 		$("#fullscreen").show().click(function() {
 			$("#photo").fullScreen({callback: function(isFullscreen) {
-				windowWidth = $(window).width();
-				windowHeight = $(window).height();
-				windowOrientation;
-				if (windowWidth > windowHeight)
-					windowOrientation = "landscape";
-				else
-					windowOrientation = "portrait";
-				windowMaxSize = Math.max(windowWidth, windowHeight);
-				windowMinSize = Math.min(windowWidth, windowHeight);
-				showMedia(currentAlbum, true);
+				maxSizeSet = false;
+				showMedia(currentAlbum, isFullscreen);
 			}});
 		});
 	}
