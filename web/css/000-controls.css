@@ -97,7 +97,7 @@ a:hover {
 #photo-view {
 	position: absolute;
 	bottom: 150px;
-	top: 0;
+	top: 3em;
 	overflow: hidden;
 	margin-bottom: 0.5em;
 	left: 0;
@@ -273,7 +273,7 @@ a:hover {
 	width: auto;
 	height: auto;
 	position: absolute;
-	top: 5em;
+	top: 0;
 	bottom: 0;  
 	left: 0;  
 	right: 0;  

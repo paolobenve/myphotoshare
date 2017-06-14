@@ -19,15 +19,16 @@ $(document).ready(function() {
 	
 	/* Globals */
 	
-	var currentAlbum = null;
+	currentAlbum = null;
 	var currentMedia = null;
 	var currentMediaIndex = -1;
 	var previousAlbum = null;
 	var previousMedia = null;
 	var originalTitle = document.title;
 	var photoFloat = new PhotoFloat();
-	var maxSize = 1600;
-	var maxSizeSet = false
+	//~ var maxSize = 1600;
+	var maxSizeSet = false;
+	var absoluteMaxSize = null;
 	//~ var thumbSizes;
 	bydateString = "_by_date";
 	bydateStringWithTrailingDash = bydateString + "-";
@@ -214,12 +215,18 @@ $(document).ready(function() {
 			return fraction[0] + "/" + fraction[1];
 		return (fraction[0] / fraction[1]).toString();
 	}
-	function scaleImage() {
+	function scaleImageFullscreen() {
+		scaleImage(true);
+	}
+	function scaleImage(fullscreen = false) {
 		var image, container;
 		image = $("#photo");
 		if (image.get(0) === this)
 			$(window).bind("resize", scaleImage);
-		container = $("#photo-view");
+		if (fullscreen)
+			container = $(window);
+		else
+			container = $("#photo-view");
 		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
@@ -238,11 +245,14 @@ $(document).ready(function() {
 		else
 			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
 	}
-	function showMedia(album = null) {
-		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, thumbSizes;
+	function showMedia(album, fullscreen = false) {
+		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
 		
+		absoluteMaxSize = album.thumbSizes[0][0];
+		if (fullscreen)
+			maxSizeSet = false;
 		if (! maxSizeSet) {
 			for (var i = 0; i < album.thumbSizes.length; i++)
 				if (! album.thumbSizes[i][1]) {
@@ -295,8 +305,11 @@ $(document).ready(function() {
 				.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
 				.attr("src", photoSrc)
 				.attr("alt", currentMedia.name)
-				.attr("title", currentMedia.date)
-				.load(scaleImage);
+				.attr("title", currentMedia.date);
+			if (fullscreen)
+				$("#photo").load(scaleImageFullscreen)
+			else
+				$("#photo").load(scaleImage)
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
@@ -524,8 +537,10 @@ $(document).ready(function() {
 		$("#fullscreen-divider").show();
 		$("#fullscreen").show().click(function() {
 			$("#photo").fullScreen({callback: function(isFullscreen) {
-				maxSize = isFullscreen ? 1600 : 1600;
-				showMedia();
+				//maxSize = absoluteMaxSize;
+				//~ if (! isFullscreen)
+				showMedia(currentAlbum, true);
+				
 			}});
 		});
 	}
