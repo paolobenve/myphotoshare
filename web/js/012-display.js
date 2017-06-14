@@ -280,25 +280,27 @@ $(document).ready(function() {
 			$("#video-box").hide();
 			$("#photo-box").show();
 		}
-		var i = currentMediaIndex;
-		do {
-			i == 0 ? i = currentAlbum.photos.length - 1: i --;
-			previousMedia = currentAlbum.photos[i];
-		} while (previousMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName);
-		i = currentMediaIndex;
-		do {
-			i == currentAlbum.photos.length - 1 ? i = 0 : i ++
-			nextMedia = currentAlbum.photos[i];
-		} while (nextMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName);
-		if (nextMedia.mediaType == "video") {
-			$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia));
-		} else {
-			$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize, false))
-		}
-		if (previousMedia.mediaType == "video") {
-			$.preloadImages(photoFloat.videoPath(currentAlbum, previousMedia));
-		} else {
-			$.preloadImages(photoFloat.photoPath(currentAlbum, previousMedia, maxSize, false));
+		if (currentAlbum.photos.length > 1) {
+			var i = currentMediaIndex;
+			do {
+				i == 0 ? i = currentAlbum.photos.length - 1: i --;
+				previousMedia = currentAlbum.photos[i];
+			} while (previousMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName);
+			i = currentMediaIndex;
+			do {
+				i == currentAlbum.photos.length - 1 ? i = 0 : i ++
+				nextMedia = currentAlbum.photos[i];
+			} while (nextMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName);
+			if (nextMedia.mediaType == "video") {
+				$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia));
+			} else {
+				$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize, false))
+			}
+			if (previousMedia.mediaType == "video") {
+				$.preloadImages(photoFloat.videoPath(currentAlbum, previousMedia));
+			} else {
+				$.preloadImages(photoFloat.photoPath(currentAlbum, previousMedia, maxSize, false));
+			}
 		}
 		if (currentMedia.mediaType != "video") {
 			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
