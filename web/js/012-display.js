@@ -592,8 +592,4 @@ $(document).ready(function() {
 		});
 		return false;
 	});
-	
-	/* get thumbnails sizes */
-	
-	
 });
