@@ -26,10 +26,8 @@ $(document).ready(function() {
 	var previousMedia = null;
 	var originalTitle = document.title;
 	var photoFloat = new PhotoFloat();
-	//~ var maxSize = 1600;
 	var maxSizeSet = false;
 	var absoluteMaxSize = null;
-	//~ var thumbSizes;
 	bydateString = "_by_date";
 	bydateStringWithTrailingDash = bydateString + "-";
 	foldersString = "_folders";
@@ -286,11 +284,6 @@ $(document).ready(function() {
 			$("#photo-box").hide();
 			$("#video-box").show();
 		} else {
-			photoRatio = width / height;
-			//~ if (photoRatio > WindowRatio) {
-				
-			//~ }
-			
 			if (width > height) {
 				height = height / width * maxSize;
 				width = maxSize;
@@ -537,8 +530,6 @@ $(document).ready(function() {
 		$("#fullscreen-divider").show();
 		$("#fullscreen").show().click(function() {
 			$("#photo").fullScreen({callback: function(isFullscreen) {
-				//maxSize = absoluteMaxSize;
-				//~ if (! isFullscreen)
 				showMedia(currentAlbum, true);
 				
 			}});
