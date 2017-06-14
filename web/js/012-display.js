@@ -199,8 +199,12 @@ $(document).ready(function() {
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#thumbs").show();
-		} else if (currentAlbum.photos.length == 1)
-			$("#thumbs").hide();
+		} else {
+			if (currentAlbum.photos.length == 1)
+				$("#thumbs").hide();
+			else
+				$("#thumbs").show();
+		}
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
@@ -337,11 +341,11 @@ $(document).ready(function() {
 			$("#album-view").addClass("no-bottom-space");
 		} else {
 			nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
+			$("#next").show();
+			$("#back").show();
 			$("#next-photo").attr("href", nextLink);
 			$("#next").attr("href", nextLink);
 			$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
-			$("#next").show();
-			$("#back").show();
 			$("#photo-view").removeClass("no-bottom-space");
 			$("#album-view").removeClass("no-bottom-space");
 		}
