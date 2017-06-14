@@ -1,3 +1,13 @@
+var windowWidth = $(window).width();
+var windowHeight = $(window).height();
+var windowOrientation;
+if (windowWidth > windowHeight)
+	windowOrientation = "landscape";
+else
+	windowOrientation = "portrait";
+windowMaxSize = Math.max(windowWidth, windowHeight);
+windowMinSize = Math.min(windowWidth, windowHeight);
+
 $(document).ready(function() {
 	
 	/* 
@@ -27,7 +37,6 @@ $(document).ready(function() {
 	var originalTitle = document.title;
 	var photoFloat = new PhotoFloat();
 	var maxSizeSet = false;
-	var absoluteMaxSize = null;
 	bydateString = "_by_date";
 	bydateStringWithTrailingDash = bydateString + "-";
 	foldersString = "_folders";
@@ -244,18 +253,40 @@ $(document).ready(function() {
 			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
 	}
 	function showMedia(album, fullscreen = false) {
-		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text;
+		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
+		if (width > height)
+			mediaOrientation = "landscape";
+		else
+			mediaOrientation = "portrait";
+			
+		mediaMaxSize = Math.max(width, height);
+		mediaMinSize = Math.min(width, height);
+		imageRatio = mediaMaxSize / mediaMinSize;
 		
-		absoluteMaxSize = album.thumbSizes[0][0];
-		if (fullscreen)
+		if (fullscreen) {
 			maxSizeSet = false;
+			windowWidth = $(window).width();
+			windowHeight = $(window).height();
+			windowOrientation;
+			if (windowWidth > windowHeight)
+				windowOrientation = "landscape";
+			else
+				windowOrientation = "portrait";
+			windowMaxSize = Math.max(windowWidth, windowHeight);
+			windowMinSize = Math.min(windowWidth, windowHeight);
+		}
 		if (! maxSizeSet) {
+			maxSize = album.thumbSizes[0][0];
 			for (var i = 0; i < album.thumbSizes.length; i++)
 				if (! album.thumbSizes[i][1]) {
-					
-					if (maxSizeSet && album.thumbSizes[i][0] < Math.max($(window).width(), $(window).height()))
+					thumbnailMinSize = album.thumbSizes[i][0] / imageRatio;
+					thumbnailMaxSize = album.thumbSizes[i][0];
+					if (mediaOrientation == windowOrientation && thumbnailMinSize < windowMinSize ||
+						mediaOrientation !== windowOrientation &&
+						(thumbnailMinSize < windowMaxSize || thumbnailMaxSize < windowMinSize))
+					//~ if (maxSizeSet && album.thumbSizes[i][0] < Math.max($(window).width(), $(window).height()))
 						break;
 					maxSize = album.thumbSizes[i][0];
 					maxSizeSet = true;
@@ -530,8 +561,16 @@ $(document).ready(function() {
 		$("#fullscreen-divider").show();
 		$("#fullscreen").show().click(function() {
 			$("#photo").fullScreen({callback: function(isFullscreen) {
+				windowWidth = $(window).width();
+				windowHeight = $(window).height();
+				windowOrientation;
+				if (windowWidth > windowHeight)
+					windowOrientation = "landscape";
+				else
+					windowOrientation = "portrait";
+				windowMaxSize = Math.max(windowWidth, windowHeight);
+				windowMinSize = Math.min(windowWidth, windowHeight);
 				showMedia(currentAlbum, true);
-				
 			}});
 		});
 	}
