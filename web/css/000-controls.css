@@ -275,3 +275,11 @@ a:hover {
 	right: 0;  
 	margin: auto;
 }
+
+.translation, .translation-en, .translation-it, .translation-es {
+	display: none;
+}
+
+.translation-active {
+	display: inline;
+}

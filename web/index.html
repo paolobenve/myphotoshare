@@ -27,20 +27,52 @@
 	<script type="text/javascript" src="js/012-display.js"></script>
 </head>
 <body>
-<div id="title">Photos</div>
+<div id="title">
+	<span class="translation-en">Photos</span>
+	<span class="translation-it">Foto</span>
+	<span class="translation-es">Foto</span>
+</div>
 <div id="photo-view">
 	<div id="photo-box">
 		<a id="next-photo"><img id="photo" /></a>
 		<div id="photo-bar">
 			<div id="photo-links">
-				<a id="metadata-link" href="javascript:void(0)">show metadata</a> |
-				<span id="folders-view-container" style="display:none;"><a id="folders-view" href="javascript:void(0)">folders view</a> |</span>
-				<span id="day-view-container" style="display:none;"><a id="day-view" href="javascript:void(0)">day view</a> |</span>
-				<span id="month-view-container"><a id="month-view" href="javascript:void(0)">month view</a> |</span>
-				<span id="year-view-container" style="display:none;"><a id="year-view" href="javascript:void(0)">year view</a> |</span>
-				<a id="original-link" target="_blank">download original</a>
+				<a id="metadata-link" href="javascript:void(0)">
+					<span class="translation-en">show metadata</span>
+					<span class="translation-it">metadati</span>
+					<span class="translation-es">metadatos</span>
+				</a> |
+				<span id="folders-view-container" style="display:none;"><a id="folders-view" href="javascript:void(0)">
+					<span class="translation-en">folders view</span>
+					<span class="translation-it">cartelle</span>
+					<span class="translation-es">carpetas</span>
+				</a> |</span>
+				<span id="day-view-container" style="display:none;"><a id="day-view" href="javascript:void(0)">
+					<span class="translation-en">day view</span>
+					<span class="translation-it">per giorno</span>
+					<span class="translation-es">por día</span>
+				</a> |</span>
+				<span id="month-view-container"><a id="month-view" href="javascript:void(0)">
+					<span class="translation-en">month view</span>
+					<span class="translation-it">per mese</span>
+					<span class="translation-es">por mes</span>
+				</a> |</span>
+				<span id="year-view-container" style="display:none;"><a id="year-view" href="javascript:void(0)">
+					<span class="translation-en">year view</span>
+					<span class="translation-it">per anno</span>
+					<span class="translation-es">por año</span>
+				</a> |</span>
+				<a id="original-link" target="_blank">
+					<span class="translation-en">download original</span>
+					<span class="translation-it">scarica originale</span>
+					<span class="translation-es">descarga original</span>
+				</a>
 				<span id="fullscreen-divider"> | </span>
-				<a id="fullscreen" href="javascript:void(0)">fullscreen</a>
+				<a id="fullscreen" href="javascript:void(0)">
+					<span class="translation-en">fullscreen</span>
+					<span class="translation-it">schermo intero</span>
+					<span class="translation-es">pantalla completa</span>
+				</a>
 			</div>
 			<div id="metadata"></div>
 		</div>
@@ -56,14 +88,44 @@
 <div id="album-view">
 	<div id="subalbums"></div>
 	<div id="thumbs">
-		<div id="loading">Loading...</div>
+		<div id="loading">
+			<span class="translation-en">Loading...</span>
+			<span class="translation-it">Sto caricando...</span>
+			<span class="translation-es">Cargando...</span>
+		</div>
 	</div>
-	<div id="powered-by"><span id="powered-by-string">Powered by</span> <a href="https://github.com/paolobenve/photofloat" target="_blank">PhotoFloat</a></div>
+	<div id="powered-by"><span id="powered-by-string">
+					<span class="translation-en">Powered by</span>
+					<span class="translation-it">Realizzato con</span>
+					<span class="translation-es">Realizado con</span>
+				</span> <a href="https://github.com/paolobenve/photofloat" target="_blank">PhotoFloat</a></div>
 </div>
 
 <div id="error-overlay"></div>
-<div id="error-text">Forgot my camera.</div>
+<div id="error-text">
+					<span class="translation-en">Forgot my camera.</span>
+					<span class="translation-it">Errore... :-(</span>
+					<span class="translation-es">Error... lo siento</span>
+				</div>
 <div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form</div>
+
+<div style="display:none">
+<span id="by-date-translation">
+	<span class='translation-en'>By date</span>
+	<span class='translation-it'>Per data</span>
+	<span class='translation-es'>Por fecha</span>
+</span>
+<span id="folders-translation">
+	<span class='translation-en'>Folders</span>
+	<span class='translation-it'>Cartelle</span>
+	<span class='translation-es'>Carpetas</span>
+</span>
+<span id="title-translation">
+	<span class="translation-en">My photos</span>
+	<span class="translation-it">Le mie foto</span>
+	<span class="translation-es">Mis fotos</span>
+</span>
+</div>
 
 </body>
 </html>

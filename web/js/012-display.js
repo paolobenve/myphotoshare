@@ -41,14 +41,39 @@ $(document).ready(function() {
 	bydateStringWithTrailingDash = bydateString + "-";
 	foldersString = "_folders";
 	foldersStringWithTrailingDash = foldersString + "-";
-	bydateEnglishString = "images by date";
-	foldersEnglishString = "folders";
 	
 	
 	/* Displays */
 	
+	function language() {
+		var userLang = navigator.language || navigator.userLanguage;
+		return userLang.split('-')[0];
+	}
+	
+	function translate() {
+		
+		if($('.translation-' + language()).length) {
+			$('.translation').removeClass('translation-active');
+			$('.translation-' + language()).addClass('translation-active');
+		} else {
+			$('.translation-en').addClass('translation-active');
+		}
+	}
+	
+	function translationsToTranslatedString(translations) {
+		translationsLines = translations.split("\n");
+		for (var i in translationsLines) {
+			if (translationsLines[i].indexOf("translation-active") != -1)
+				return translationsLines[i].replace(/<\/?[^>]+(>|$)/g, "").trim();
+		}
+	}
+
+
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i;
+		var translations = $("#title-translation").html();
+		var originalTitle = translationsToTranslatedString(translations);
+		
 		if (!currentAlbum.path.length)
 			components = [originalTitle];
 		else {
@@ -65,24 +90,19 @@ $(document).ready(function() {
 			if (i < components.length - 1 || currentMedia !== null)
 				title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 			var titleAdd = components[i];
-			if (typeof bydateTranslation !== 'undefined')
-				titleAdd = titleAdd.replace(bydateString, bydateTranslation);
-			else
-				titleAdd = titleAdd.replace(bydateString, bydateEnglishString);
-			if (typeof foldersTranslation !== 'undefined')
-				titleAdd = titleAdd.replace(foldersString, foldersTranslation);
-			else
-				titleAdd = titleAdd.replace(foldersString, foldersEnglishString);
+			titleAdd = titleAdd.replace(bydateString, $("#by-date-translation").html());
+			titleAdd = titleAdd.replace(foldersString, $("#folders-translation").html());
 			title += titleAdd;
 			var documentTitleAdd = components[components.length - 1 - i];
-			if (typeof bydateTranslation !== 'undefined')
-				documentTitleAdd = documentTitleAdd.replace(bydateString, bydateTranslation);
-			else
-				documentTitleAdd = documentTitleAdd.replace(bydateString, bydateEnglishString);
-			if (typeof foldersTranslation !== 'undefined')
-				documentTitleAdd = documentTitleAdd.replace(foldersString, foldersTranslation);
-			else
-				documentTitleAdd = documentTitleAdd.replace(foldersString, foldersEnglishString);
+			var byDateTranslationLines = $("#by-date-translation").html().split("\n");
+			for (var translation in byDateTranslationLines) {
+				if (translation.indexOf("translation-active") != -1) {
+					var byDateTranslation = translation.replace(/<\/?[^>]+(>|$)/g, "");
+					break;
+				}
+			}
+			documentTitleAdd = documentTitleAdd.replace(bydateString, translationsToTranslatedString($("#by-date-translation").html()));
+			documentTitleAdd = documentTitleAdd.replace(foldersString, translationsToTranslatedString($("#folders-translation").html()));
 			documentTitle += documentTitleAdd;
 			if (i < components.length - 1 || currentMedia !== null) {
 				title += "</a>";
@@ -170,14 +190,8 @@ $(document).ready(function() {
 				for (i = 0; i < currentAlbum.albums.length; ++i) {
 					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 					var imageTextAdd = currentAlbum.albums[i].path;
-					if (typeof bydateTranslation !== 'undefined')
-						imageTextAdd = imageTextAdd.replace(bydateString, bydateTranslation);
-					else
-						imageTextAdd = imageTextAdd.replace(bydateString, bydateEnglishString);
-					if (typeof foldersTranslation !== 'undefined')
-						imageTextAdd = imageTextAdd.replace(foldersString, foldersTranslation);
-					else
-						imageTextAdd = imageTextAdd.replace(foldersString, foldersEnglishString);
+					imageTextAdd = imageTextAdd.replace(bydateString, $("#by-date-translation").html());
+					imageTextAdd = imageTextAdd.replace(foldersString, $("#folders-translation").html());
 					image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" +
 								imageTextAdd +
 								"</div>");
@@ -216,6 +230,7 @@ $(document).ready(function() {
 				$("#thumbs").show();
 		}
 		setTimeout(scrollToThumb, 1);
+		translate();
 	}
 	function getDecimal(fraction) {
 		if (fraction[0] < fraction[1])
@@ -429,21 +444,6 @@ $(document).ready(function() {
 		$("#album-view").addClass("photo-view-container");
 		$("#subalbums").hide();
 		$("#photo-view").show();
-		
-		if (typeof showMetadataTranslation !== 'undefined')
-			$("#metadata-link").html(showMetadataTranslation);
-		if (typeof foldersViewTranslation !== 'undefined')
-			$("#folders-view").html(foldersViewTranslation);
-		if (typeof byDayTranslation !== 'undefined')
-			$("#day-view").html(byDayTranslation);
-		if (typeof byMonthTranslation !== 'undefined')
-			$("#month-view").html(byMonthTranslation);
-		if (typeof byYearTranslation !== 'undefined')
-			$("#year-view").html(byYearTranslation);
-		if (typeof donwloadOriginalTranslation !== 'undefined')
-			$("#original-link").html(donwloadOriginalTranslation);
-		if (typeof fullscreenTranslation !== 'undefined')
-			$("#fullscreen").html(fullscreenTranslation);
 	}
 	
 	
@@ -499,12 +499,6 @@ $(document).ready(function() {
 		else
 			$(".thumb-caption").show();
 		
-		if (typeof poweredByTranslation !== 'undefined')
-			$("#powered-by-string").html(poweredByTranslation);
-		if (typeof loadingTranslation !== 'undefined')
-			$("#loading").html(loadingTranslation);
-		if (typeof errorTextTranslation !== 'undefined')
-			$("#error-text").html(errorTextTranslation);
 	}
 	
 	/* Event listeners */
@@ -592,4 +586,7 @@ $(document).ready(function() {
 		});
 		return false;
 	});
+	
+	translate();
+
 });
