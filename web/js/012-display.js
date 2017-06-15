@@ -238,17 +238,17 @@ $(document).ready(function() {
 		return (fraction[0] / fraction[1]).toString();
 	}
 	function scaleImageFullscreen() {
-		scaleImage(true);
+		scaleImage($(window));
 	}
-	function scaleImage(fullscreen = false) {
+	function scaleImageNormal() {
+		scaleImage($("#photo-view"));
+	}
+	function scaleImage(state) {
 		var image, container;
 		image = $("#photo");
 		if (image.get(0) === this)
 			$(window).bind("resize", scaleImage);
-		if (fullscreen)
-			container = $(window);
-		else
-			container = $("#photo-view");
+		container = state;
 		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
@@ -341,7 +341,7 @@ $(document).ready(function() {
 			if (fullscreen)
 				$("#photo").load(scaleImageFullscreen)
 			else
-				$("#photo").load(scaleImage)
+				$("#photo").load(scaleImageNormal)
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
