@@ -36,10 +36,15 @@
 		<a id="next-photo"><img id="photo" /></a>
 		<div id="photo-bar">
 			<div id="photo-links">
-				<a id="metadata-link" href="javascript:void(0)">
+				<a id="metadata-show" href="javascript:void(0)">
 					<span class="translation-en">show metadata</span>
 					<span class="translation-it">metadati</span>
 					<span class="translation-es">metadatos</span>
+				</a>
+				<a id="metadata-hide" style="display:none;" href="javascript:void(0)">
+					<span class="translation-en">hide metadata</span>
+					<span class="translation-it">nascondi metadati</span>
+					<span class="translation-es">esconde metadatos</span>
 				</a> |
 				<span id="folders-view-container" style="display:none;"><a id="folders-view" href="javascript:void(0)">
 					<span class="translation-en">folders view</span>
@@ -101,11 +106,16 @@
 </div>
 
 <div id="error-overlay"></div>
-<div id="error-text">
-					<span class="translation-en">Forgot my camera.</span>
-					<span class="translation-it">Errore... :-(</span>
-					<span class="translation-es">Error... lo siento</span>
-				</div>
+<div id="error-text-folder">
+	<span class="translation-en">Wrong folder, going to root album</span>
+	<span class="translation-it">Album sbagliato, vado all'inizio</span>
+	<span class="translation-es">Error en la carpeta, voy al comienzo</span>
+</div>
+<div id="error-text-image">
+	<span class="translation-en">Wrong image, showing the album</span>
+	<span class="translation-it">Immagine sbagliata, mostro l'album</span>
+	<span class="translation-es">Error en la imágen, muestro la carpeta</span>
+</div>
 <div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form</div>
 
 <div style="display:none">

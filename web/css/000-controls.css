@@ -198,7 +198,7 @@ a:hover {
 	color: #FFAD27;
 	margin-top: 20px;
 }
-#error-overlay, #error-text, #auth-text {
+#error-overlay, #error-text-folder, #error-text-image, #auth-text {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -209,12 +209,12 @@ a:hover {
 #error-overlay {
 	background-color: #000000;
 }
-#error-text, #auth-text {
+#error-text-folder, #error-text-image, #auth-text {
 	position: fixed;
 	padding-top: 20%;
 	text-align: center;
 }
-#error-text {
+#error-text-folder, #error-text-image {
 	font-size: 4em;
 	font-weight: bold;
 	font-style: italic;

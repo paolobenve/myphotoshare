@@ -71,45 +71,33 @@ $(document).ready(function() {
 
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i;
-		var translations = $("#title-translation").html();
-		var originalTitle = translationsToTranslatedString(translations);
+		var originalTitle = translationsToTranslatedString($("#title-translation").html());
+		var documentTitleAdd = "";
 		
-		if (!currentAlbum.path.length)
+		if (! currentAlbum.path.length)
 			components = [originalTitle];
 		else {
 			components = currentAlbum.path.split("/");
+			if (components[0] == foldersString)
+				components.shift();
 			components.unshift(originalTitle);
 		}
 		if (currentMedia !== null)
 			documentTitle += photoFloat.trimExtension(currentMedia.name);
 		for (i = 0; i < components.length; ++i) {
-			if (i || currentMedia !== null)
-				documentTitle += " \u00ab ";
 			if (i)
 				last += "/" + components[i];
 			if (i < components.length - 1 || currentMedia !== null)
 				title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
-			var titleAdd = components[i];
-			titleAdd = titleAdd.replace(bydateString, $("#by-date-translation").html());
-			titleAdd = titleAdd.replace(foldersString, $("#folders-translation").html());
-			title += titleAdd;
-			var documentTitleAdd = components[components.length - 1 - i];
-			var byDateTranslationLines = $("#by-date-translation").html().split("\n");
-			for (var translation in byDateTranslationLines) {
-				if (translation.indexOf("translation-active") != -1) {
-					var byDateTranslation = translation.replace(/<\/?[^>]+(>|$)/g, "");
-					break;
-				}
-			}
-			documentTitleAdd = documentTitleAdd.replace(bydateString, translationsToTranslatedString($("#by-date-translation").html()));
-			documentTitleAdd = documentTitleAdd.replace(foldersString, translationsToTranslatedString($("#folders-translation").html()));
-			documentTitle += documentTitleAdd;
-			if (i < components.length - 1 || currentMedia !== null) {
-				title += "</a>";
-			}
+			if (i == 1 && components[i] == bydateString)
+				components[i] = translationsToTranslatedString($("#by-date-translation").html());
+			title += components[i];
 			if (i < components.length - 1 || currentMedia !== null)
-				title += " &raquo; ";
-
+				title += "</a> &raquo; ";
+			
+			if (i || currentMedia !== null)
+				documentTitle += " \u00ab ";
+			documentTitle += components[components.length - 1 - i];
 		}
 		if (currentMedia !== null)
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</div>";
@@ -238,17 +226,24 @@ $(document).ready(function() {
 		return (fraction[0] / fraction[1]).toString();
 	}
 	function scaleImageFullscreen() {
-		scaleImage($(window));
+		var image;
+		image = $("#photo");
+		if (image.get(0) === this) {
+			$(window).unbind("resize", scaleImageNormal);
+			$(window).bind("resize", scaleImageFullscreen);
+		}
+		scaleImage($(window), image);
 	}
 	function scaleImageNormal() {
-		scaleImage($("#photo-view"));
-	}
-	function scaleImage(state) {
-		var image, container;
+		var image;
 		image = $("#photo");
-		if (image.get(0) === this)
-			$(window).bind("resize", scaleImage);
-		container = state;
+		if (image.get(0) === this) {
+			$(window).unbind("resize", scaleImageFullscreen);
+			$(window).bind("resize", scaleImageNormal);
+		}
+		scaleImage($("#photo-view"), image);
+	}
+	function scaleImage(container, image) {
 		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
@@ -310,7 +305,8 @@ $(document).ready(function() {
 				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the H.264 video format!</p></div>').appendTo('#video-box-inner');
 			} else {
 				$(window).unbind("resize", scaleVideo);
-				$(window).unbind("resize", scaleImage);
+				$(window).unbind("resize", scaleImageNormal);
+				$(window).unbind("resize", scaleImageFullscreen);
 				videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
 				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
 					.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
@@ -331,7 +327,7 @@ $(document).ready(function() {
 				height = maxSize;
 			}
 			$(window).unbind("resize", scaleVideo);
-			$(window).unbind("resize", scaleImage);
+			$(window).unbind("resize", scaleImageNormal);
 			photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, maxSize, false);
 			$("#photo")
 				.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
@@ -556,21 +552,24 @@ $(document).ready(function() {
 			}});
 		});
 	}
-	$("#metadata-link").click(function() {
-		if (!$("#metadata").is(":visible"))
-			$("#metadata").stop()
-				.css("height", 0)
-				.css("padding-top", 0)
-				.css("padding-bottom", 0)
-				.show()
-				.animate({ height: $("#metadata > table").height(), paddingTop: 3, paddingBottom: 3 }, "slow", function() {
-					$(this).css("height", "auto");
-					$("#metadata-link").text($("#metadata-link").text().replace("show", "hide"));
-				});
-		else
-			$("#metadata").stop().animate({ height: 0, paddingTop: 0, paddingBottom: 0 }, "slow", function() {
+	$("#metadata-show").click(function() {
+		$("#metadata-show").hide();
+		$("#metadata-hide").show();
+		$("#metadata").stop()
+			.css("height", 0)
+			.css("padding-top", 0)
+			.css("padding-bottom", 0)
+			.show()
+			.animate({ height: $("#metadata > table").height(), paddingTop: 3, paddingBottom: 3 }, "slow", function() {
+				$(this).css("height", "auto");
+			});
+	});
+	$("#metadata-hide").click(function() {
+		$("#metadata-show").show();
+		$("#metadata-hide").hide();
+		$("#metadata").stop()
+			.animate({ height: 0, paddingTop: 0, paddingBottom: 0 }, "slow", function() {
 				$(this).hide();
-				$("#metadata-link").text($("#metadata-link").text().replace("hide", "show"));
 			});
 	});
 	$("#auth-form").submit(function() {

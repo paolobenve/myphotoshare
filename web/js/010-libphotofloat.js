@@ -7,6 +7,7 @@
 	/* public member functions */
 	PhotoFloat.prototype.album = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
+		
 		if (typeof subalbum.photos !== "undefined" && subalbum.photos !== null) {
 			callback(subalbum);
 			return;
@@ -20,10 +21,6 @@
 			return;
 		}
 		cacheFile = "cache/" + cacheKey + ".json";
-		if (PhotoFloat.urlDoesntExist(cacheFile)) {
-			cacheKey = "root";
-			cacheFile = "cache/root.json";
-		}
 		self = this;
 		ajaxOptions = {
 			type: "GET",
@@ -41,7 +38,9 @@
 		};
 		if (typeof error !== "undefined" && error !== null) {
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-				error(jqXHR.status);
+				$("#error-text-folder").fadeIn(1500);
+				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(500);
+				window.location.hash = "_folders";
 			};
 		}
 		$.ajax(ajaxOptions);
@@ -67,7 +66,7 @@
 		hash = PhotoFloat.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (! hash.length) {
-			album = PhotoFloat.cachePath("root");
+			album = PhotoFloat.cachePath("_folders");
 			photo = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
 			photo = hash.substring(index + 1);
@@ -86,7 +85,9 @@
 					}
 				}
 				if (i >= theAlbum.photos.length) {
-					photo = null;
+					$("#error-text-image").fadeIn(1500);
+					$("#error-text-image, #error-overlay, #auth-text").fadeOut(500);
+					window.location.hash = album;
 					i = -1;
 				}
 			}
@@ -227,20 +228,6 @@
 		return hash;
 	};
 	
-	PhotoFloat.urlDoesntExist = function(url) {
-		var request = new XMLHttpRequest();
-		request.open('GET', url, true);
-		request.onreadystatechange = function(){
-		    if (request.readyState === 4){
-			if (request.status === 404) {  
-			    return true;
-			}  
-		    }
-		};
-		request.send();
-	};
-
-	
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
 	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
@@ -255,7 +242,6 @@
 	PhotoFloat.prototype.photoYearAlbum = PhotoFloat.photoYearAlbum;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
-	PhotoFloat.prototype.urlDoesntExist = PhotoFloat.urlDoesntExist;
 	/* expose class globally */
 	window.PhotoFloat = PhotoFloat;
 }());

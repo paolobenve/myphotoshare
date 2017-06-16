@@ -44,6 +44,7 @@ Features added by Paolo:
 * When a photo is viewed, the user can switch between the folder the photo belongs and the year/month/date the photo was taken
 * Thumbnails generation is faster then before
 * Added customizable translations in index.html: feel free to customize your language
+* Better error management: if folder is wrong, show root folder; if image is wrong, show album
 
 Features added by Joachim:
 
