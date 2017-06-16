@@ -7,6 +7,7 @@
 	/* public member functions */
 	PhotoFloat.prototype.album = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
+		
 		if (typeof subalbum.photos !== "undefined" && subalbum.photos !== null) {
 			callback(subalbum);
 			return;
@@ -15,15 +16,13 @@
 			cacheKey = subalbum;
 		else
 			cacheKey = PhotoFloat.cachePath(subalbum.parent.path + "/" + subalbum.path);
+		if (this.albumCache === undefined)
+			this.albumCache = [];
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
 			return;
 		}
 		cacheFile = "cache/" + cacheKey + ".json";
-		if (PhotoFloat.urlDoesntExist(cacheFile)) {
-			cacheKey = "root";
-			cacheFile = "cache/root.json";
-		}
 		self = this;
 		ajaxOptions = {
 			type: "GET",
@@ -41,7 +40,7 @@
 		};
 		if (typeof error !== "undefined" && error !== null) {
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-				error(jqXHR.status);
+				PhotoFloat.prototype.album("_folders", callback, error);
 			};
 		}
 		$.ajax(ajaxOptions);
@@ -227,20 +226,6 @@
 		return hash;
 	};
 	
-	PhotoFloat.urlDoesntExist = function(url) {
-		var request = new XMLHttpRequest();
-		request.open('GET', url, true);
-		request.onreadystatechange = function(){
-		    if (request.readyState === 4){
-			if (request.status === 404) {  
-			    return true;
-			}  
-		    }
-		};
-		request.send();
-	};
-
-	
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
 	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
@@ -255,7 +240,6 @@
 	PhotoFloat.prototype.photoYearAlbum = PhotoFloat.photoYearAlbum;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
-	PhotoFloat.prototype.urlDoesntExist = PhotoFloat.urlDoesntExist;
 	/* expose class globally */
 	window.PhotoFloat = PhotoFloat;
 }());
