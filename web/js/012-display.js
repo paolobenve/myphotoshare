@@ -243,12 +243,11 @@ $(document).ready(function() {
 	function scaleImageNormal() {
 		scaleImage($("#photo-view"));
 	}
-	function scaleImage(state) {
-		var image, container;
+	function scaleImage(container) {
+		var image;
 		image = $("#photo");
 		if (image.get(0) === this)
 			$(window).bind("resize", scaleImage);
-		container = state;
 		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
