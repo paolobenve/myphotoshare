@@ -226,16 +226,24 @@ $(document).ready(function() {
 		return (fraction[0] / fraction[1]).toString();
 	}
 	function scaleImageFullscreen() {
-		scaleImage($(window));
-	}
-	function scaleImageNormal() {
-		scaleImage($("#photo-view"));
-	}
-	function scaleImage(container) {
 		var image;
 		image = $("#photo");
-		if (image.get(0) === this)
-			$(window).bind("resize", scaleImage);
+		if (image.get(0) === this) {
+			$(window).unbind("resize", scaleImageNormal);
+			$(window).bind("resize", scaleImageFullscreen);
+		}
+		scaleImage($(window), image);
+	}
+	function scaleImageNormal() {
+		var image;
+		image = $("#photo");
+		if (image.get(0) === this) {
+			$(window).unbind("resize", scaleImageFullscreen);
+			$(window).bind("resize", scaleImageNormal);
+		}
+		scaleImage($("#photo-view"), image);
+	}
+	function scaleImage(container, image) {
 		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
@@ -297,7 +305,8 @@ $(document).ready(function() {
 				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the H.264 video format!</p></div>').appendTo('#video-box-inner');
 			} else {
 				$(window).unbind("resize", scaleVideo);
-				$(window).unbind("resize", scaleImage);
+				$(window).unbind("resize", scaleImageNormal);
+				$(window).unbind("resize", scaleImageFullscreen);
 				videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
 				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
 					.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
@@ -318,7 +327,7 @@ $(document).ready(function() {
 				height = maxSize;
 			}
 			$(window).unbind("resize", scaleVideo);
-			$(window).unbind("resize", scaleImage);
+			$(window).unbind("resize", scaleImageNormal);
 			photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, maxSize, false);
 			$("#photo")
 				.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
