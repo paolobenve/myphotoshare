@@ -16,8 +16,6 @@
 			cacheKey = subalbum;
 		else
 			cacheKey = PhotoFloat.cachePath(subalbum.parent.path + "/" + subalbum.path);
-		if (this.albumCache === undefined)
-			this.albumCache = [];
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
 			return;
@@ -40,7 +38,9 @@
 		};
 		if (typeof error !== "undefined" && error !== null) {
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-				PhotoFloat.prototype.album("_folders", callback, error);
+				$("#error-text-folder").fadeIn(1500);
+				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(500);
+				window.location.hash = "_folders";
 			};
 		}
 		$.ajax(ajaxOptions);
@@ -85,7 +85,9 @@
 					}
 				}
 				if (i >= theAlbum.photos.length) {
-					photo = null;
+					$("#error-text-image").fadeIn(1500);
+					$("#error-text-image, #error-overlay, #auth-text").fadeOut(500);
+					window.location.hash = album;
 					i = -1;
 				}
 			}
