@@ -17,7 +17,10 @@ def make_photo_thumbs(self, original_path, thumb_path, size):
 	# Everything that goes through the queue.Queue must be pickable, and since
 	# self._photo_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
-	self._photo_thumbnail(original_path, thumb_path, size[0], size[1])
+	try:
+		self._photo_thumbnail(original_path, thumb_path, size[0], size[1])
+	except KeyboardInterrupt:
+		raise
 
 class Album(object):
 	def __init__(self, path):
@@ -163,7 +166,10 @@ class Photo(object):
 		
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
-			self._photo_thumbnails(path, thumb_path)
+			try:
+				self._photo_thumbnails(path, thumb_path)
+			except KeyboardInterrupt:
+				raise
 		elif self._attributes["mediaType"] == "video":
 			self._video_thumbnails(thumb_path, path)
 			self._video_transcode(thumb_path, path)
@@ -406,7 +412,12 @@ class Photo(object):
 		
 		try:
 			for size in Photo.thumb_sizes:
-				pool.apply_async(make_photo_thumbs, args = (self, original_path, thumb_path, size))
+				try:
+					pool.apply_async(make_photo_thumbs, args = (self, original_path, thumb_path, size))
+				except KeyboardInterrupt:
+					raise
+		except KeyboardInterrupt:
+			raise
 		except:
 			pool.terminate()
 		
