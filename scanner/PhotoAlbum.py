@@ -167,7 +167,7 @@ class Photo(object):
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
 			try:
-				self._photo_thumbnails(path, thumb_path)
+				self._photo_thumbnails(image, path, thumb_path)
 			except KeyboardInterrupt:
 				raise
 		elif self._attributes["mediaType"] == "video":
@@ -404,26 +404,17 @@ class Photo(object):
 				os.unlink(thumb_path)
 			except:
 				pass
-
-	def _photo_thumbnails(self, original_path, thumb_path):
-		# get number of cores on the system, and use all minus one
-		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
-		pool = Pool(processes=num_of_cores)
-		
+		return image
+	def _photo_thumbnails(self, image, original_path, thumb_path):
+		thumb = image
 		try:
 			for size in Photo.thumb_sizes:
 				try:
-					pool.apply_async(make_photo_thumbs, args = (self, original_path, thumb_path, size))
+					thumb = self._thumbnail(thumb, original_path, thumb_path, size[0], size[1])
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
 			raise
-		except:
-			pool.terminate()
-		
-		pool.close()
-		pool.join()
-	
 	def _video_thumbnails(self, thumb_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(
