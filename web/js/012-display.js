@@ -344,6 +344,9 @@ $(document).ready(function() {
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#photo-box").show();
+			$("#metadata").hide();
+			$("#metadata-show").show();
+			$("#metadata-hide").hide();
 		}
 		if (currentAlbum.photos.length > 1) {
 			var i = currentMediaIndex;
