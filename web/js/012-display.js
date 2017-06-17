@@ -78,8 +78,6 @@ $(document).ready(function() {
 			components = [originalTitle];
 		else {
 			components = currentAlbum.path.split("/");
-			if (components[0] == foldersString)
-				components.shift();
 			components.unshift(originalTitle);
 		}
 		if (currentMedia !== null)
@@ -87,17 +85,21 @@ $(document).ready(function() {
 		for (i = 0; i < components.length; ++i) {
 			if (i)
 				last += "/" + components[i];
-			if (i < components.length - 1 || currentMedia !== null)
-				title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
-			if (i == 1 && components[i] == bydateString)
-				components[i] = translationsToTranslatedString($("#by-date-translation").html());
-			title += components[i];
-			if (i < components.length - 1 || currentMedia !== null)
-				title += "</a> &raquo; ";
-			
-			if (i || currentMedia !== null)
-				documentTitle += " \u00ab ";
-			documentTitle += components[components.length - 1 - i];
+			if (i != 1 || components[i] != foldersString) {
+				if (i < components.length - 1 || currentMedia !== null)
+					title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+				if (i == 1 && components[i] == bydateString)
+					components[i] = translationsToTranslatedString($("#by-date-translation").html());
+				title += components[i];
+				if (i < components.length - 1 || currentMedia !== null)
+					title += "</a>";
+				
+				if (i || currentMedia !== null)
+					documentTitle += " \u00ab ";
+				documentTitle += components[components.length - 1 - i];
+			}
+			if ((i < components.length - 1 || currentMedia !== null) && (i == components.length - 1 || components[i + 1] != foldersString))
+				title += " &raquo; ";
 		}
 		if (currentMedia !== null)
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</div>";
