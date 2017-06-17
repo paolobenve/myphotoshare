@@ -12,13 +12,13 @@ import gc
 import tempfile
 from VideoToolWrapper import *
 
-def make_photo_thumbs(self, original_path, thumb_path, size):
+def make_photo_thumbs(self, image, original_path, thumb_path, size):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
 	# self._photo_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self._photo_thumbnail(original_path, thumb_path, size[0], size[1])
+		self._photo_thumbnail(image, original_path, thumb_path, size[0], size[1])
 	except KeyboardInterrupt:
 		raise
 
@@ -137,6 +137,11 @@ class Album(object):
 
 class Photo(object):
 	thumb_sizes = [ (1600, False), (1200, False), (800, False), (150, True) ]
+	parallel = False
+	if (parallel):
+		message("method", "parallel thumbnail generation")
+	else:
+		message("method", "cascade thumbnail generation")
 	def __init__(self, path, thumb_path=None, attributes=None):
 		self._path = trim_base(path)
 		self.folders = trim_base(os.path.dirname(self._path))
@@ -308,14 +313,14 @@ class Photo(object):
 				break
 	
 	
-	def _photo_thumbnail(self, original_path, thumb_path, size, square=False):
-		try:
-			image = Image.open(original_path)
-		except KeyboardInterrupt:
-			raise
-		except:
-			self.is_valid = False
-			return
+	def _photo_thumbnail(self, image, original_path, thumb_path, size, square=False):
+		#~ try:
+			#~ image = Image.open(original_path)
+		#~ except KeyboardInterrupt:
+			#~ raise
+		#~ except:
+			#~ self.is_valid = False
+			#~ return
 		
 		mirror = image
 		if self._orientation == 2:
@@ -388,6 +393,9 @@ class Photo(object):
 		image_copy.thumbnail((size, size), Image.ANTIALIAS)
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=95)
+			next_level()
+			message(size[0] + " thumbnail", "OK")
+			back_level()
 			return image_copy
 		except KeyboardInterrupt:
 			try:
@@ -397,24 +405,46 @@ class Photo(object):
 			raise
 		except IOError:
 			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=95)
+			next_level()
+			message(size[0] + " thumbnail", "OK (bug workaround)")
+			back_level()
 			return image_copy
 		except:
-			message("save failure", os.path.basename(thumb_path))
+			next_level()
+			message(size[0] + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", returning original image")
+			back_level()
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
-		return image
+			return image
 	def _photo_thumbnails(self, image, original_path, thumb_path):
-		thumb = image
+		if (Photo.parallel):
+			# get number of cores on the system, and use all minus one
+			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+			pool = Pool(processes=num_of_cores)
+		else:
+			thumb = image
 		try:
 			for size in Photo.thumb_sizes:
 				try:
-					thumb = self._thumbnail(thumb, original_path, thumb_path, size[0], size[1])
+					if (Photo.parallel):
+						pool.apply_async(make_photo_thumbs, args = (self, image, original_path, thumb_path, size))
+					else:
+						thumb = self._thumbnail(thumb, original_path, thumb_path, size[0], size[1])
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
 			raise
+		except:
+			if (Photo.parallel):
+				pool.terminate()
+			else:
+				pass
+		if (Photo.parallel):
+			pool.close()
+			pool.join()
+
 	def _video_thumbnails(self, thumb_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(
