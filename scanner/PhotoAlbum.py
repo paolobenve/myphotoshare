@@ -142,14 +142,15 @@ class Photo(object):
 		message("method", "parallel thumbnail generation")
 	else:
 		message("method", "cascade thumbnail generation")
-	def __init__(self, path, thumb_path=None, attributes=None):
-		self._path = trim_base(path)
-		self.folders = trim_base(os.path.dirname(self._path))
-		self.album_path = os.path.join("albums", self._path)
+	def __init__(self, media_path, thumb_path=None, attributes=None):
+		self.media_file_name = trim_base(media_path)
+		message("_path", self.media_file_name)
+		self.folders = trim_base(os.path.dirname(self.media_file_name))
+		self.album_path = os.path.join("albums", self.media_file_name)
 		self.is_valid = True
 		image = None
 		try:
-			mtime = file_mtime(path)
+			mtime = file_mtime(media_path)
 		except KeyboardInterrupt:
 			raise
 		except:
@@ -163,21 +164,21 @@ class Photo(object):
 		self._attributes["mediaType"] = "photo"
 		
 		try:
-			image = Image.open(path)
+			image = Image.open(media_path)
 		except KeyboardInterrupt:
 			raise
 		except:
-			self._video_metadata(path)
+			self._video_metadata(media_path)
 		
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
 			try:
-				self._photo_thumbnails(image, path, thumb_path)
+				self._photo_thumbnails(image, media_path, thumb_path)
 			except KeyboardInterrupt:
 				raise
 		elif self._attributes["mediaType"] == "video":
-			self._video_thumbnails(thumb_path, path)
-			self._video_transcode(thumb_path, path)
+			self._video_thumbnails(thumb_path, media_path)
+			self._video_transcode(thumb_path, media_path)
 		else:
 			self.is_valid = False
 			return
@@ -349,7 +350,7 @@ class Photo(object):
 		self._thumbnail(image, original_path, thumb_path, size, square)
 
 	def _thumbnail(self, image, original_path, thumb_path, size, square):
-		thumb_path = os.path.join(thumb_path, image_cache(self._path, size, square))
+		thumb_path = os.path.join(thumb_path, image_cache(self.media_file_name, size, square))
 		info_string = "%spx" % (str(size))
 		if square:
 			info_string += ", square"
@@ -418,7 +419,7 @@ class Photo(object):
 			except:
 				pass
 			return image
-	def _photo_thumbnails(self, image, original_path, thumb_path):
+	def _photo_thumbnails(self, image, photo_path, thumb_path):
 		if (Photo.parallel):
 			# get number of cores on the system, and use all minus one
 			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
@@ -429,9 +430,11 @@ class Photo(object):
 			for size in Photo.thumb_sizes:
 				try:
 					if (Photo.parallel):
-						pool.apply_async(make_photo_thumbs, args = (self, image, original_path, thumb_path, size))
+						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumb_path, size))
 					else:
-						thumb = self._thumbnail(thumb, original_path, thumb_path, size[0], size[1])
+						#~ message(thumb_path, photo_path)
+						#~ message("size", size[0] + " " + size[1])
+						thumb = self._thumbnail(thumb, thumb_path, thumb_path, size[0], size[1])
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
@@ -502,7 +505,7 @@ class Photo(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, video_cache(self._path))
+		transcode_path = os.path.join(transcode_path, video_cache(self.media_file_name))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -575,22 +578,22 @@ class Photo(object):
 
 	@property
 	def name(self):
-		return os.path.basename(self._path)
+		return os.path.basename(self.media_file_name)
 	def __str__(self):
 		return self.name
 	@property
 	def path(self):
-		return self._path
+		return self.media_file_name
 	@property
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			for size in Photo.thumb_sizes:
 				if size[1]:
-					caches.append(image_cache(self._path, size[0], size[1]))
-			caches.append(video_cache(self._path))
+					caches.append(image_cache(self.media_file_name, size[0], size[1]))
+			caches.append(video_cache(self.media_file_name))
 		else:
-			caches = [image_cache(self._path, size[0], size[1]) for size in Photo.thumb_sizes]
+			caches = [image_cache(self.media_file_name, size[0], size[1]) for size in Photo.thumb_sizes]
 		return caches
 	@property
 	def date(self):
@@ -656,7 +659,7 @@ class Photo(object):
 					pass
 		return Photo(path, None, dictionary)
 	def to_dict(self):
-		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self._path, "date": self.date }
+		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self.media_file_name, "date": self.date }
 		foldersString = "_folders"
 		foldersAlbum = foldersString
 		if (self.folders):
@@ -669,7 +672,7 @@ class Photo(object):
 					"dayAlbum": self.day_album_path,
 					"byDateName": os.path.join(self.day_album_path, self.name),
 					"foldersAlbum": foldersAlbum,
-					"completeName": os.path.join(foldersString, self._path),
+					"completeName": os.path.join(foldersString, self.media_file_name),
 					"date": self.date
 				}
 		photo.update(self.attributes)
