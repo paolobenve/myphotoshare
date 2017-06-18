@@ -168,12 +168,12 @@
 		}
 		return "cache/" + hash;
 	};
-	PhotoFloat.photoPath = function(album, photo, size, square) {
+	PhotoFloat.photoPath = function(album, photo, thumb_size, square) {
 		var suffix, hash;
 		if (square)
-			suffix = size.toString() + "s";
+			suffix = thumb_size.toString() + "s";
 		else
-			suffix = size.toString();
+			suffix = thumb_size.toString();
 		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)

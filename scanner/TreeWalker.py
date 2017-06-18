@@ -2,7 +2,7 @@ import os
 import os.path
 import sys
 from datetime import datetime
-from PhotoAlbum import Photo, Album, PhotoAlbumEncoder
+from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from CachePath import *
 import json
 
@@ -24,8 +24,7 @@ class TreeWalker:
 		#origin_cache = os.path.join(self.cache_path, json_name_by_date(self.album_path))
 		if not origin_album.empty:
 			origin_album.cache(self.cache_path)
-		if (Photo.parallel):
-			self.remove_stale()
+		self.remove_stale()
 		message("complete", "")
 	def generate_date_album(self):
 		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
@@ -138,8 +137,8 @@ class TreeWalker:
 							cache_files.append(os.path.join(self.cache_path, video_cache(entry)))
 						else:
 							# image
-							for size in Photo.thumb_sizes:
-								cache_files.append(os.path.join(self.cache_path, image_cache(entry, size[0], False)))
+							for thumb_size in Media.thumb_sizes:
+								cache_files.append(os.path.join(self.cache_path, image_cache(entry, thumb_size[0], False)))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
 						cache_hit = True
@@ -152,7 +151,7 @@ class TreeWalker:
 							photo = cached_photo
 				if not cache_hit:
 					message("get metainfo", os.path.basename(entry))
-					photo = Photo(entry, self.cache_path)
+					photo = Media(entry, self.cache_path)
 				if photo.is_valid:
 					self.all_photos.append(photo)
 					album.add_photo(photo)

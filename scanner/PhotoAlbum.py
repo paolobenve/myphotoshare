@@ -12,13 +12,13 @@ import gc
 import tempfile
 from VideoToolWrapper import *
 
-def make_photo_thumbs(self, image, original_path, thumb_path, size):
+def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
 	# self._photo_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self._photo_thumbnail(image, original_path, thumb_path, size[0], size[1])
+		self._photo_thumbnail(image, original_path, thumbs_path, thumb_size[0], thumb_size[1])
 	except KeyboardInterrupt:
 		raise
 
@@ -97,7 +97,7 @@ class Album(object):
 	def from_dict(dictionary, cripple=True):
 		album = Album(dictionary["path"])
 		for photo in dictionary["photos"]:
-			album.add_photo(Photo.from_dict(photo, untrim_base(album.path)))
+			album.add_photo(Media.from_dict(photo, untrim_base(album.path)))
 		if not cripple:
 			for subalbum in dictionary["albums"]:
 				album.add_album(Album.from_dict(subalbum), cripple)
@@ -127,7 +127,7 @@ class Album(object):
 			dictionary = { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
 		else:
 			dictionary = { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
-		dictionary["thumbSizes"] = Photo.thumb_sizes
+		dictionary["thumbSizes"] = Media.thumb_sizes
 		return dictionary
 	def photo_from_path(self, path):
 		for photo in self._photos:
@@ -135,14 +135,14 @@ class Album(object):
 				return photo
 		return None
 
-class Photo(object):
+class Media(object):
 	thumb_sizes = [ (1600, False), (1200, False), (800, False), (150, True) ]
 	parallel = False
 	if (parallel):
 		message("method", "parallel thumbnail generation")
 	else:
 		message("method", "cascade thumbnail generation")
-	def __init__(self, media_path, thumb_path=None, attributes=None):
+	def __init__(self, media_path, thumbs_path=None, attributes=None):
 		self.media_file_name = trim_base(media_path)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
 		self.album_path = os.path.join("albums", self.media_file_name)
@@ -172,12 +172,12 @@ class Photo(object):
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
 			try:
-				self._photo_thumbnails(image, media_path, thumb_path)
+				self._photo_thumbnails(image, media_path, thumbs_path)
 			except KeyboardInterrupt:
 				raise
 		elif self._attributes["mediaType"] == "video":
-			self._video_thumbnails(thumb_path, media_path)
-			self._video_transcode(thumb_path, media_path)
+			self._video_thumbnails(thumbs_path, media_path)
+			self._video_transcode(thumbs_path, media_path)
 		else:
 			self.is_valid = False
 			return
@@ -313,7 +313,7 @@ class Photo(object):
 				break
 	
 	
-	def _photo_thumbnail(self, image, original_path, thumb_path, size, square=False):
+	def _photo_thumbnail(self, image, original_path, thumbs_path, thumb_size, square=False):
 		#~ try:
 			#~ image = Image.open(original_path)
 		#~ except KeyboardInterrupt:
@@ -346,10 +346,10 @@ class Photo(object):
 			mirror = image.transpose(Image.ROTATE_90)
 
 		image = mirror
-		self._thumbnail(image, original_path, thumb_path, size, square)
+		self._thumbnail(image, original_path, thumbs_path, thumb_size, square)
 
-	def _thumbnail(self, image, original_path, thumbs_path, size, square):
-		thumb_path = os.path.join(thumbs_path, image_cache(self.media_file_name, size, square))
+	def _thumbnail(self, image, original_path, thumbs_path, thumb_size, square):
+		thumb_path = os.path.join(thumbs_path, image_cache(self.media_file_name, thumb_size, square))
 		info_string = thumb_path
 		if square:
 			info_string += ", square"
@@ -394,7 +394,7 @@ class Photo(object):
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=95)
 			next_level()
-			message(str(size) + " thumbnail", "OK")
+			message(str(thumb_size) + " thumbnail", "OK")
 			back_level()
 			return image_copy
 		except KeyboardInterrupt:
@@ -406,12 +406,12 @@ class Photo(object):
 		except IOError:
 			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=95)
 			next_level()
-			message(str(size) + " thumbnail", "OK (bug workaround)")
+			message(str(thumb_size) + " thumbnail", "OK (bug workaround)")
 			back_level()
 			return image_copy
 		except:
 			next_level()
-			message(str(size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", returning original image")
+			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", returning original image")
 			back_level()
 			try:
 				os.unlink(thumb_path)
@@ -423,9 +423,9 @@ class Photo(object):
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		pool = Pool(processes=num_of_cores)
 		try:
-			for size in Photo.thumb_sizes:
+			for thumb_size in Media.thumb_sizes:
 				try:
-					pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, size))
+					pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size))
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
@@ -437,20 +437,20 @@ class Photo(object):
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			for size in Photo.thumb_sizes:
+			for thumb_size in Media.thumb_sizes:
 				try:
 					#~ message(photo_path, thumbs_path)
-					thumb = self._thumbnail(thumb, photo_path, thumbs_path, size[0], size[1])
+					thumb = self._thumbnail(thumb, photo_path, thumbs_path, thumb_size[0], thumb_size[1])
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
-		if (Photo.parallel):
+		if (Media.parallel):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
 		else:
 			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
-	def _video_thumbnails(self, thumb_path, original_path):
+	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(
 			'-i', original_path,    # original file to extract thumbs from
@@ -498,9 +498,9 @@ class Photo(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		for size in Photo.thumb_sizes:
-			if size[1]:
-				self._thumbnail(mirror, original_path, thumb_path, size[0], size[1])
+		for thumb_size in Media.thumb_sizes:
+			if thumb_size[1]:
+				self._thumbnail(mirror, original_path, thumbs_path, thumb_size[0], thumb_size[1])
 		try:
 			os.unlink(tfn)
 		except:
@@ -590,12 +590,12 @@ class Photo(object):
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
-			for size in Photo.thumb_sizes:
-				if size[1]:
-					caches.append(image_cache(self.media_file_name, size[0], size[1]))
+			for thumb_size in Media.thumb_sizes:
+				if thumb_size[1]:
+					caches.append(image_cache(self.media_file_name, thumb_size[0], thumb_size[1]))
 			caches.append(video_cache(self.media_file_name))
 		else:
-			caches = [image_cache(self.media_file_name, size[0], size[1]) for size in Photo.thumb_sizes]
+			caches = [image_cache(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in Media.thumb_sizes]
 		return caches
 	@property
 	def date(self):
@@ -659,7 +659,7 @@ class Photo(object):
 					raise
 				except:
 					pass
-		return Photo(path, None, dictionary)
+		return Media(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self.media_file_name, "date": self.date }
 		foldersString = "_folders"
@@ -685,7 +685,7 @@ class PhotoAlbumEncoder(json.JSONEncoder):
 		if isinstance(obj, datetime):
 			#~ return obj.strftime("%a %b %d %H:%M:%S %Y")
 			return obj.strftime("%c")
-		if isinstance(obj, Album) or isinstance(obj, Photo):
+		if isinstance(obj, Album) or isinstance(obj, Media):
 			return obj.to_dict()
 		return json.JSONEncoder.default(self, obj)
 
