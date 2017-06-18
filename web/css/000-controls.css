@@ -12,12 +12,16 @@ a {
 a:hover {
 	color: #FFAD27;
 }
-#title, #title:hover {
-	position: absolute;
-	top: 0;
+#title, #title:hover, #day-view-container, #folders-view-container {
 	padding: 0.4em;
 	font-weight: bold;
 	font-size: medium;
+	float: left;
+}
+
+#title, #title:hover {
+	position: absolute;
+	top: 0;
 }
 
 #title {
@@ -25,7 +29,17 @@ a:hover {
 	top: 0;
 	padding: 0.4em;
 	font-weight: bold;
-	font-size: medium;
+}
+
+#day-view-container, #folders-view-container {
+	display: none;
+	float: right;
+	font-variant: small-caps;
+	background-color: white;
+}
+
+a#day-view, a#folders-view {
+	color: black;
 }
 
 #loading {
@@ -282,3 +296,4 @@ a:hover {
 .translation-active {
 	display: inline;
 }
+

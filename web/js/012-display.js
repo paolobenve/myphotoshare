@@ -371,27 +371,14 @@ $(document).ready(function() {
 			}
 		}
 		if (currentMedia.mediaType != "video") {
+			$("#title").css("width", $(window).width - em2px("10"));
 			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
 				$("#folders-view-container").hide();
-				$("#day-view-container").hide();
-				$("#month-view-container").show();
-				$("#year-view-container").show();
-			}
-			else if (currentAlbum.path == photoFloat.photoMonthAlbum(currentMedia)) {
-				$("#folders-view-container").hide();
 				$("#day-view-container").show();
-				$("#month-view-container").hide();
-				$("#year-view-container").show();
 			}
-			else if (currentAlbum.path == photoFloat.photoDayAlbum(currentMedia)) {
+			else {
 				$("#folders-view-container").show();
-				$("#day-view-container").hide();
-				$("#month-view-container").hide();
-				$("#year-view-container").show();
-			}
-			
-			if (currentAlbum.path == photoFloat.photoYearAlbum(currentMedia)) {
-				$("#year-view-container").hide();
+				$("#day-view-container").hide();;
 			}
 		}
 		
@@ -417,8 +404,6 @@ $(document).ready(function() {
 		if (currentMedia.mediaType != "video") {
 			$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
 			$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
-			$("#month-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.monthAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
-			$("#year-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.yearAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
 		}
 		
 		text = "<table>";
@@ -447,7 +432,10 @@ $(document).ready(function() {
 		$("#photo-view").show();
 	}
 	
-	
+	function em2px(em) {
+		var emSize = parseFloat($("body").css("font-size"));
+		return (em / emSize);
+	}
 	/* Error displays */
 	
 	function die(error) {

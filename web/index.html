@@ -26,10 +26,26 @@
 	<script type="text/javascript" src="js/012-display.js"></script>
 </head>
 <body>
-<div id="title">
-	<span class="translation-en">Photos</span>
-	<span class="translation-it">Foto</span>
-	<span class="translation-es">Foto</span>
+<div id="title-container">
+	<div id="title">
+		<span class="translation-en">Photos</span>
+		<span class="translation-it">Foto</span>
+		<span class="translation-es">Foto</span>
+	</div>
+	<div id="day-view-container" style="display:none;">
+		<a id="day-view" href="javascript:void(0)">
+			<span class="translation-en">day view</span>
+			<span class="translation-it">per giorno</span>
+			<span class="translation-es">por día</span>
+		</a>
+	</div>
+	<div id="folders-view-container" style="display:none;">
+		<a id="folders-view" href="javascript:void(0)">
+			<span class="translation-en">folders view</span>
+			<span class="translation-it">cartelle</span>
+			<span class="translation-es">carpetas</span>
+		</a>
+	</div>
 </div>
 <div id="photo-view">
 	<div id="photo-box">
@@ -46,26 +62,6 @@
 					<span class="translation-it">nascondi metadati</span>
 					<span class="translation-es">esconde metadatos</span>
 				</a> |
-				<span id="folders-view-container" style="display:none;"><a id="folders-view" href="javascript:void(0)">
-					<span class="translation-en">folders view</span>
-					<span class="translation-it">cartelle</span>
-					<span class="translation-es">carpetas</span>
-				</a> |</span>
-				<span id="day-view-container" style="display:none;"><a id="day-view" href="javascript:void(0)">
-					<span class="translation-en">day view</span>
-					<span class="translation-it">per giorno</span>
-					<span class="translation-es">por día</span>
-				</a> |</span>
-				<span id="month-view-container"><a id="month-view" href="javascript:void(0)">
-					<span class="translation-en">month view</span>
-					<span class="translation-it">per mese</span>
-					<span class="translation-es">por mes</span>
-				</a> |</span>
-				<span id="year-view-container" style="display:none;"><a id="year-view" href="javascript:void(0)">
-					<span class="translation-en">year view</span>
-					<span class="translation-it">per anno</span>
-					<span class="translation-es">por año</span>
-				</a> |</span>
 				<a id="original-link" target="_blank">
 					<span class="translation-en">download original</span>
 					<span class="translation-it">scarica originale</span>
