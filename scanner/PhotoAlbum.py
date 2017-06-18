@@ -137,7 +137,7 @@ class Album(object):
 
 class Media(object):
 	thumb_sizes = [ (1600, False), (1200, False), (800, False), (150, True) ]
-	parallel = False
+	parallel = True
 	if (parallel):
 		message("method", "parallel thumbnail generation")
 	else:
@@ -390,12 +390,14 @@ class Media(object):
 				bottom = image_copy.size[1] - ((image_copy.size[1] - image_copy.size[0]) / 2)
 			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
-		image_copy.thumbnail((size, size), Image.ANTIALIAS)
+		image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=95)
-			next_level()
-			message(str(thumb_size) + " thumbnail", "OK")
-			back_level()
+			next_level(1)
+			next_level(1)
+			message(str(thumb_size) + " thumbnail", "OK", 1)
+			back_level(1)
+			back_level(1)
 			return image_copy
 		except KeyboardInterrupt:
 			try:
@@ -405,13 +407,17 @@ class Media(object):
 			raise
 		except IOError:
 			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=95)
-			next_level()
-			message(str(thumb_size) + " thumbnail", "OK (bug workaround)")
-			back_level()
+			next_level(1)
+			next_level(1)
+			message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 1)
+			back_level(1)
+			back_level(1)
 			return image_copy
 		except:
 			next_level()
-			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", returning original image")
+			next_level()
+			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
+			back_level()
 			back_level()
 			try:
 				os.unlink(thumb_path)
@@ -419,21 +425,27 @@ class Media(object):
 				pass
 			return image
 	def _photo_thumbnails_parallel(self, image, photo_path, thumbs_path):
-		# get number of cores on the system, and use all minus one
-		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
-		pool = Pool(processes=num_of_cores)
 		try:
-			for thumb_size in Media.thumb_sizes:
-				try:
-					pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size))
-				except KeyboardInterrupt:
-					raise
+			# get number of cores on the system, and use all minus one
+			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+			pool = Pool(processes=num_of_cores)
+			try:
+				for thumb_size in Media.thumb_sizes:
+					try:
+						#~ import timeit
+						#~ start_time = timeit.default_timer()
+						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size))
+						#~ message("time", str(timeit.default_timer() - start_time))
+					except KeyboardInterrupt:
+						raise
+			except KeyboardInterrupt:
+				raise
+			except:
+				pool.terminate()
+			pool.close()
+			pool.join()
 		except KeyboardInterrupt:
 			raise
-		except:
-			pool.terminate()
-		pool.close()
-		pool.join()
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:

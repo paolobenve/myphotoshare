@@ -62,7 +62,7 @@ class TreeWalker:
 		self.all_albums.append(by_date_album)
 		root_cache = os.path.join(self.cache_path, json_name(self.album_path))
 		if not by_date_album.empty:
-			#message("cache_path1", self.cache_path + "   " + os.path.basename(self.cache_path))
+			message("cache_path", self.cache_path + "   " + os.path.basename(self.cache_path), 2)
 			by_date_album.cache(self.cache_path)
 		return by_date_album
 	def add_photo_to_tree_by_date(self, photo):
