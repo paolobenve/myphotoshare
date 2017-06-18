@@ -144,7 +144,6 @@ class Photo(object):
 		message("method", "cascade thumbnail generation")
 	def __init__(self, media_path, thumb_path=None, attributes=None):
 		self.media_file_name = trim_base(media_path)
-		message("_path", self.media_file_name)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
 		self.album_path = os.path.join("albums", self.media_file_name)
 		self.is_valid = True
@@ -349,16 +348,16 @@ class Photo(object):
 		image = mirror
 		self._thumbnail(image, original_path, thumb_path, size, square)
 
-	def _thumbnail(self, image, original_path, thumb_path, size, square):
-		thumb_path = os.path.join(thumb_path, image_cache(self.media_file_name, size, square))
-		info_string = "%spx" % (str(size))
+	def _thumbnail(self, image, original_path, thumbs_path, size, square):
+		thumb_path = os.path.join(thumbs_path, image_cache(self.media_file_name, size, square))
+		info_string = thumb_path
 		if square:
 			info_string += ", square"
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
 			next_level()
 			message("existing thumb", info_string)
 			back_level()
-			return
+			return image
 		next_level()
 		message("thumbing", info_string)
 		back_level()
@@ -377,7 +376,7 @@ class Photo(object):
 				message("corrupt image", os.path.basename(original_path))
 				back_level()
 				self.is_valid = False
-				return
+				return image
 		if square:
 			if image_copy.size[0] > image_copy.size[1]:
 				left = (image_copy.size[0] - image_copy.size[1]) / 2
@@ -395,7 +394,7 @@ class Photo(object):
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=95)
 			next_level()
-			message(size[0] + " thumbnail", "OK")
+			message(str(size) + " thumbnail", "OK")
 			back_level()
 			return image_copy
 		except KeyboardInterrupt:
@@ -407,47 +406,50 @@ class Photo(object):
 		except IOError:
 			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=95)
 			next_level()
-			message(size[0] + " thumbnail", "OK (bug workaround)")
+			message(str(size) + " thumbnail", "OK (bug workaround)")
 			back_level()
 			return image_copy
 		except:
 			next_level()
-			message(size[0] + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", returning original image")
+			message(str(size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", returning original image")
 			back_level()
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
 			return image
-	def _photo_thumbnails(self, image, photo_path, thumb_path):
-		if (Photo.parallel):
-			# get number of cores on the system, and use all minus one
-			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
-			pool = Pool(processes=num_of_cores)
-		else:
-			thumb = image
+	def _photo_thumbnails_parallel(self, image, photo_path, thumbs_path):
+		# get number of cores on the system, and use all minus one
+		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+		pool = Pool(processes=num_of_cores)
 		try:
 			for size in Photo.thumb_sizes:
 				try:
-					if (Photo.parallel):
-						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumb_path, size))
-					else:
-						#~ message(thumb_path, photo_path)
-						#~ message("size", size[0] + " " + size[1])
-						thumb = self._thumbnail(thumb, thumb_path, thumb_path, size[0], size[1])
+					pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, size))
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
 			raise
 		except:
-			if (Photo.parallel):
-				pool.terminate()
-			else:
-				pass
+			pool.terminate()
+		pool.close()
+		pool.join()
+	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
+		thumb = image
+		try:
+			for size in Photo.thumb_sizes:
+				try:
+					#~ message(photo_path, thumbs_path)
+					thumb = self._thumbnail(thumb, photo_path, thumbs_path, size[0], size[1])
+				except KeyboardInterrupt:
+					raise
+		except KeyboardInterrupt:
+			raise
+	def _photo_thumbnails(self, image, photo_path, thumbs_path):
 		if (Photo.parallel):
-			pool.close()
-			pool.join()
-
+			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
+		else:
+			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 	def _video_thumbnails(self, thumb_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(

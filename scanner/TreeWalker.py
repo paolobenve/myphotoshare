@@ -24,7 +24,8 @@ class TreeWalker:
 		#origin_cache = os.path.join(self.cache_path, json_name_by_date(self.album_path))
 		if not origin_album.empty:
 			origin_album.cache(self.cache_path)
-		self.remove_stale()
+		if (Photo.parallel):
+			self.remove_stale()
 		message("complete", "")
 	def generate_date_album(self):
 		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
