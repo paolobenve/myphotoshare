@@ -31,11 +31,16 @@ a:hover {
 	font-weight: bold;
 }
 
+#buttons-container {
+	float: right;
+}
 #day-view-container, #folders-view-container {
 	display: none;
-	float: right;
 	font-variant: small-caps;
+	text-align: center;
 	background-color: white;
+	border-radius: .5em;
+	margin: .5em;
 }
 
 a#day-view, a#folders-view {

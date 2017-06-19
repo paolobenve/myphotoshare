@@ -371,15 +371,15 @@ $(document).ready(function() {
 			}
 		}
 		if (currentMedia.mediaType != "video") {
-			$("#title").css("width", $(window).width - em2px("10"));
 			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
 				$("#folders-view-container").hide();
 				$("#day-view-container").show();
 			}
 			else {
 				$("#folders-view-container").show();
-				$("#day-view-container").hide();;
+				$("#day-view-container").hide();
 			}
+			$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
 		}
 		
 		if (currentAlbum.photos.length == 1) {
@@ -432,9 +432,9 @@ $(document).ready(function() {
 		$("#photo-view").show();
 	}
 	
-	function em2px(em) {
-		var emSize = parseFloat($("body").css("font-size"));
-		return (em / emSize);
+	function em2px(selector, em) {
+		var emSize = parseFloat($(selector).css("font-size"));
+		return (em * emSize);
 	}
 	/* Error displays */
 	
