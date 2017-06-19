@@ -17,6 +17,7 @@ class TreeWalker:
 		self.all_photos = list()
 		folders_album = self.walk(self.album_path)
 		self.big_lists()
+		self.save_json_options()
 		by_date_album = self.generate_date_album()
 		origin_album = Album(self.album_path)
 		origin_album.add_album(folders_album)
@@ -176,6 +177,11 @@ class TreeWalker:
 		message("caching", "all photos path list")
 		fp = open(os.path.join(self.cache_path, "all_photos.json"), 'w')
 		json.dump(photo_list, fp, cls=PhotoAlbumEncoder)
+		fp.close()
+	def save_json_options(self):
+		message("caching", "options to json file")
+		fp = open(os.path.join(self.cache_path, "options.json"), 'w')
+		json.dump(Options.Options, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	def remove_stale(self):
 		message("cleanup", "building stale list")
