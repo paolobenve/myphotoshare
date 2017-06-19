@@ -29,8 +29,8 @@ class TreeWalker:
 		message("complete", "")
 	def generate_date_album(self):
 		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
-		bydateString = "_by_date"
-		by_date_path = os.path.join(self.album_path, bydateString)
+		#~ bydateString = "_by_date"
+		by_date_path = os.path.join(self.album_path, Options.Options['byDateString'])
 		by_date_album = Album(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
 			year_path = os.path.join(by_date_path, str(year))
@@ -76,9 +76,9 @@ class TreeWalker:
 			self.tree_by_date[photo.year][photo.month][photo.day] = list()
 		self.tree_by_date[photo.year][photo.month][photo.day].append(photo)
 	def walk(self, path):
-		foldersString = "_folders"
+		#~ foldersString = "_folders"
 		trimmed_path = trim_base_custom(path, self.album_path)
-		path_with_marker = os.path.join(self.album_path, foldersString)
+		path_with_marker = os.path.join(self.album_path, Options.Options['foldersString'])
 		if trimmed_path:
 			path_with_marker = os.path.join(path_with_marker, trimmed_path)
 		next_level()

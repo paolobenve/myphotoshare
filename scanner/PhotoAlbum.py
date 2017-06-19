@@ -106,10 +106,10 @@ class Album(object):
 		album._sort()
 		return album
 	def remove_marker(self, path):
-		foldersString = "_folders"
-		marker_position = path.find(foldersString)
+		#~ foldersString = "_folders"
+		marker_position = path.find(Options.Options['foldersString'])
 		if marker_position == 0:
-			path = path[len(foldersString):]
+			path = path[len(Options.Options['foldersString']):]
 			if len(path) > 0:
 				path = path[1:]
 		return path
@@ -129,7 +129,7 @@ class Album(object):
 			dictionary = { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
 		else:
 			dictionary = { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
-		dictionary["thumbSizes"] = Media.thumb_sizes
+		dictionary["thumbSizes"] = Options.Options['thumbSizes']
 		return dictionary
 	def photo_from_path(self, path):
 		for photo in self._photos:
@@ -138,26 +138,16 @@ class Album(object):
 		return None
 
 class Media(object):
-	thumb_sizes = Options.Options['thumbSizes']
-	mode = Options.Options['thumbnailsGenerationMode']
-	# 25 images ~ 5MB each, 4 thumbnail sizes:
-	# parallel ~ 60 seconds
-	# mixed    ~ 35 seconds
-	# cascade  ~ 30 seconds
-	#
-	# 25 images ~ 5MB each, 4 thumbnail sizes, the 4 already present:
-	# parallel ~ 48 seconds
-	# mixed    ~ 35 seconds
-	# cascade  ~ 0.2 seconds
-	if (mode == "parallel"):
-		message("method", "parallel thumbnail generation")
-	elif (mode == "mixed"):
-		message("method", "mixed thumbnail generation")
-	elif (mode == "cascade"):
-		message("method", "cascade thumbnail generation")
-		# be sure thumb_sizes is correctly sorted 
-		thumb_sizes.sort(key=lambda tup: tup[0], reverse = True)
 	def __init__(self, media_path, thumbs_path=None, attributes=None):
+		if (Options.Options['thumbnailsGenerationMode'] == "parallel"):
+			message("method", "parallel thumbnail generation")
+		elif (Options.Options['thumbnailsGenerationMode'] == "mixed"):
+			message("method", "mixed thumbnail generation")
+		elif (Options.Options['thumbnailsGenerationMode'] == "cascade"):
+			message("method", "cascade thumbnail generation")
+			# be sure thumb_sizes is correctly sorted 
+			Options.Options['thumbSizes'].sort(key=lambda tup: tup[0], reverse = True)
+		
 		self.media_file_name = trim_base(media_path)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
 		self.album_path = os.path.join("albums", self.media_file_name)
@@ -411,7 +401,7 @@ class Media(object):
 		else:
 			image_copy = self.resize_canvas(image_copy, thumbnail_size)
 		try:
-			image_copy.save(thumb_path, "JPEG", quality=95)
+			image_copy.save(thumb_path, "JPEG", quality=Options.Options['jpegQuality'])
 			next_level(1)
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK", 1)
@@ -425,7 +415,7 @@ class Media(object):
 				pass
 			raise
 		except IOError:
-			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=95)
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.Options['jpegQuality'])
 			next_level(1)
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
@@ -435,6 +425,7 @@ class Media(object):
 		except:
 			next_level()
 			next_level()
+			message("options",Options.Options['jpegQuality'])
 			message(str(thumbnail_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
 			back_level()
 			back_level()
@@ -471,8 +462,8 @@ class Media(object):
 			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 			pool = Pool(processes=num_of_cores)
 			try:
-				for thumb_size in Media.thumb_sizes:
-					if (Media.mode == "mixed" and thumb_size == Media.thumb_sizes[0]):
+				for thumb_size in Options.Options['thumbSizes']:
+					if (Options.Options['thumbnailsGenerationMode'] == "mixed" and thumb_size == Options.Options['thumbSizes'][0]):
 						continue
 					try:
 						#~ import timeit
@@ -492,7 +483,7 @@ class Media(object):
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			thumb_size = Media.thumb_sizes[0]
+			thumb_size = Options.Options['thumbSizes'][0]
 			try:
 				if (max(image.size[0], image.size[1]) < thumb_size):
 					image_to_start_from = image
@@ -508,7 +499,7 @@ class Media(object):
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			for thumb_size in Media.thumb_sizes:
+			for thumb_size in Options.Options['thumbSizes']:
 				try:
 					if (max(image.size[0], image.size[1]) < thumb_size[0]):
 						image_to_start_from = image
@@ -520,11 +511,11 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
-		if (Media.mode == "parallel"):
+		if (Options.Options['thumbnailsGenerationMode'] == "parallel"):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
-		elif (Media.mode == "mixed"):
+		elif (Options.Options['thumbnailsGenerationMode'] == "mixed"):
 			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
-		elif (Media.mode == "cascade"):
+		elif (Options.Options['thumbnailsGenerationMode'] == "cascade"):
 			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
@@ -574,7 +565,7 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		for thumb_size in Media.thumb_sizes:
+		for thumb_size in Options.Options['thumbSizes']:
 			if thumb_size[1]:
 				self._thumbnail(mirror, original_path, thumbs_path, thumb_size[0], thumb_size[1])
 		try:
@@ -587,23 +578,23 @@ class Media(object):
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
-			'-i', original_path,		# original file to be encoded
-			'-c:v', 'libx264',		# set h264 as videocodec
-			'-preset', 'slow',		# set specific preset that provides a certain encoding speed to compression ratio
-			'-profile:v', 'baseline',	# set output to specific h264 profile
-			'-level', '3.0',		# sets highest compatibility with target devices
-			'-crf', '20',			# set quality
-			'-b:v', '4M',			# set videobitrate to 4Mbps
-			'-strict', 'experimental',	# allow native aac codec below
-			'-c:a', 'aac',			# set aac as audiocodec
-			'-ac', '2',			# force two audiochannels
-			'-ab', '160k',			# set audiobitrate to 160Kbps
-			'-maxrate', '10000000',		# limits max rate, will degrade CRF if needed
-			'-bufsize', '10000000',		# define how much the client should buffer
-			'-f', 'mp4',			# fileformat mp4
-			'-threads', str(num_of_cores),	# number of cores (all minus one)
-			'-loglevel', 'quiet',		# don't display anything
-			'-y' 				# don't prompt for overwrite
+			'-i', original_path,					# original file to be encoded
+			'-c:v', 'libx264',					# set h264 as videocodec
+			'-preset', 'slow',					# set specific preset that provides a certain encoding speed to compression ratio
+			'-profile:v', 'baseline',				# set output to specific h264 profile
+			'-level', '3.0',					# sets highest compatibility with target devices
+			'-crf', '20',						# set quality
+			'-b:v', Options.Options['videoTranscodeBitrate'],	# set videobitrate to 4Mbps
+			'-strict', 'experimental',				# allow native aac codec below
+			'-c:a', 'aac',						# set aac as audiocodec
+			'-ac', '2',						# force two audiochannels
+			'-ab', '160k',						# set audiobitrate to 160Kbps
+			'-maxrate', '10000000',					# limits max rate, will degrade CRF if needed
+			'-bufsize', '10000000',					# define how much the client should buffer
+			'-f', 'mp4',						# fileformat mp4
+			'-threads', str(num_of_cores),				# number of cores (all minus one)
+			'-loglevel', 'quiet',					# don't display anything
+			'-y' 							# don't prompt for overwrite
 		]
 		filters = []
 		info_string = "%s -> mp4, h264" % (os.path.basename(original_path))
@@ -666,12 +657,12 @@ class Media(object):
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
-			for thumb_size in Media.thumb_sizes:
+			for thumb_size in Options.Options['thumbSizes']:
 				if thumb_size[1]:
 					caches.append(image_cache(self.media_file_name, thumb_size[0], thumb_size[1]))
 			caches.append(video_cache(self.media_file_name))
 		else:
-			caches = [image_cache(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in Media.thumb_sizes]
+			caches = [image_cache(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in Options.Options['thumbSizes']]
 		return caches
 	@property
 	def date(self):
@@ -702,8 +693,8 @@ class Media(object):
 		return self.year_month + " " + self.day
 	@property
 	def year_album_path(self):
-		bydateString = "_by_date"
-		return bydateString + "/" + self.year
+		#~ bydateString = "_by_date"
+		return Options.Options['byDateString'] + "/" + self.year
 	@property
 	def month_album_path(self):
 		return self.year_album_path + "/" + self.month
@@ -738,8 +729,8 @@ class Media(object):
 		return Media(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self.media_file_name, "date": self.date }
-		foldersString = "_folders"
-		foldersAlbum = foldersString
+		#~ foldersString = "_folders"
+		foldersAlbum = Options.Options['foldersString']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 		photo = {
@@ -750,7 +741,7 @@ class Media(object):
 					"dayAlbum": self.day_album_path,
 					"byDateName": os.path.join(self.day_album_path, self.name),
 					"foldersAlbum": foldersAlbum,
-					"completeName": os.path.join(foldersString, self.media_file_name),
+					"completeName": os.path.join(Options.Options['foldersString'], self.media_file_name),
 					"date": self.date
 				}
 		photo.update(self.attributes)

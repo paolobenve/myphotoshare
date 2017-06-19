@@ -1,5 +1,6 @@
 import os.path
 from datetime import datetime
+from Options import Options
 
 max_verbose = 0
 def message(category, text, verbose = 0):
@@ -34,7 +35,7 @@ def cache_base(path, filepath=False):
 	else:
 		#~ elif filepath and len(path.split(os.sep)) < 2:
 			#~ path = "root-" + path
-		path = trim_base(path).replace('/', '-').replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
+		path = trim_base(path).replace('/', Options.Options['cacheFolderSeparator']).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 		while path.find("--") != -1:
 			path = path.replace("--", "-")
 		while path.find("__") != -1:

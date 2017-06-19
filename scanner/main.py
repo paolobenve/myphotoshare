@@ -11,20 +11,29 @@ from Options import Options
 def main():
 	reload(sys)
 	sys.setdefaultencoding("UTF-8")
-	if len(sys.argv) != 3:
-		print "usage: %s ALBUM_PATH CACHE_PATH" % sys.argv[0]
+	if len(sys.argv) != 3 and len(sys.argv) != 2:
+		print "usage: %s ALBUM_PATH CACHE_PATH - or %s CONFIG_FILE" % (sys.argv[0], sys.argv[0])
 		return
-	#~ try:
-	Options()
+	
 	#~ except TypeError:
 		#~ message("Options", "Incorrect options in Options.py")
 		#~ sys.exit(-97)
 	try:
 		os.umask(022)
-		package_directory = os.path.dirname(os.path.abspath(__file__))
-		message("dir",package_directory)
-		message("options", str(Options.Options['albumPath']))
-		TreeWalker(os.path.join(package_directory, Options.Options['albumPath']), os.path.join(package_directory, Options.Options['cachePath']))
+		if len(sys.argv) == 3:
+			# 2 arguments: album and cache paths
+			# the other parameters are the default options
+			message("1",Options.Options)
+			Options()
+			message("2",Options.Options)
+			TreeWalker(sys.argv[1], sys.argv[2])
+		else:
+			# 1 arguments: the config files
+			# which modifies the default options
+			config_file = sys.argv[1]
+			execfile(config_file)
+			Options()
+			TreeWalker(Options.Options['albumPath'], Options.Options['cachePath'])
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)
