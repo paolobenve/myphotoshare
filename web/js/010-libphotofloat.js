@@ -5,11 +5,6 @@
 	}
 	
 	/* public member functions */
-	PhotoFloat.prototype.getOptions = function() {
-		$.getJSON('cache/options.json', function (data) {
-			Options = data;
-		});
-	};
 	PhotoFloat.prototype.album = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
 		
@@ -80,7 +75,6 @@
 			album = hash;
 			photo = null;
 		}
-		this.getOptions();
 		this.album(album, function(theAlbum) {
 			var i = -1;
 			if (photo !== null) {

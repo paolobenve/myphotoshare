@@ -7,7 +7,7 @@ else
 	windowOrientation = "portrait";
 windowMaxSize = Math.max(windowWidth, windowHeight);
 windowMinSize = Math.min(windowWidth, windowHeight);
-var Options = [];
+Options = [];
 
 $(document).ready(function() {
 	
@@ -46,6 +46,13 @@ $(document).ready(function() {
 	
 	/* Displays */
 	
+	function getOptions () {
+		$.getJSON('cache/options.json', function (data) {
+			Options = data;
+		});
+	}
+	getOptions();
+	console.log(Options);
 	function language() {
 		var userLang = navigator.language || navigator.userLanguage;
 		return userLang.split('-')[0];
@@ -468,8 +475,7 @@ $(document).ready(function() {
 		$("#error-text, #error-overlay, #auth-text").fadeOut(500);
 		$("body, html").css("overflow", "auto");
 	}
-		
-		
+	
 	
 	/* Entry point for most events */
 	
