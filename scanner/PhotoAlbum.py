@@ -137,7 +137,7 @@ class Album(object):
 
 class Media(object):
 	thumb_sizes = [ (1600, False), (1200, False), (800, False), (150, True) ]
-	parallel = True
+	parallel = False
 	if (parallel):
 		message("method", "parallel thumbnail generation")
 	else:
@@ -350,7 +350,7 @@ class Media(object):
 
 	def _thumbnail(self, image, original_path, thumbs_path, thumb_size, square):
 		thumb_path = os.path.join(thumbs_path, image_cache(self.media_file_name, thumb_size, square))
-		info_string = thumb_path
+		info_string = str(thumb_size)
 		if square:
 			info_string += ", square"
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:

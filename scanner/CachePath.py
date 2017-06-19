@@ -1,7 +1,7 @@
 import os.path
 from datetime import datetime
 
-max_verbose = 1
+max_verbose = 0
 def message(category, text, verbose = 0):
 	if (verbose <= max_verbose):
 		if message.level <= 0:
