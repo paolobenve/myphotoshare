@@ -72,7 +72,6 @@ $(document).ready(function() {
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i;
 		var originalTitle = translationsToTranslatedString($("#title-translation").html());
-		var documentTitleAdd = "";
 		
 		if (! currentAlbum.path.length)
 			components = [originalTitle];
@@ -80,8 +79,6 @@ $(document).ready(function() {
 			components = currentAlbum.path.split("/");
 			components.unshift(originalTitle);
 		}
-		if (currentMedia !== null)
-			documentTitle += photoFloat.trimExtension(currentMedia.name);
 		for (i = 0; i < components.length; ++i) {
 			if (i)
 				last += "/" + components[i];
@@ -94,14 +91,6 @@ $(document).ready(function() {
 					title += components[i];
 				if (i < components.length - 1 || currentMedia !== null)
 					title += "</a>";
-				
-				if (! (components.length > 1 && i == components.length - 2 && components[1] == bydateString)) {
-					if (i || currentMedia !== null)
-						documentTitle += " \u00ab ";
-					documentTitle += components[components.length - 1 - i];
-				}
-				if (i == components.length - 1 && components[1] == bydateString)
-					documentTitle += " " + translationsToTranslatedString($("#by-date-translation").html());
 			}
 			if (i == 0 && components.length > 1 && components[i + 1] == bydateString)
 				title += " ";
@@ -111,6 +100,24 @@ $(document).ready(function() {
 		}
 		if (currentMedia !== null)
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</div>";
+		
+		for (i = 0; i < components.length; ++i) {
+			if (i == 0) {
+				documentTitle += components[0]
+				if (components.length > 2 || currentMedia !== null)
+					documentTitle = " \u00ab " + documentTitle;
+			}
+			else if (i == 1 && components[1] == bydateString) {
+				documentTitle += " " + translationsToTranslatedString($("#by-date-translation").html());
+			}
+			else if (i > 1) {
+				documentTitle = components[i] + documentTitle;
+				if (i < components.length - 1 || currentMedia !== null)
+					documentTitle = " \u00ab " + documentTitle;
+			}
+		}
+		if (currentMedia !== null)
+			documentTitle = photoFloat.trimExtension(currentMedia.name) + documentTitle;
 		
 		$("#title").html(title);
 		document.title = documentTitle;
