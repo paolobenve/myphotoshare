@@ -138,10 +138,21 @@ class Album(object):
 
 class Media(object):
 	thumb_sizes = [ (1600, False), (1200, False), (800, False), (150, True) ]
-	parallel = False
-	if (parallel):
+	mode = "cascade"
+	# 25 images ~ 5MB each, 4 thumbnail sizes:
+	# parallel ~ 60 seconds
+	# mixed    ~ 35 seconds
+	# cascade  ~ 30 seconds
+	#
+	# 25 images ~ 5MB each, 4 thumbnail sizes, the 4 already present:
+	# parallel ~ 48 seconds
+	# mixed    ~ 35 seconds
+	# cascade  ~ 0.2 seconds
+	if (mode == "parallel"):
 		message("method", "parallel thumbnail generation")
-	else:
+	elif (mode == "mixed"):
+		message("method", "mixed thumbnail generation")
+	elif (mode == "cascade"):
 		message("method", "cascade thumbnail generation")
 	def __init__(self, media_path, thumbs_path=None, attributes=None):
 		self.media_file_name = trim_base(media_path)
@@ -314,7 +325,7 @@ class Media(object):
 				break
 	
 	
-	def _photo_thumbnail(self, image, original_path, thumbs_path, thumb_size, square=False):
+	def _photo_thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square=False):
 		#~ try:
 			#~ image = Image.open(original_path)
 		#~ except KeyboardInterrupt:
@@ -347,11 +358,11 @@ class Media(object):
 			mirror = image.transpose(Image.ROTATE_90)
 
 		image = mirror
-		self._thumbnail(image, original_path, thumbs_path, thumb_size, square)
+		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, square)
 
-	def _thumbnail(self, image, original_path, thumbs_path, thumb_size, square):
-		thumb_path = os.path.join(thumbs_path, image_cache(self.media_file_name, thumb_size, square))
-		info_string = str(thumb_size)
+	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square):
+		thumb_path = os.path.join(thumbs_path, image_cache(self.media_file_name, thumbnail_size, square))
+		info_string = str(thumbnail_size)
 		if square:
 			info_string += ", square"
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
@@ -392,18 +403,15 @@ class Media(object):
 			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
 		image_size = max(image_copy.size[0], image_copy.size[1])
-		if (image_size >= thumb_size):
-			image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+		if (image_size >= thumbnail_size):
+			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
 		else:
-			message(image_size, thumb_size)
-			message(image_copy.size[0], image_copy.size[1])
-			image_copy = self.resize_canvas(image_copy, thumb_size)
-			message(image_copy.size[0], image_copy.size[1])
+			image_copy = self.resize_canvas(image_copy, thumbnail_size)
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=95)
 			next_level(1)
 			next_level(1)
-			message(str(thumb_size) + " thumbnail", "OK", 1)
+			message(str(thumbnail_size) + " thumbnail", "OK", 1)
 			back_level(1)
 			back_level(1)
 			return image_copy
@@ -417,14 +425,14 @@ class Media(object):
 			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=95)
 			next_level(1)
 			next_level(1)
-			message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 1)
+			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
 			back_level(1)
 			back_level(1)
 			return image_copy
 		except:
 			next_level()
 			next_level()
-			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
+			message(str(thumbnail_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
 			back_level()
 			back_level()
 			try:
@@ -452,7 +460,6 @@ class Media(object):
 		if len(mode) == 4:  # RGBA, CMYK
 			new_background = (34, 34, 34, 1)
 		newImage = Image.new(mode, (canvas_width, canvas_height), new_background)
-		message(newImage.size[0], newImage.size[1])
 		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
 		return newImage
 	def _photo_thumbnails_parallel(self, image, photo_path, thumbs_path):
@@ -462,6 +469,8 @@ class Media(object):
 			pool = Pool(processes=num_of_cores)
 			try:
 				for thumb_size in Media.thumb_sizes:
+					if (Media.mode == "mixed" and thumb_size == Media.thumb_sizes[0]):
+						continue
 					try:
 						#~ import timeit
 						#~ start_time = timeit.default_timer()
@@ -477,12 +486,28 @@ class Media(object):
 			pool.join()
 		except KeyboardInterrupt:
 			raise
+	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
+		thumb = image
+		try:
+			thumb_size = Media.thumb_sizes[0]
+			try:
+				if (max(image.size[0], image.size[1]) < thumb_size):
+					image_to_start_from = image
+				else:
+					image_to_start_from = thumb
+				skip_first_size = True
+				thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size[0], thumb_size[1])
+				self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
+			except KeyboardInterrupt:
+				raise
+		except KeyboardInterrupt:
+			raise
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
 			for thumb_size in Media.thumb_sizes:
 				try:
-					if (max(image.size[0], image.size[1]) < thumb_size):
+					if (max(image.size[0], image.size[1]) < thumb_size[0]):
 						image_to_start_from = image
 					else:
 						image_to_start_from = thumb
@@ -492,9 +517,11 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
-		if (Media.parallel):
+		if (Media.mode == "parallel"):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
-		else:
+		elif (Media.mode == "mixed"):
+			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
+		elif (Media.mode == "cascade"):
 			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
