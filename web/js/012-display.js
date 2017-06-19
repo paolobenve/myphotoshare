@@ -94,11 +94,18 @@ $(document).ready(function() {
 				if (i < components.length - 1 || currentMedia !== null)
 					title += "</a>";
 				
-				if (i || currentMedia !== null)
-					documentTitle += " \u00ab ";
-				documentTitle += components[components.length - 1 - i];
+				if (! (components.length > 1 && i == components.length - 2 && components[1] == bydateString)) {
+					if (i || currentMedia !== null)
+						documentTitle += " \u00ab ";
+					documentTitle += components[components.length - 1 - i];
+				}
+				if (i == components.length - 1 && components[1] == bydateString)
+					documentTitle += " " + components[1];
 			}
-			if ((i < components.length - 1 || currentMedia !== null) && (i == components.length - 1 || components[i + 1] != foldersString))
+			if (i == 0 && components.length > 1 && components[i + 1] == bydateString)
+				title += " ";
+			else if ((i < components.length - 1 || currentMedia !== null) &&
+				(i == components.length - 1 || components[i + 1] != foldersString))
 				title += " &raquo; ";
 		}
 		if (currentMedia !== null)
@@ -250,6 +257,7 @@ $(document).ready(function() {
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
 			image.css("height", "100%").css("width", "auto").css("position", "").css("bottom", "");
+		$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
 	}
 	function scaleVideo() {
 		var video, container;
@@ -481,6 +489,10 @@ $(document).ready(function() {
 		setTitle();
 		if (currentMedia !== null)
 			showMedia(currentAlbum);
+		else {
+			$("#folders-view-container").hide();
+			$("#day-view-container").hide();
+		}
 		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
 		if (currentMedia !== null)
