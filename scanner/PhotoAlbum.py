@@ -11,6 +11,7 @@ from multiprocessing import Pool
 import gc
 import tempfile
 from VideoToolWrapper import *
+import math
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -390,7 +391,14 @@ class Media(object):
 				bottom = image_copy.size[1] - ((image_copy.size[1] - image_copy.size[0]) / 2)
 			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
-		image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+		image_size = max(image_copy.size[0], image_copy.size[1])
+		if (image_size >= thumb_size):
+			image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+		else:
+			message(image_size, thumb_size)
+			message(image_copy.size[0], image_copy.size[1])
+			image_copy = self.resize_canvas(image_copy, thumb_size)
+			message(image_copy.size[0], image_copy.size[1])
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=95)
 			next_level(1)
@@ -424,6 +432,29 @@ class Media(object):
 			except:
 				pass
 			return image
+	def resize_canvas(self, image, canvas_max_size):
+		old_width, old_height = image.size
+		if (old_width > old_height):
+			canvas_width = canvas_max_size
+			canvas_height = int(float(canvas_width) / float(old_width) * float(old_height))
+		else:
+			canvas_height = canvas_max_size
+			canvas_width = int(float(canvas_height) / float(old_height) * float(old_width))
+		
+		# Center the image
+		x1 = int(math.floor((canvas_width - old_width) / 2))
+		y1 = int(math.floor((canvas_height - old_height) / 2))
+		mode = image.mode
+		if len(mode) == 1:  # L, 1
+			new_background = (34)
+		if len(mode) == 3:  # RGB
+			new_background = (34, 34, 34)
+		if len(mode) == 4:  # RGBA, CMYK
+			new_background = (34, 34, 34, 1)
+		newImage = Image.new(mode, (canvas_width, canvas_height), new_background)
+		message(newImage.size[0], newImage.size[1])
+		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
+		return newImage
 	def _photo_thumbnails_parallel(self, image, photo_path, thumbs_path):
 		try:
 			# get number of cores on the system, and use all minus one
@@ -451,8 +482,11 @@ class Media(object):
 		try:
 			for thumb_size in Media.thumb_sizes:
 				try:
-					#~ message(photo_path, thumbs_path)
-					thumb = self._thumbnail(thumb, photo_path, thumbs_path, thumb_size[0], thumb_size[1])
+					if (max(image.size[0], image.size[1]) < thumb_size):
+						image_to_start_from = image
+					else:
+						image_to_start_from = thumb
+					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size[0], thumb_size[1])
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:

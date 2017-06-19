@@ -12,12 +12,16 @@ a {
 a:hover {
 	color: #FFAD27;
 }
-#title, #title:hover {
-	position: absolute;
-	top: 0;
+#title, #title:hover, #day-view-container, #folders-view-container {
 	padding: 0.4em;
 	font-weight: bold;
 	font-size: medium;
+	float: left;
+}
+
+#title, #title:hover {
+	position: absolute;
+	top: 0;
 }
 
 #title {
@@ -25,7 +29,22 @@ a:hover {
 	top: 0;
 	padding: 0.4em;
 	font-weight: bold;
-	font-size: medium;
+}
+
+#buttons-container {
+	float: right;
+}
+#day-view-container, #folders-view-container {
+	display: none;
+	font-variant: small-caps;
+	text-align: center;
+	background-color: white;
+	border-radius: .5em;
+	margin: .5em;
+}
+
+a#day-view, a#folders-view {
+	color: black;
 }
 
 #loading {
@@ -282,3 +301,4 @@ a:hover {
 .translation-active {
 	display: inline;
 }
+

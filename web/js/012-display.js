@@ -89,16 +89,24 @@ $(document).ready(function() {
 				if (i < components.length - 1 || currentMedia !== null)
 					title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && components[i] == bydateString)
-					components[i] = translationsToTranslatedString($("#by-date-translation").html());
-				title += components[i];
+					title += translationsToTranslatedString($("#by-date-translation").html());
+				else
+					title += components[i];
 				if (i < components.length - 1 || currentMedia !== null)
 					title += "</a>";
 				
-				if (i || currentMedia !== null)
-					documentTitle += " \u00ab ";
-				documentTitle += components[components.length - 1 - i];
+				if (! (components.length > 1 && i == components.length - 2 && components[1] == bydateString)) {
+					if (i || currentMedia !== null)
+						documentTitle += " \u00ab ";
+					documentTitle += components[components.length - 1 - i];
+				}
+				if (i == components.length - 1 && components[1] == bydateString)
+					documentTitle += " " + translationsToTranslatedString($("#by-date-translation").html());
 			}
-			if ((i < components.length - 1 || currentMedia !== null) && (i == components.length - 1 || components[i + 1] != foldersString))
+			if (i == 0 && components.length > 1 && components[i + 1] == bydateString)
+				title += " ";
+			else if ((i < components.length - 1 || currentMedia !== null) &&
+				(i == components.length - 1 || components[i + 1] != foldersString))
 				title += " &raquo; ";
 		}
 		if (currentMedia !== null)
@@ -250,6 +258,7 @@ $(document).ready(function() {
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
 			image.css("height", "100%").css("width", "auto").css("position", "").css("bottom", "");
+		$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
 	}
 	function scaleVideo() {
 		var video, container;
@@ -373,26 +382,13 @@ $(document).ready(function() {
 		if (currentMedia.mediaType != "video") {
 			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
 				$("#folders-view-container").hide();
-				$("#day-view-container").hide();
-				$("#month-view-container").show();
-				$("#year-view-container").show();
-			}
-			else if (currentAlbum.path == photoFloat.photoMonthAlbum(currentMedia)) {
-				$("#folders-view-container").hide();
 				$("#day-view-container").show();
-				$("#month-view-container").hide();
-				$("#year-view-container").show();
 			}
-			else if (currentAlbum.path == photoFloat.photoDayAlbum(currentMedia)) {
+			else {
 				$("#folders-view-container").show();
 				$("#day-view-container").hide();
-				$("#month-view-container").hide();
-				$("#year-view-container").show();
 			}
-			
-			if (currentAlbum.path == photoFloat.photoYearAlbum(currentMedia)) {
-				$("#year-view-container").hide();
-			}
+			$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
 		}
 		
 		if (currentAlbum.photos.length == 1) {
@@ -417,8 +413,6 @@ $(document).ready(function() {
 		if (currentMedia.mediaType != "video") {
 			$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
 			$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
-			$("#month-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.monthAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
-			$("#year-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.yearAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
 		}
 		
 		text = "<table>";
@@ -447,7 +441,10 @@ $(document).ready(function() {
 		$("#photo-view").show();
 	}
 	
-	
+	function em2px(selector, em) {
+		var emSize = parseFloat($(selector).css("font-size"));
+		return (em * emSize);
+	}
 	/* Error displays */
 	
 	function die(error) {
@@ -493,6 +490,10 @@ $(document).ready(function() {
 		setTitle();
 		if (currentMedia !== null)
 			showMedia(currentAlbum);
+		else {
+			$("#folders-view-container").hide();
+			$("#day-view-container").hide();
+		}
 		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
 		if (currentMedia !== null)
