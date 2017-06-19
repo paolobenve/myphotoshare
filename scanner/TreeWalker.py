@@ -5,6 +5,7 @@ from datetime import datetime
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from CachePath import *
 import json
+from Options import Options
 
 class TreeWalker:
 	def __init__(self, album_path, cache_path):

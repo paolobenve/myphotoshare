@@ -12,6 +12,7 @@ import gc
 import tempfile
 from VideoToolWrapper import *
 import math
+from Options import Options
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -137,8 +138,8 @@ class Album(object):
 		return None
 
 class Media(object):
-	thumb_sizes = [ (1600, False), (1200, False), (800, False), (150, True) ]
-	mode = "cascade"
+	thumb_sizes = Options.Options['thumbSizes']
+	mode = Options.Options['thumbnailsGenerationMode']
 	# 25 images ~ 5MB each, 4 thumbnail sizes:
 	# parallel ~ 60 seconds
 	# mixed    ~ 35 seconds
