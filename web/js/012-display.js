@@ -89,8 +89,9 @@ $(document).ready(function() {
 				if (i < components.length - 1 || currentMedia !== null)
 					title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && components[i] == bydateString)
-					components[i] = translationsToTranslatedString($("#by-date-translation").html());
-				title += components[i];
+					title += translationsToTranslatedString($("#by-date-translation").html());
+				else
+					title += components[i];
 				if (i < components.length - 1 || currentMedia !== null)
 					title += "</a>";
 				
@@ -100,7 +101,7 @@ $(document).ready(function() {
 					documentTitle += components[components.length - 1 - i];
 				}
 				if (i == components.length - 1 && components[1] == bydateString)
-					documentTitle += " " + components[1];
+					documentTitle += " " + translationsToTranslatedString($("#by-date-translation").html());
 			}
 			if (i == 0 && components.length > 1 && components[i + 1] == bydateString)
 				title += " ";
