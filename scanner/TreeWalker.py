@@ -179,13 +179,14 @@ class TreeWalker:
 		json.dump(photo_list, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	def save_json_options(self):
-		message("caching", "options to json file")
-		fp = open(os.path.join(self.cache_path, "options.json"), 'w')
-		json.dump(Options.Options, fp, cls=PhotoAlbumEncoder)
+		message("caching", "options"))
+		json_options_file = os.path.join(self.cache_path, 'options.json')
+		fp = open(json_options_file, 'w')
+		json.dump(Options.Options, fp)
 		fp.close()
 	def remove_stale(self):
 		message("cleanup", "building stale list")
-		all_cache_entries = { "all_photos.json": True, "latest_photos.json": True }
+		all_cache_entries = { "all_photos.json": True, "latest_photos.json": True, Options.Options['jsonOptionsFile']: True }
 		for album in self.all_albums:
 			all_cache_entries[album.json_file] = True
 		for photo in self.all_photos:

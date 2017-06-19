@@ -7,6 +7,7 @@ else
 	windowOrientation = "portrait";
 windowMaxSize = Math.max(windowWidth, windowHeight);
 windowMinSize = Math.min(windowWidth, windowHeight);
+var Options = [];
 
 $(document).ready(function() {
 	
@@ -598,7 +599,6 @@ $(document).ready(function() {
 		});
 		return false;
 	});
-	
 	translate();
 
 });

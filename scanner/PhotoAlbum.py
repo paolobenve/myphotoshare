@@ -425,7 +425,6 @@ class Media(object):
 		except:
 			next_level()
 			next_level()
-			message("options",Options.Options['jpegQuality'])
 			message(str(thumbnail_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
 			back_level()
 			back_level()

@@ -23,15 +23,12 @@ def main():
 		if len(sys.argv) == 3:
 			# 2 arguments: album and cache paths
 			# the other parameters are the default options
-			message("1",Options.Options)
 			Options()
-			message("2",Options.Options)
 			TreeWalker(sys.argv[1], sys.argv[2])
 		else:
 			# 1 arguments: the config files
 			# which modifies the default options
-			config_file = sys.argv[1]
-			execfile(config_file)
+			execfile(sys.argv[1])
 			Options()
 			TreeWalker(Options.Options['albumPath'], Options.Options['cachePath'])
 	except KeyboardInterrupt:
