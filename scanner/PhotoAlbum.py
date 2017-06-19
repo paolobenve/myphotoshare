@@ -154,6 +154,8 @@ class Media(object):
 		message("method", "mixed thumbnail generation")
 	elif (mode == "cascade"):
 		message("method", "cascade thumbnail generation")
+		# be sure thumb_sizes is correctly sorted 
+		thumb_sizes.sort(key=lambda tup: tup[0], reverse = True)
 	def __init__(self, media_path, thumbs_path=None, attributes=None):
 		self.media_file_name = trim_base(media_path)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
