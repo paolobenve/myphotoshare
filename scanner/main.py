@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 from TreeWalker import TreeWalker
-from CachePath import message
+from CachePath import *
 import sys
 import os
 import os.path

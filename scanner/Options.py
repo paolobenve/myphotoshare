@@ -8,9 +8,9 @@ class Options:
 	
 	DefaultOptions = {
 		'max_verbose'                  : 0, # verbosity level
-		'albumPath'                    : "", # absolute path
-		'cachePath'                    : "", # absolute path
 		'indexHtmlPath'                : "", # absolute path of the folder where index.html resides
+		'albumPath'                    : "", # absolute path
+		'cachePath'                    : "", 
 		'thumbSizes'                   : [ (1600, False), (1200, False), (800, False), (150, True) ],
 		'language'                     :"en", # overrides browser language
 		'zeroThumbSpacing'             : False,
@@ -67,4 +67,22 @@ class Options:
 				self.Options[key]
 			except KeyError:
 				self.Options[key] = self.DefaultOptions[key]
-
+		if self.Options['indexHtmlPath'] == "" and self.Options['albumPath'] == "" and self.Options['cachePath'] == "":
+			message("options", "at least indexHtmlPath or both albumPath and cachePath must be given, quitting")
+			sys.exit(-97)
+		elif self.Options['indexHtmlPath'] and not self.Options['albumPath'] and not self.Options['cachePath']:
+			message("options", "on indexHtmlPath is given, using its subfolder 'albums' for albumPath and 'cache' for cachePath")
+			self.Options['albumPath'] = self.Options['indexHtmlPath']
+			if self.Options['albumPath'][-1:] != "/":
+				self.Options['albumPath'] += "/"
+			self.Options['albumPath'] += "albums"
+			self.Options['cachePath'] = self.Options['indexHtmlPath']
+			if self.Options['cachePath'][-1:] != "/":
+				self.Options['cachePath'] += "/"
+		elif self.Options['indexHtmlPath'] == "" and self.Options['albumPath'] and self.Options['cachePath'] and self.Options['albumPath'][:self.Options['albumPath'].rfind("/")] == self.Options['cachePath'][:self.Options['albumPath'].rfind("/")] :
+			self.Options['indexHtmlPath'] = self.Options['albumPath'][:self.Options['albumPath'].rfind("/")]
+		message("Options", "", 1)
+		next_level(1)
+		for key in self.Options :
+			message(key, self.Options[key], 1)
+		back_level(1)
