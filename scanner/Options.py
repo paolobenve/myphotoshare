@@ -7,11 +7,13 @@ class Options:
 		Options = {}
 	
 	DefaultOptions = {
+		'max_verbose'                  : 0, # verbosity level
 		'albumPath'                    : "", # absolute path
 		'cachePath'                    : "", # absolute path
+		'indexHtmlPath'                : "", # absolute path of the folder where index.html resides
 		'thumbSizes'                   : [ (1600, False), (1200, False), (800, False), (150, True) ],
 		'language'                     :"en", # overrides browser language
-		'js_zeroThumbSpacing'             : False,
+		'zeroThumbSpacing'             : False,
 		'videoTranscodeBitrate'        : "4M",
 		'foldersString'                : "_folders",
 		'byDateString'                 : "_by_date",
@@ -39,6 +41,9 @@ class Options:
 	}
 	
 	OptionsForJs = [
+		'albumPath',
+		'cachePath',
+		'indexHtmlPath',
 		'language',
 		'js_zeroThumbSpacing',
 		'foldersString',

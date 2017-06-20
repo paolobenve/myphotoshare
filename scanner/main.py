@@ -24,12 +24,14 @@ def main():
 			# 2 arguments: album and cache paths
 			# the other parameters are the default options
 			Options()
+			message("Browsing", "start!")
 			TreeWalker(sys.argv[1], sys.argv[2])
 		else:
 			# 1 arguments: the config files
 			# which modifies the default options
 			execfile(sys.argv[1])
 			Options()
+			message("Browsing", "start!")
 			TreeWalker(Options.Options['albumPath'], Options.Options['cachePath'])
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")

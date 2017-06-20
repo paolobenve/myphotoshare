@@ -9,6 +9,15 @@ from Options import Options
 
 class TreeWalker:
 	def __init__(self, album_path, cache_path):
+		if (Options.Options['thumbnailsGenerationMode'] == "parallel"):
+			message("method", "parallel thumbnail generation")
+		elif (Options.Options['thumbnailsGenerationMode'] == "mixed"):
+			message("method", "mixed thumbnail generation")
+		elif (Options.Options['thumbnailsGenerationMode'] == "cascade"):
+			message("method", "cascade thumbnail generation")
+			# be sure thumb_sizes is correctly sorted 
+			Options.Options['thumbSizes'].sort(key=lambda tup: tup[0], reverse = True)
+		
 		self.album_path = os.path.abspath(album_path).decode(sys.getfilesystemencoding())
 		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
 		set_cache_path_base(self.album_path)
@@ -87,7 +96,7 @@ class TreeWalker:
 			message("access denied", os.path.basename(path))
 			back_level()
 			return None
-		message("walking", os.path.basename(path))
+		message("Next level", os.path.basename(path))
 		cache = os.path.join(self.cache_path, json_name(path))
 		cached = False
 		cached_album = None
@@ -180,8 +189,16 @@ class TreeWalker:
 		fp.close()
 	def save_json_options(self):
 		message("caching", "options")
-		json_options_file = os.path.join(self.cache_path, 'options.json')
-		fp = open(json_options_file, 'w')
+		try:
+			json_options_file = os.path.join(Options.Options['indexHtmlPath'], 'options.json')
+			next_level()
+			message("json options file", "trying " + json_options_file)
+			fp = open(json_options_file, 'w')
+		except IOError:
+			json_options_file = os.path.join(self.cache_path, 'options.json')
+			message("read only", "using " + json_options_file)
+			fp = open(json_options_file, 'w')
+		back_level()
 		optionSave = {}
 		for key, option in Options.Options.iteritems():
 			if key in Options.OptionsForJs:

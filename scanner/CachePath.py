@@ -2,20 +2,19 @@ import os.path
 from datetime import datetime
 from Options import Options
 
-max_verbose = 0
 def message(category, text, verbose = 0):
-	if (verbose <= max_verbose):
+	if (verbose <= Options.Options['max_verbose']):
 		if message.level <= 0:
 			sep = "  "
 		else:
 			sep = "--"
 		print "%s %s%s[%s]%s%s" % (datetime.now().isoformat(), max(0, message.level) * "  |", sep, str(category), max(1, (20 - len(str(category)))) * " ", str(text))
-message.level = -1
+message.level = 0
 def next_level(verbose = 0):
-	if (verbose <= max_verbose):
+	if (verbose <= Options.Options['max_verbose']):
 		message.level += 1
 def back_level(verbose = 0):
-	if (verbose <= max_verbose):
+	if (verbose <= Options.Options['max_verbose']):
 		message.level -= 1
 def set_cache_path_base(base):
 	trim_base.base = base

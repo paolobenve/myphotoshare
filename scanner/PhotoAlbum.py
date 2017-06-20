@@ -139,15 +139,6 @@ class Album(object):
 
 class Media(object):
 	def __init__(self, media_path, thumbs_path=None, attributes=None):
-		if (Options.Options['thumbnailsGenerationMode'] == "parallel"):
-			message("method", "parallel thumbnail generation")
-		elif (Options.Options['thumbnailsGenerationMode'] == "mixed"):
-			message("method", "mixed thumbnail generation")
-		elif (Options.Options['thumbnailsGenerationMode'] == "cascade"):
-			message("method", "cascade thumbnail generation")
-			# be sure thumb_sizes is correctly sorted 
-			Options.Options['thumbSizes'].sort(key=lambda tup: tup[0], reverse = True)
-		
 		self.media_file_name = trim_base(media_path)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
 		self.album_path = os.path.join("albums", self.media_file_name)

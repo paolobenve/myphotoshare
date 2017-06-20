@@ -516,7 +516,7 @@ $(document).ready(function() {
 		$("#loading").show();
 		$("link[rel=image_src]").remove();
 		$("link[rel=video_src]").remove();
-		getOptions(parseHash);
+		getOptions("", parseHash);
 		//~ photoFloat.parseHash(location.hash, hashParsed, die);
 	});
 	$(window).hashchange();
@@ -527,11 +527,13 @@ $(document).ready(function() {
 		photoFloat.parseHash(hash, callback, error);
 	}
 	
-	function getOptions(callback) {
+	function getOptions(cacheSubDir, callback) {
 		if (Object.keys(Options).length > 0)
 			photoFloat.parseHash(location.hash, hashParsed, die);
 		else {
-			optionsFile = "cache/options.json";
+			if (cacheSubDir && cacheSubDir.substr(-1) != "/")
+				cacheSubDir += "/"
+			optionsFile = cacheSubDir + "options.json";
 			ajaxOptions = {
 				type: "GET",
 				dataType: "json",
@@ -541,6 +543,14 @@ $(document).ready(function() {
 						Options[key] = data;
 					//~ console.log(Options);
 					callback(location.hash, hashParsed, die);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					if (errorThrown == "Not Found" && ! cacheSubDir)
+						getOptions("cache", parseHash);
+					else {
+						$("#error-options-file").fadeIn(1500);
+						$("#error-options-file, #error-overlay, #auth-text").fadeOut(500);
+					}
 				}
 			};
 			if (typeof error !== "undefined" && error !== null) {
