@@ -217,7 +217,7 @@ a#day-view, a#folders-view {
 	color: #FFAD27;
 	margin-top: 20px;
 }
-#error-overlay, #error-text-folder, #error-text-image, #auth-text {
+#error-overlay, #error-text-folder, #error-text-image, #error-options-file, #auth-text {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -228,12 +228,12 @@ a#day-view, a#folders-view {
 #error-overlay {
 	background-color: #000000;
 }
-#error-text-folder, #error-text-image, #auth-text {
+#error-text-folder, #error-text-image, #error-options-file, #auth-text {
 	position: fixed;
 	padding-top: 20%;
 	text-align: center;
 }
-#error-text-folder, #error-text-image {
+#error-text-folder, #error-text-image, #error-options-file {
 	font-size: 4em;
 	font-weight: bold;
 	font-style: italic;

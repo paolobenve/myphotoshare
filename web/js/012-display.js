@@ -7,7 +7,7 @@ else
 	windowOrientation = "portrait";
 windowMaxSize = Math.max(windowWidth, windowHeight);
 windowMinSize = Math.min(windowWidth, windowHeight);
-Options = [];
+
 
 $(document).ready(function() {
 	
@@ -42,17 +42,10 @@ $(document).ready(function() {
 	bydateStringWithTrailingDash = bydateString + "-";
 	foldersString = "_folders";
 	foldersStringWithTrailingDash = foldersString + "-";
-	
+	Options = {};
 	
 	/* Displays */
 	
-	function getOptions () {
-		$.getJSON('cache/options.json', function (data) {
-			Options = data;
-		});
-	}
-	getOptions();
-	console.log(Options);
 	function language() {
 		var userLang = navigator.language || navigator.userLanguage;
 		return userLang.split('-')[0];
@@ -523,9 +516,55 @@ $(document).ready(function() {
 		$("#loading").show();
 		$("link[rel=image_src]").remove();
 		$("link[rel=video_src]").remove();
-		photoFloat.parseHash(location.hash, hashParsed, die);
+		getOptions(parseHash);
+		//~ photoFloat.parseHash(location.hash, hashParsed, die);
 	});
 	$(window).hashchange();
+	
+	
+	// this function is needed in order to let this point to the correct value in photoFloat.parseHash
+	function parseHash(hash, callback, error) {
+		photoFloat.parseHash(hash, callback, error);
+	}
+	
+	function getOptions(callback) {
+		if (Object.keys(Options).length > 0)
+			photoFloat.parseHash(location.hash, hashParsed, die);
+		else {
+			optionsFile = "cache/options.json";
+			ajaxOptions = {
+				type: "GET",
+				dataType: "json",
+				url: optionsFile,
+				success: function(data) {
+					for (key in data)
+						Options[key] = data;
+					//~ console.log(Options);
+					callback(location.hash, hashParsed, die);
+				}
+			};
+			if (typeof error !== "undefined" && error !== null) {
+				ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
+					$("#error-options-file").fadeIn(1500);
+					$("#error-options-file, #error-overlay, #auth-text").fadeOut(500);
+				};
+			}
+			$.ajax(ajaxOptions);
+		}
+	};
+
+
+
+	
+	//~ function getOptions() {
+		//~ $.getJSON('cache/options.json', function (data) {
+			//~ Options = data;
+			//~ console.log(Options);
+			//~ $(window).hashchange();
+		//~ });
+	//~ }
+	
+	
 	$(document).keydown(function(e){
 		if (currentMedia === null)
 			return true;
