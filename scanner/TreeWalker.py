@@ -86,7 +86,6 @@ class TreeWalker:
 			self.tree_by_date[photo.year][photo.month][photo.day] = list()
 		self.tree_by_date[photo.year][photo.month][photo.day].append(photo)
 	def walk(self, path):
-		#~ foldersString = "_folders"
 		trimmed_path = trim_base_custom(path, self.album_path)
 		path_with_marker = os.path.join(self.album_path, ModOptions.usrOptions['foldersString'])
 		if trimmed_path:

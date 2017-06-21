@@ -40,7 +40,7 @@
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
 				$("#error-text-folder").fadeIn(1500);
 				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(500);
-				window.location.hash = "_folders";
+				window.location.hash = Options['foldersString'];
 			};
 		}
 		$.ajax(ajaxOptions);
@@ -66,7 +66,7 @@
 		hash = PhotoFloat.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (! hash.length) {
-			album = PhotoFloat.cachePath("_folders");
+			album = PhotoFloat.cachePath(Options['foldersString']);
 			photo = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
 			photo = hash.substring(index + 1);
@@ -117,7 +117,7 @@
 			path = path.substring(1);
 		path = path
 			.replace(/ /g, "_")
-			.replace(/\//g, "-")
+			.replace(/\//g, Options['cacheFolderSeparator'])
 			.replace(/\(/g, "")
 			.replace(/\)/g, "")
 			.replace(/#/g, "")

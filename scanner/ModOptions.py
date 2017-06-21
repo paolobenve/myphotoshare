@@ -14,7 +14,7 @@ def SetOptions(config_file = ""):
 		'cachePath'                        : "", # absolute path, for use in python 
 		'serverCachePath'                  : "cache", # relative path, for use in js 
 		'thumbSizes'                       : [ (1600, False), (1200, False), (800, False), (150, True) ],
-		'language'                         :"en", # overrides browser language
+		'language'                         : "", # overrides browser language
 		'ThumbSpacing'                     : "3px", # string!
 		'videoTranscodeBitrate'            : "4M",
 		'foldersString'                    : "_folders",
@@ -23,7 +23,7 @@ def SetOptions(config_file = ""):
 		'pageTitle'                        : "My photos",
 		'differentAlbumThumbnails'         : False,
 		'thumbnailsGenerationMode'         : "cascade", # permitted values: "cascade", "parallel", "mixed"
-		'showMediaNamesBelowInAlbums'      : True,
+		'showMediaNamesBelowInAlbums'      : False,
 		'titleFontSize'                    : "medium",	# other values: large, small, or a px/em size
 		'titleColor'                       : "white",
 		'titleColorHover'                  : "yellow",
@@ -41,14 +41,14 @@ def SetOptions(config_file = ""):
 	OptionsForJs = [
 		'serverAlbumPath',
 		'serverCachePath',
-		'language',
+		'language',	# DONE
 		'ThumbSpacing',	# DONE
 		'foldersString',	# DONE
 		'byDateString',	# DONE
-		'cacheFolderSeparator',
+		'cacheFolderSeparator',	# DONE
 		'pageTitle',	# DONE
-		'differentAlbumThumbnails',
-		'showMediaNamesBelowInAlbums',
+		'differentAlbumThumbnails',	# DONE
+		'showMediaNamesBelowInAlbums',	# DONE
 		'titleFontSize',	# DONE
 		'titleColor',	# DONE
 		'titleColorHover',	# DONE

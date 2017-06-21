@@ -106,7 +106,6 @@ class Album(object):
 		album._sort()
 		return album
 	def remove_marker(self, path):
-		#~ foldersString = "_folders"
 		marker_position = path.find(ModOptions.usrOptions['foldersString'])
 		if marker_position == 0:
 			path = path[len(ModOptions.usrOptions['foldersString']):]
@@ -719,7 +718,6 @@ class Media(object):
 		return Media(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self.media_file_name, "date": self.date }
-		#~ foldersString = "_folders"
 		foldersAlbum = ModOptions.usrOptions['foldersString']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)

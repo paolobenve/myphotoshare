@@ -38,16 +38,17 @@ $(document).ready(function() {
 	var originalTitle = document.title;
 	var photoFloat = new PhotoFloat();
 	var maxSizeSet = false;
-	//~ bydateString = "_by_date"; => Options['byDateString']
-	//~ bydateStringWithTrailingSeparator = bydateString + "-";
-	//~ foldersString = "_folders";
 	Options = {};
 	
 	/* Displays */
 	
 	function language() {
-		var userLang = navigator.language || navigator.userLanguage;
-		return userLang.split('-')[0];
+		if (Options['language'])
+			return Options['language'];
+		else {
+			var userLang = navigator.language || navigator.userLanguage;
+			return userLang.split('-')[0];
+		}
 	}
 	
 	function translate() {
@@ -73,8 +74,7 @@ $(document).ready(function() {
 		var title = "", documentTitle = "", last = "", components, i;
 		//~ var originalTitle = translationsToTranslatedString($("#title-translation").html());
 		var originalTitle = Options['pageTitle'];
-		
-		
+		translate();
 		
 		if (! currentAlbum.path.length)
 			components = [originalTitle];
@@ -242,7 +242,6 @@ $(document).ready(function() {
 				$("#thumbs").show();
 		}
 		setTimeout(scrollToThumb, 1);
-		translate();
 	}
 	function getDecimal(fraction) {
 		if (fraction[0] < fraction[1])
@@ -509,7 +508,7 @@ $(document).ready(function() {
 		}
 		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
-		if (currentMedia !== null)
+		if (currentMedia !== null || ! Options['showMediaNamesBelowInAlbums'])
 			$(".thumb-caption").hide();
 		else
 			$(".thumb-caption").show();
@@ -563,7 +562,10 @@ $(document).ready(function() {
 		$("#photo-name").css("color", Options['titleImageNameColor']);
 		$("#thumbs img").css("margin-left", Options['ThumbSpacing']);
 		$("#thumbs img").css("margin-right", Options['ThumbSpacing']);
-		$("#thumbs img").css("margin-top", Options['ThumbSpacing']);
+		$(".album-button").css("margin-left", Options['ThumbSpacing']);
+		$(".album-button").css("margin-right", Options['ThumbSpacing']);
+		if (Options['differentAlbumThumbnails'])
+			$(".album-button").addClass("alt");
 	}
 	
 	/* Event listeners */
@@ -689,6 +691,5 @@ $(document).ready(function() {
 		});
 		return false;
 	});
-	translate();
 
 });
