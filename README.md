@@ -1,6 +1,6 @@
 # photofloat
 ### A Web 2.0 Photo Gallery Done Right via Static JSON & Dynamic Javascript
-#### by Jason A. Donenfeld (<Jason@zx2c4.com>), Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
+#### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
 ![Screenshot](screenshot.jpg)
 ![Screenshot](screenshot-root.jpg)
@@ -40,16 +40,22 @@ The JavaScript application consists of a single `index.html` file with a single 
 Features added by Paolo:
 
 * A date tree is builded, permitting photo to be seen by year, month, date
-* Root view makes the user choose between folders view and "by date" view
-* When a photo is viewed, the user can switch between the folder the photo belongs and the year/month/date the photo was taken
-* Thumbnails generation is faster then before
-* Added customizable translations in index.html: feel free to customize your language
+* When a photo is viewed, the user can switch between the folder and the day/month/year the photo was taken
+* Cascade thumbnails generation
 * Better error management: if folder is wrong, show root folder; if image is wrong, show album
+* In addition to former invocation (with albums and cache paths), photofloat can be invoked with one parameter:
+the customization file, which adds many configuration variables; web site appearance now is very customizable
+* (to do) share buttons
+* (to do) Translations file
+
+Features added by Jerome:
+
+* manage videos
 
 Features added by Joachim:
 
-* manage videos
 * generate minified css and js through external api
+* parallel thumbnail generation
 
 It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
 
@@ -106,9 +112,7 @@ cron file example with albums and cache in /var/www:
 
     # update photofloat cache
     
-    58 1  * * *<--->root<-->cd /folder/where/you/have/photofloat  && ./scanner/main.py /var/www/html/foto/albums /var/www/html/foto/cache
-
-
+    58 1  * * *<--->root<-->cd /folder/where/you/have/photofloat  && ./scanner/main.py /web/site/root/albums /web/site/root/cache
 
 
 ## Optional: Server-side Authentication
