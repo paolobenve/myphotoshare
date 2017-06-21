@@ -5,9 +5,6 @@ OptionsForJs = []
 def SetOptions(config_file = ""):
 	global usrOptions, OptionsForJs
 	from CachePath import message, next_level, back_level
-	#~ try:
-		#~ Options
-	#~ except NameError:
 	
 	DefaultOptions = {
 		'max_verbose'                      : 0, # verbosity level, python only
@@ -18,7 +15,7 @@ def SetOptions(config_file = ""):
 		'serverCachePath'                  : "cache", # relative path, for use in js 
 		'thumbSizes'                       : [ (1600, False), (1200, False), (800, False), (150, True) ],
 		'language'                         :"en", # overrides browser language
-		'zeroThumbSpacing'                 : False,
+		'ThumbSpacing'                     : "3px", # string!
 		'videoTranscodeBitrate'            : "4M",
 		'foldersString'                    : "_folders",
 		'byDateString'                     : "_by_date",
@@ -45,11 +42,11 @@ def SetOptions(config_file = ""):
 		'serverAlbumPath',
 		'serverCachePath',
 		'language',
-		'zeroThumbSpacing',
-		'foldersString',
-		'byDateString',
+		'ThumbSpacing',	# DONE
+		'foldersString',	# DONE
+		'byDateString',	# DONE
 		'cacheFolderSeparator',
-		'pageTitle',
+		'pageTitle',	# DONE
 		'differentAlbumThumbnails',
 		'showMediaNamesBelowInAlbums',
 		'titleFontSize',	# DONE

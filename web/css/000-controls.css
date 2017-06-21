@@ -66,9 +66,6 @@ a#day-view, a#folders-view {
 
 #thumbs img {
 	border: 0;
-	margin-left: 3px;
-	margin-right: 3px;
-	margin-top: 3px;
 }
 #thumbs img.current-thumb {
 	border-top: 3px solid #FFAD27 !important;
@@ -275,7 +272,7 @@ a#day-view, a#folders-view {
 .thumb-caption {
 	display: block;
 	font-size: 75%;
-	width: 155px;
+	width: 150px;
 	text-align: center;
 	color: chartreuse;
 }

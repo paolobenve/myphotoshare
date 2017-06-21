@@ -38,10 +38,9 @@ $(document).ready(function() {
 	var originalTitle = document.title;
 	var photoFloat = new PhotoFloat();
 	var maxSizeSet = false;
-	bydateString = "_by_date";
-	bydateStringWithTrailingDash = bydateString + "-";
-	foldersString = "_folders";
-	foldersStringWithTrailingDash = foldersString + "-";
+	//~ bydateString = "_by_date"; => Options['byDateString']
+	//~ bydateStringWithTrailingSeparator = bydateString + "-";
+	//~ foldersString = "_folders";
 	Options = {};
 	
 	/* Displays */
@@ -86,22 +85,22 @@ $(document).ready(function() {
 		for (i = 0; i < components.length; ++i) {
 			if (i)
 				last += "/" + components[i];
-			if (i != 1 || components[i] != foldersString) {
+			if (i != 1 || components[i] != Options['foldersString']) {
 				if (i < components.length - 1 || currentMedia !== null)
-					if (! (i == 1 && components[i] == bydateString))
+					if (! (i == 1 && components[i] == Options['byDateString']))
 						title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
-				if (i == 1 && components[i] == bydateString)
+				if (i == 1 && components[i] == Options['byDateString'])
 					title += translationsToTranslatedString($("#by-date-translation").html());
 				else
 					title += components[i];
 				if (i < components.length - 1 || currentMedia !== null)
-					if (! (i == 0 && components.length > 1 && components[i + 1] == bydateString))
+					if (! (i == 0 && components.length > 1 && components[i + 1] == Options['byDateString']))
 						title += "</a>";
 			}
-			if (i == 0 && components.length > 1 && components[i + 1] == bydateString)
+			if (i == 0 && components.length > 1 && components[i + 1] == Options['byDateString'])
 				title += " ";
 			else if ((i < components.length - 1 || currentMedia !== null) &&
-				(i == components.length - 1 || components[i + 1] != foldersString))
+				(i == components.length - 1 || components[i + 1] != Options['foldersString']))
 				title += " &raquo; ";
 		}
 		if (currentMedia !== null)
@@ -113,7 +112,7 @@ $(document).ready(function() {
 				if (components.length > 2 || currentMedia !== null)
 					documentTitle = " \u00ab " + documentTitle;
 			}
-			else if (i == 1 && components[1] == bydateString) {
+			else if (i == 1 && components[1] == Options['byDateString']) {
 				documentTitle += " " + translationsToTranslatedString($("#by-date-translation").html());
 			}
 			else if (i > 1) {
@@ -165,7 +164,8 @@ $(document).ready(function() {
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
 				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true);
-				if (thumbHash.indexOf(bydateStringWithTrailingDash) === 0) {
+				bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
+				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 					thumbHash =
 						PhotoFloat.cachePath(currentAlbum.photos[i].completeName.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
 						"/" +
@@ -202,8 +202,8 @@ $(document).ready(function() {
 				for (i = 0; i < currentAlbum.albums.length; ++i) {
 					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 					var imageTextAdd = currentAlbum.albums[i].path;
-					imageTextAdd = imageTextAdd.replace(bydateString, $("#by-date-translation").html());
-					imageTextAdd = imageTextAdd.replace(foldersString, $("#folders-translation").html());
+					imageTextAdd = imageTextAdd.replace(Options['byDateString'], $("#by-date-translation").html());
+					imageTextAdd = imageTextAdd.replace(Options['foldersString'], $("#folders-translation").html());
 					image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" +
 								imageTextAdd +
 								"</div>");
@@ -485,7 +485,7 @@ $(document).ready(function() {
 			return;
 		if (album != currentAlbum)
 			currentAlbum = null;
-		if (currentAlbum && currentAlbum.path.indexOf(bydateString) === 0 && photo !== null) {
+		if (currentAlbum && currentAlbum.path.indexOf(Options['byDateString']) === 0 && photo !== null) {
 			previousAlbum = currentAlbum;
 			album = currentAlbum;
 			previousMedia = photo;
@@ -561,6 +561,9 @@ $(document).ready(function() {
 			$(this).css("color", Options['titleColor'])
 		});
 		$("#photo-name").css("color", Options['titleImageNameColor']);
+		$("#thumbs img").css("margin-left", Options['ThumbSpacing']);
+		$("#thumbs img").css("margin-right", Options['ThumbSpacing']);
+		$("#thumbs img").css("margin-top", Options['ThumbSpacing']);
 	}
 	
 	/* Event listeners */

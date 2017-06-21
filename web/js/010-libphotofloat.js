@@ -141,7 +141,8 @@
 	PhotoFloat.photoHashFolder = function(album, media) {
 		var hash;
 		hash = PhotoFloat.photoHash(album, media);
-		if (hash.indexOf(bydateStringWithTrailingDash) === 0) {
+		bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
+		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 			hash = PhotoFloat.cachePath(media.completeName.substring(0, media.completeName.length - media.name.length - 1)) + "/" + PhotoFloat.cachePath(media.name);
 		}
 		return hash;
@@ -158,12 +159,14 @@
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
-			var foldersString = "_folders-";
-			if (hash.indexOf(foldersString) === 0)
-				hash = hash.substring(foldersString.length);
+			bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
+			var foldersStringWithTrailingSeparator = Options['foldersString'] + Options['cacheFolderSeparator'];
+			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
+				hash = hash.substring(foldersStringWithTrailingSeparator.length);
 			else {
-				if (hash.indexOf(bydateStringWithTrailingDash) === 0)
-				hash = hash.substring(bydateStringWithTrailingDash.length);
+				bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
+				if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
+				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
 		return "cache/" + hash;
@@ -179,12 +182,13 @@
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
-			var foldersString = "_folders-";
-			if (hash.indexOf(foldersString) === 0)
-				hash = hash.substring(foldersString.length);
+			foldersStringWithTrailingSeparator = Options['foldersString'] + Options['cacheFolderSeparator'];
+			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
+				hash = hash.substring(foldersStringWithTrailingSeparator.length);
 			else {
-				if (hash.indexOf(bydateStringWithTrailingDash) === 0)
-				hash = hash.substring(bydateStringWithTrailingDash.length);
+				bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
+				if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
+				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
 		return "cache/" + hash;
