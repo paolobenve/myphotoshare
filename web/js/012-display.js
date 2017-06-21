@@ -533,7 +533,7 @@ $(document).ready(function() {
 		else {
 			if (cacheSubDir && cacheSubDir.substr(-1) != "/")
 				cacheSubDir += "/"
-			optionsFile = cacheSubDir + "options.json";
+			optionsFile = cacheSubDir + "cache/options.json";
 			ajaxOptions = {
 				type: "GET",
 				dataType: "json",
@@ -544,14 +544,6 @@ $(document).ready(function() {
 					//~ console.log(Options);
 					callback(location.hash, hashParsed, die);
 				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					if (errorThrown == "Not Found" && ! cacheSubDir)
-						getOptions("cache", parseHash);
-					else {
-						$("#error-options-file").fadeIn(1500);
-						$("#error-options-file, #error-overlay, #auth-text").fadeOut(500);
-					}
-				}
 			};
 			if (typeof error !== "undefined" && error !== null) {
 				ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {

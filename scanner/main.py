@@ -1,12 +1,11 @@
 #!/usr/bin/env python2
 
 from TreeWalker import TreeWalker
-from CachePath import *
+from CachePath import message
 import sys
 import os
 import os.path
-from Options import Options
-
+import ModOptions
 
 def main():
 	reload(sys)
@@ -19,23 +18,24 @@ def main():
 		#~ message("Options", "Incorrect options in Options.py")
 		#~ sys.exit(-97)
 	try:
+		
 		os.umask(022)
 		if len(sys.argv) == 3:
 			# 2 arguments: album and cache paths
 			# the other parameters are the default options
-			Options()
+			ModOptions.SetOptions()
 			message("Browsing", "start!")
 			TreeWalker(sys.argv[1], sys.argv[2])
 		else:
 			# 1 arguments: the config files
 			# which modifies the default options
-			execfile(sys.argv[1])
-			Options()
+			
+			ModOptions.SetOptions(sys.argv[1])
 			message("Browsing", "start!")
-			TreeWalker(Options.Options['albumPath'], Options.Options['cachePath'])
+			TreeWalker(ModOptions.usrOptions['albumPath'], ModOptions.usrOptions['cachePath'])
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)
-	
+
 if __name__ == "__main__":
 	main()

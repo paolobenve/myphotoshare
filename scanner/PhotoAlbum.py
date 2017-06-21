@@ -12,7 +12,7 @@ import gc
 import tempfile
 from VideoToolWrapper import *
 import math
-from Options import Options
+import ModOptions
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -107,9 +107,9 @@ class Album(object):
 		return album
 	def remove_marker(self, path):
 		#~ foldersString = "_folders"
-		marker_position = path.find(Options.Options['foldersString'])
+		marker_position = path.find(ModOptions.usrOptions['foldersString'])
 		if marker_position == 0:
-			path = path[len(Options.Options['foldersString']):]
+			path = path[len(ModOptions.usrOptions['foldersString']):]
 			if len(path) > 0:
 				path = path[1:]
 		return path
@@ -129,7 +129,7 @@ class Album(object):
 			dictionary = { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
 		else:
 			dictionary = { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
-		dictionary["thumbSizes"] = Options.Options['thumbSizes']
+		dictionary["thumbSizes"] = ModOptions.usrOptions['thumbSizes']
 		return dictionary
 	def photo_from_path(self, path):
 		for photo in self._photos:
@@ -392,7 +392,7 @@ class Media(object):
 		else:
 			image_copy = self.resize_canvas(image_copy, thumbnail_size)
 		try:
-			image_copy.save(thumb_path, "JPEG", quality=Options.Options['jpegQuality'])
+			image_copy.save(thumb_path, "JPEG", quality=ModOptions.usrOptions['jpegQuality'])
 			next_level(1)
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK", 1)
@@ -406,7 +406,7 @@ class Media(object):
 				pass
 			raise
 		except IOError:
-			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.Options['jpegQuality'])
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=ModOptions.usrOptions['jpegQuality'])
 			next_level(1)
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
@@ -452,8 +452,8 @@ class Media(object):
 			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 			pool = Pool(processes=num_of_cores)
 			try:
-				for thumb_size in Options.Options['thumbSizes']:
-					if (Options.Options['thumbnailsGenerationMode'] == "mixed" and thumb_size == Options.Options['thumbSizes'][0]):
+				for thumb_size in ModOptions.usrOptions['thumbSizes']:
+					if (ModOptions.usrOptions['thumbnailsGenerationMode'] == "mixed" and thumb_size == ModOptions.usrOptions['thumbSizes'][0]):
 						continue
 					try:
 						#~ import timeit
@@ -473,7 +473,7 @@ class Media(object):
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			thumb_size = Options.Options['thumbSizes'][0]
+			thumb_size = ModOptions.usrOptions['thumbSizes'][0]
 			try:
 				if (max(image.size[0], image.size[1]) < thumb_size):
 					image_to_start_from = image
@@ -489,7 +489,7 @@ class Media(object):
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			for thumb_size in Options.Options['thumbSizes']:
+			for thumb_size in ModOptions.usrOptions['thumbSizes']:
 				try:
 					if (max(image.size[0], image.size[1]) < thumb_size[0]):
 						image_to_start_from = image
@@ -501,11 +501,11 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
-		if (Options.Options['thumbnailsGenerationMode'] == "parallel"):
+		if (ModOptions.usrOptions['thumbnailsGenerationMode'] == "parallel"):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
-		elif (Options.Options['thumbnailsGenerationMode'] == "mixed"):
+		elif (ModOptions.usrOptions['thumbnailsGenerationMode'] == "mixed"):
 			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
-		elif (Options.Options['thumbnailsGenerationMode'] == "cascade"):
+		elif (ModOptions.usrOptions['thumbnailsGenerationMode'] == "cascade"):
 			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
@@ -555,7 +555,7 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		for thumb_size in Options.Options['thumbSizes']:
+		for thumb_size in ModOptions.usrOptions['thumbSizes']:
 			if thumb_size[1]:
 				self._thumbnail(mirror, original_path, thumbs_path, thumb_size[0], thumb_size[1])
 		try:
@@ -574,7 +574,7 @@ class Media(object):
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
 			'-crf', '20',						# set quality
-			'-b:v', Options.Options['videoTranscodeBitrate'],	# set videobitrate to 4Mbps
+			'-b:v', ModOptions.usrOptions['videoTranscodeBitrate'],	# set videobitrate to 4Mbps
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec
 			'-ac', '2',						# force two audiochannels
@@ -647,12 +647,12 @@ class Media(object):
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
-			for thumb_size in Options.Options['thumbSizes']:
+			for thumb_size in ModOptions.usrOptions['thumbSizes']:
 				if thumb_size[1]:
 					caches.append(image_cache(self.media_file_name, thumb_size[0], thumb_size[1]))
 			caches.append(video_cache(self.media_file_name))
 		else:
-			caches = [image_cache(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in Options.Options['thumbSizes']]
+			caches = [image_cache(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in ModOptions.usrOptions['thumbSizes']]
 		return caches
 	@property
 	def date(self):
@@ -684,7 +684,7 @@ class Media(object):
 	@property
 	def year_album_path(self):
 		#~ bydateString = "_by_date"
-		return Options.Options['byDateString'] + "/" + self.year
+		return ModOptions.usrOptions['byDateString'] + "/" + self.year
 	@property
 	def month_album_path(self):
 		return self.year_album_path + "/" + self.month
@@ -720,7 +720,7 @@ class Media(object):
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self.media_file_name, "date": self.date }
 		#~ foldersString = "_folders"
-		foldersAlbum = Options.Options['foldersString']
+		foldersAlbum = ModOptions.usrOptions['foldersString']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 		photo = {
@@ -731,7 +731,7 @@ class Media(object):
 					"dayAlbum": self.day_album_path,
 					"byDateName": os.path.join(self.day_album_path, self.name),
 					"foldersAlbum": foldersAlbum,
-					"completeName": os.path.join(Options.Options['foldersString'], self.media_file_name),
+					"completeName": os.path.join(ModOptions.usrOptions['foldersString'], self.media_file_name),
 					"date": self.date
 				}
 		photo.update(self.attributes)

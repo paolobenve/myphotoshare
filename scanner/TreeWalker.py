@@ -5,18 +5,18 @@ from datetime import datetime
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from CachePath import *
 import json
-from Options import Options
+import ModOptions
 
 class TreeWalker:
 	def __init__(self, album_path, cache_path):
-		if (Options.Options['thumbnailsGenerationMode'] == "parallel"):
+		if (ModOptions.usrOptions['thumbnailsGenerationMode'] == "parallel"):
 			message("method", "parallel thumbnail generation")
-		elif (Options.Options['thumbnailsGenerationMode'] == "mixed"):
+		elif (ModOptions.usrOptions['thumbnailsGenerationMode'] == "mixed"):
 			message("method", "mixed thumbnail generation")
-		elif (Options.Options['thumbnailsGenerationMode'] == "cascade"):
+		elif (ModOptions.usrOptions['thumbnailsGenerationMode'] == "cascade"):
 			message("method", "cascade thumbnail generation")
 			# be sure thumb_sizes is correctly sorted 
-			Options.Options['thumbSizes'].sort(key=lambda tup: tup[0], reverse = True)
+			ModOptions.usrOptions['thumbSizes'].sort(key=lambda tup: tup[0], reverse = True)
 		
 		self.album_path = os.path.abspath(album_path).decode(sys.getfilesystemencoding())
 		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
@@ -40,7 +40,7 @@ class TreeWalker:
 	def generate_date_album(self):
 		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
 		#~ bydateString = "_by_date"
-		by_date_path = os.path.join(self.album_path, Options.Options['byDateString'])
+		by_date_path = os.path.join(self.album_path, ModOptions.usrOptions['byDateString'])
 		by_date_album = Album(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
 			year_path = os.path.join(by_date_path, str(year))
@@ -88,7 +88,7 @@ class TreeWalker:
 	def walk(self, path):
 		#~ foldersString = "_folders"
 		trimmed_path = trim_base_custom(path, self.album_path)
-		path_with_marker = os.path.join(self.album_path, Options.Options['foldersString'])
+		path_with_marker = os.path.join(self.album_path, ModOptions.usrOptions['foldersString'])
 		if trimmed_path:
 			path_with_marker = os.path.join(path_with_marker, trimmed_path)
 		next_level()
@@ -188,20 +188,13 @@ class TreeWalker:
 		json.dump(photo_list, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	def save_json_options(self):
-		message("caching", "options")
-		try:
-			json_options_file = os.path.join(Options.Options['indexHtmlPath'], 'options.json')
-			next_level()
-			message("json options file", "trying " + json_options_file)
-			fp = open(json_options_file, 'w')
-		except IOError:
-			json_options_file = os.path.join(self.cache_path, 'options.json')
-			message("read only", "using " + json_options_file)
-			fp = open(json_options_file, 'w')
-		back_level()
+		json_options_file = os.path.join(self.cache_path, 'options.json')
+		message("caching options", "in " + json_options_file)
+		fp = open(json_options_file, 'w')
 		optionSave = {}
-		for key, option in Options.Options.iteritems():
-			if key in Options.OptionsForJs:
+		#~ message("OptionsForJs", ModOptions.usrOptionsForJs)
+		for key, option in ModOptions.usrOptions.iteritems():
+			if key in ModOptions.OptionsForJs:
 				optionSave[key] = option
 		json.dump(optionSave, fp)
 		fp.close()

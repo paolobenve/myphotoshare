@@ -1,10 +1,13 @@
-#~ from CachePath import message
+import sys
 
-class Options:
-	try:
-		Options
-	except NameError:
-		Options = {}
+usrOptions = {}
+OptionsForJs = []
+def SetOptions(config_file = ""):
+	global usrOptions, OptionsForJs
+	from CachePath import message, next_level, back_level
+	#~ try:
+		#~ Options
+	#~ except NameError:
 	
 	DefaultOptions = {
 		'max_verbose'                  : 0, # verbosity level
@@ -40,6 +43,8 @@ class Options:
 		'switchButtonColor'            : "black"
 	}
 	
+	if config_file:
+		execfile(config_file)
 	OptionsForJs = [
 		'albumPath',
 		'cachePath',
@@ -59,30 +64,29 @@ class Options:
 		'switchButtonBackgroundColor',
 		'switchButtonColor'
 	]
-
+	for key in DefaultOptions :
+		try:
+			usrOptions[key]
+		except KeyError:
+			usrOptions[key] = DefaultOptions[key]
 	
-	def __init__(self):
-		for key in self.DefaultOptions :
-			try:
-				self.Options[key]
-			except KeyError:
-				self.Options[key] = self.DefaultOptions[key]
-		if self.Options['indexHtmlPath'] == "" and self.Options['albumPath'] == "" and self.Options['cachePath'] == "":
-			message("options", "at least indexHtmlPath or both albumPath and cachePath must be given, quitting")
-			sys.exit(-97)
-		elif self.Options['indexHtmlPath'] and not self.Options['albumPath'] and not self.Options['cachePath']:
-			message("options", "on indexHtmlPath is given, using its subfolder 'albums' for albumPath and 'cache' for cachePath")
-			self.Options['albumPath'] = self.Options['indexHtmlPath']
-			if self.Options['albumPath'][-1:] != "/":
-				self.Options['albumPath'] += "/"
-			self.Options['albumPath'] += "albums"
-			self.Options['cachePath'] = self.Options['indexHtmlPath']
-			if self.Options['cachePath'][-1:] != "/":
-				self.Options['cachePath'] += "/"
-		elif self.Options['indexHtmlPath'] == "" and self.Options['albumPath'] and self.Options['cachePath'] and self.Options['albumPath'][:self.Options['albumPath'].rfind("/")] == self.Options['cachePath'][:self.Options['albumPath'].rfind("/")] :
-			self.Options['indexHtmlPath'] = self.Options['albumPath'][:self.Options['albumPath'].rfind("/")]
-		message("Options", "", 1)
-		next_level(1)
-		for key in self.Options :
-			message(key, self.Options[key], 1)
-		back_level(1)
+	if not usrOptions['indexHtmlPath'] and not usrOptions['albumPath'] and not usrOptions['cachePath']:
+		message("options", "at least indexHtmlPath or both albumPath and cachePath must be given, quitting")
+		sys.exit(-97)
+	elif usrOptions['indexHtmlPath'] and not usrOptions['albumPath'] and not usrOptions['cachePath']:
+		message("options", "on indexHtmlPath is given, using its subfolder 'albums' for albumPath and 'cache' for cachePath")
+		usrOptions['albumPath'] = os.path.join(usrOptions['indexHtmlPath'], "albums")
+		usrOptions['cachePath'] = os.path.join(usrOptions['indexHtmlPath'], "cache")
+	elif usrOptions['indexHtmlPath'] == "" and usrOptions['albumPath'] and usrOptions['cachePath'] and usrOptions['albumPath'][:usrOptions['albumPath'].rfind("/")] == usrOptions['cachePath'][:usrOptions['albumPath'].rfind("/")] :
+		usrOptions['indexHtmlPath'] = usrOptions['albumPath'][:usrOptions['albumPath'].rfind("/")]
+	message("Options", "asterisk denotes options changed by config file")
+	next_level()
+	
+	for key in usrOptions:
+		if DefaultOptions[key] == usrOptions[key]:
+			option = "  "
+		else:
+			option = "* "
+		option += str(usrOptions[key])
+		message(key, option)
+	back_level()
