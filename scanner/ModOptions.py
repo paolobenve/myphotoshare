@@ -77,7 +77,10 @@ def SetOptions(config_file = ""):
 		message("options", "on indexHtmlPath is given, using its subfolder 'albums' for albumPath and 'cache' for cachePath")
 		usrOptions['albumPath'] = os.path.join(usrOptions['indexHtmlPath'], "albums")
 		usrOptions['cachePath'] = os.path.join(usrOptions['indexHtmlPath'], "cache")
-	elif usrOptions['indexHtmlPath'] == "" and usrOptions['albumPath'] and usrOptions['cachePath'] and usrOptions['albumPath'][:usrOptions['albumPath'].rfind("/")] == usrOptions['cachePath'][:usrOptions['albumPath'].rfind("/")] :
+	elif (not usrOptions['indexHtmlPath'] and
+			usrOptions['albumPath'] and
+			usrOptions['cachePath'] and
+			usrOptions['albumPath'][:usrOptions['albumPath'].rfind("/")] == usrOptions['cachePath'][:usrOptions['albumPath'].rfind("/")]):
 		usrOptions['indexHtmlPath'] = usrOptions['albumPath'][:usrOptions['albumPath'].rfind("/")]
 	message("Options", "asterisk denotes options changed by config file")
 	next_level()
