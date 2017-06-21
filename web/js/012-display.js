@@ -574,7 +574,7 @@ $(document).ready(function() {
 		$("#loading").show();
 		$("link[rel=image_src]").remove();
 		$("link[rel=video_src]").remove();
-		getOptions("", parseHash);
+		getOptions(parseHash);
 		//~ photoFloat.parseHash(location.hash, hashParsed, die);
 	});
 	$(window).hashchange();
@@ -585,13 +585,11 @@ $(document).ready(function() {
 		photoFloat.parseHash(hash, callback, error);
 	}
 	
-	function getOptions(cacheSubDir, callback) {
+	function getOptions(callback) {
 		if (Object.keys(Options).length > 0)
 			photoFloat.parseHash(location.hash, hashParsed, die);
 		else {
-			if (cacheSubDir && cacheSubDir.substr(-1) != "/")
-				cacheSubDir += "/"
-			optionsFile = cacheSubDir + "cache/options.json";
+			optionsFile = Options['serverCachePath'] + "/options.json";
 			ajaxOptions = {
 				type: "GET",
 				dataType: "json",

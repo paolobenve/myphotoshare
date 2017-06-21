@@ -10,9 +10,9 @@ def SetOptions(config_file = ""):
 		'max_verbose'                      : 0, # verbosity level, python only
 		'indexHtmlPath'                    : "", # absolute path of the folder where index.html resides, by default albumPath is "albums" inside it and cachePath is cache inside it
 		'albumPath'                        : "", # absolute path, for use in python
-		'serverAlbumPath'                  : "albums", # relative path, for use in js
+		'serverAlbumPath'                  : "albums", # relative path, for use in js, no trailing slash
 		'cachePath'                        : "", # absolute path, for use in python 
-		'serverCachePath'                  : "cache", # relative path, for use in js 
+		'serverCachePath'                  : "cache", # relative path, for use in js, no trailing slash
 		'thumbSizes'                       : [ (1600, False), (1200, False), (800, False), (150, True) ],
 		'language'                         : "", # overrides browser language
 		'ThumbSpacing'                     : "3px", # string!

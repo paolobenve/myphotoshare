@@ -19,6 +19,7 @@ class TreeWalker:
 			ModOptions.usrOptions['thumbSizes'].sort(key=lambda tup: tup[0], reverse = True)
 		
 		self.album_path = os.path.abspath(album_path).decode(sys.getfilesystemencoding())
+		print os.path.abspath(album_path)
 		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
 		set_cache_path_base(self.album_path)
 		self.all_albums = list()
