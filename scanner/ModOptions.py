@@ -27,7 +27,7 @@ def SetOptions(config_file = ""):
 		'titleColor'                       : "white",
 		'titleColorHover'                  : "yellow",
 		'titleImageNameColor'              : "green",
-		'jpegQuality'                      : "95",		# a string representing an integere number 1 -100
+		'jpegQuality'                      : 95,	# an integer number 1 -100
 		'backgroundColor'                  : "#222222",	# ~ gray
 		'switchButtonBackgroundColor'      : "black",
 		'switchButtonBackgroundColorHover' : "white",
