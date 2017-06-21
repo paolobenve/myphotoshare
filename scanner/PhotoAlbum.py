@@ -139,7 +139,7 @@ class Media(object):
 	def __init__(self, media_path, thumbs_path=None, attributes=None):
 		self.media_file_name = trim_base(media_path)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
-		self.album_path = os.path.join("albums", self.media_file_name)
+		self.album_path = os.path.join(ModOptions.usrOptions['serverAlbumPath'], self.media_file_name)
 		self.is_valid = True
 		image = None
 		try:

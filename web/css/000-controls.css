@@ -146,7 +146,7 @@ a#day-view, a#folders-view {
 	background-color: #000000;
 	font-weight: bold;
 	height: 10px;
-	font-size: 10px;
+	font-size: 70%;
 	line-height: 7px;
 	padding-top: 3px;
 	padding-bottom: 3px;
@@ -163,8 +163,8 @@ a#day-view, a#folders-view {
 #metadata {
 	background-color: #000000;
 	width: 340px;
-	font-size: 12px;
-	line-height: 12px;
+	font-size: 75%;
+	line-height: 1em;
 	padding-top: 3px;
 	padding-bottom: 3px;
 	padding-right: 10px;

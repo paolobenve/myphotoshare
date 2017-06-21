@@ -12,7 +12,6 @@ def SetOptions(config_file = ""):
 		'albumPath'                        : "", # absolute path, for use in python
 		'serverAlbumPath'                  : "albums", # relative path, for use in js, no trailing slash
 		'cachePath'                        : "", # absolute path, for use in python 
-		'serverCachePath'                  : "cache", # relative path, for use in js, no trailing slash
 		'thumbSizes'                       : [ (1600, False), (1200, False), (800, False), (150, True) ],
 		'language'                         : "", # overrides browser language
 		'ThumbSpacing'                     : "3px", # string!
@@ -23,7 +22,7 @@ def SetOptions(config_file = ""):
 		'pageTitle'                        : "My photos",
 		'differentAlbumThumbnails'         : False,
 		'thumbnailsGenerationMode'         : "cascade", # permitted values: "cascade", "parallel", "mixed"
-		'showMediaNamesBelowInAlbums'      : False,
+		'showMediaNamesBelowInAlbums'      : True,
 		'titleFontSize'                    : "medium",	# other values: large, small, or a px/em size
 		'titleColor'                       : "white",
 		'titleColorHover'                  : "yellow",
@@ -40,7 +39,6 @@ def SetOptions(config_file = ""):
 		execfile(config_file)
 	OptionsForJs = [
 		'serverAlbumPath',
-		'serverCachePath',
 		'language',	# DONE
 		'ThumbSpacing',	# DONE
 		'foldersString',	# DONE

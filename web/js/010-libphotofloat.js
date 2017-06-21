@@ -20,7 +20,7 @@
 			callback(this.albumCache[cacheKey]);
 			return;
 		}
-		cacheFile = Options['serverCachePath'] + "/" + cacheKey + ".json";
+		cacheFile = "cache/" + cacheKey + ".json";
 		self = this;
 		ajaxOptions = {
 			type: "GET",
@@ -169,7 +169,7 @@
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		return Options['serverCachePath'] + "/" + hash;
+		return "cache/" + hash;
 	};
 	PhotoFloat.photoPath = function(album, photo, thumb_size, square) {
 		var suffix, hash;
@@ -191,7 +191,7 @@
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		return Options['serverCachePath'] + "/" + hash;
+		return "cache/" + hash;
 	};
 	PhotoFloat.originalPhotoPath = function(photo) {
 		return photo.albumName;

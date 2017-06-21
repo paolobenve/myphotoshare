@@ -589,7 +589,7 @@ $(document).ready(function() {
 		if (Object.keys(Options).length > 0)
 			photoFloat.parseHash(location.hash, hashParsed, die);
 		else {
-			optionsFile = Options['serverCachePath'] + "/options.json";
+			optionsFile = "cache/options.json";
 			ajaxOptions = {
 				type: "GET",
 				dataType: "json",
