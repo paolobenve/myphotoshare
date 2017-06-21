@@ -1,0 +1,39 @@
+# Customization file for photofloat
+#
+# This is actually a python script, do not remove the first two lines of code
+#
+# Values here are the default ones set in scanner/ModOptions.py
+#
+# Do not modify this file: copy it to any location on your disk (e.g. /etc/photofloat) and have fun customizing it!
+
+from ModOptions import usrOptions
+global usrOptions
+usrOptions = {
+	# 'max_verbose'                      : 0, # verbosity level, python only
+	# 'indexHtmlPath'                    : "", # absolute path of the folder where index.html resides, by default albumPath is "albums" inside it and cachePath is cache inside it
+	# 'albumPath'                        : "", # absolute path, for use in python
+	# 'serverAlbumPath'                  : "albums", # relative path, for use in js, no trailing slash
+	# 'cachePath'                        : "", # absolute path, for use in python 
+	# 'thumbSizes'                       : [ (1600, False), (1200, False), (800, False), (150, True) ],
+	# 'language'                         : "", # overrides browser language
+	# 'ThumbSpacing'                     : "3px", # string!
+	# 'videoTranscodeBitrate'            : "4M",
+	# 'foldersString'                    : "_folders",
+	# 'byDateString'                     : "_by_date",
+	# 'cacheFolderSeparator'             : "-",
+	# 'pageTitle'                        : "My photos",
+	# 'differentAlbumThumbnails'         : False,
+	# 'thumbnailsGenerationMode'         : "cascade", # permitted values: "cascade", "parallel", "mixed"
+	# 'showMediaNamesBelowInAlbums'      : True,
+	# 'titleFontSize'                    : "medium",	# other values: large, small, or a px/em size
+	# 'titleColor'                       : "white",
+	# 'titleColorHover'                  : "yellow",
+	# 'titleImageNameColor'              : "green",
+	# 'jpegQuality'                      : "95",		# a string representing an integere number 1 -100
+	# 'backgroundColor'                  : "#222222",	# ~ gray
+	# 'switchButtonBackgroundColor'      : "black",
+	# 'switchButtonBackgroundColorHover' : "white",
+	# 'switchButtonColor'                : "white",
+	# 'switchButtonColorHover'           : "black"
+}
+
