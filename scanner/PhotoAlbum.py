@@ -129,7 +129,6 @@ class Album(object):
 			dictionary = { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
 		else:
 			dictionary = { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
-		dictionary["thumbSizes"] = ModOptions.usrOptions['thumbSizes']
 		return dictionary
 	def photo_from_path(self, path):
 		for photo in self._photos:
@@ -437,12 +436,13 @@ class Media(object):
 		x1 = int(math.floor((canvas_width - old_width) / 2))
 		y1 = int(math.floor((canvas_height - old_height) / 2))
 		mode = image.mode
-		if len(mode) == 1:  # L, 1
-			new_background = (34)
-		if len(mode) == 3:  # RGB
-			new_background = (34, 34, 34)
-		if len(mode) == 4:  # RGBA, CMYK
-			new_background = (34, 34, 34, 1)
+		#~ if len(mode) == 1:  # L, 1
+			#~ new_background = (34)
+		#~ if len(mode) == 3:  # RGB
+			#~ new_background = (34, 34, 34)
+		#~ if len(mode) == 4:  # RGBA, CMYK
+			#~ new_background = (34, 34, 34, 1)
+		new_background = ModOptions.usrOptions['backgroundColor']
 		newImage = Image.new(mode, (canvas_width, canvas_height), new_background)
 		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
 		return newImage

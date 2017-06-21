@@ -10,59 +10,58 @@ def SetOptions(config_file = ""):
 	#~ except NameError:
 	
 	DefaultOptions = {
-		'max_verbose'                  : 0, # verbosity level
-		'indexHtmlPath'                : "", # absolute path of the folder where index.html resides
-		'albumPath'                    : "", # absolute path
-		'cachePath'                    : "", 
-		'thumbSizes'                   : [ (1600, False), (1200, False), (800, False), (150, True) ],
-		'language'                     :"en", # overrides browser language
-		'zeroThumbSpacing'             : False,
-		'videoTranscodeBitrate'        : "4M",
-		'foldersString'                : "_folders",
-		'byDateString'                 : "_by_date",
-		'cacheFolderSeparator'         : "-",
-		'pageTitle'                    : "My photos",
-		'differentAlbumThumbnails'     : False,
-		'thumbnailsGenerationMode'     : "cascade", # permitted values: "cascade", "parallel", "mixed"
-		# 25 images ~ 5MB each, 4 thumbnail sizes:
-		# parallel ~ 60 seconds
-		# mixed    ~ 35 seconds
-		# cascade  ~ 30 seconds
-		#
-		# 25 images ~ 5MB each, 4 thumbnail sizes, the 4 already present:
-		# parallel ~ 48 seconds
-		# mixed    ~ 35 seconds
-		# cascade  ~ 0.2 seconds
-		'showMediaNamesBelowInAlbums'  : True,
-		'titleFontSize'                : "medium",	# other values: large, small, or a px/em size
-		'titleColor'                   : "white",
-		'titleImageNameColor'          : "green",
-		'jpegQuality'                  : 95,		# a number 1 -100
-		'backgroundColor'              : "#222222",	# ~ gray
-		'switchButtonBackgroundColor'  : "white",
-		'switchButtonColor'            : "black"
+		'max_verbose'                      : 0, # verbosity level, python only
+		'indexHtmlPath'                    : "", # absolute path of the folder where index.html resides, by default albumPath is "albums" inside it and cachePath is cache inside it
+		'albumPath'                        : "", # absolute path, for use in python
+		'serverAlbumPath'                  : "albums", # relative path, for use in js
+		'cachePath'                        : "", # absolute path, for use in python 
+		'serverCachePath'                  : "cache", # relative path, for use in js 
+		'thumbSizes'                       : [ (1600, False), (1200, False), (800, False), (150, True) ],
+		'language'                         :"en", # overrides browser language
+		'zeroThumbSpacing'                 : False,
+		'videoTranscodeBitrate'            : "4M",
+		'foldersString'                    : "_folders",
+		'byDateString'                     : "_by_date",
+		'cacheFolderSeparator'             : "-",
+		'pageTitle'                        : "My photos",
+		'differentAlbumThumbnails'         : False,
+		'thumbnailsGenerationMode'         : "cascade", # permitted values: "cascade", "parallel", "mixed"
+		'showMediaNamesBelowInAlbums'      : True,
+		'titleFontSize'                    : "medium",	# other values: large, small, or a px/em size
+		'titleColor'                       : "white",
+		'titleColorHover'                  : "yellow",
+		'titleImageNameColor'              : "green",
+		'jpegQuality'                      : 95,		# a number 1 -100
+		'backgroundColor'                  : "#222222",	# ~ gray
+		'switchButtonBackgroundColor'      : "black",
+		'switchButtonBackgroundColorHover' : "white",
+		'switchButtonColor'                : "white",
+		'switchButtonColorHover'           : "black"
 	}
 	
 	if config_file:
 		execfile(config_file)
 	OptionsForJs = [
-		'albumPath',
-		'cachePath',
-		'indexHtmlPath',
+		'serverAlbumPath',
+		'serverCachePath',
 		'language',
-		'js_zeroThumbSpacing',
+		'zeroThumbSpacing',
 		'foldersString',
 		'byDateString',
 		'cacheFolderSeparator',
 		'pageTitle',
 		'differentAlbumThumbnails',
 		'showMediaNamesBelowInAlbums',
-		'titleFontSize',
-		'titleColor',
-		'titleImageNameColor',
-		'backgroundColor',
-		'switchButtonBackgroundColor',
-		'switchButtonColor'
+		'titleFontSize',	# DONE
+		'titleColor',	# DONE
+		'titleColorHover',	# DONE
+		'titleImageNameColor',	# DONE
+		'backgroundColor',	# DONE
+		'switchButtonBackgroundColor',	# DONE
+		'switchButtonBackgroundColorHover',	# DONE
+		'switchButtonColor',	# DONE
+		'switchButtonColorHover',	# DONE
+		'thumbSizes'	# DONE
 	]
 	for key in DefaultOptions :
 		try:

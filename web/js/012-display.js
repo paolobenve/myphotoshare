@@ -72,7 +72,10 @@ $(document).ready(function() {
 
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i;
-		var originalTitle = translationsToTranslatedString($("#title-translation").html());
+		//~ var originalTitle = translationsToTranslatedString($("#title-translation").html());
+		var originalTitle = Options['pageTitle'];
+		
+		
 		
 		if (! currentAlbum.path.length)
 			components = [originalTitle];
@@ -85,13 +88,15 @@ $(document).ready(function() {
 				last += "/" + components[i];
 			if (i != 1 || components[i] != foldersString) {
 				if (i < components.length - 1 || currentMedia !== null)
-					title += "<a href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+					if (! (i == 1 && components[i] == bydateString))
+						title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && components[i] == bydateString)
 					title += translationsToTranslatedString($("#by-date-translation").html());
 				else
 					title += components[i];
 				if (i < components.length - 1 || currentMedia !== null)
-					title += "</a>";
+					if (! (i == 0 && components.length > 1 && components[i + 1] == bydateString))
+						title += "</a>";
 			}
 			if (i == 0 && components.length > 1 && components[i + 1] == bydateString)
 				title += " ";
@@ -100,7 +105,7 @@ $(document).ready(function() {
 				title += " &raquo; ";
 		}
 		if (currentMedia !== null)
-			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</div>";
+			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
 		
 		for (i = 0; i < components.length; ++i) {
 			if (i == 0) {
@@ -123,6 +128,7 @@ $(document).ready(function() {
 		$("#title").html(title);
 		document.title = documentTitle;
 	}
+
 	function scrollToThumb() {
 		var photo, thumb;
 		photo = currentMedia;
@@ -295,22 +301,22 @@ $(document).ready(function() {
 		imageRatio = mediaMaxSize / mediaMinSize;
 		
 		if (fullscreen) {
-			maxSize = album.thumbSizes[0][0];
+			maxSize = Options['thumbSizes'][0][0];
 			maxSizeSet = true;
 		}
 		if (! maxSizeSet) {
-			maxSize = album.thumbSizes[0][0];
-			for (var i = 0; i < album.thumbSizes.length; i++)
-				if (! album.thumbSizes[i][1]) {
-					thumbnailMinSize = album.thumbSizes[i][0] / imageRatio;
-					thumbnailMaxSize = album.thumbSizes[i][0];
+			maxSize = Options['thumbSizes'][0][0];
+			for (var i = 0; i < Options['thumbSizes'].length; i++)
+				if (! Options['thumbSizes'][i][1]) {
+					thumbnailMinSize = Options['thumbSizes'][i][0] / imageRatio;
+					thumbnailMaxSize = Options['thumbSizes'][i][0];
 					if (mediaOrientation == windowOrientation &&
 							(thumbnailMinSize < windowMinSize && thumbnailMaxSize < windowMaxSize) ||
 						mediaOrientation !== windowOrientation &&
 							(thumbnailMinSize < windowMaxSize && thumbnailMaxSize < windowMinSize))
-					//~ if (maxSizeSet && album.thumbSizes[i][0] < Math.max($(window).width(), $(window).height()))
+					//~ if (maxSizeSet && Options['thumbSizes'][i][0] < Math.max($(window).width(), $(window).height()))
 						break;
-					maxSize = album.thumbSizes[i][0];
+					maxSize = Options['thumbSizes'][i][0];
 					maxSizeSet = true;
 				}
 		}
@@ -508,6 +514,53 @@ $(document).ready(function() {
 		else
 			$(".thumb-caption").show();
 		
+		setOptions();
+	}
+	
+	function setOptions() {
+		$("body").css("background-color", Options['backgroundColor']);
+		$("#day-view-container").css("color", Options['switchButtonColor']);
+		$("#day-view-container").hover(function() {
+			//mouse over
+			$(this).css("color", Options['switchButtonColorHover'])
+		}, function() {
+			//mouse out
+			$(this).css("color", Options['switchButtonColor'])
+		});
+		$("#folders-view-container").css("color", Options['switchButtonColor']);
+		$("#folders-view-container").hover(function() {
+			//mouse over
+			$(this).css("color", Options['switchButtonColorHover'])
+		}, function() {
+			//mouse out
+			$(this).css("color", Options['switchButtonColor'])
+		});
+		$("#day-view-container").css("background-color", Options['switchButtonBackgroundColor']);
+		$("#day-view-container").hover(function() {
+			//mouse over
+			$(this).css("background-color", Options['switchButtonBackgroundColorHover'])
+		}, function() {
+			//mouse out
+			$(this).css("background-color", Options['switchButtonBackgroundColor'])
+		});
+		$("#folders-view-container").css("background-color", Options['switchButtonBackgroundColor']);
+		$("#folders-view-container").hover(function() {
+			//mouse over
+			$(this).css("background-color", Options['switchButtonBackgroundColorHover'])
+		}, function() {
+			//mouse out
+			$(this).css("background-color", Options['switchButtonBackgroundColor'])
+		});
+		$("#title").css("font-size", Options['titleFontSize']);
+		$(".title-anchor").css("color", Options['titleColor']);
+		$(".title-anchor").hover(function() {
+			//mouse over
+			$(this).css("color", Options['titleColorHover'])
+		}, function() {
+			//mouse out
+			$(this).css("color", Options['titleColor'])
+		});
+		$("#photo-name").css("color", Options['titleImageNameColor']);
 	}
 	
 	/* Event listeners */
@@ -539,9 +592,8 @@ $(document).ready(function() {
 				dataType: "json",
 				url: optionsFile,
 				success: function(data) {
-					for (key in data)
-						Options[key] = data;
-					//~ console.log(Options);
+					for (var key in data)
+						Options[key] = data[key];
 					callback(location.hash, hashParsed, die);
 				},
 			};
@@ -554,18 +606,6 @@ $(document).ready(function() {
 			$.ajax(ajaxOptions);
 		}
 	};
-
-
-
-	
-	//~ function getOptions() {
-		//~ $.getJSON('cache/options.json', function (data) {
-			//~ Options = data;
-			//~ console.log(Options);
-			//~ $(window).hashchange();
-		//~ });
-	//~ }
-	
 	
 	$(document).keydown(function(e){
 		if (currentMedia === null)
