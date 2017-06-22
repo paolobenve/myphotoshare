@@ -343,7 +343,8 @@ class Media(object):
 		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, square)
 
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square):
-		thumb_path = os.path.join(thumbs_path, image_cache(self.media_file_name, thumbnail_size, square))
+		thumb_path = path_with_md5(os.path.join(thumbs_path_with_subdir, image_cache(self.media_file_name, thumbnail_size, square)))
+		print thumb_path
 		info_string = str(thumbnail_size)
 		if square:
 			info_string += ", square"

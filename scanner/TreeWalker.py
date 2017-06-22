@@ -148,7 +148,7 @@ class TreeWalker:
 						else:
 							# image
 							for thumb_size in Media.thumb_sizes:
-								cache_files.append(os.path.join(self.cache_path, image_cache(entry, thumb_size[0], False)))
+								cache_files.append(thumb_path_with_md5(os.path.join(self.cache_path, image_cache(entry, thumb_size[0], False))))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
 						cache_hit = True

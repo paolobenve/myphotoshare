@@ -54,6 +54,14 @@ def image_cache(path, size, square=False):
 	else:
 		suffix = str(size)
 	return cache_base(path, True) + "_" + suffix + ".jpg"
+def path_with_md5(path):
+	subdir = hashlib.sha224(path).hexdigest()[0,2]
+	if not os.path.exists(subdir):
+		os.makedirs(subdir)
+	path_with_subdir = os.path.join(path, subdir)
+	if not os.path.exists(path_with_subdir):
+		os.makedirs(path_with_subdir)
+	return path_with_subdir
 def video_cache(path):
 	return cache_base(path, True) + ".mp4"
 def file_mtime(path):
