@@ -218,7 +218,26 @@ class TreeWalker:
 			for entry in photo.image_caches:
 				all_cache_entries[entry] = True
 		message("cleanup", "searching for stale cache entries")
+		deletable_files_suffixes = list()
+		deletable_files_suffixes.append(".json")
+		for thumb_size in ModOptions.usrOptions['thumbSizes']:
+			suffix = "_" + str(thumb_size[0])
+			if thumb_size[1]:
+				suffix += "s"
+			suffix += ".jpg"
+			deletable_files_suffixes.append(suffix)
+		next_level()
 		for cache in os.listdir(self.cache_path):
+			# only delete json's and thumbnails
+			found = False
+			for suffix in deletable_files_suffixes:
+				index = cache.find(suffix)
+				if index != -1 and index == len(cache) - len(suffix):
+					found = True
+					continue
+			if not found:
+				message("not deleting", cache)
+				continue
 			try:
 				cache = cache.decode(sys.getfilesystemencoding())
 			except KeyboardInterrupt:
@@ -228,3 +247,4 @@ class TreeWalker:
 			if cache not in all_cache_entries:
 				message("cleanup", os.path.basename(cache))
 				os.unlink(os.path.join(self.cache_path, cache))
+		back_level()
