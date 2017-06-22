@@ -12,9 +12,10 @@ def SetOptions(config_file = ""):
 		'albumPath'                        : "", # absolute path, for use in python
 		'serverAlbumPath'                  : "albums", # relative path, for use in js, no trailing slash
 		'cachePath'                        : "", # absolute path, for use in python 
+		'serverCachePath'                  : "cache", # relative path, for use in js, no trailing slash
 		'thumbSizes'                       : [ (1600, False), (1200, False), (800, False), (150, True) ],
 		'language'                         : "", # overrides browser language
-		'ThumbSpacing'                     : "3px", # string!
+		'thumbSpacing'                     : "3px", # string!
 		'videoTranscodeBitrate'            : "4M",
 		'foldersString'                    : "_folders",
 		'byDateString'                     : "_by_date",
@@ -39,8 +40,10 @@ def SetOptions(config_file = ""):
 		execfile(config_file)
 	OptionsForJs = [
 		'serverAlbumPath',
+		'serverCachePath',
+		'cachePath',
 		'language',	# DONE
-		'ThumbSpacing',	# DONE
+		'thumbSpacing',	# DONE
 		'foldersString',	# DONE
 		'byDateString',	# DONE
 		'cacheFolderSeparator',	# DONE

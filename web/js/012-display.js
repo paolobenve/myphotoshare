@@ -560,10 +560,10 @@ $(document).ready(function() {
 			$(this).css("color", Options['titleColor'])
 		});
 		$("#photo-name").css("color", Options['titleImageNameColor']);
-		$("#thumbs img").css("margin-left", Options['ThumbSpacing']);
-		$("#thumbs img").css("margin-right", Options['ThumbSpacing']);
-		$(".album-button").css("margin-left", Options['ThumbSpacing']);
-		$(".album-button").css("margin-right", Options['ThumbSpacing']);
+		$("#thumbs img").css("margin-left", Options['thumbSpacing']);
+		$("#thumbs img").css("margin-right", Options['thumbSpacing']);
+		$(".album-button").css("margin-left", Options['thumbSpacing']);
+		$(".album-button").css("margin-right", Options['thumbSpacing']);
 		if (Options['differentAlbumThumbnails'])
 			$(".album-button").addClass("alt");
 	}
@@ -574,7 +574,7 @@ $(document).ready(function() {
 		$("#loading").show();
 		$("link[rel=image_src]").remove();
 		$("link[rel=video_src]").remove();
-		getOptions(parseHash);
+		getOptions("", parseHash);
 		//~ photoFloat.parseHash(location.hash, hashParsed, die);
 	});
 	$(window).hashchange();
@@ -585,11 +585,13 @@ $(document).ready(function() {
 		photoFloat.parseHash(hash, callback, error);
 	}
 	
-	function getOptions(callback) {
+	function getOptions(cacheSubDir, callback) {
 		if (Object.keys(Options).length > 0)
 			photoFloat.parseHash(location.hash, hashParsed, die);
 		else {
-			optionsFile = "cache/options.json";
+			if (cacheSubDir && cacheSubDir.substr(-1) != "/")
+				cacheSubDir += "/"
+			optionsFile = cacheSubDir + "options.json";
 			ajaxOptions = {
 				type: "GET",
 				dataType: "json",
@@ -597,8 +599,21 @@ $(document).ready(function() {
 				success: function(data) {
 					for (var key in data)
 						Options[key] = data[key];
+					if (Options['serverCachePath'] && Options['serverCachePath'].substr(-1) != "/")
+						Options['serverCachePath'] += "/";
+					if (Options['serverAlbumPath'] && Options['serverAlbumPath'].substr(-1) != "/")
+						Options['serverAlbumPath'] += "/";
+					
 					callback(location.hash, hashParsed, die);
 				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					if (errorThrown == "Not Found" && ! cacheSubDir)
+						getOptions("cache", parseHash);
+					else {
+						$("#error-options-file").fadeIn(1500);
+						$("#error-options-file, #error-overlay, #auth-text").fadeOut(500);
+					}
+				}
 			};
 			if (typeof error !== "undefined" && error !== null) {
 				ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {

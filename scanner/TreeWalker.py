@@ -187,9 +187,21 @@ class TreeWalker:
 		json.dump(photo_list, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	def save_json_options(self):
-		json_options_file = os.path.join(self.cache_path, 'options.json')
-		message("caching options", "in " + json_options_file)
-		fp = open(json_options_file, 'w')
+		
+		try:
+			json_options_file = os.path.join(ModOptions.usrOptions['indexHtmlPath'], 'options.json')
+			next_level()
+			message("json options file", "trying " + json_options_file)
+			fp = open(json_options_file, 'w')
+			next_level()
+			message("OK", "")
+			back_level()
+		except IOError:
+			json_options_file = os.path.join(self.cache_path, 'options.json')
+			next_level()
+			message("read only directory", "using " + json_options_file)
+			back_level()
+			fp = open(json_options_file, 'w')
 		optionSave = {}
 		#~ message("OptionsForJs", ModOptions.usrOptionsForJs)
 		for key, option in ModOptions.usrOptions.iteritems():

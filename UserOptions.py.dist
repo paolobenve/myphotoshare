@@ -16,7 +16,7 @@ usrOptions = {
 	# 'cachePath'                        : "", # absolute path, for use in python 
 	# 'thumbSizes'                       : [ (1600, False), (1200, False), (800, False), (150, True) ],
 	# 'language'                         : "", # overrides browser language
-	# 'ThumbSpacing'                     : "3px", # string!
+	# 'thumbSpacing'                     : "3px", # string!
 	# 'videoTranscodeBitrate'            : "4M",
 	# 'foldersString'                    : "_folders",
 	# 'byDateString'                     : "_by_date",
