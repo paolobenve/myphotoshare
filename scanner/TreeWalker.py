@@ -148,7 +148,7 @@ class TreeWalker:
 						else:
 							# image
 							for thumb_size in Media.thumb_sizes:
-								cache_files.append(thumb_path_with_md5(os.path.join(self.cache_path, image_cache(entry, thumb_size[0], False))))
+								cache_files.append(os.path.join(self.cache_path, path_with_md5(entry, thumb_size[0], False)))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
 						cache_hit = True
@@ -209,15 +209,24 @@ class TreeWalker:
 				optionSave[key] = option
 		json.dump(optionSave, fp)
 		fp.close()
-	def remove_stale(self):
-		message("cleanup", "building stale list")
-		all_cache_entries = { "all_photos.json": True, "latest_photos.json": True, "options.json": True }
-		for album in self.all_albums:
-			all_cache_entries[album.json_file] = True
-		for photo in self.all_photos:
-			for entry in photo.image_caches:
-				all_cache_entries[entry] = True
-		message("cleanup", "searching for stale cache entries")
+	def remove_stale(self, subdir = "", cache_list = {}):
+		if not subdir:
+			message("cleanup", "building stale list")
+			#~ if subdir:
+				#~ all_cache_entries = {}
+			#~ else:
+			all_cache_entries = { "all_photos.json": True, "latest_photos.json": True, "options.json": True }
+			for album in self.all_albums:
+				all_cache_entries[album.json_file] = True
+			for photo in self.all_photos:
+				for entry in photo.image_caches:
+					all_cache_entries[entry] = True
+		else:
+			all_cache_entries = cache_list
+		info = "searching for stale cache entries"
+		if subdir:
+			info += " in subdir " + subdir
+		message("cleanup", info)
 		deletable_files_suffixes = list()
 		deletable_files_suffixes.append(".json")
 		for thumb_size in ModOptions.usrOptions['thumbSizes']:
@@ -227,24 +236,29 @@ class TreeWalker:
 			suffix += ".jpg"
 			deletable_files_suffixes.append(suffix)
 		next_level()
-		for cache in sorted(os.listdir(self.cache_path)):
-			# only delete json's and thumbnails
-			found = False
-			for suffix in deletable_files_suffixes:
-				index = cache.find(suffix)
-				if index != -1 and index == len(cache) - len(suffix):
-					found = True
+		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
+			if os.path.isdir(os.path.join(ModOptions.usrOptions['cachePath'], cache)):
+				self.remove_stale(cache, all_cache_entries)
+			else:
+				# only delete json's and thumbnails
+				found = False
+				for suffix in deletable_files_suffixes:
+					index = cache.find(suffix)
+					if index != -1 and index == len(cache) - len(suffix):
+						found = True
+						continue
+				if not found:
+					message("not deleting", cache)
 					continue
-			if not found:
-				message("not deleting", cache)
-				continue
-			try:
-				cache = cache.decode(sys.getfilesystemencoding())
-			except KeyboardInterrupt:
-				raise
-			except:
-				pass
-			if cache not in all_cache_entries:
-				message("cleanup", os.path.basename(cache))
-				os.unlink(os.path.join(self.cache_path, cache))
+				try:
+					cache = cache.decode(sys.getfilesystemencoding())
+				except KeyboardInterrupt:
+					raise
+				except:
+					pass
+				cache_with_subdir = os.path.join(subdir, cache)
+				if cache_with_subdir not in all_cache_entries:
+					message("cleanup", cache_with_subdir)
+					#~ message("cleanup", os.path.basename(cache))
+					os.unlink(os.path.join(self.cache_path, cache_with_subdir))
 		back_level()

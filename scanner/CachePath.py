@@ -1,6 +1,7 @@
 import ModOptions
 import os.path
 from datetime import datetime
+import hashlib
 
 def message(category, text, verbose = 0):
 	global usrOptions
@@ -54,14 +55,16 @@ def image_cache(path, size, square=False):
 	else:
 		suffix = str(size)
 	return cache_base(path, True) + "_" + suffix + ".jpg"
-def path_with_md5(path):
-	subdir = hashlib.sha224(path).hexdigest()[0,2]
-	if not os.path.exists(subdir):
-		os.makedirs(subdir)
-	path_with_subdir = os.path.join(path, subdir)
-	if not os.path.exists(path_with_subdir):
-		os.makedirs(path_with_subdir)
-	return path_with_subdir
+def md5_subdir(path):
+	md5 = hashlib.sha224(path).hexdigest()
+	return md5[:2]
+def path_with_md5(path, size, square=False):
+	subdir = md5_subdir(path)
+	cache_path_with_subdir = os.path.join(ModOptions.usrOptions['cachePath'], subdir)
+	if not os.path.exists(cache_path_with_subdir):
+		os.makedirs(cache_path_with_subdir)
+	image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, square))
+	return image_cache_with_subdir
 def video_cache(path):
 	return cache_base(path, True) + ".mp4"
 def file_mtime(path):

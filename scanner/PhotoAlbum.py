@@ -343,8 +343,7 @@ class Media(object):
 		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, square)
 
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square):
-		thumb_path = path_with_md5(os.path.join(thumbs_path_with_subdir, image_cache(self.media_file_name, thumbnail_size, square)))
-		print thumb_path
+		thumb_path = os.path.join(thumbs_path, path_with_md5(self.media_file_name, thumbnail_size, square))
 		info_string = str(thumbnail_size)
 		if square:
 			info_string += ", square"
@@ -652,7 +651,7 @@ class Media(object):
 					caches.append(image_cache(self.media_file_name, thumb_size[0], thumb_size[1]))
 			caches.append(video_cache(self.media_file_name))
 		else:
-			caches = [image_cache(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in ModOptions.usrOptions['thumbSizes']]
+			caches = [path_with_md5(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in ModOptions.usrOptions['thumbSizes']]
 		return caches
 	@property
 	def date(self):
@@ -722,6 +721,8 @@ class Media(object):
 		foldersAlbum = ModOptions.usrOptions['foldersString']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
+		print self.media_file_name
+		print md5_subdir(self.media_file_name)
 		photo = {
 					"name": self.name,
 					"albumName": self.album_path,
@@ -731,8 +732,10 @@ class Media(object):
 					"byDateName": os.path.join(self.day_album_path, self.name),
 					"foldersAlbum": foldersAlbum,
 					"completeName": os.path.join(ModOptions.usrOptions['foldersString'], self.media_file_name),
-					"date": self.date
+					"date": self.date,
+					"md5Subdir": md5_subdir(self.media_file_name)
 				}
+		print photo
 		photo.update(self.attributes)
 		return photo
 
