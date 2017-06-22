@@ -87,8 +87,11 @@ $(document).ready(function() {
 				last += "/" + components[i];
 			if (i != 1 || components[i] != Options['foldersString']) {
 				if (i < components.length - 1 || currentMedia !== null)
-					if (! (i == 1 && components[i] == Options['byDateString']))
-						title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+					if (! (i == 0 && components.length > 1 && components[i + 1] == Options['byDateString']))
+						if (i == 1 && components[i] == Options['byDateString'])
+							title = "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">" + title;
+						else
+							title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && components[i] == Options['byDateString'])
 					title += translationsToTranslatedString($("#by-date-translation").html());
 				else
@@ -241,6 +244,20 @@ $(document).ready(function() {
 			else
 				$("#thumbs").show();
 		}
+		
+		if (currentAlbum.path == Options["foldersString"]) {
+			$("#folders-view-container").hide();
+			$("#day-view-container").show();
+			$("#day-view").attr("href", "#!/" + Options["byDateString"]);
+		}
+		else if (currentAlbum.path == Options["byDateString"]) {
+			$("#folders-view-container").show();
+			$("#day-view-container").hide();
+			$("#folders-view").attr("href", "#!/" + Options["foldersString"]);
+		}
+
+		
+		
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
