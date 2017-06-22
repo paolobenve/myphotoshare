@@ -118,7 +118,7 @@ class TreeWalker:
 				cached_album = None
 		if not cached:
 			album = Album(path_with_marker)
-		for entry in os.listdir(path):
+		for entry in sorted(os.listdir(path)):
 			if entry[0] == '.':
 				continue
 			try:
@@ -227,7 +227,7 @@ class TreeWalker:
 			suffix += ".jpg"
 			deletable_files_suffixes.append(suffix)
 		next_level()
-		for cache in os.listdir(self.cache_path):
+		for cache in sorted(os.listdir(self.cache_path)):
 			# only delete json's and thumbnails
 			found = False
 			for suffix in deletable_files_suffixes:
