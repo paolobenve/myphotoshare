@@ -125,9 +125,23 @@ class Album(object):
 					subalbums.append(sub)
 		path_without_marker = self.remove_marker(self.path)
 		if path_without_marker == self.path:
-			dictionary = { "path": self.path, "date": self.date, "albums": subalbums, "photos": self._photos }
+			dictionary = {
+				"path": self.path,
+				"date": self.date,
+				"albums": subalbums,
+				"photos": self._photos,
+				"cacheBase": cache_base(self.path)
+				}
 		else:
-			dictionary = { "path": self.path, "physicalPath": path_without_marker, "date": self.date, "albums": subalbums, "photos": self._photos }
+			dictionary = {
+				"path": self.path,
+				"physicalPath": path_without_marker,
+				"date": self.date,
+				"albums": subalbums,
+				"photos": self._photos,
+				"cacheBase": cache_base(self.path)
+				}
+		
 		return dictionary
 	def photo_from_path(self, path):
 		for photo in self._photos:
@@ -721,21 +735,19 @@ class Media(object):
 		foldersAlbum = ModOptions.usrOptions['foldersString']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
-		print self.media_file_name
-		print md5_subdir(self.media_file_name)
 		photo = {
-					"name": self.name,
-					"albumName": self.album_path,
-					"yearAlbum": self.year_album_path,
-					"monthAlbum": self.month_album_path,
-					"dayAlbum": self.day_album_path,
-					"byDateName": os.path.join(self.day_album_path, self.name),
-					"foldersAlbum": foldersAlbum,
-					"completeName": os.path.join(ModOptions.usrOptions['foldersString'], self.media_file_name),
-					"date": self.date,
-					"md5Subdir": md5_subdir(self.media_file_name)
-				}
-		print photo
+				"name": self.name,
+				"albumName": self.album_path,
+				"yearAlbum": self.year_album_path,
+				"monthAlbum": self.month_album_path,
+				"dayAlbum": self.day_album_path,
+				"byDateName": os.path.join(self.day_album_path, self.name),
+				"foldersAlbum": foldersAlbum,
+				"completeName": os.path.join(ModOptions.usrOptions['foldersString'], self.media_file_name),
+				"date": self.date,
+				"md5Subdir": md5_subdir(self.media_file_name),
+				"cacheBase": cache_base(self.name)
+			}
 		photo.update(self.attributes)
 		return photo
 

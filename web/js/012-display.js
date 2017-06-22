@@ -31,7 +31,7 @@ $(document).ready(function() {
 	/* Globals */
 	
 	currentAlbum = null;
-	var currentMedia = null;
+	currentMedia = null;
 	var currentMediaIndex = -1;
 	var previousAlbum = null;
 	var previousMedia = null;

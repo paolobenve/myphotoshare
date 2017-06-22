@@ -191,7 +191,7 @@
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		return Options['serverCachePath'] + hash;
+		return Options['serverCachePath'] + photo["md5Subdir"] + "/" + hash;
 	};
 	PhotoFloat.originalPhotoPath = function(photo) {
 		return photo.albumName;
