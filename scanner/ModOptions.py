@@ -66,7 +66,9 @@ def SetOptions(config_file = ""):
 			usrOptions[key]
 		except KeyError:
 			usrOptions[key] = DefaultOptions[key]
-	
+	if len(sys.argv) == 3:
+		usrOptions['albumPath'] = sys.argv[1]
+		usrOptions['cachePath'] = sys.argv[2]
 	if not usrOptions['indexHtmlPath'] and not usrOptions['albumPath'] and not usrOptions['cachePath']:
 		message("options", "at least indexHtmlPath or both albumPath and cachePath must be given, quitting")
 		sys.exit(-97)
