@@ -1,0 +1,109 @@
+# Default options file for photofloat
+#
+# This file is imported through the ConfigParser standard module
+#
+# This file sets the default options: they are read by scanner/ModOptions.py
+#
+# Do not modify this file: copy it to any location on your disk (e.g. /etc/photofloat), rename it removing the trailing ".defaults" and have fun customizing it!
+# Your config values will supersede the standard ones defined here
+
+[options]
+
+###########################################################
+# scanner option
+###########################################################
+
+# verbosity level, python only
+max_verbose = 0
+
+# absolute path of the folder where index.html resides, by default albumPath is "albums" inside it and cachePath is "cache" inside it
+indexHtmlPath = 
+
+# albums folder absolute path
+albumPath = 
+
+# cache folder absolute path, for use in python 
+cachePath = 
+
+# The transcode bitrate used for videos
+videoTranscodeBitrate = 4M
+
+# The jpg quality parameter for generating the tumbnails
+# an integer number 1 -100
+jpegQuality = 95
+
+
+###########################################################
+# scanner and ui options
+###########################################################
+
+
+# The thubnail sizes to be used, each value is a tuple (max-width, square)
+thumbSizes = [ (1600, False), (1200, False), (800, False), (150, True) ]
+
+# strings used internally, do not change them unless you know what you are doing
+foldersString = _folders
+byDateString = _by_date,
+cacheFolderSeparator = -
+
+###########################################################
+# js options
+###########################################################
+
+# Where will js search the photo/video albums
+serverAlbumPath = albums
+
+# Where will js search the cache files
+serverCachePath = cache
+
+
+###########################################################
+# user interface options
+###########################################################
+
+# the language for the web page
+# if not set, the browser language is used
+# if set, it overrides the browser language
+language = 
+
+# the title of the collections of photos/albums
+pageTitle = My photos
+
+# spacing between thumbnails, a string with a css value
+thumbSpacing = 3px
+
+# should we show album thumbnails different from photo ones?
+differentAlbumThumbnails = False
+
+# what method will be used to generate tumbnails?
+# permitted values:
+# cascade: the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
+# parallel: every thumbnail is generated from the image, and the various generations are launched parallely on the various cores of the cpu
+# mixed: the biggest thumbnail is generated from image, the following are generate in a parallel way from the former
+thumbnailsGenerationMode = cascade
+
+# will photos/videos names be shown below the thumbnail in albums?
+showMediaNamesBelowInAlbums = True
+
+# The css font-size value for the title on page top
+# other values: large, small, or a px/em size
+titleFontSize = medium
+
+# the tile color
+titleColor = white
+
+# the tile color when mouse is over it
+titleColorHover = yellow
+
+# the color to use for the photo/video name in title
+titleImageNameColor = green
+
+# the page background color (this is ~ gray)
+backgroundColor = #222222
+
+# The colors for the top right button which switches between folder and date view
+switchButtonBackgroundColor = black
+switchButtonBackgroundColorHover = white
+switchButtonColor = white
+switchButtonColorHover = black
+
