@@ -106,9 +106,9 @@ class Album(object):
 		album._sort()
 		return album
 	def remove_marker(self, path):
-		marker_position = path.find(Options.config.get('options', 'foldersString'))
+		marker_position = path.find(Options.config['foldersString'])
 		if marker_position == 0:
-			path = path[len(Options.config.get('options', 'foldersString')):]
+			path = path[len(Options.config['foldersString']):]
 			if len(path) > 0:
 				path = path[1:]
 		return path
@@ -139,7 +139,7 @@ class Media(object):
 	def __init__(self, media_path, thumbs_path=None, attributes=None):
 		self.media_file_name = trim_base(media_path)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
-		self.album_path = os.path.join(Options.config.get('options', 'serverAlbumPath'), self.media_file_name)
+		self.album_path = os.path.join(Options.config['serverAlbumPath'], self.media_file_name)
 		self.is_valid = True
 		image = None
 		try:
@@ -390,7 +390,7 @@ class Media(object):
 		else:
 			image_copy = self.resize_canvas(image_copy, thumbnail_size)
 		try:
-			image_copy.save(thumb_path, "JPEG", quality=eval(int(Options.config.get('options', 'jpegQuality'))))
+			image_copy.save(thumb_path, "JPEG", quality=int(Options.config['jpegQuality']))
 			next_level(1)
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK", 1)
@@ -404,7 +404,7 @@ class Media(object):
 				pass
 			raise
 		except IOError:
-			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=eval(int(Options.config.get('options', 'jpegQuality'))))
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=int(Options.config['jpegQuality']))
 			next_level(1)
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
@@ -441,7 +441,7 @@ class Media(object):
 			#~ new_background = (34, 34, 34)
 		#~ if len(mode) == 4:  # RGBA, CMYK
 			#~ new_background = (34, 34, 34, 1)
-		new_background = Options.config.get('options', 'backgroundColor')
+		new_background = Options.config['backgroundColor']
 		newImage = Image.new(mode, (canvas_width, canvas_height), new_background)
 		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
 		return newImage
@@ -451,8 +451,8 @@ class Media(object):
 			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 			pool = Pool(processes=num_of_cores)
 			try:
-				for thumb_size in eval(Options.config.get('options', 'thumbSizes')):
-					if (Options.config.get('options', 'thumbnailsGenerationMode') == "mixed" and thumb_size == eval(Options.config.get('options', 'thumbSizes'))[0]):
+				for thumb_size in eval(Options.config['thumbSizes']):
+					if (Options.config['thumbnailsGenerationMode'] == "mixed" and thumb_size == eval(Options.config['thumbSizes'])[0]):
 						continue
 					try:
 						#~ import timeit
@@ -472,7 +472,7 @@ class Media(object):
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			thumb_size = eval(Options.config.get('options', 'thumbSizes'))[0]
+			thumb_size = eval(Options.config['thumbSizes'])[0]
 			try:
 				if (max(image.size[0], image.size[1]) < thumb_size):
 					image_to_start_from = image
@@ -488,7 +488,7 @@ class Media(object):
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			for thumb_size in eval(Options.config.get('options', 'thumbSizes')):
+			for thumb_size in eval(Options.config['thumbSizes']):
 				try:
 					if (max(image.size[0], image.size[1]) < thumb_size[0]):
 						image_to_start_from = image
@@ -500,11 +500,11 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
-		if (Options.config.get('options', 'thumbnailsGenerationMode') == "parallel"):
+		if (Options.config['thumbnailsGenerationMode'] == "parallel"):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
-		elif (Options.config.get('options', 'thumbnailsGenerationMode') == "mixed"):
+		elif (Options.config['thumbnailsGenerationMode'] == "mixed"):
 			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
-		elif (Options.config.get('options', 'thumbnailsGenerationMode') == "cascade"):
+		elif (Options.config['thumbnailsGenerationMode'] == "cascade"):
 			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
@@ -554,7 +554,7 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		for thumb_size in eval(Options.config.get('options', 'thumbSizes')):
+		for thumb_size in eval(Options.config['thumbSizes']):
 			if thumb_size[1]:
 				self._thumbnail(mirror, original_path, thumbs_path, thumb_size[0], thumb_size[1])
 		try:
@@ -573,7 +573,7 @@ class Media(object):
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
 			'-crf', '20',						# set quality
-			'-b:v', Options.config.get('options', 'videoTranscodeBitrate'),	# set videobitrate to 4Mbps
+			'-b:v', Options.config['videoTranscodeBitrate'],	# set videobitrate to 4Mbps
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec
 			'-ac', '2',						# force two audiochannels
@@ -646,12 +646,12 @@ class Media(object):
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
-			for thumb_size in eval(Options.config.get('options', 'thumbSizes')):
+			for thumb_size in eval(Options.config['thumbSizes']):
 				if thumb_size[1]:
 					caches.append(image_cache(self.media_file_name, thumb_size[0], thumb_size[1]))
 			caches.append(video_cache(self.media_file_name))
 		else:
-			caches = [image_cache(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in eval(Options.config.get('options', 'thumbSizes'))]
+			caches = [image_cache(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in eval(Options.config['thumbSizes'])]
 		return caches
 	@property
 	def date(self):
@@ -683,7 +683,7 @@ class Media(object):
 	@property
 	def year_album_path(self):
 		#~ bydateString = "_by_date"
-		return Options.config.get('options', 'byDateString') + "/" + self.year
+		return Options.config['byDateString'] + "/" + self.year
 	@property
 	def month_album_path(self):
 		return self.year_album_path + "/" + self.month
@@ -718,7 +718,7 @@ class Media(object):
 		return Media(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self.media_file_name, "date": self.date }
-		foldersAlbum = Options.config.get('options', 'foldersString')
+		foldersAlbum = Options.config['foldersString']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 		photo = {
@@ -729,7 +729,7 @@ class Media(object):
 					"dayAlbum": self.day_album_path,
 					"byDateName": os.path.join(self.day_album_path, self.name),
 					"foldersAlbum": foldersAlbum,
-					"completeName": os.path.join(Options.config.get('options', 'foldersString'), self.media_file_name),
+					"completeName": os.path.join(Options.config['foldersString'], self.media_file_name),
 					"date": self.date
 				}
 		photo.update(self.attributes)

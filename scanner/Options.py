@@ -1,4 +1,4 @@
 import ConfigParser
 
-config = ConfigParser.RawConfigParser()
+config = {}
 OptionsForJs = list()

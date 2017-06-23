@@ -6,7 +6,7 @@ import Options
 def message(category, text, verbose = 0):
 	global usrOptions
 	try:
-		max_verbose = Options.config.get('options', 'max_verbose')
+		max_verbose = Options.config['max_verbose']
 	except NameError:
 		max_verbose = 0
 	if (verbose <= max_verbose):
@@ -18,10 +18,10 @@ def message(category, text, verbose = 0):
 
 message.level = 0
 def next_level(verbose = 0):
-	if (verbose <= Options.config.get('options', 'max_verbose')):
+	if (verbose <= Options.config['max_verbose']):
 		message.level += 1
 def back_level(verbose = 0):
-	if (verbose <= Options.config.get('options', 'max_verbose')):
+	if (verbose <= Options.config['max_verbose']):
 		message.level -= 1
 def set_cache_path_base(base):
 	trim_base.base = base
@@ -39,7 +39,7 @@ def cache_base(path, filepath=False):
 	if len(path) == 0:
 		path = "root"
 	else:
-		path = trim_base(path).replace('/', Options.config.get('options', 'cacheFolderSeparator')).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
+		path = trim_base(path).replace('/', Options.config['cacheFolderSeparator']).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 		while path.find("--") != -1:
 			path = path.replace("--", "-")
 		while path.find("__") != -1:
