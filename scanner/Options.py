@@ -1,4 +1,4 @@
 import ConfigParser
 
 config = {}
-OptionsForJs = list()
+optionsForJs = list()

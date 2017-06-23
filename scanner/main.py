@@ -28,14 +28,14 @@ def main():
 		# which modifies the default options
 		usr_config.readfp(open(sys.argv[1]))
 	else:
-		usr_config.set('options', 'albumPath', sys.argv[1])
-		usr_config.set('options', 'cachePath', sys.argv[2])
+		usr_config.set('options', 'album_path', sys.argv[1])
+		usr_config.set('options', 'cache_path', sys.argv[2])
 
 	message("Options", "asterisk denotes options changed by config file")
 	next_level()
 	# pass config values to a dict, because ConfigParser objects are not reliable
-	for option in Options.config.options('options'):
-		Options.config[option] = Options.config.get('options', option)
+	for option in usr_config.options('options'):
+		Options.config[option] = usr_config.get('options', option)
 		if default_config.get('options', option) == Options.config.get('options', option):
 			value = "  "
 		else:
@@ -43,52 +43,52 @@ def main():
 		value += str(Options.config[option])
 		message(option, value)
 	back_level()
-	#~ if not Options.config['indexHtmlPath']:
-		#~ Options.config.set('options', 'indexHtmlPath', "")
-	#~ Options.config.set('options', 'thumbSizes', eval(Options.config.get('options', 'thumbSizes')))
-	#~ Options.config.set('options', 'jpegQuality', int(Options.config.get('options', 'jpegQuality')))
+	#~ if not Options.config['index_html_path']:
+		#~ Options.config.set('options', 'index_html_path', "")
+	#~ Options.config.set('options', 'thumb_sizes', eval(Options.config.get('options', 'thumb_sizes')))
+	#~ Options.config.set('options', 'jpeg_quality', int(Options.config.get('options', 'jpeg_quality')))
 
-	Options.OptionsForJs = [
-		'serverAlbumPath',
-		'serverCachePath',
-		'cachePath',
+	Options.optionsForJs = [
+		'server_album_path',
+		'server_cache_path',
+		'cache_path',
 		'language',
-		'thumbSpacing',
-		'foldersString',
-		'byDateString',
-		'cacheFolderSeparator',
-		'pageTitle',
-		'differentAlbumThumbnails',
-		'showMediaNamesBelowInAlbums',
-		'titleFontSize',
-		'titleColor',
-		'titleColorHover',
-		'titleImageNameColor',
-		'backgroundColor',
-		'switchButtonBackgroundColor',
-		'switchButtonBackgroundColorHover',
-		'switchButtonColor',
-		'switchButtonColorHover',
-		'thumbSizes'
+		'thumb_spacing',
+		'folders_string',
+		'by_date_string',
+		'cache_folder_separator',
+		'page_title',
+		'different_album_thumbnails',
+		'show_media_names_below_thumbs_in_albums',
+		'title_font_size',
+		'title_color',
+		'title_color_hover',
+		'title_image_name_color',
+		'background_color',
+		'switch_button_background_color',
+		'switch_button_background_color_hover',
+		'switch_button_color',
+		'switch_button_color_hover',
+		'thumb_sizes'
 	]
 
 
-	if not Options.config['indexHtmlPath'] and not Options.config['albumPath'] and not Options.config['cachePath']:
-		message("options", "at least indexHtmlPath or both albumPath and cachePath must be given, quitting")
+	if not Options.config['index_html_path'] and not Options.config['album_path'] and not Options.config['cache_path']:
+		message("options", "at least index_html_path or both album_path and cache_path must be given, quitting")
 		sys.exit(-97)
-	elif Options.config['indexHtmlPath'] and not Options.config['albumPath'] and not Options.config['cachePath']:
-		message("options", "on indexHtmlPath is given, using its subfolder 'albums' for albumPath and 'cache' for cachePath")
-		Options.config['albumPath'] = os.path.join(Options.config['indexHtmlPath'], "albums")
-		Options.config['cachePath'] = os.path.join(Options.config['indexHtmlPath'], "cache")
-	elif (not Options.config['indexHtmlPath'] and
-			Options.config['albumPath'] and
-			Options.config['cachePath'] and
-			Options.config['albumPath'][:Options.config['albumPath']
-				.rfind("/")] == Options.config['cachePath'][:Options.config['albumPath'].rfind("/")]):
-		album_path = Options.config['albumPath']
+	elif Options.config['index_html_path'] and not Options.config['album_path'] and not Options.config['cache_path']:
+		message("options", "on index_html_path is given, using its subfolder 'albums' for album_path and 'cache' for cache_path")
+		Options.config['album_path'] = os.path.join(Options.config['index_html_path'], "albums")
+		Options.config['cache_path'] = os.path.join(Options.config['index_html_path'], "cache")
+	elif (not Options.config['index_html_path'] and
+			Options.config['album_path'] and
+			Options.config['cache_path'] and
+			Options.config['album_path'][:Options.config['album_path']
+				.rfind("/")] == Options.config['cache_path'][:Options.config['album_path'].rfind("/")]):
+		album_path = Options.config['album_path']
 		album_base = album_path[:album_path.rfind("/")]
 		#~ print 123,album_base
-		Options.config['indexHtmlPath'] = album_base
+		Options.config['index_html_path'] = album_base
 	try:
 		os.umask(002)
 		message("Browsing", "start!")
@@ -99,8 +99,8 @@ def main():
 		else:
 			# 1 arguments: the config files
 			# which modifies the default options
-			#~ TreeWalker(ModOptions.usrOptions['albumPath'], ModOptions.usrOptions['cachePath'])
-			TreeWalker(Options.config['albumPath'], Options.config['cachePath'])
+			#~ TreeWalker(ModOptions.usrOptions['album_path'], ModOptions.usrOptions['cache_path'])
+			TreeWalker(Options.config['album_path'], Options.config['cache_path'])
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)

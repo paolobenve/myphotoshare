@@ -9,14 +9,14 @@ import Options
 
 class TreeWalker:
 	def __init__(self, album_path, cache_path):
-		if (Options.config['thumbnailsGenerationMode'] == "parallel"):
+		if (Options.config['thumbnail_generation_mode'] == "parallel"):
 			message("method", "parallel thumbnail generation")
-		elif (Options.config['thumbnailsGenerationMode'] == "mixed"):
+		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
 			message("method", "mixed thumbnail generation")
-		elif (Options.config['thumbnailsGenerationMode'] == "cascade"):
+		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
 			message("method", "cascade thumbnail generation")
 			# be sure thumb_sizes is correctly sorted 
-			eval(Options.config['thumbSizes']).sort(key=lambda tup: tup[0], reverse = True)
+			eval(Options.config['thumb_sizes']).sort(key=lambda tup: tup[0], reverse = True)
 		self.album_path = os.path.abspath(album_path).decode(sys.getfilesystemencoding())
 		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
 		set_cache_path_base(self.album_path)
@@ -39,7 +39,7 @@ class TreeWalker:
 	def generate_date_album(self):
 		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
 		#~ bydateString = "_by_date"
-		by_date_path = os.path.join(self.album_path, Options.config['byDateString'])
+		by_date_path = os.path.join(self.album_path, Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
 			year_path = os.path.join(by_date_path, str(year))
@@ -86,7 +86,7 @@ class TreeWalker:
 		self.tree_by_date[photo.year][photo.month][photo.day].append(photo)
 	def walk(self, path):
 		trimmed_path = trim_base_custom(path, self.album_path)
-		path_with_marker = os.path.join(self.album_path, Options.config['foldersString'])
+		path_with_marker = os.path.join(self.album_path, Options.config['folders_string'])
 		if trimmed_path:
 			path_with_marker = os.path.join(path_with_marker, trimmed_path)
 		next_level()
@@ -188,7 +188,7 @@ class TreeWalker:
 	def save_json_options(self):
 		
 		try:
-			json_options_file = os.path.join(Options.config['indexHtmlPath'], 'options.json')
+			json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
 			next_level()
 			message("json options file", "trying " + json_options_file)
 			fp = open(json_options_file, 'w')
@@ -202,10 +202,11 @@ class TreeWalker:
 			back_level()
 			fp = open(json_options_file, 'w')
 		optionSave = {}
-		#~ message("OptionsForJs", ModOptions.usrOptionsForJs)
-		for option in Options.config.iteritems():
-			if Options.config[option] in Options.OptionsForJs:
-				optionSave[option] = Options.config[option]
+		
+		#~ message("optionsForJs", ModOptions.usroptionsForJs)
+		for key, option in Options.config.iteritems():
+			if key in Options.optionsForJs:
+				optionSave[option] = option
 		json.dump(optionSave, fp)
 		fp.close()
 	def remove_stale(self):
@@ -219,7 +220,7 @@ class TreeWalker:
 		message("cleanup", "searching for stale cache entries")
 		deletable_files_suffixes = list()
 		deletable_files_suffixes.append(".json")
-		for thumb_size in eval(Options.config['thumbSizes']):
+		for thumb_size in eval(Options.config['thumb_sizes']):
 			suffix = "_" + str(thumb_size[0])
 			if thumb_size[1]:
 				suffix += "s"

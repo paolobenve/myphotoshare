@@ -532,7 +532,7 @@ window.Modernizr = (function( window, document, undefined ) {
 
         setCss('background-color:rgba(150,255,150,.5)');
 
-        return contains(mStyle.backgroundColor, 'rgba');
+        return contains(mStyle.background_color, 'rgba');
     };
 
     tests['hsla'] = function() {
@@ -541,7 +541,7 @@ window.Modernizr = (function( window, document, undefined ) {
 
         setCss('background-color:hsla(120,40%,100%,.5)');
 
-        return contains(mStyle.backgroundColor, 'rgba') || contains(mStyle.backgroundColor, 'hsla');
+        return contains(mStyle.background_color, 'rgba') || contains(mStyle.background_color, 'hsla');
     };
 
     tests['multiplebgs'] = function() {
