@@ -87,8 +87,11 @@ $(document).ready(function() {
 				last += "/" + components[i];
 			if (i != 1 || components[i] != Options['folders_string']) {
 				if (i < components.length - 1 || currentMedia !== null)
-					if (! (i == 1 && components[i] == Options['by_date_string']))
-						title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+					if (! (i == 0 && components.length > 1 && components[i + 1] == Options['by_date_string']))
+						if (i == 1 && components[i] == Options['by_date_string'])
+							title = "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">" + title;
+						else
+							title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && components[i] == Options['by_date_string'])
 					title += translationsToTranslatedString($("#by-date-translation").html());
 				else
