@@ -159,7 +159,7 @@ class TreeWalker:
 							message("cache hit", os.path.basename(entry))
 							photo = cached_photo
 				if not cache_hit:
-					message("get metainfo", os.path.basename(entry))
+					message("processing image/video", os.path.basename(entry))
 					photo = Media(entry, self.cache_path)
 				if photo.is_valid:
 					self.all_photos.append(photo)
