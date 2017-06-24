@@ -8,7 +8,6 @@ import os.path
 import ConfigParser
 import Options
 
-
 def main():
 	reload(sys)
 	sys.setdefaultencoding("UTF-8")
@@ -19,10 +18,11 @@ def main():
 	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")
 	default_config_file = os.path.join(project_dir, "photofloat.conf.defaults")
 	default_config = ConfigParser.ConfigParser()
-	usr_config = ConfigParser.ConfigParser()
 	default_config.readfp(open(default_config_file))
 	
-	config = default_config
+	usr_config = ConfigParser.ConfigParser()
+	usr_config = default_config
+	
 	if len(sys.argv) == 2:
 		# 1 arguments: the config files
 		# which modifies the default options
@@ -37,12 +37,13 @@ def main():
 	for option in usr_config.options('options'):
 		Options.config[option] = usr_config.get('options', option)
 		if default_config.get('options', option) == Options.config.get('options', option):
-			value = "  "
+			option_value = "  "
 		else:
-			value = "* "
-		value += str(Options.config[option])
-		message(option, value)
+			option_value = "* "
+		option_value += str(Options.config[option])
+		message(option, option_value)
 	back_level()
+
 
 	Options.optionsForJs = [
 		'server_album_path',
@@ -87,14 +88,7 @@ def main():
 	try:
 		os.umask(002)
 		message("Browsing", "start!")
-		if len(sys.argv) == 3:
-			# 2 arguments: album and cache paths
-			# the other parameters cannot be changed, the default options are used
-			TreeWalker(sys.argv[1], sys.argv[2])
-		else:
-			# 1 arguments: the config files
-			# which modifies the default options
-			TreeWalker(Options.config['album_path'], Options.config['cache_path'])
+		TreeWalker(Options.config['album_path'], Options.config['cache_path'])
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)

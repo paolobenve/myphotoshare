@@ -10,6 +10,8 @@ def message(category, text, verbose = 0):
 		max_verbose = Options.config['max_verbose']
 	except KeyError:
 		max_verbose = 0
+	except AttributeError:
+		max_verbose = 0
 	if (verbose <= max_verbose):
 		if message.level <= 0:
 			sep = "  "

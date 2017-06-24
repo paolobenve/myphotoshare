@@ -345,16 +345,14 @@ class Media(object):
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square):
 		thumb_path = os.path.join(thumbs_path, image_cache(self.media_file_name, thumbnail_size, square))
 		info_string = str(thumbnail_size)
+		next_level()
 		if square:
 			info_string += ", square"
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
-			next_level()
 			message("existing thumb", info_string)
 			back_level()
 			return image
-		next_level()
 		message("thumbing", info_string)
-		back_level()
 		gc.collect()
 		try:
 			image_copy = image.copy()
@@ -366,10 +364,9 @@ class Media(object):
 			except KeyboardInterrupt:
 				raise
 			except:
-				next_level()
 				message("corrupt image", os.path.basename(original_path))
-				back_level()
 				self.is_valid = False
+				back_level()
 				return image
 		if square:
 			if image_copy.size[0] > image_copy.size[1]:
@@ -392,10 +389,9 @@ class Media(object):
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=int(Options.config['jpeg_quality']))
 			next_level(1)
-			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK", 1)
 			back_level(1)
-			back_level(1)
+			back_level()
 			return image_copy
 		except KeyboardInterrupt:
 			try:
@@ -406,21 +402,19 @@ class Media(object):
 		except IOError:
 			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=int(Options.config['jpeg_quality']))
 			next_level(1)
-			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
 			back_level(1)
-			back_level(1)
+			back_level()
 			return image_copy
 		except:
 			next_level()
-			next_level()
 			message(str(thumbnail_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
-			back_level()
 			back_level()
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
+			back_level()
 			return image
 	def resize_canvas(self, image, canvas_max_size):
 		old_width, old_height = image.size
