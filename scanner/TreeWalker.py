@@ -238,7 +238,7 @@ class TreeWalker:
 			deletable_files_suffixes.append(suffix)
 		next_level()
 		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
-			if os.path.isdir(os.path.join(ModOptions.usrOptions['cachePath'], cache)):
+			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):
 				self.remove_stale(cache, all_cache_entries)
 			else:
 				# only delete json's and thumbnails

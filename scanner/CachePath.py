@@ -1,11 +1,7 @@
 import os.path
 from datetime import datetime
-<<<<<<< HEAD
 import hashlib
-=======
-import ConfigParser
 import Options
->>>>>>> options
 
 max_verbose = 0
 def message(category, text, verbose = 0):
@@ -65,7 +61,7 @@ def md5_subdir(path):
 	return md5[:2]
 def path_with_md5(path, size, square=False):
 	subdir = md5_subdir(path)
-	cache_path_with_subdir = os.path.join(ModOptions.usrOptions['cachePath'], subdir)
+	cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
 	if not os.path.exists(cache_path_with_subdir):
 		os.makedirs(cache_path_with_subdir)
 	image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, square))

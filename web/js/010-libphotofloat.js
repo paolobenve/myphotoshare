@@ -192,7 +192,6 @@
 			}
 		}
 		return Options['serverCachePath'] + photo["md5Subdir"] + "/" + hash;
->>>>>>> options
 	};
 	PhotoFloat.originalPhotoPath = function(photo) {
 		return photo.albumName;

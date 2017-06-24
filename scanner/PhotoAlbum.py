@@ -737,7 +737,7 @@ class Media(object):
 				"dayAlbum": self.day_album_path,
 				"byDateName": os.path.join(self.day_album_path, self.name),
 				"foldersAlbum": foldersAlbum,
-				"completeName": os.path.join(ModOptions.usrOptions['foldersString'], self.media_file_name),
+				"completeName": os.path.join(Options.config['folders_string'], self.media_file_name),
 				"date": self.date,
 				"md5Subdir": md5_subdir(self.media_file_name),
 				"cacheBase": cache_base(self.name)
