@@ -244,6 +244,18 @@ $(document).ready(function() {
 			else
 				$("#thumbs").show();
 		}
+		
+		if (currentAlbum.path == Options["folders_string"]) {
+			$("#folders-view-container").hide();
+			$("#day-view-container").show();
+			$("#day-view").attr("href", "#!/" + Options["by_date_string"]);
+		}
+		else if (currentAlbum.path == Options["by_date_string"]) {
+			$("#folders-view-container").show();
+			$("#day-view-container").hide();
+			$("#folders-view").attr("href", "#!/" + Options["folders_string"]);
+		}
+		
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
