@@ -20,7 +20,7 @@
 			callback(this.albumCache[cacheKey]);
 			return;
 		}
-		cacheFile = Options['serverCachePath'] + cacheKey + ".json";
+		cacheFile = Options['server_cache_path'] + cacheKey + ".json";
 		self = this;
 		ajaxOptions = {
 			type: "GET",
@@ -40,7 +40,7 @@
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
 				$("#error-text-folder").fadeIn(1500);
 				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(500);
-				window.location.hash = Options['foldersString'];
+				window.location.hash = Options['folders_string'];
 			};
 		}
 		$.ajax(ajaxOptions);
@@ -66,7 +66,7 @@
 		hash = PhotoFloat.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (! hash.length) {
-			album = PhotoFloat.cachePath(Options['foldersString']);
+			album = PhotoFloat.cachePath(Options['folders_string']);
 			photo = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
 			photo = hash.substring(index + 1);
@@ -117,7 +117,7 @@
 			path = path.substring(1);
 		path = path
 			.replace(/ /g, "_")
-			.replace(/\//g, Options['cacheFolderSeparator'])
+			.replace(/\//g, Options['cache_folder_separator'])
 			.replace(/\(/g, "")
 			.replace(/\)/g, "")
 			.replace(/#/g, "")
@@ -141,7 +141,7 @@
 	PhotoFloat.photoHashFolder = function(album, media) {
 		var hash;
 		hash = PhotoFloat.photoHash(album, media);
-		bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
+		bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 			hash = PhotoFloat.cachePath(media.completeName.substring(0, media.completeName.length - media.name.length - 1)) + "/" + PhotoFloat.cachePath(media.name);
 		}
@@ -159,17 +159,17 @@
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
-			bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
-			var foldersStringWithTrailingSeparator = Options['foldersString'] + Options['cacheFolderSeparator'];
+			bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
+			var foldersStringWithTrailingSeparator = Options['folders_string'] + Options['cache_folder_separator'];
 			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
 				hash = hash.substring(foldersStringWithTrailingSeparator.length);
 			else {
-				bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
+				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		return Options['serverCachePath'] + hash;
+		return Options['server_cache_path'] + hash;
 	};
 	PhotoFloat.photoPath = function(album, photo, thumb_size, square) {
 		var suffix, hash;
@@ -182,16 +182,17 @@
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
-			foldersStringWithTrailingSeparator = Options['foldersString'] + Options['cacheFolderSeparator'];
+			foldersStringWithTrailingSeparator = Options['folders_string'] + Options['cache_folder_separator'];
 			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
 				hash = hash.substring(foldersStringWithTrailingSeparator.length);
 			else {
-				bydateStringWithTrailingSeparator = Options['byDateString'] + Options['cacheFolderSeparator'];
+				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
 		return Options['serverCachePath'] + photo["md5Subdir"] + "/" + hash;
+>>>>>>> options
 	};
 	PhotoFloat.originalPhotoPath = function(photo) {
 		return photo.albumName;

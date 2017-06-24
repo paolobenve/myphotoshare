@@ -1,27 +1,34 @@
-import ModOptions
 import os.path
 from datetime import datetime
+<<<<<<< HEAD
 import hashlib
+=======
+import ConfigParser
+import Options
+>>>>>>> options
 
+max_verbose = 0
 def message(category, text, verbose = 0):
 	global usrOptions
 	try:
-		max_verbose = ModOptions.usrOptions['max_verbose']
-	except NameError:
+		max_verbose = Options.config['max_verbose']
+	except KeyError:
+		max_verbose = 0
+	except AttributeError:
 		max_verbose = 0
 	if (verbose <= max_verbose):
 		if message.level <= 0:
 			sep = "  "
 		else:
 			sep = "--"
-		print "%s %s%s[%s]%s%s" % (datetime.now().isoformat(), max(0, message.level) * "  |", sep, str(category), max(1, (30 - len(str(category)))) * " ", str(text))
+		print "%s %s%s[%s]%s%s" % (datetime.now().isoformat(), max(0, message.level) * "  |", sep, str(category), max(1, (40 - len(str(category)))) * " ", str(text))
 
 message.level = 0
 def next_level(verbose = 0):
-	if (verbose <= ModOptions.usrOptions['max_verbose']):
+	if (verbose <= max_verbose):
 		message.level += 1
 def back_level(verbose = 0):
-	if (verbose <= ModOptions.usrOptions['max_verbose']):
+	if (verbose <= max_verbose):
 		message.level -= 1
 def set_cache_path_base(base):
 	trim_base.base = base
@@ -39,9 +46,7 @@ def cache_base(path, filepath=False):
 	if len(path) == 0:
 		path = "root"
 	else:
-		#~ elif filepath and len(path.split(os.sep)) < 2:
-			#~ path = "root-" + path
-		path = trim_base(path).replace('/', ModOptions.usrOptions['cacheFolderSeparator']).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
+		path = trim_base(path).replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 		while path.find("--") != -1:
 			path = path.replace("--", "-")
 		while path.find("__") != -1:

@@ -12,7 +12,7 @@ import gc
 import tempfile
 from VideoToolWrapper import *
 import math
-import ModOptions
+import Options
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -106,9 +106,9 @@ class Album(object):
 		album._sort()
 		return album
 	def remove_marker(self, path):
-		marker_position = path.find(ModOptions.usrOptions['foldersString'])
+		marker_position = path.find(Options.config['folders_string'])
 		if marker_position == 0:
-			path = path[len(ModOptions.usrOptions['foldersString']):]
+			path = path[len(Options.config['folders_string']):]
 			if len(path) > 0:
 				path = path[1:]
 		return path
@@ -153,7 +153,7 @@ class Media(object):
 	def __init__(self, media_path, thumbs_path=None, attributes=None):
 		self.media_file_name = trim_base(media_path)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
-		self.album_path = os.path.join(ModOptions.usrOptions['serverAlbumPath'], self.media_file_name)
+		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
 		self.is_valid = True
 		image = None
 		try:
@@ -359,16 +359,14 @@ class Media(object):
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square):
 		thumb_path = os.path.join(thumbs_path, path_with_md5(self.media_file_name, thumbnail_size, square))
 		info_string = str(thumbnail_size)
+		next_level()
 		if square:
 			info_string += ", square"
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
-			next_level()
 			message("existing thumb", info_string)
 			back_level()
 			return image
-		next_level()
 		message("thumbing", info_string)
-		back_level()
 		gc.collect()
 		try:
 			image_copy = image.copy()
@@ -380,10 +378,9 @@ class Media(object):
 			except KeyboardInterrupt:
 				raise
 			except:
-				next_level()
 				message("corrupt image", os.path.basename(original_path))
-				back_level()
 				self.is_valid = False
+				back_level()
 				return image
 		if square:
 			if image_copy.size[0] > image_copy.size[1]:
@@ -404,12 +401,11 @@ class Media(object):
 		else:
 			image_copy = self.resize_canvas(image_copy, thumbnail_size)
 		try:
-			image_copy.save(thumb_path, "JPEG", quality=ModOptions.usrOptions['jpegQuality'])
-			next_level(1)
+			image_copy.save(thumb_path, "JPEG", quality=int(Options.config['jpeg_quality']))
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK", 1)
 			back_level(1)
-			back_level(1)
+			back_level()
 			return image_copy
 		except KeyboardInterrupt:
 			try:
@@ -418,23 +414,21 @@ class Media(object):
 				pass
 			raise
 		except IOError:
-			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=ModOptions.usrOptions['jpegQuality'])
-			next_level(1)
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=int(Options.config['jpeg_quality']))
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
 			back_level(1)
-			back_level(1)
+			back_level()
 			return image_copy
 		except:
 			next_level()
-			next_level()
 			message(str(thumbnail_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
-			back_level()
 			back_level()
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
+			back_level()
 			return image
 	def resize_canvas(self, image, canvas_max_size):
 		old_width, old_height = image.size
@@ -455,7 +449,7 @@ class Media(object):
 			#~ new_background = (34, 34, 34)
 		#~ if len(mode) == 4:  # RGBA, CMYK
 			#~ new_background = (34, 34, 34, 1)
-		new_background = ModOptions.usrOptions['backgroundColor']
+		new_background = Options.config['background_color']
 		newImage = Image.new(mode, (canvas_width, canvas_height), new_background)
 		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
 		return newImage
@@ -465,8 +459,8 @@ class Media(object):
 			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 			pool = Pool(processes=num_of_cores)
 			try:
-				for thumb_size in ModOptions.usrOptions['thumbSizes']:
-					if (ModOptions.usrOptions['thumbnailsGenerationMode'] == "mixed" and thumb_size == ModOptions.usrOptions['thumbSizes'][0]):
+				for thumb_size in eval(Options.config['thumb_sizes']):
+					if (Options.config['thumbnail_generation_mode'] == "mixed" and thumb_size == eval(Options.config['thumb_sizes'])[0]):
 						continue
 					try:
 						#~ import timeit
@@ -486,7 +480,7 @@ class Media(object):
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			thumb_size = ModOptions.usrOptions['thumbSizes'][0]
+			thumb_size = eval(Options.config['thumb_sizes'])[0]
 			try:
 				if (max(image.size[0], image.size[1]) < thumb_size):
 					image_to_start_from = image
@@ -502,7 +496,7 @@ class Media(object):
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			for thumb_size in ModOptions.usrOptions['thumbSizes']:
+			for thumb_size in eval(Options.config['thumb_sizes']):
 				try:
 					if (max(image.size[0], image.size[1]) < thumb_size[0]):
 						image_to_start_from = image
@@ -514,11 +508,11 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
-		if (ModOptions.usrOptions['thumbnailsGenerationMode'] == "parallel"):
+		if (Options.config['thumbnail_generation_mode'] == "parallel"):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
-		elif (ModOptions.usrOptions['thumbnailsGenerationMode'] == "mixed"):
+		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
 			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
-		elif (ModOptions.usrOptions['thumbnailsGenerationMode'] == "cascade"):
+		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
 			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
@@ -568,7 +562,7 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		for thumb_size in ModOptions.usrOptions['thumbSizes']:
+		for thumb_size in eval(Options.config['thumb_sizes']):
 			if thumb_size[1]:
 				self._thumbnail(mirror, original_path, thumbs_path, thumb_size[0], thumb_size[1])
 		try:
@@ -587,7 +581,7 @@ class Media(object):
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
 			'-crf', '20',						# set quality
-			'-b:v', ModOptions.usrOptions['videoTranscodeBitrate'],	# set videobitrate to 4Mbps
+			'-b:v', Options.config['video_transcode_bitrate'],	# set videobitrate
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec
 			'-ac', '2',						# force two audiochannels
@@ -660,12 +654,12 @@ class Media(object):
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
-			for thumb_size in ModOptions.usrOptions['thumbSizes']:
+			for thumb_size in eval(Options.config['thumb_sizes']):
 				if thumb_size[1]:
 					caches.append(image_cache(self.media_file_name, thumb_size[0], thumb_size[1]))
 			caches.append(video_cache(self.media_file_name))
 		else:
-			caches = [path_with_md5(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in ModOptions.usrOptions['thumbSizes']]
+			caches = [path_with_md5(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in eval(Options.config['thumb_sizes'])]
 		return caches
 	@property
 	def date(self):
@@ -697,7 +691,7 @@ class Media(object):
 	@property
 	def year_album_path(self):
 		#~ bydateString = "_by_date"
-		return ModOptions.usrOptions['byDateString'] + "/" + self.year
+		return Options.config['by_date_string'] + "/" + self.year
 	@property
 	def month_album_path(self):
 		return self.year_album_path + "/" + self.month
@@ -732,7 +726,7 @@ class Media(object):
 		return Media(path, None, dictionary)
 	def to_dict(self):
 		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self.media_file_name, "date": self.date }
-		foldersAlbum = ModOptions.usrOptions['foldersString']
+		foldersAlbum = Options.config['folders_string']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 		photo = {

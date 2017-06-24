@@ -1,0 +1,112 @@
+# Default options file for photofloat
+#
+# This file is imported through the ConfigParser standard module
+#       boolean values:
+#          1 = yes = true;
+#          0 = false = no
+#
+# This file sets the default options: they are read by scanner/ModOptions.py
+#
+# Do not modify this file: copy it to any location on your disk (e.g. /etc/photofloat), rename it removing the trailing ".defaults" and have fun customizing it!
+# Your config values will supersede the standard ones defined here
+
+[options]
+
+###########################################################
+# scanner option
+###########################################################
+
+# verbosity level, a number 0-3
+max_verbose = 0
+
+# absolute path of the folder where index.html resides, by default album_path is "albums" inside it and cache_path is "cache" inside it
+index_html_path = 
+
+# albums folder absolute path
+album_path = 
+
+# cache folder absolute path, for use in python 
+cache_path = 
+
+# The transcode bitrate used for videos
+video_transcode_bitrate = 4M
+
+# The jpg quality parameter for generating the tumbnails
+# an integer number 1 -100
+jpeg_quality = 95
+
+
+###########################################################
+# scanner and ui options
+###########################################################
+
+
+# The thubnail sizes to be used, each value is a tuple (max-width, square)
+thumb_sizes = [(1600, False), (1200, False), (800, False), (150, True)]
+
+# strings used internally, do not change them unless you know what you are doing
+folders_string = _folders
+by_date_string = _by_date
+cache_folder_separator = -
+
+###########################################################
+# js options
+###########################################################
+
+# Where will js search the photo/video albums
+server_album_path = albums
+
+# Where will js search the cache files
+server_cache_path = cache
+
+
+###########################################################
+# user interface options
+###########################################################
+
+# the language for the web page
+# if not set, the browser language is used
+# if set, it overrides the browser language
+language = 
+
+# the title of the collections of photos/albums
+page_title = My photos
+
+# spacing between thumbnails, a string with a css value
+thumb_spacing = 3px
+
+# should we show album thumbnails different from photo ones?
+different_album_thumbnails = true
+
+# what method will be used to generate tumbnails?
+# permitted values:
+#    cascade : the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
+#    parallel: every thumbnail is generated from the image, and the processes are launched parallely on the various cores of the cpu
+#    mixed   : the biggest thumbnail is generated from image, the following are generate in a parallel way from the biggest thumbnail
+thumbnail_generation_mode = cascade
+
+# will photos/videos names be shown below the thumbnail in albums?
+show_media_names_below_thumbs_in_albums = True
+
+# The css font-size value for the title on page top
+# other values: large, small, or a px/em size
+title_font_size = medium
+
+# the tile color
+title_color = white
+
+# the tile color when mouse is over it
+title_color_hover = yellow
+
+# the color to use for the photo/video name in title
+title_image_name_color = green
+
+# the page background color (this is ~ gray)
+background_color = #222222
+
+# The colors for the top right button which switches between folder and date view
+switch_button_background_color = black
+switch_button_background_color_hover = white
+switch_button_color = white
+switch_button_color_hover = black
+
