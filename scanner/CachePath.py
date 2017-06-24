@@ -51,10 +51,9 @@ def cache_base(path, filepath=False):
 def json_name(path):
 	return cache_base(path) + ".json"
 def image_cache(path, size, square=False):
+	suffix = str(size)
 	if square:
 		suffix = str(size) + "s"
-	else:
-		suffix = str(size)
 	return cache_base(path, True) + "_" + suffix + ".jpg"
 def md5_subdir(path):
 	md5 = hashlib.md5(path).hexdigest()
