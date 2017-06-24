@@ -245,15 +245,15 @@ $(document).ready(function() {
 				$("#thumbs").show();
 		}
 		
-		if (currentAlbum.path == Options["folders_string"]) {
+		if (currentAlbum.path == Options['folders_string']) {
 			$("#folders-view-container").hide();
 			$("#day-view-container").show();
-			$("#day-view").attr("href", "#!/" + Options["by_date_string"]);
+			$("#day-view").attr("href", "#!/" + Options['by_date_string']);
 		}
-		else if (currentAlbum.path == Options["by_date_string"]) {
+		else if (currentAlbum.path == Options['by_date_string']) {
 			$("#folders-view-container").show();
 			$("#day-view-container").hide();
-			$("#folders-view").attr("href", "#!/" + Options["folders_string"]);
+			$("#folders-view").attr("href", "#!/" + Options['folders_string']);
 		}
 		
 		setTimeout(scrollToThumb, 1);
@@ -617,15 +617,15 @@ $(document).ready(function() {
 						Options['server_cache_path'] += "/";
 					if (Options['server_album_path'] && Options['server_album_path'].substr(-1) != "/")
 						Options['server_album_path'] += "/";
-					while(Options["thumb_sizes"].indexOf('(') != -1)
-						Options["thumb_sizes"] = Options["thumb_sizes"].replace('(', '[');
-					while(Options["thumb_sizes"].indexOf(')') != -1)
-						Options["thumb_sizes"] = Options["thumb_sizes"].replace(')', ']');
-					while(Options["thumb_sizes"].indexOf('False') != -1)
-						Options["thumb_sizes"] = Options["thumb_sizes"].replace('False', 0);
-					while(Options["thumb_sizes"].indexOf('True') != -1)
-						Options["thumb_sizes"] = Options["thumb_sizes"].replace('True', 1);
-					Options["thumb_sizes"] = JSON.parse(Options["thumb_sizes"]);
+					while(Options['thumb_sizes'].indexOf('(') != -1)
+						Options['thumb_sizes'] = Options['thumb_sizes'].replace('(', '[');
+					while(Options['thumb_sizes'].indexOf(')') != -1)
+						Options['thumb_sizes'] = Options['thumb_sizes'].replace(')', ']');
+					while(Options['thumb_sizes'].indexOf('False') != -1)
+						Options['thumb_sizes'] = Options['thumb_sizes'].replace('False', 0);
+					while(Options['thumb_sizes'].indexOf('True') != -1)
+						Options['thumb_sizes'] = Options['thumb_sizes'].replace('True', 1);
+					Options['thumb_sizes'] = JSON.parse(Options['thumb_sizes']);
 					
 					callback(location.hash, hashParsed, die);
 				},
