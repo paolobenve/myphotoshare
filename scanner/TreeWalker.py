@@ -167,7 +167,7 @@ class TreeWalker:
 					self.add_photo_to_tree_by_date(photo)
 				else:
 					next_level
-					message("unreadable", ")
+					message("unreadable", ":-(")
 					back_level()
 				back_level()
 		if not album.empty:
