@@ -166,7 +166,9 @@ class TreeWalker:
 					album.add_photo(photo)
 					self.add_photo_to_tree_by_date(photo)
 				else:
-					message("unreadable", os.path.basename(entry))
+					next_level
+					message("unreadable", ")
+					back_level()
 				back_level()
 		if not album.empty:
 			message("caching", os.path.basename(path))
