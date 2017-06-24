@@ -13,10 +13,13 @@ a:hover {
 	color: #FFAD27;
 }
 #title, #title:hover, #day-view-container, #folders-view-container {
-	padding: 0.4em;
 	font-weight: bold;
 	font-size: medium;
 	float: left;
+}
+
+#title, #title:hover {
+	padding: 0.4em;
 }
 
 #title, #title:hover {
@@ -44,7 +47,7 @@ a:hover {
 	font-variant: small-caps;
 	text-align: center;
 	border-radius: .5em;
-	margin: .5em;
+	padding: .5em;
 }
 
 a#day-view, a#folders-view {
@@ -309,5 +312,6 @@ a#day-view, a#folders-view {
 
 .translation-active {
 	display: inline;
+	padding: .5em;
 }
 
