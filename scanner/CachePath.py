@@ -57,7 +57,7 @@ def image_cache(path, size, square=False):
 		suffix = str(size)
 	return cache_base(path, True) + "_" + suffix + ".jpg"
 def md5_subdir(path):
-	md5 = hashlib.sha224(path).hexdigest()
+	md5 = hashlib.md5(path).hexdigest()
 	return md5[:2]
 def path_with_md5(path, size, square=False):
 	subdir = md5_subdir(path)
