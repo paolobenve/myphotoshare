@@ -43,10 +43,6 @@ def main():
 		value += str(Options.config[option])
 		message(option, value)
 	back_level()
-	#~ if not Options.config['index_html_path']:
-		#~ Options.config.set('options', 'index_html_path', "")
-	#~ Options.config.set('options', 'thumb_sizes', eval(Options.config.get('options', 'thumb_sizes')))
-	#~ Options.config.set('options', 'jpeg_quality', int(Options.config.get('options', 'jpeg_quality')))
 
 	Options.optionsForJs = [
 		'server_album_path',
@@ -87,19 +83,17 @@ def main():
 				.rfind("/")] == Options.config['cache_path'][:Options.config['album_path'].rfind("/")]):
 		album_path = Options.config['album_path']
 		album_base = album_path[:album_path.rfind("/")]
-		#~ print 123,album_base
 		Options.config['index_html_path'] = album_base
 	try:
 		os.umask(002)
 		message("Browsing", "start!")
 		if len(sys.argv) == 3:
 			# 2 arguments: album and cache paths
-			# the other parameters are the default options
+			# the other parameters cannot be changed, the default options are used
 			TreeWalker(sys.argv[1], sys.argv[2])
 		else:
 			# 1 arguments: the config files
 			# which modifies the default options
-			#~ TreeWalker(ModOptions.usrOptions['album_path'], ModOptions.usrOptions['cache_path'])
 			TreeWalker(Options.config['album_path'], Options.config['cache_path'])
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")

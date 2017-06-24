@@ -573,7 +573,7 @@ class Media(object):
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
 			'-crf', '20',						# set quality
-			'-b:v', Options.config['video_transcode_bitrate'],	# set videobitrate to 4Mbps
+			'-b:v', Options.config['video_transcode_bitrate'],	# set videobitrate
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec
 			'-ac', '2',						# force two audiochannels

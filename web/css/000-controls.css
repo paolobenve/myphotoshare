@@ -77,25 +77,25 @@ a#day-view, a#folders-view {
 .album-button {
 	float: left;
 	display: block;
-	width: 170px;
+	width: 150px;
 	height: 40px;
 	text-align: center;
 	font-style: italic;
 	font-size: 90%;
 	background-repeat: no-repeat;
 	background-position-x: center;
-	background-position-y: 10px;
-	padding-top: 160px;
+	background-position-y: 0;
+	padding-top: 150px;
 	background-image: url(../img/image-placeholder.png);
 	background-color: gray;
 	margin: 0 3px 30px 3px;
 }
 
 .album-button.alt {
-	width: 150px;
-	background-position-y: 0;
-	background-color: inherit;
-	padding-top: 150px;
+	width: 170px;
+	background-position-y: 10px;
+	background-color: gray;
+	padding-top: 160px;
 }
 
 

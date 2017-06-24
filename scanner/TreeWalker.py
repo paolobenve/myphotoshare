@@ -203,10 +203,9 @@ class TreeWalker:
 			fp = open(json_options_file, 'w')
 		optionSave = {}
 		
-		#~ message("optionsForJs", ModOptions.usroptionsForJs)
 		for key, option in Options.config.iteritems():
 			if key in Options.optionsForJs:
-				optionSave[option] = option
+				optionSave[key] = option
 		json.dump(optionSave, fp)
 		fp.close()
 	def remove_stale(self):

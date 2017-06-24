@@ -15,7 +15,7 @@
 		if (Object.prototype.toString.call(subalbum).slice(8, -1) === "String")
 			cacheKey = subalbum;
 		else
-			cacheKey = PhotoFloat.cache_path(subalbum.parent.path + "/" + subalbum.path);
+			cacheKey = PhotoFloat.cachePath(subalbum.parent.path + "/" + subalbum.path);
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
 			return;
@@ -66,7 +66,7 @@
 		hash = PhotoFloat.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (! hash.length) {
-			album = PhotoFloat.cache_path(Options['folders_string']);
+			album = PhotoFloat.cachePath(Options['folders_string']);
 			photo = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
 			photo = hash.substring(index + 1);
@@ -79,7 +79,7 @@
 			var i = -1;
 			if (photo !== null) {
 				for (i = 0; i < theAlbum.photos.length; ++i) {
-					if (PhotoFloat.cache_path(theAlbum.photos[i].name) === photo) {
+					if (PhotoFloat.cachePath(theAlbum.photos[i].name) === photo) {
 						photo = theAlbum.photos[i];
 						break;
 					}
@@ -110,7 +110,7 @@
 	};
 	
 	/* static functions */
-	PhotoFloat.cache_path = function(path) {
+	PhotoFloat.cachePath = function(path) {
 		if (path === "")
 			return "root";
 		if (path.charAt(0) === "/")
@@ -136,33 +136,33 @@
 		return path;
 	};
 	PhotoFloat.photoHash = function(album, media) {
-		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cache_path(media.name);
+		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(media.name);
 	};
 	PhotoFloat.photoHashFolder = function(album, media) {
 		var hash;
 		hash = PhotoFloat.photoHash(album, media);
 		bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
-			hash = PhotoFloat.cache_path(media.completeName.substring(0, media.completeName.length - media.name.length - 1)) + "/" + PhotoFloat.cache_path(media.name);
+			hash = PhotoFloat.cachePath(media.completeName.substring(0, media.completeName.length - media.name.length - 1)) + "/" + PhotoFloat.cachePath(media.name);
 		}
 		return hash;
 	};
 	PhotoFloat.albumHash = function(album) {
 		if (typeof album.photos !== "undefined" && album.photos !== null)
-			return PhotoFloat.cache_path(album.path);
-		return PhotoFloat.cache_path(album.parent.path + "/" + album.path);
+			return PhotoFloat.cachePath(album.path);
+		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
 	};
 	PhotoFloat.videoPath = function(album, video) {
 		var hashFolder = PhotoFloat.photoHashFolder(album, video) + ".mp4";
-		hash = PhotoFloat.cache_path(hashFolder);
+		hash = PhotoFloat.cachePath(hashFolder);
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
 			bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
-			var folders_stringWithTrailingSeparator = Options['folders_string'] + Options['cache_folder_separator'];
-			if (hash.indexOf(folders_stringWithTrailingSeparator) === 0)
-				hash = hash.substring(folders_stringWithTrailingSeparator.length);
+			var foldersStringWithTrailingSeparator = Options['folders_string'] + Options['cache_folder_separator'];
+			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
+				hash = hash.substring(foldersStringWithTrailingSeparator.length);
 			else {
 				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
@@ -177,14 +177,14 @@
 			suffix = thumb_size.toString() + "s";
 		else
 			suffix = thumb_size.toString();
-		hash = PhotoFloat.cache_path(PhotoFloat.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
+		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
-			folders_stringWithTrailingSeparator = Options['folders_string'] + Options['cache_folder_separator'];
-			if (hash.indexOf(folders_stringWithTrailingSeparator) === 0)
-				hash = hash.substring(folders_stringWithTrailingSeparator.length);
+			foldersStringWithTrailingSeparator = Options['folders_string'] + Options['cache_folder_separator'];
+			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
+				hash = hash.substring(foldersStringWithTrailingSeparator.length);
 			else {
 				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
@@ -233,7 +233,7 @@
 	};
 	
 	/* make static methods callable as member functions */
-	PhotoFloat.prototype.cache_path = PhotoFloat.cache_path;
+	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
 	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
 	PhotoFloat.prototype.photoHashFolder = PhotoFloat.photoHashFolder;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;

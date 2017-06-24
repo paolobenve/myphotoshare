@@ -88,7 +88,7 @@ $(document).ready(function() {
 			if (i != 1 || components[i] != Options['folders_string']) {
 				if (i < components.length - 1 || currentMedia !== null)
 					if (! (i == 1 && components[i] == Options['by_date_string']))
-						title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cache_path(last.substring(1)) : "") + "\">";
+						title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && components[i] == Options['by_date_string'])
 					title += translationsToTranslatedString($("#by-date-translation").html());
 				else
@@ -167,9 +167,9 @@ $(document).ready(function() {
 				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 					thumbHash =
-						PhotoFloat.cache_path(currentAlbum.photos[i].completeName.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
+						PhotoFloat.cachePath(currentAlbum.photos[i].completeName.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
 						"/" +
-						PhotoFloat.cache_path(currentAlbum.photos[i].name);
+						PhotoFloat.cachePath(currentAlbum.photos[i].name);
 				}
 				link = $("<a href=\"#!/" + hash + "\"></a>");
 				image = $("<div class=\"thumb-container\">" +
@@ -313,7 +313,6 @@ $(document).ready(function() {
 							(thumbnailMinSize < windowMinSize && thumbnailMaxSize < windowMaxSize) ||
 						mediaOrientation !== windowOrientation &&
 							(thumbnailMinSize < windowMaxSize && thumbnailMaxSize < windowMinSize))
-					//~ if (maxSizeSet && Options['thumb_sizes'][i][0] < Math.max($(window).width(), $(window).height()))
 						break;
 					maxSize = Options['thumb_sizes'][i][0];
 					maxSizeSet = true;
@@ -424,8 +423,8 @@ $(document).ready(function() {
 		}
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		if (currentMedia.mediaType != "video") {
-			$("#folders-view").attr("href", "#!/" + PhotoFloat.cache_path(currentMedia.foldersAlbum) + "/" + PhotoFloat.cache_path(currentMedia.name));
-			$("#day-view").attr("href", "#!/" + PhotoFloat.cache_path(currentMedia.dayAlbum) + "/" + PhotoFloat.cache_path(currentMedia.name));
+			$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+			$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
 		}
 		
 		text = "<table>";
@@ -603,6 +602,15 @@ $(document).ready(function() {
 						Options['server_cache_path'] += "/";
 					if (Options['server_album_path'] && Options['server_album_path'].substr(-1) != "/")
 						Options['server_album_path'] += "/";
+					while(Options["thumb_sizes"].indexOf('(') != -1)
+						Options["thumb_sizes"] = Options["thumb_sizes"].replace('(', '[');
+					while(Options["thumb_sizes"].indexOf(')') != -1)
+						Options["thumb_sizes"] = Options["thumb_sizes"].replace(')', ']');
+					while(Options["thumb_sizes"].indexOf('False') != -1)
+						Options["thumb_sizes"] = Options["thumb_sizes"].replace('False', 0);
+					while(Options["thumb_sizes"].indexOf('True') != -1)
+						Options["thumb_sizes"] = Options["thumb_sizes"].replace('True', 1);
+					Options["thumb_sizes"] = JSON.parse(Options["thumb_sizes"]);
 					
 					callback(location.hash, hashParsed, die);
 				},

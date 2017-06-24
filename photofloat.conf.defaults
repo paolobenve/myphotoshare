@@ -1,6 +1,9 @@
 # Default options file for photofloat
 #
 # This file is imported through the ConfigParser standard module
+#       boolean values:
+#          1 = yes = true;
+#          0 = false = no
 #
 # This file sets the default options: they are read by scanner/ModOptions.py
 #
@@ -13,7 +16,7 @@
 # scanner option
 ###########################################################
 
-# verbosity level, python only
+# verbosity level, a number 0-3
 max_verbose = 0
 
 # absolute path of the folder where index.html resides, by default album_path is "albums" inside it and cache_path is "cache" inside it
@@ -39,11 +42,11 @@ jpeg_quality = 95
 
 
 # The thubnail sizes to be used, each value is a tuple (max-width, square)
-thumb_sizes = [ (1600, False), (1200, False), (800, False), (150, True) ]
+thumb_sizes = [(1600, False), (1200, False), (800, False), (150, True)]
 
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _folders
-by_date_string = _by_date,
+by_date_string = _by_date
 cache_folder_separator = -
 
 ###########################################################
@@ -73,13 +76,13 @@ page_title = My photos
 thumb_spacing = 3px
 
 # should we show album thumbnails different from photo ones?
-different_album_thumbnails = False
+different_album_thumbnails = true
 
 # what method will be used to generate tumbnails?
 # permitted values:
-# cascade: the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
-# parallel: every thumbnail is generated from the image, and the various generations are launched parallely on the various cores of the cpu
-# mixed: the biggest thumbnail is generated from image, the following are generate in a parallel way from the former
+#    cascade : the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
+#    parallel: every thumbnail is generated from the image, and the processes are launched parallely on the various cores of the cpu
+#    mixed   : the biggest thumbnail is generated from image, the following are generate in a parallel way from the biggest thumbnail
 thumbnail_generation_mode = cascade
 
 # will photos/videos names be shown below the thumbnail in albums?
