@@ -29,6 +29,7 @@ a:hover {
 	top: 0;
 	padding: 0.4em;
 	font-weight: bold;
+	line-height: 1.3em;
 }
 
 .title-anchor {
@@ -89,6 +90,7 @@ a#day-view, a#folders-view {
 	background-image: url(../img/image-placeholder.png);
 	background-color: gray;
 	margin: 0 3px 30px 3px;
+	line-height: 1.1em
 }
 
 .album-button.alt {

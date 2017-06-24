@@ -99,7 +99,7 @@ title_color = white
 title_color_hover = yellow
 
 # the color to use for the photo/video name in title
-title_image_name_color = green
+title_image_name_color = lime
 
 # the page background color (this is ~ gray)
 background_color = #222222
