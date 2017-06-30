@@ -143,7 +143,7 @@ class TreeWalker:
 						cache_files = list()
 						if "mediaType" in cached_photo.attributes and cached_photo.attributes["mediaType"] == "video":
 							# video
-							cache_files.append(os.path.join(self.cache_path, video_cache(entry)))
+							cache_files.append(os.path.join(self.cache_path, video_cache_with_md5(entry)))
 						else:
 							# image
 							for thumb_size in Media.thumb_sizes:

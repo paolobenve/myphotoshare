@@ -571,7 +571,7 @@ class Media(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, video_cache(self.media_file_name))
+		transcode_path = os.path.join(transcode_path, video_cache_with_md5(self.media_file_name))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -656,8 +656,8 @@ class Media(object):
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			for thumb_size in eval(Options.config['thumb_sizes']):
 				if thumb_size[1]:
-					caches.append(image_cache(self.media_file_name, thumb_size[0], thumb_size[1]))
-			caches.append(video_cache(self.media_file_name))
+					caches.append(path_with_md5(self.media_file_name, thumb_size[0], thumb_size[1]))
+			caches.append(video_cache_with_md5(self.media_file_name))
 		else:
 			caches = [path_with_md5(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in eval(Options.config['thumb_sizes'])]
 		return caches

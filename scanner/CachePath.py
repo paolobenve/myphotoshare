@@ -65,7 +65,13 @@ def path_with_md5(path, size, square=False):
 		os.makedirs(cache_path_with_subdir)
 	image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, square))
 	return image_cache_with_subdir
-def video_cache(path):
+def video_cache_with_md5(path):
+	subdir = md5_subdir(path)
+	cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
+	if not os.path.exists(cache_path_with_subdir):
+		os.makedirs(cache_path_with_subdir)
 	return cache_base(path, True) + ".mp4"
+#~ def video_cache(path):
+	#~ return cache_base(path, True) + ".mp4"
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))
