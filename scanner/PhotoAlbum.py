@@ -366,7 +366,6 @@ class Media(object):
 			message("existing thumb", info_string)
 			back_level()
 			return image
-		message("thumbing", info_string)
 		gc.collect()
 		try:
 			image_copy = image.copy()
@@ -403,7 +402,8 @@ class Media(object):
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=int(Options.config['jpeg_quality']))
 			next_level(1)
-			message(str(thumbnail_size) + " thumbnail", "OK", 1)
+			message("thumbing", info_string)
+			#~ message(str(thumbnail_size) + " thumbnail", "OK", 1)
 			back_level(1)
 			back_level()
 			return image_copy

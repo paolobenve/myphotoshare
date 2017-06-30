@@ -171,7 +171,7 @@ class TreeWalker:
 					back_level()
 				back_level()
 		if not album.empty:
-			message("caching", os.path.basename(path))
+			message("caching folder", os.path.basename(path))
 			album.cache(self.cache_path)
 			self.all_albums.append(album)
 		else:
@@ -188,21 +188,17 @@ class TreeWalker:
 		json.dump(photo_list, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	def save_json_options(self):
-		
+		next_level()
 		try:
 			json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
-			next_level()
-			message("json options file", "trying " + json_options_file)
 			fp = open(json_options_file, 'w')
-			next_level()
-			message("OK", "")
-			back_level()
+			message("json options file", json_options_file)
 		except IOError:
+			json_options_file_old = json_options_file
 			json_options_file = os.path.join(self.cache_path, 'options.json')
-			next_level()
-			message("read only directory", "using " + json_options_file)
-			back_level()
+			message("json options file", json_options_file + " (couldn not save " + json_options_file_old + ")")
 			fp = open(json_options_file, 'w')
+		back_level()
 		optionSave = {}
 		
 		for key, option in Options.config.iteritems():
