@@ -419,7 +419,7 @@ $(document).ready(function() {
 		if (currentAlbum.photos.length == 1) {
 			$("#next").hide();
 			$("#back").hide();
-			$("#next-photo").removeAttr("href");
+			$(".next-media").removeAttr("href");
 			$("#next").removeAttr("href");
 			$("#back").removeAttr("href");
 			$("#photo-view").addClass("no-bottom-space");
@@ -428,7 +428,7 @@ $(document).ready(function() {
 			nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
 			$("#next").show();
 			$("#back").show();
-			$("#next-photo").attr("href", nextLink);
+			$(".next-media").attr("href", nextLink);
 			$("#next").attr("href", nextLink);
 			$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
 			$("#photo-view").removeClass("no-bottom-space");
