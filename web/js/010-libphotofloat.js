@@ -169,7 +169,10 @@
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		return Options['server_cache_path'] + video["cacheSubdir"] + "/" + hash;
+		if (video["cacheSubdir"])
+			return Options['server_cache_path'] + video["cacheSubdir"] + "/" + hash;
+		else
+			return Options['server_cache_path'] + hash;
 	};
 	PhotoFloat.photoPath = function(album, photo, thumb_size, square) {
 		var suffix, hash;
@@ -191,7 +194,10 @@
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		return Options['server_cache_path'] + photo["cacheSubdir"] + "/" + hash;
+		if (photo["cacheSubdir"])
+			return Options['server_cache_path'] + photo["cacheSubdir"] + "/" + hash;
+		else
+			return Options['server_cache_path'] + hash;
 	};
 	PhotoFloat.originalPhotoPath = function(photo) {
 		return photo.albumName;

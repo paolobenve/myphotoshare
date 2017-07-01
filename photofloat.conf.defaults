@@ -32,7 +32,8 @@ cache_path =
 # permitted values:
 #    md5	: the leading 2 characters of the md5 of the image/video path relative to albums dir
 #    folder	: the leading 2 characters of the subfolder of the image/video path relative to albums dir
-subdir_method = md5
+#    (none)	: no subfolders
+subdir_method = 
 
 # The transcode bitrate used for videos
 video_transcode_bitrate = 4M

@@ -58,25 +58,33 @@ def image_cache(path, size, square=False):
 def cache_subdir(path):
 	if Options.config['subdir_method'] == "md5":
 		subdir = hashlib.md5(path).hexdigest()[:2]
-	else:
+	elif Options.config['subdir_method'] == "folder":
 		if path.find("/") == -1:
 			subdir = "__"
 		else:
 			subdir = path[:path.find("/")][:2]
+	else:
+		subdir = ""
 	return subdir
 def path_with_subdir(path, size, square=False):
 	subdir = cache_subdir(path)
-	cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
-	if not os.path.exists(cache_path_with_subdir):
-		os.makedirs(cache_path_with_subdir)
-	image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, square))
+	if subdir:
+		cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
+		if not os.path.exists(cache_path_with_subdir):
+			os.makedirs(cache_path_with_subdir)
+		image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, square))
+	else:
+		image_cache_with_subdir = image_cache(path, size, square)
 	return image_cache_with_subdir
 def video_cache_with_subdir(path):
 	subdir = cache_subdir(path)
-	cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
-	if not os.path.exists(cache_path_with_subdir):
-		os.makedirs(cache_path_with_subdir)
-	video_cache_with_subdir = os.path.join(subdir, video_cache(path))
+	if subdir:
+		cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
+		if not os.path.exists(cache_path_with_subdir):
+			os.makedirs(cache_path_with_subdir)
+		video_cache_with_subdir = os.path.join(subdir, video_cache(path))
+	else:
+		video_cache_with_subdir = video_cache(path)
 	return video_cache_with_subdir
 def video_cache(path):
 	return cache_base(path, True) + "_transcoded.mp4"
