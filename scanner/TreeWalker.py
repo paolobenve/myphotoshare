@@ -139,7 +139,10 @@ class TreeWalker:
 				cache_hit = False
 				if cached_album:
 					cached_photo = cached_album.photo_from_path(entry)
-					if cached_photo and file_mtime(entry) <= cached_photo.attributes["dateTimeFile"]:
+					if (
+						cached_photo and
+						file_mtime(entry) <= cached_photo.attributes["dateTimeFile"]
+					):
 						cache_files = list()
 						if "mediaType" in cached_photo.attributes and cached_photo.attributes["mediaType"] == "video":
 							# video
@@ -203,10 +206,7 @@ class TreeWalker:
 		back_level()
 		optionSave = {}
 		
-		for key, option in Options.config.iteritems():
-			if key in Options.optionsForJs:
-				optionSave[key] = option
-		json.dump(optionSave, fp)
+		json.dump(Options.config, fp)
 		fp.close()
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:

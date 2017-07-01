@@ -361,7 +361,11 @@ class Media(object):
 		next_level()
 		if square:
 			info_string += ", square"
-		if os.path.exists(thumb_path) and file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
+		if (
+			os.path.exists(thumb_path) and
+			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
+			not Options.config['recreate_photo_thumbnails']
+		):
 			message("existing thumb", info_string)
 			back_level()
 			return image
@@ -593,7 +597,11 @@ class Media(object):
 		next_level()
 		message("transcoding", info_string)
 		back_level()
-		if os.path.exists(transcode_path) and file_mtime(transcode_path) >= self._attributes["dateTimeFile"]:
+		if (
+			os.path.exists(transcode_path) and
+			file_mtime(transcode_path) >= self._attributes["dateTimeFile"] and
+			not Options.config['retranscode_videos']
+		):
 			self._video_metadata(transcode_path, False)
 			return
 		if "originalSize" in self._attributes and self._attributes["originalSize"][1] > 720:

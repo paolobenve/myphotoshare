@@ -7,6 +7,7 @@ import os
 import os.path
 import ConfigParser
 import Options
+import json
 
 def main():
 	reload(sys)
@@ -44,32 +45,6 @@ def main():
 		message(option, option_value)
 	back_level()
 
-
-	Options.optionsForJs = [
-		'server_album_path',
-		'server_cache_path',
-		'cache_path',
-		'language',
-		'thumb_spacing',
-		'folders_string',
-		'by_date_string',
-		'cache_folder_separator',
-		'page_title',
-		'different_album_thumbnails',
-		'show_media_names_below_thumbs_in_albums',
-		'title_font_size',
-		'title_color',
-		'title_color_hover',
-		'title_image_name_color',
-		'background_color',
-		'switch_button_background_color',
-		'switch_button_background_color_hover',
-		'switch_button_color',
-		'switch_button_color_hover',
-		'thumb_sizes'
-	]
-
-
 	if not Options.config['index_html_path'] and not Options.config['album_path'] and not Options.config['cache_path']:
 		message("options", "at least index_html_path or both album_path and cache_path must be given, quitting")
 		sys.exit(-97)
@@ -85,6 +60,23 @@ def main():
 		album_path = Options.config['album_path']
 		album_base = album_path[:album_path.rfind("/")]
 		Options.config['index_html_path'] = album_base
+
+	json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
+	try:
+		with open(json_options_file) as old_options_file:
+			old_options = json.load(old_options_file)
+	except IOError:
+		options_file = os.path.join(Options.config['index_html_path'], "cache/options.json")
+		with open(json_options_file) as old_options_file:
+			old_options = json.load(old_options_file)
+	
+	Options.config['recreate_photo_thumbnails'] = False
+	if int(old_options['jpeg_quality']) != int(Options.config['jpeg_quality']):
+		Options.config['recreate_photo_thumbnails'] = True
+	Options.config['retranscode_videos'] = False
+	if str(old_options['video_transcode_bitrate']) != str(Options.config['video_transcode_bitrate']):
+		Options.config['retranscode_videos'] = True
+
 	try:
 		os.umask(002)
 		message("Browsing", "start!")
@@ -92,6 +84,7 @@ def main():
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)
+	
 
 if __name__ == "__main__":
 	main()
