@@ -209,9 +209,6 @@ class TreeWalker:
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
 			message("cleanup", "building stale list")
-			#~ if subdir:
-				#~ all_cache_entries = {}
-			#~ else:
 			all_cache_entries = { "all_photos.json": True, "latest_photos.json": True, "options.json": True }
 			for album in self.all_albums:
 				all_cache_entries[album.json_file] = True
@@ -220,12 +217,13 @@ class TreeWalker:
 					all_cache_entries[entry] = True
 		else:
 			all_cache_entries = cache_list
-		info = "searching for stale cache entries"
+		info = "in cache path"
 		if subdir:
-			info += " in subdir " + subdir
-		message("cleanup", info)
+			info = "in subdir " + subdir
+		message("cleanup, searching", info)
 		deletable_files_suffixes = list()
 		deletable_files_suffixes.append(".json")
+		deletable_files_suffixes.append("_transcoded.mp4")
 		for thumb_size in eval(Options.config['thumb_sizes']):
 			suffix = "_" + str(thumb_size[0])
 			if thumb_size[1]:
@@ -237,7 +235,7 @@ class TreeWalker:
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):
 				self.remove_stale(cache, all_cache_entries)
 			else:
-				# only delete json's and thumbnails
+				# only delete json's, transcoded videos and thumbnails
 				found = False
 				for suffix in deletable_files_suffixes:
 					index = cache.find(suffix)
@@ -256,6 +254,6 @@ class TreeWalker:
 				cache_with_subdir = os.path.join(subdir, cache)
 				if cache_with_subdir not in all_cache_entries:
 					message("cleanup", cache_with_subdir)
-					#~ message("cleanup", os.path.basename(cache))
-					os.unlink(os.path.join(self.cache_path, cache_with_subdir))
+					file_to_delete = os.path.join(self.cache_path, cache_with_subdir)
+					os.unlink(os.path.join(self.cache_path, file_to_delete))
 		back_level()

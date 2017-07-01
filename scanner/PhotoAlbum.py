@@ -298,9 +298,7 @@ class Media(object):
 
 
 	def _video_metadata(self, path, original=True):
-		#~ message("debug", "video metadata")
 		p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
-		#~ message("debug: p", p)
 		if p == False:
 			self.is_valid = False
 			return
@@ -357,6 +355,7 @@ class Media(object):
 		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, square)
 
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square):
+		#~ message("video", path_with_md5(self.media_file_name, thumbnail_size, square))
 		thumb_path = os.path.join(thumbs_path, path_with_md5(self.media_file_name, thumbnail_size, square))
 		info_string = str(thumbnail_size)
 		next_level()
@@ -403,7 +402,6 @@ class Media(object):
 			image_copy.save(thumb_path, "JPEG", quality=int(Options.config['jpeg_quality']))
 			next_level(1)
 			message("thumbing", info_string)
-			#~ message(str(thumbnail_size) + " thumbnail", "OK", 1)
 			back_level(1)
 			back_level()
 			return image_copy
@@ -463,10 +461,7 @@ class Media(object):
 					if (Options.config['thumbnail_generation_mode'] == "mixed" and thumb_size == eval(Options.config['thumb_sizes'])[0]):
 						continue
 					try:
-						#~ import timeit
-						#~ start_time = timeit.default_timer()
 						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size))
-						#~ message("time", str(timeit.default_timer() - start_time))
 					except KeyboardInterrupt:
 						raise
 			except KeyboardInterrupt:
