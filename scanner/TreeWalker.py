@@ -72,7 +72,7 @@ class TreeWalker:
 		self.all_albums.append(by_date_album)
 		root_cache = os.path.join(self.cache_path, json_name(self.album_path))
 		if not by_date_album.empty:
-			message("cache_path", self.cache_path + "   " + os.path.basename(self.cache_path), 2)
+			#~ message("cache_path", self.cache_path + "   " + os.path.basename(self.cache_path), 2)
 			by_date_album.cache(self.cache_path)
 		return by_date_album
 	def add_photo_to_tree_by_date(self, photo):
@@ -94,7 +94,7 @@ class TreeWalker:
 			message("access denied", os.path.basename(path))
 			back_level()
 			return None
-		message("Next level", os.path.basename(path))
+		message("Next level folder:", os.path.basename(path))
 		cache = os.path.join(self.cache_path, json_name(path))
 		cached = False
 		cached_album = None
@@ -143,11 +143,11 @@ class TreeWalker:
 						cache_files = list()
 						if "mediaType" in cached_photo.attributes and cached_photo.attributes["mediaType"] == "video":
 							# video
-							cache_files.append(os.path.join(self.cache_path, video_cache_with_md5(entry)))
+							cache_files.append(os.path.join(self.cache_path, video_cache_with_subdir(entry)))
 						else:
 							# image
 							for thumb_size in Media.thumb_sizes:
-								cache_files.append(os.path.join(self.cache_path, path_with_md5(entry, thumb_size[0], False)))
+								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size[0], False)))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
 						cache_hit = True
@@ -159,7 +159,7 @@ class TreeWalker:
 							message("cache hit", os.path.basename(entry))
 							photo = cached_photo
 				if not cache_hit:
-					message("processing image/video", os.path.basename(entry))
+					message(" processing image/video", os.path.basename(entry))
 					photo = Media(entry, self.cache_path)
 				if photo.is_valid:
 					self.all_photos.append(photo)
@@ -171,7 +171,9 @@ class TreeWalker:
 					back_level()
 				back_level()
 		if not album.empty:
-			message("caching folder", os.path.basename(path))
+			next_level()
+			message("caching folder:", os.path.basename(path))
+			back_level()
 			album.cache(self.cache_path)
 			self.all_albums.append(album)
 		else:
@@ -192,11 +194,11 @@ class TreeWalker:
 		try:
 			json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
 			fp = open(json_options_file, 'w')
-			message("json options file", json_options_file)
+			message("saving json options file", json_options_file)
 		except IOError:
 			json_options_file_old = json_options_file
 			json_options_file = os.path.join(self.cache_path, 'options.json')
-			message("json options file", json_options_file + " (couldn not save " + json_options_file_old + ")")
+			message("saving json options file", json_options_file + " (couldn not save " + json_options_file_old + ")")
 			fp = open(json_options_file, 'w')
 		back_level()
 		optionSave = {}
@@ -215,12 +217,13 @@ class TreeWalker:
 			for photo in self.all_photos:
 				for entry in photo.image_caches:
 					all_cache_entries[entry] = True
+			next_level()
 		else:
 			all_cache_entries = cache_list
 		info = "in cache path"
 		if subdir:
 			info = "in subdir " + subdir
-		message("cleanup, searching", info)
+		message("searching", info)
 		deletable_files_suffixes = list()
 		deletable_files_suffixes.append(".json")
 		deletable_files_suffixes.append("_transcoded.mp4")
@@ -233,7 +236,13 @@ class TreeWalker:
 		next_level()
 		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):
+				next_level()
 				self.remove_stale(cache, all_cache_entries)
+				if not os.listdir(os.path.join(self.cache_path, cache)):
+					message("empty subdir, deleting", "xxxx")
+					file_to_delete = os.path.join(self.cache_path, cache)
+					os.rmdir(os.path.join(self.cache_path, file_to_delete))
+				back_level()
 			else:
 				# only delete json's, transcoded videos and thumbnails
 				found = False
@@ -256,4 +265,6 @@ class TreeWalker:
 					message("cleanup", cache_with_subdir)
 					file_to_delete = os.path.join(self.cache_path, cache_with_subdir)
 					os.unlink(os.path.join(self.cache_path, file_to_delete))
+		if not subdir:
+			back_level()
 		back_level()

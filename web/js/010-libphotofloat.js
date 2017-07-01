@@ -153,7 +153,7 @@
 		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
 	};
 	PhotoFloat.videoPath = function(album, video) {
-		var hashFolder = PhotoFloat.photoHashFolder(album, video) + ".mp4";
+		var hashFolder = PhotoFloat.photoHashFolder(album, video) + "_transcoded.mp4";
 		hash = PhotoFloat.cachePath(hashFolder);
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)
@@ -169,7 +169,7 @@
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		return Options['server_cache_path'] + hash;
+		return Options['server_cache_path'] + video["cacheSubdir"] + "/" + hash;
 	};
 	PhotoFloat.photoPath = function(album, photo, thumb_size, square) {
 		var suffix, hash;
@@ -191,7 +191,7 @@
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		return Options['server_cache_path'] + photo["md5Subdir"] + "/" + hash;
+		return Options['server_cache_path'] + photo["cacheSubdir"] + "/" + hash;
 	};
 	PhotoFloat.originalPhotoPath = function(photo) {
 		return photo.albumName;

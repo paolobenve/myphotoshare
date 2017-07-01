@@ -22,11 +22,17 @@ max_verbose = 0
 # absolute path of the folder where index.html resides, by default album_path is "albums" inside it and cache_path is "cache" inside it
 index_html_path = 
 
-# albums folder absolute path
+# albums folder absolute path, for use in python 
 album_path = 
 
 # cache folder absolute path, for use in python 
 cache_path = 
+
+# the method to use for generating cache 2-charachters subdirs
+# permitted values:
+#    md5	: the leading 2 characters of the md5 of the image/video path relative to albums dir
+#    folder	: the leading 2 characters of the subfolder of the image/video path relative to albums dir
+subdir_method = md5
 
 # The transcode bitrate used for videos
 video_transcode_bitrate = 4M

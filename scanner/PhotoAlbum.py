@@ -355,8 +355,8 @@ class Media(object):
 		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, square)
 
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square):
-		#~ message("video", path_with_md5(self.media_file_name, thumbnail_size, square))
-		thumb_path = os.path.join(thumbs_path, path_with_md5(self.media_file_name, thumbnail_size, square))
+		#~ message("video", path_with_subdir(self.media_file_name, thumbnail_size, square))
+		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size, square))
 		info_string = str(thumbnail_size)
 		next_level()
 		if square:
@@ -566,7 +566,7 @@ class Media(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, video_cache_with_md5(self.media_file_name))
+		transcode_path = os.path.join(transcode_path, video_cache_with_subdir(self.media_file_name))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -651,10 +651,10 @@ class Media(object):
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			for thumb_size in eval(Options.config['thumb_sizes']):
 				if thumb_size[1]:
-					caches.append(path_with_md5(self.media_file_name, thumb_size[0], thumb_size[1]))
-			caches.append(video_cache_with_md5(self.media_file_name))
+					caches.append(path_with_subdir(self.media_file_name, thumb_size[0], thumb_size[1]))
+			caches.append(video_cache_with_subdir(self.media_file_name))
 		else:
-			caches = [path_with_md5(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in eval(Options.config['thumb_sizes'])]
+			caches = [path_with_subdir(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in eval(Options.config['thumb_sizes'])]
 		return caches
 	@property
 	def date(self):
@@ -734,7 +734,7 @@ class Media(object):
 				"foldersAlbum": foldersAlbum,
 				"completeName": os.path.join(Options.config['folders_string'], self.media_file_name),
 				"date": self.date,
-				"md5Subdir": md5_subdir(self.media_file_name),
+				"cacheSubdir": cache_subdir(self.media_file_name),
 				"cacheBase": cache_base(self.name)
 			}
 		photo.update(self.attributes)

@@ -55,18 +55,24 @@ def image_cache(path, size, square=False):
 	if square:
 		suffix = str(size) + "s"
 	return cache_base(path, True) + "_" + suffix + ".jpg"
-def md5_subdir(path):
-	md5 = hashlib.md5(path).hexdigest()
-	return md5[:2]
-def path_with_md5(path, size, square=False):
-	subdir = md5_subdir(path)
+def cache_subdir(path):
+	if Options.config['subdir_method'] == "md5":
+		subdir = hashlib.md5(path).hexdigest()[:2]
+	else:
+		if path.find("/") == -1:
+			subdir = "__"
+		else:
+			subdir = path[:path.find("/")][:2]
+	return subdir
+def path_with_subdir(path, size, square=False):
+	subdir = cache_subdir(path)
 	cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
 	if not os.path.exists(cache_path_with_subdir):
 		os.makedirs(cache_path_with_subdir)
 	image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, square))
 	return image_cache_with_subdir
-def video_cache_with_md5(path):
-	subdir = md5_subdir(path)
+def video_cache_with_subdir(path):
+	subdir = cache_subdir(path)
 	cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
 	if not os.path.exists(cache_path_with_subdir):
 		os.makedirs(cache_path_with_subdir)
