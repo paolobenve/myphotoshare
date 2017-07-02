@@ -360,11 +360,18 @@ class Media(object):
 		info_string = str(thumbnail_size)
 		next_level()
 		if square:
-			info_string += ", square"
+			if Options.config['media_thumb_type'] == "square":
+				info_string += ", square thumbnail"
+			elif Options.config['media_thumb_type'] == "fixed_height":
+				info_string += ", fixed height thumbnail"
+			if Options.config['media_thumb_type'] == "canvas":
+				info_string += ", thumbnail in canvas"
 		if (
 			os.path.exists(thumb_path) and
-			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
-			not Options.config['recreate_photo_thumbnails']
+			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
+				not square and not Options.config['recreate_reduced_photos'] or
+				square and not Options.config['recreate_thumbnails']
+			)
 		):
 			message("existing thumb", info_string)
 			back_level()
@@ -384,7 +391,7 @@ class Media(object):
 				self.is_valid = False
 				back_level()
 				return image
-		if square:
+		if square and Options.config['media_thumb_type'] == "square":
 			if image_copy.size[0] > image_copy.size[1]:
 				left = (image_copy.size[0] - image_copy.size[1]) / 2
 				top = 0
@@ -398,6 +405,13 @@ class Media(object):
 			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
 		image_size = max(image_copy.size[0], image_copy.size[1])
+		if (
+			square and Options.config['media_thumb_type'] == "fixed_height" and
+			image_copy.size[0] > image_copy.size[1]
+		):
+			print thumbnail_size
+			thumbnail_size = int(round(float(thumbnail_size * image_copy.size[0]) / float(image_copy.size[1])))
+			print thumbnail_size
 		if (image_size >= thumbnail_size):
 			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
 		else:

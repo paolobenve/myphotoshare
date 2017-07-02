@@ -38,7 +38,7 @@ subdir_method = md5
 # The transcode bitrate used for videos
 video_transcode_bitrate = 4M
 
-# The jpg quality parameter for generating the tumbnails
+# The jpg quality parameter for generating the reduced size images and the tumbnails
 # an integer number 1 -100
 jpeg_quality = 95
 
@@ -47,7 +47,6 @@ jpeg_quality = 95
 # scanner and ui options
 ###########################################################
 
-
 # The sizes for the reduced images
 reduced_sizes = [1600, 1200, 800]
 
@@ -55,6 +54,16 @@ reduced_sizes = [1600, 1200, 800]
 album_thumb_size = 200
 # The sizes for the thumbnails for images/videos
 media_thumb_size = 110
+
+# How should we generate the media thumbnail?
+# permitted values:
+#    square		: photofloat's classical thumbnail
+#    fixed_height	: the size determines the height, the width will depend on orientation
+#    canvas		: square thumbnail containing the whole image
+# fixed_height: TOO MANY PROBLEMS WITH VISUALIZING THEM
+#   many css values should be decided according to actual thumbnail width
+# 
+media_thumb_type = fixed_height
 
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _folders

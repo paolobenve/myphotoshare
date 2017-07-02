@@ -78,12 +78,21 @@ def main():
 		with open(json_options_file) as old_options_file:
 			old_options = json.load(old_options_file)
 	
-	Options.config['recreate_photo_thumbnails'] = False
+	Options.config['recreate_reduced_photos'] = False
 	try:
 		if old_options['jpeg_quality'] != Options.config['jpeg_quality']:
-			Options.config['recreate_photo_thumbnails'] = True
+			Options.config['recreate_reduced_photos'] = True
 	except KeyError:
-		Options.config['recreate_photo_thumbnails'] = False
+		Options.config['recreate_reduced_photos'] = False
+	Options.config['recreate_thumbnails'] = False
+	try:
+		if (
+			old_options['jpeg_quality'] != Options.config['jpeg_quality'] or
+			old_options['media_thumb_type'] != Options.config['media_thumb_type']
+		):
+			Options.config['recreate_thumbnails'] = True
+	except KeyError:
+		Options.config['recreate_thumbnails'] = False
 	Options.config['retranscode_videos'] = False
 	try:
 		if str(old_options['video_transcode_bitrate']) != str(Options.config['video_transcode_bitrate']):

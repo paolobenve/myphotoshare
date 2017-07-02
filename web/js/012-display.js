@@ -152,6 +152,7 @@ $(document).ready(function() {
 	}
 	function showAlbum(populate) {
 		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnail_size;
+		var width, height, thumbWidth, thumbHeight;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
@@ -159,6 +160,7 @@ $(document).ready(function() {
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
+				id = photoFloat.trimExtension(currentAlbum.photos[i].name);
 				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnail_size, true);
 				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
@@ -168,18 +170,33 @@ $(document).ready(function() {
 						PhotoFloat.cachePath(currentAlbum.photos[i].name);
 				}
 				link = $("<a href=\"#!/" + hash + "\"></a>");
-				image = $("<div class=\"thumb-container\">" +
+				width = currentAlbum.photos[i].size[0];
+				height = currentAlbum.photos[i].size[1];
+				imageString = "<div class=\"thumb-container\" id=\"" + id + "\">" +
 							"<img title=\"" + currentAlbum.photos[i].name +
 							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-							"\" src=\"" + thumbHash +
-							"\" height=\"" + thumbnail_size +
-							"\" width=\"" + thumbnail_size +
-							"\" />" +
+							"\" src=\"" +  thumbHash;
+				if (Options['media_thumb_type'] == "fixed_height") {
+					thumbHeight = Options['media_thumb_size'];
+					thumbWidth = Options['media_thumb_size'] / height * width;
+					imageString += 	"\" height=\"" + thumbHeight +
+							"\" width=\"" + thumbWidth;
+				} else {
+					imageString += 	"\" height=\"" + thumbnail_size +
+							"\" width=\"" + thumbnail_size;
+				}
+				imageString += 		"\" />" +
 							"<div class=\"thumb-caption-media\">" +
 							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
 							"</div>" +
-							"</div>");
-
+							"</div>";
+				image = $(imageString);
+				
+				
+				if (Options['media_thumb_type'] == "fixed_height") {
+					$("div#" + id).css("width", thumbWidth.toString() + "px");
+				}
+				
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);
 				photos.push(link);
@@ -542,7 +559,7 @@ $(document).ready(function() {
 	
 	function setOptions() {
 		var thumbnail_size;
-		thumbnail_size_big = Options['thumb_size'];
+		thumbnail_size_big = Options['album_thumb_size'];
 		thumbnail_size_little = Options['media_thumb_size'];
 		$("body").css("background-color", Options['background_color']);
 		$("#day-view-container").css("color", Options['switch_button_color']);
