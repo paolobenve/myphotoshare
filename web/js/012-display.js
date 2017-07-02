@@ -163,11 +163,10 @@ $(document).ready(function() {
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
-			thumbnail_size = Number(Options['thumb_sizes'][0]);
+			thumbnail_size = Options['thumb_sizes'][0];
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
-				thumbnail_size = Number(Options['thumb_sizes'][0]);
 				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnail_size, true);
 				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
@@ -218,7 +217,7 @@ $(document).ready(function() {
 					subalbums.push(link);
 					(function(theContainer, theAlbum, theImage, theLink) {
 						photoFloat.albumPhoto(theAlbum, function(album, photo) {
-							thumbnail_size = Number(Options['thumb_sizes'][0]);
+							thumbnail_size = Options['thumb_sizes'][0];
 							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, thumbnail_size, true) + ")");
 						}, function error() {
 							theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
