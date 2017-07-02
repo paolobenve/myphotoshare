@@ -14,13 +14,13 @@ from VideoToolWrapper import *
 import math
 import Options
 
-def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size):
+def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, square):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
 	# self._photo_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self._photo_thumbnail(image, original_path, thumbs_path, thumb_size[0], thumb_size[1])
+		self._photo_thumbnail(image, original_path, thumbs_path, thumb_size, square)
 	except KeyboardInterrupt:
 		raise
 
@@ -461,11 +461,16 @@ class Media(object):
 			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 			pool = Pool(processes=num_of_cores)
 			try:
-				for thumb_size in eval(Options.config['thumb_sizes']):
-					if (Options.config['thumbnail_generation_mode'] == "mixed" and thumb_size == eval(Options.config['thumb_sizes'])[0]):
+				for thumb_size in eval(Options.config['reduced_sizes']):
+					if (Options.config['thumbnail_generation_mode'] == "mixed" and thumb_size == eval(Options.config['reduced_sizes'])[0]):
 						continue
 					try:
-						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size))
+						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size, False))
+					except KeyboardInterrupt:
+						raise
+				for thumb_size in eval(Options.config['thumb_sizes']):
+					try:
+						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size, True))
 					except KeyboardInterrupt:
 						raise
 			except KeyboardInterrupt:
@@ -479,14 +484,13 @@ class Media(object):
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			thumb_size = eval(Options.config['thumb_sizes'])[0]
+			thumb_size = eval(Options.config['reduced_sizes'])[0]
 			try:
 				if (max(image.size[0], image.size[1]) < thumb_size):
 					image_to_start_from = image
 				else:
 					image_to_start_from = thumb
-				skip_first_size = True
-				thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size[0], thumb_size[1])
+				thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, False)
 				self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
 			except KeyboardInterrupt:
 				raise
@@ -495,13 +499,19 @@ class Media(object):
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			for thumb_size in eval(Options.config['thumb_sizes']):
+			for thumb_size in eval(Options.config['reduced_sizes']):
 				try:
-					if (max(image.size[0], image.size[1]) < thumb_size[0]):
+					if (max(image.size[0], image.size[1]) < thumb_size):
 						image_to_start_from = image
 					else:
 						image_to_start_from = thumb
-					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size[0], thumb_size[1])
+					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, False)
+				except KeyboardInterrupt:
+					raise
+			for thumb_size in eval(Options.config['thumb_sizes']):
+				try:
+					image_to_start_from = thumb
+					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, True)
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
@@ -562,8 +572,7 @@ class Media(object):
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
 		for thumb_size in eval(Options.config['thumb_sizes']):
-			if thumb_size[1]:
-				self._thumbnail(mirror, original_path, thumbs_path, thumb_size[0], thumb_size[1])
+			self._thumbnail(mirror, original_path, thumbs_path, thumb_size, True)
 		try:
 			os.unlink(tfn)
 		except:
@@ -658,11 +667,14 @@ class Media(object):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			for thumb_size in eval(Options.config['thumb_sizes']):
-				if thumb_size[1]:
-					caches.append(path_with_subdir(self.media_file_name, thumb_size[0], thumb_size[1]))
+				caches.append(path_with_subdir(self.media_file_name, thumb_size, True))
 			caches.append(video_cache_with_subdir(self.media_file_name))
 		else:
-			caches = [path_with_subdir(self.media_file_name, thumb_size[0], thumb_size[1]) for thumb_size in eval(Options.config['thumb_sizes'])]
+			caches = []
+			for thumb_size in eval(Options.config['reduced_sizes']):
+				caches.append(path_with_subdir(self.media_file_name, thumb_size, False))
+			for thumb_size in eval(Options.config['thumb_sizes']):
+				caches.append(path_with_subdir(self.media_file_name, thumb_size, True))
 		return caches
 	@property
 	def date(self):

@@ -33,7 +33,7 @@ cache_path =
 #    md5	: the leading 2 characters of the md5 of the image/video path relative to albums dir
 #    folder	: the leading 2 characters of the subfolder of the image/video path relative to albums dir
 #    (none)	: no subfolders
-subdir_method = 
+subdir_method = md5
 
 # The transcode bitrate used for videos
 video_transcode_bitrate = 4M
@@ -48,8 +48,11 @@ jpeg_quality = 95
 ###########################################################
 
 
-# The thubnail sizes to be used, each value is a tuple (max-width, square)
-thumb_sizes = [(1600, False), (1200, False), (800, False), (150, True)]
+# The sizes for the reduced images
+reduced_sizes = [1600, 1200, 800]
+
+# The sizes for the thumbnails: they are used when showing albums/folders
+thumb_sizes = [200, 100]
 
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _folders
