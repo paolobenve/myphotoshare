@@ -239,7 +239,6 @@ class TreeWalker:
 			suffix += "s"
 			suffix += ".jpg"
 			deletable_files_suffixes.append(suffix)
-		print deletable_files_suffixes
 		next_level()
 		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):
@@ -251,16 +250,17 @@ class TreeWalker:
 					os.rmdir(os.path.join(self.cache_path, file_to_delete))
 				back_level()
 			else:
-				# only delete json's, transcoded videos and thumbnails
+				# only delete json's, transcoded videos, reduced images and thumbnails
 				found = False
 				for suffix in deletable_files_suffixes:
 					index = cache.find(suffix)
-					if index != -1 and index == len(cache) - len(suffix):
+					if index != -1 and index + len(suffix) == len(cache):
 						found = True
 						continue
 				if not found:
 					message("not deleting", cache)
 					continue
+				
 				try:
 					cache = cache.decode(sys.getfilesystemencoding())
 				except KeyboardInterrupt:
