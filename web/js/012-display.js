@@ -619,6 +619,8 @@ $(document).ready(function() {
 		});
 		$("#photo-name").css("color", Options['title_image_name_color']);
 		$(".thumb-container").css("margin-right", Options['thumb_spacing'].toString() + "px");
+		if (Options['media_thumb_type'] != "fixed_height")
+			$(".thumb-container").css("width", thumbnail_size_little.toString() + "px");
 		$(".album-button").css("margin-right", Options['thumb_spacing'].toString() + "px");
 		if (Options['different_album_thumbnails']) {
 			$(".album-button").css("width", (thumbnail_size_big * 1.1).toString() + "px");
