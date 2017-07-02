@@ -150,8 +150,10 @@ class TreeWalker:
 							cache_files.append(os.path.join(self.cache_path, video_cache_with_subdir(entry)))
 						else:
 							# image
-							for thumb_size in Media.thumb_sizes:
-								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size[0], False)))
+							for thumb_size in eval(Options.config['reduced_sizes']):
+								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size, False)))
+							for thumb_size in eval(Options.config['thumb_sizes']):
+								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size, False)))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
 						cache_hit = True

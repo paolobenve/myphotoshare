@@ -315,23 +315,21 @@ $(document).ready(function() {
 		imageRatio = mediaMaxSize / mediaMinSize;
 		
 		if (fullscreen) {
-			maxSize = Options['thumb_sizes'][0][0];
+			maxSize = Options['reduced_sizes'][0];
 			maxSizeSet = true;
 		}
 		if (! maxSizeSet) {
-			maxSize = Options['thumb_sizes'][0][0];
-			for (var i = 0; i < Options['thumb_sizes'].length; i++)
-				if (! Options['thumb_sizes'][i][1]) {
-					thumbnailMinSize = Options['thumb_sizes'][i][0] / imageRatio;
-					thumbnailMaxSize = Options['thumb_sizes'][i][0];
-					if (mediaOrientation == windowOrientation &&
-							(thumbnailMinSize < windowMinSize && thumbnailMaxSize < windowMaxSize) ||
-						mediaOrientation !== windowOrientation &&
-							(thumbnailMinSize < windowMaxSize && thumbnailMaxSize < windowMinSize))
-						break;
-					maxSize = Options['thumb_sizes'][i][0];
-					maxSizeSet = true;
-				}
+			maxSize = Options['reduced_sizes'][0];
+			for (var i = 0; i < Options['reduced_sizes'].length; i++)
+				thumbnailMinSize = Options['reduced_sizes'][i] / imageRatio;
+				thumbnailMaxSize = Options['reduced_sizes'][i];
+				if (mediaOrientation == windowOrientation &&
+						(thumbnailMinSize < windowMinSize && thumbnailMaxSize < windowMaxSize) ||
+					mediaOrientation !== windowOrientation &&
+						(thumbnailMinSize < windowMaxSize && thumbnailMaxSize < windowMinSize))
+					break;
+				maxSize = Options['reduced_sizes'][i];
+				maxSizeSet = true;
 		}
 		
 		if (currentMedia.mediaType == "video") {
@@ -622,6 +620,7 @@ $(document).ready(function() {
 						Options['thumb_sizes'] = Options['thumb_sizes'].replace('False', 0);
 					while(Options['thumb_sizes'].indexOf('True') != -1)
 						Options['thumb_sizes'] = Options['thumb_sizes'].replace('True', 1);
+					Options['reduced_sizes'] = JSON.parse(Options['reduced_sizes']);
 					Options['thumb_sizes'] = JSON.parse(Options['thumb_sizes']);
 					
 					callback(location.hash, hashParsed, die);
