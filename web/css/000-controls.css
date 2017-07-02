@@ -269,13 +269,22 @@ a#day-view, a#folders-view {
 	display: inline;
 	position: relative;
 	top: 0;
+	margin-bottom: 1em;
 }
-.thumb-caption {
+.thumb-caption-media, .thumb-caption-album {
 	display: block;
-	font-size: 75%;
 	text-align: center;
 	color: chartreuse;
 	overflow: hidden;
+	padding: 0 .2em;
+}
+
+.thumb-caption-media {
+	font-size: 75%;
+}
+
+.thumb-caption-album {
+	font-size: inherit;
 }
 
 #thumbs a {

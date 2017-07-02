@@ -16,8 +16,8 @@ class TreeWalker:
 		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
 			message("method", "cascade thumbnail generation")
 			# be sure thumb_sizes is correctly sorted 
-			eval(Options.config['reduced_sizes']).sort(reverse = True)
-			eval(Options.config['thumb_sizes']).sort(reverse = True)
+			Options.config['reduced_sizes'].sort(reverse = True)
+			Options.config['thumb_sizes'].sort(reverse = True)
 		self.album_path = os.path.abspath(album_path).decode(sys.getfilesystemencoding())
 		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
 		set_cache_path_base(self.album_path)
@@ -150,9 +150,9 @@ class TreeWalker:
 							cache_files.append(os.path.join(self.cache_path, video_cache_with_subdir(entry)))
 						else:
 							# image
-							for thumb_size in eval(Options.config['reduced_sizes']):
+							for thumb_size in Options.config['reduced_sizes']:
 								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size, False)))
-							for thumb_size in eval(Options.config['thumb_sizes']):
+							for thumb_size in Options.config['thumb_sizes']:
 								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size, False)))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
@@ -230,11 +230,11 @@ class TreeWalker:
 		deletable_files_suffixes = list()
 		deletable_files_suffixes.append(".json")
 		deletable_files_suffixes.append("_transcoded.mp4")
-		for thumb_size in eval(Options.config['reduced_sizes']):
+		for thumb_size in Options.config['reduced_sizes']:
 			suffix = "_" + str(thumb_size)
 			suffix += ".jpg"
 			deletable_files_suffixes.append(suffix)
-		for thumb_size in eval(Options.config['thumb_sizes']):
+		for thumb_size in Options.config['thumb_sizes']:
 			suffix = "_" + str(thumb_size)
 			suffix += "s"
 			suffix += ".jpg"

@@ -82,8 +82,8 @@ language =
 # the title of the collections of photos/albums
 page_title = My photos
 
-# spacing between thumbnails, a string with a css value
-thumb_spacing = 3px
+# spacing between thumbnails, pixels (integer)
+thumb_spacing = 3
 
 # should we show album thumbnails different from photo ones?
 different_album_thumbnails = true

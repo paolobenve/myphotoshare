@@ -403,7 +403,7 @@ class Media(object):
 		else:
 			image_copy = self.resize_canvas(image_copy, thumbnail_size)
 		try:
-			image_copy.save(thumb_path, "JPEG", quality=int(Options.config['jpeg_quality']))
+			image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			next_level(1)
 			message("thumbing", info_string)
 			back_level(1)
@@ -416,7 +416,7 @@ class Media(object):
 				pass
 			raise
 		except IOError:
-			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=int(Options.config['jpeg_quality']))
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			next_level(1)
 			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
 			back_level(1)
@@ -461,14 +461,14 @@ class Media(object):
 			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 			pool = Pool(processes=num_of_cores)
 			try:
-				for thumb_size in eval(Options.config['reduced_sizes']):
-					if (Options.config['thumbnail_generation_mode'] == "mixed" and thumb_size == eval(Options.config['reduced_sizes'])[0]):
+				for thumb_size in Options.config['reduced_sizes']:
+					if (Options.config['thumbnail_generation_mode'] == "mixed" and thumb_size == Options.config['reduced_sizes'][0]):
 						continue
 					try:
 						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size, False))
 					except KeyboardInterrupt:
 						raise
-				for thumb_size in eval(Options.config['thumb_sizes']):
+				for thumb_size in Options.config['thumb_sizes']:
 					try:
 						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size, True))
 					except KeyboardInterrupt:
@@ -484,7 +484,7 @@ class Media(object):
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			thumb_size = eval(Options.config['reduced_sizes'])[0]
+			thumb_size = Options.config['reduced_sizes'][0]
 			try:
 				if (max(image.size[0], image.size[1]) < thumb_size):
 					image_to_start_from = image
@@ -499,7 +499,7 @@ class Media(object):
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		thumb = image
 		try:
-			for thumb_size in eval(Options.config['reduced_sizes']):
+			for thumb_size in Options.config['reduced_sizes']:
 				try:
 					if (max(image.size[0], image.size[1]) < thumb_size):
 						image_to_start_from = image
@@ -508,7 +508,7 @@ class Media(object):
 					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, False)
 				except KeyboardInterrupt:
 					raise
-			for thumb_size in eval(Options.config['thumb_sizes']):
+			for thumb_size in Options.config['thumb_sizes']:
 				try:
 					image_to_start_from = thumb
 					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, True)
@@ -571,7 +571,7 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		for thumb_size in eval(Options.config['thumb_sizes']):
+		for thumb_size in Options.config['thumb_sizes']:
 			self._thumbnail(mirror, original_path, thumbs_path, thumb_size, True)
 		try:
 			os.unlink(tfn)
@@ -666,14 +666,14 @@ class Media(object):
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
-			for thumb_size in eval(Options.config['thumb_sizes']):
+			for thumb_size in Options.config['thumb_sizes']:
 				caches.append(path_with_subdir(self.media_file_name, thumb_size, True))
 			caches.append(video_cache_with_subdir(self.media_file_name))
 		else:
 			caches = []
-			for thumb_size in eval(Options.config['reduced_sizes']):
+			for thumb_size in Options.config['reduced_sizes']:
 				caches.append(path_with_subdir(self.media_file_name, thumb_size, False))
-			for thumb_size in eval(Options.config['thumb_sizes']):
+			for thumb_size in Options.config['thumb_sizes']:
 				caches.append(path_with_subdir(self.media_file_name, thumb_size, True))
 		return caches
 	@property

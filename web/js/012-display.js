@@ -183,7 +183,7 @@ $(document).ready(function() {
 							"\" height=\"" + thumbnail_size +
 							"\" width=\"" + thumbnail_size +
 							"\" />" +
-							"<div class=\"thumb-caption\">" +
+							"<div class=\"thumb-caption-media\">" +
 							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
 							"</div>" +
 							"</div>");
@@ -211,7 +211,9 @@ $(document).ready(function() {
 					imageTextAdd = imageTextAdd.replace(Options['by_date_string'], $("#by-date-translation").html());
 					imageTextAdd = imageTextAdd.replace(Options['folders_string'], $("#folders-translation").html());
 					image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" +
+								"<span class='thumb-caption-album'>" +
 								imageTextAdd +
+								"</span>" +
 								"</div>");
 					link.append(image);
 					subalbums.push(link);
@@ -526,9 +528,9 @@ $(document).ready(function() {
 		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
 		if (currentMedia !== null || ! Options['show_media_names_below_thumbs_in_albums'])
-			$(".thumb-caption").hide();
+			$(".thumb-caption-media").hide();
 		else
-			$(".thumb-caption").show();
+			$(".thumb-caption-media").show();
 		
 		setOptions();
 	}
@@ -578,11 +580,12 @@ $(document).ready(function() {
 			$(this).css("color", Options['title_color'])
 		});
 		$("#photo-name").css("color", Options['title_image_name_color']);
-		$("#thumbs img").css("margin-left", Options['thumb_spacing']);
-		$("#thumbs img").css("margin-right", Options['thumb_spacing']);
-		$(".album-button").css("margin-left", Options['thumb_spacing']);
-		$(".album-button").css("margin-right", Options['thumb_spacing']);
-		$(".thumb-caption").css("width", thumbnail_size.toString() + "px");
+		//~ $("#thumbs img").css("margin-left", Options['thumb_spacing'].toString() + "px");
+		$("#thumbs img").css("margin-right", Options['thumb_spacing'].toString() + "px");
+		$(".album-button").css("margin-left", Options['thumb_spacing'].toString() + "px");
+		//~ $(".album-button").css("margin-right", Options['thumb_spacing'].toString() + "px");
+		$(".thumb-caption-media").css("width", thumbnail_size.toString() + "px");
+		$(".thumb-caption-album").css("width", thumbnail_size.toString() + "px");
 		if (Options['different_album_thumbnails']) {
 			$(".album-button").css("width", (thumbnail_size * 1.1).toString() + "px");
 			$(".album-button").css("padding-top", (thumbnail_size * 1.1).toString() + "px");
@@ -629,8 +632,6 @@ $(document).ready(function() {
 						Options['server_cache_path'] += "/";
 					if (Options['server_album_path'] && Options['server_album_path'].substr(-1) != "/")
 						Options['server_album_path'] += "/";
-					Options['reduced_sizes'] = JSON.parse(Options['reduced_sizes']);
-					Options['thumb_sizes'] = JSON.parse(Options['thumb_sizes']);
 					
 					callback(location.hash, hashParsed, die);
 				},

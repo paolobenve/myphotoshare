@@ -36,13 +36,21 @@ def main():
 	next_level()
 	# pass config values to a dict, because ConfigParser objects are not reliable
 	for option in usr_config.options('options'):
-		Options.config[option] = usr_config.get('options', option)
+		if option in ('max_verbose', 'jpeg_quality', 'thumb_spacing'):
+			Options.config[option] = usr_config.getint('options', option)
+		elif option in ('different_album_thumbnails', 'show_media_names_below_thumbs_in_albums'):
+			Options.config[option] = usr_config.getboolean('options', option)
+		elif option in ('reduced_sizes', 'thumb_sizes'):
+			Options.config[option] = eval(usr_config.get('options', option))
+		else:
+			Options.config[option] = usr_config.get('options', option)
 		if default_config.get('options', option) == Options.config.get('options', option):
 			option_value = "  "
 		else:
 			option_value = "* "
 		option_value += str(Options.config[option])
 		message(option, option_value)
+	# values that have type != string
 	back_level()
 
 	if not Options.config['index_html_path'] and not Options.config['album_path'] and not Options.config['cache_path']:
@@ -72,7 +80,7 @@ def main():
 	
 	Options.config['recreate_photo_thumbnails'] = False
 	try:
-		if int(old_options['jpeg_quality']) != int(Options.config['jpeg_quality']):
+		if old_options['jpeg_quality'] != Options.config['jpeg_quality']:
 			Options.config['recreate_photo_thumbnails'] = True
 	except KeyError:
 		Options.config['recreate_photo_thumbnails'] = False
