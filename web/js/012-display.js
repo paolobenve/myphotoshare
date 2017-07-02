@@ -163,10 +163,12 @@ $(document).ready(function() {
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
+			thumbnail_size = Number(Options['thumb_sizes'][0]);
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
-				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], 150, true);
+				thumbnail_size = Number(Options['thumb_sizes'][0]);
+				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnail_size, true);
 				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 					thumbHash =
@@ -179,7 +181,9 @@ $(document).ready(function() {
 							"<img title=\"" + currentAlbum.photos[i].name +
 							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
 							"\" src=\"" + thumbHash +
-							"\" height=\"150\" width=\"150\" />" +
+							"\" height=\"" + thumbnail_size +
+							"\" width=\"" + thumbnail_size +
+							"\" />" +
 							"<div class=\"thumb-caption\">" +
 							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
 							"</div>" +
@@ -214,7 +218,8 @@ $(document).ready(function() {
 					subalbums.push(link);
 					(function(theContainer, theAlbum, theImage, theLink) {
 						photoFloat.albumPhoto(theAlbum, function(album, photo) {
-							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, 150, true) + ")");
+							thumbnail_size = Number(Options['thumb_sizes'][0]);
+							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, thumbnail_size, true) + ")");
 						}, function error() {
 							theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 							theLink.remove();
@@ -612,14 +617,6 @@ $(document).ready(function() {
 						Options['server_cache_path'] += "/";
 					if (Options['server_album_path'] && Options['server_album_path'].substr(-1) != "/")
 						Options['server_album_path'] += "/";
-					while(Options['thumb_sizes'].indexOf('(') != -1)
-						Options['thumb_sizes'] = Options['thumb_sizes'].replace('(', '[');
-					while(Options['thumb_sizes'].indexOf(')') != -1)
-						Options['thumb_sizes'] = Options['thumb_sizes'].replace(')', ']');
-					while(Options['thumb_sizes'].indexOf('False') != -1)
-						Options['thumb_sizes'] = Options['thumb_sizes'].replace('False', 0);
-					while(Options['thumb_sizes'].indexOf('True') != -1)
-						Options['thumb_sizes'] = Options['thumb_sizes'].replace('True', 1);
 					Options['reduced_sizes'] = JSON.parse(Options['reduced_sizes']);
 					Options['thumb_sizes'] = JSON.parse(Options['thumb_sizes']);
 					
