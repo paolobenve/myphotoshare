@@ -71,11 +71,17 @@ def main():
 			old_options = json.load(old_options_file)
 	
 	Options.config['recreate_photo_thumbnails'] = False
-	if int(old_options['jpeg_quality']) != int(Options.config['jpeg_quality']):
-		Options.config['recreate_photo_thumbnails'] = True
+	try:
+		if int(old_options['jpeg_quality']) != int(Options.config['jpeg_quality']):
+			Options.config['recreate_photo_thumbnails'] = True
+	except KeyError:
+		Options.config['recreate_photo_thumbnails'] = False
 	Options.config['retranscode_videos'] = False
-	if str(old_options['video_transcode_bitrate']) != str(Options.config['video_transcode_bitrate']):
-		Options.config['retranscode_videos'] = True
+	try:
+		if str(old_options['video_transcode_bitrate']) != str(Options.config['video_transcode_bitrate']):
+			Options.config['retranscode_videos'] = True
+	except KeyError:
+		Options.config['retranscode_videos'] = False
 
 	try:
 		os.umask(002)

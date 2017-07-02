@@ -324,7 +324,7 @@ $(document).ready(function() {
 		}
 		if (! maxSizeSet) {
 			maxSize = Options['reduced_sizes'][0];
-			for (var i = 0; i < Options['reduced_sizes'].length; i++)
+			for (var i = 0; i < Options['reduced_sizes'].length; i++) {
 				thumbnailMinSize = Options['reduced_sizes'][i] / imageRatio;
 				thumbnailMaxSize = Options['reduced_sizes'][i];
 				if (mediaOrientation == windowOrientation &&
@@ -334,6 +334,7 @@ $(document).ready(function() {
 					break;
 				maxSize = Options['reduced_sizes'][i];
 				maxSizeSet = true;
+			}
 		}
 		
 		if (currentMedia.mediaType == "video") {
