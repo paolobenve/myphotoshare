@@ -6,6 +6,7 @@ from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from CachePath import *
 import json
 import Options
+import re
 
 class TreeWalker:
 	def __init__(self, album_path, cache_path):
@@ -15,9 +16,8 @@ class TreeWalker:
 			message("method", "mixed thumbnail generation")
 		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
 			message("method", "cascade thumbnail generation")
-			# be sure thumb_sizes is correctly sorted 
+			# be sure reduced_sizes array is correctly sorted 
 			Options.config['reduced_sizes'].sort(reverse = True)
-			Options.config['thumb_sizes'].sort(reverse = True)
 		self.album_path = os.path.abspath(album_path).decode(sys.getfilesystemencoding())
 		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
 		set_cache_path_base(self.album_path)
@@ -152,7 +152,7 @@ class TreeWalker:
 							# image
 							for thumb_size in Options.config['reduced_sizes']:
 								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size, False)))
-							for thumb_size in Options.config['thumb_sizes']:
+							for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size, False)))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
@@ -234,11 +234,12 @@ class TreeWalker:
 			suffix = "_" + str(thumb_size)
 			suffix += ".jpg"
 			deletable_files_suffixes.append(suffix)
-		for thumb_size in Options.config['thumb_sizes']:
+		for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 			suffix = "_" + str(thumb_size)
 			suffix += "s"
 			suffix += ".jpg"
 			deletable_files_suffixes.append(suffix)
+		print deletable_files_suffixes
 		next_level()
 		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):

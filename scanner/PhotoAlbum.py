@@ -468,7 +468,7 @@ class Media(object):
 						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size, False))
 					except KeyboardInterrupt:
 						raise
-				for thumb_size in Options.config['thumb_sizes']:
+				for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 					try:
 						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size, True))
 					except KeyboardInterrupt:
@@ -508,7 +508,7 @@ class Media(object):
 					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, False)
 				except KeyboardInterrupt:
 					raise
-			for thumb_size in Options.config['thumb_sizes']:
+			for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 				try:
 					image_to_start_from = thumb
 					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, True)
@@ -571,7 +571,7 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		for thumb_size in Options.config['thumb_sizes']:
+		for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 			self._thumbnail(mirror, original_path, thumbs_path, thumb_size, True)
 		try:
 			os.unlink(tfn)
@@ -666,14 +666,14 @@ class Media(object):
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
-			for thumb_size in Options.config['thumb_sizes']:
+			for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 				caches.append(path_with_subdir(self.media_file_name, thumb_size, True))
 			caches.append(video_cache_with_subdir(self.media_file_name))
 		else:
 			caches = []
 			for thumb_size in Options.config['reduced_sizes']:
 				caches.append(path_with_subdir(self.media_file_name, thumb_size, False))
-			for thumb_size in Options.config['thumb_sizes']:
+			for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 				caches.append(path_with_subdir(self.media_file_name, thumb_size, True))
 		return caches
 	@property

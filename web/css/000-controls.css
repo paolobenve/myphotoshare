@@ -126,7 +126,10 @@ a#day-view, a#folders-view {
 	z-index: -1;
 }
 #photo-view.no-bottom-space {
+/*
 	bottom: 2em;
+*/
+	bottom: 0;
 }
 #photo-box, #video-box {
 	display: inline;
@@ -206,7 +209,10 @@ a#day-view, a#folders-view {
 	text-align: center;
 }
 .photo-view-container.no-bottom-space {
+/*
 	height: 3em;
+*/
+	height: 0;
 }
 #powered-by {
 	clear: both;

@@ -1,12 +1,4 @@
-var windowWidth = $(window).width();
-var windowHeight = $(window).height();
-var windowOrientation;
-if (windowWidth > windowHeight)
-	windowOrientation = "landscape";
-else
-	windowOrientation = "portrait";
-windowMaxSize = Math.max(windowWidth, windowHeight);
-windowMinSize = Math.min(windowWidth, windowHeight);
+var windowWidth, windowHeight, windowOrientation;
 
 
 $(document).ready(function() {
@@ -159,11 +151,11 @@ $(document).ready(function() {
 		}
 	}
 	function showAlbum(populate) {
-		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash;
+		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnail_size;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
-			thumbnail_size = Options['thumb_sizes'][0];
+			thumbnail_size = Options['media_thumb_size'];
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
@@ -219,7 +211,7 @@ $(document).ready(function() {
 					subalbums.push(link);
 					(function(theContainer, theAlbum, theImage, theLink) {
 						photoFloat.albumPhoto(theAlbum, function(album, photo) {
-							thumbnail_size = Options['thumb_sizes'][0];
+							var thumbnail_size = Options['album_thumb_size'];
 							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, thumbnail_size, true) + ")");
 						}, function error() {
 							theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
@@ -291,8 +283,9 @@ $(document).ready(function() {
 		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
-			image.css("height", "100%").css("width", "auto").css("position", "").css("bottom", "");
-		$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
+			image.css("height", "100%").css("width", "auto").css("position", 0).css("bottom", 0);
+		$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) -
+					2 * parseInt($("#title").css("padding")));
 	}
 	function scaleVideo() {
 		var video, container;
@@ -308,9 +301,20 @@ $(document).ready(function() {
 			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
 	}
 	function showMedia(album, fullscreen = false) {
-		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation;
+		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation, thumbnail_size;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
+
+		windowWidth = $(window).width();
+		windowHeight = $(window).height();
+		if (windowWidth > windowHeight)
+			windowOrientation = "landscape";
+		else
+			windowOrientation = "portrait";
+		windowMaxSize = Math.max(windowWidth, windowHeight);
+		windowMinSize = Math.min(windowWidth, windowHeight);
+
+
 		if (width > height)
 			mediaOrientation = "landscape";
 		else
@@ -327,12 +331,12 @@ $(document).ready(function() {
 		if (! maxSizeSet) {
 			maxSize = Options['reduced_sizes'][0];
 			for (var i = 0; i < Options['reduced_sizes'].length; i++) {
-				thumbnailMinSize = Options['reduced_sizes'][i] / imageRatio;
-				thumbnailMaxSize = Options['reduced_sizes'][i];
+				reducedMinSize = Options['reduced_sizes'][i] / imageRatio;
+				reducedMaxSize = Options['reduced_sizes'][i];
 				if (mediaOrientation == windowOrientation &&
-						(thumbnailMinSize < windowMinSize && thumbnailMaxSize < windowMaxSize) ||
+						(reducedMinSize < windowMinSize && reducedMaxSize < windowMaxSize) ||
 					mediaOrientation !== windowOrientation &&
-						(thumbnailMinSize < windowMaxSize && thumbnailMaxSize < windowMinSize))
+						(reducedMinSize < windowMaxSize && reducedMaxSize < windowMinSize))
 					break;
 				maxSize = Options['reduced_sizes'][i];
 				maxSizeSet = true;
@@ -466,9 +470,10 @@ $(document).ready(function() {
 		$("#metadata").html(text);
 		
 		$("#album-view").addClass("photo-view-container");
-		thumbnail_size = Options['thumb_sizes'][0];
+		thumbnail_size = Options['media_thumb_size'];
 		$(".photo-view-container").css("height", (thumbnail_size + 5).toString() + "px");
-		$("#photo-view").css("bottom", (thumbnail_size + 5).toString() + "px");
+		if (currentAlbum.photos.length != 1)
+			$("#photo-view").css("bottom", (thumbnail_size + 5).toString() + "px");
 		$("#subalbums").hide();
 		$("#photo-view").show();
 	}
@@ -536,7 +541,9 @@ $(document).ready(function() {
 	}
 	
 	function setOptions() {
-		thumbnail_size = Options['thumb_sizes'][0];
+		var thumbnail_size;
+		thumbnail_size_big = Options['thumb_size'];
+		thumbnail_size_little = Options['media_thumb_size'];
 		$("body").css("background-color", Options['background_color']);
 		$("#day-view-container").css("color", Options['switch_button_color']);
 		$("#day-view-container").hover(function() {
@@ -580,19 +587,16 @@ $(document).ready(function() {
 			$(this).css("color", Options['title_color'])
 		});
 		$("#photo-name").css("color", Options['title_image_name_color']);
-		//~ $("#thumbs img").css("margin-left", Options['thumb_spacing'].toString() + "px");
-		$("#thumbs img").css("margin-right", Options['thumb_spacing'].toString() + "px");
-		$(".album-button").css("margin-left", Options['thumb_spacing'].toString() + "px");
-		//~ $(".album-button").css("margin-right", Options['thumb_spacing'].toString() + "px");
-		$(".thumb-caption-media").css("width", thumbnail_size.toString() + "px");
-		$(".thumb-caption-album").css("width", thumbnail_size.toString() + "px");
+		$(".thumb-container").css("margin-right", Options['thumb_spacing'].toString() + "px");
+		$(".album-button").css("margin-right", Options['thumb_spacing'].toString() + "px");
+		$(".thumb-container").css("width", thumbnail_size_little.toString() + "px");
 		if (Options['different_album_thumbnails']) {
-			$(".album-button").css("width", (thumbnail_size * 1.1).toString() + "px");
-			$(".album-button").css("padding-top", (thumbnail_size * 1.1).toString() + "px");
-			$(".album-button").css("background-position-y", (thumbnail_size * 0.1).toString() + "px");
+			$(".album-button").css("width", (thumbnail_size_big * 1.1).toString() + "px");
+			$(".album-button").css("padding-top", (thumbnail_size_big * 1.1).toString() + "px");
+			$(".album-button").css("background-position-y", (thumbnail_size_big * 0.1).toString() + "px");
 		} else {
-			$(".album-button").css("width", thumbnail_size.toString() + "px");
-			$(".album-button").css("padding-top", thumbnail_size.toString() + "px");
+			$(".album-button").css("width", thumbnail_size_big.toString() + "px");
+			$(".album-button").css("padding-top", thumbnail_size_big.toString() + "px");
 			$(".album-button").css("background-position-y", "0");
 		}
 	}

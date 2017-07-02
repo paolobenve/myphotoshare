@@ -51,8 +51,10 @@ jpeg_quality = 95
 # The sizes for the reduced images
 reduced_sizes = [1600, 1200, 800]
 
-# The sizes for the thumbnails: they are used when showing albums/folders
-thumb_sizes = [200, 100]
+# The sizes for the thumbnails to use for albums
+album_thumb_size = 200
+# The sizes for the thumbnails for images/videos
+media_thumb_size = 110
 
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _folders
