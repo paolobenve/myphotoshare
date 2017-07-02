@@ -464,6 +464,9 @@ $(document).ready(function() {
 		$("#metadata").html(text);
 		
 		$("#album-view").addClass("photo-view-container");
+		thumbnail_size = Options['thumb_sizes'][0];
+		$(".photo-view-container").css("height", (thumbnail_size + 5).toString() + "px");
+		$("#photo-view").css("bottom", (thumbnail_size + 5).toString() + "px");
 		$("#subalbums").hide();
 		$("#photo-view").show();
 	}
@@ -531,6 +534,7 @@ $(document).ready(function() {
 	}
 	
 	function setOptions() {
+		thumbnail_size = Options['thumb_sizes'][0];
 		$("body").css("background-color", Options['background_color']);
 		$("#day-view-container").css("color", Options['switch_button_color']);
 		$("#day-view-container").hover(function() {
@@ -578,8 +582,16 @@ $(document).ready(function() {
 		$("#thumbs img").css("margin-right", Options['thumb_spacing']);
 		$(".album-button").css("margin-left", Options['thumb_spacing']);
 		$(".album-button").css("margin-right", Options['thumb_spacing']);
-		if (Options['different_album_thumbnails'])
-			$(".album-button").addClass("alt");
+		$(".thumb-caption").css("width", thumbnail_size.toString() + "px");
+		if (Options['different_album_thumbnails']) {
+			$(".album-button").css("width", (thumbnail_size * 1.1).toString() + "px");
+			$(".album-button").css("padding-top", (thumbnail_size * 1.1).toString() + "px");
+			$(".album-button").css("background-position-y", (thumbnail_size * 0.1).toString() + "px");
+		} else {
+			$(".album-button").css("width", thumbnail_size.toString() + "px");
+			$(".album-button").css("padding-top", thumbnail_size.toString() + "px");
+			$(".album-button").css("background-position-y", "0");
+		}
 	}
 	
 	/* Event listeners */

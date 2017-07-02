@@ -81,7 +81,6 @@ a#day-view, a#folders-view {
 .album-button {
 	float: left;
 	display: block;
-	width: 150px;
 	height: 40px;
 	text-align: center;
 	font-style: italic;
@@ -89,20 +88,11 @@ a#day-view, a#folders-view {
 	background-repeat: no-repeat;
 	background-position-x: center;
 	background-position-y: 0;
-	padding-top: 150px;
 	background-image: url(../img/image-placeholder.png);
 	background-color: gray;
 	margin: 0 3px 30px 3px;
 	line-height: 1.1em
 }
-
-.album-button.alt {
-	width: 170px;
-	background-position-y: 10px;
-	background-color: gray;
-	padding-top: 160px;
-}
-
 
 #next, #back {
 	position: absolute;
@@ -127,7 +117,6 @@ a#day-view, a#folders-view {
 }
 #photo-view {
 	position: absolute;
-	bottom: 150px;
 	top: 3em;
 	overflow: hidden;
 	margin-bottom: 0.5em;
@@ -206,7 +195,7 @@ a#day-view, a#folders-view {
 }
 .photo-view-container {
 	position: absolute;
-	height: 155px;
+	height: 0;
 	width: 100%;
 	bottom: 0;
 	top: auto !important;
@@ -284,9 +273,9 @@ a#day-view, a#folders-view {
 .thumb-caption {
 	display: block;
 	font-size: 75%;
-	width: 150px;
 	text-align: center;
 	color: chartreuse;
+	overflow: hidden;
 }
 
 #thumbs a {
