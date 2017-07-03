@@ -156,7 +156,6 @@ $(document).ready(function() {
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
-			$(".thumb-container").css("width", Options['media_thumb_size'].toString() + "px");
 			thumbnail_size = Options['media_thumb_size'];
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
@@ -173,13 +172,15 @@ $(document).ready(function() {
 				link = $("<a href=\"#!/" + hash + "\"></a>");
 				width = currentAlbum.photos[i].size[0];
 				height = currentAlbum.photos[i].size[1];
-				imageString = "<div class=\"thumb-container\"";
+				imageString = "<div class=\"thumb-container\" style=\"width: ";
 				if (Options['media_thumb_type'] == "fixed_height") {
 					thumbHeight = Options['media_thumb_size'];
 					thumbWidth = thumbHeight / height * width;
-					imageString += 	" style=\"width: " +  thumbWidth.toString() + "px;\"";
+					imageString += thumbWidth.toString();
+				} else {
+					imageString += Options['media_thumb_size'].toString().toString();
 				}
-				imageString += 		">";
+				imageString += 			"px;\">";
 				imageString += 		"<img title=\"" + currentAlbum.photos[i].name +
 							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
 							"\" src=\"" +  thumbHash;
@@ -619,8 +620,6 @@ $(document).ready(function() {
 		});
 		$("#photo-name").css("color", Options['title_image_name_color']);
 		$(".thumb-container").css("margin-right", Options['thumb_spacing'].toString() + "px");
-		if (Options['media_thumb_type'] != "fixed_height")
-			$(".thumb-container").css("width", thumbnail_size_little.toString() + "px");
 		$(".album-button").css("margin-right", Options['thumb_spacing'].toString() + "px");
 		if (Options['different_album_thumbnails']) {
 			$(".album-button").css("width", (thumbnail_size_big * 1.1).toString() + "px");
