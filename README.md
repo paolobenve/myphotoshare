@@ -1,5 +1,5 @@
-# photofloat
-### A Web 2.0 Photo Gallery Done Right via Static JSON & Dynamic Javascript
+# photofloat v. 2.0
+### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
 ![Screenshot](screenshot.jpg)
@@ -37,17 +37,6 @@ The JavaScript application consists of a single `index.html` file with a single 
 * Optional server-side authentication support
 * A thousand other tweaks here and there...
 
-Features added by Paolo:
-
-* A date tree is builded, permitting photo to be seen by year, month, date
-* When a photo is viewed, the user can switch between the folder and the day/month/year the photo was taken
-* Cascade thumbnails generation
-* Better error management: if folder is wrong, show root folder; if image is wrong, show album
-* In addition to former invocation (with albums and cache paths), photofloat can be invoked with one parameter:
-the customization file, which adds many configuration variables; web site appearance now is very customizable
-* (to do) share buttons
-* (to do) Translations file
-
 Features added by Jerome:
 
 * manage videos
@@ -56,6 +45,25 @@ Features added by Joachim:
 
 * generate minified css and js through external api
 * parallel thumbnail generation
+
+Features added in version 2.0:
+
+* A date tree is builded, permitting photo to be seen by year, month, date
+* When a photo is viewed, the user can switch between the folder and the date the photo was taken
+* Better error management: if folder is wrong, show root folder; if image is wrong, show album
+* In addition to former invocation (with albums and cache paths), photofloat can be invoked with one parameter:
+the customization file, which adds many configuration variables; web site appearance now is very customizable:
+* - choose between cascade, parallel and mixed thumbnails generation
+* - fhoose between putting thumbnails in cache dir or in subdir, by 2-letters, from folder md5 or beginning of folder
+* - thumbnail can be spaced
+* - album thumbnails can be showed different from images ones
+* - jpeg quality can be set
+* - 3 different thumbnail types: square (photofloat's classical), fixed_height (the size determines the height, the width will depend on orientation), canvas (square thumbnail containing the whole image)
+* - page title, font sizes, colors and background colors can be customized
+* - photo names can be shown below thumbnails when showing an album
+* - initial language support
+* - albums and cache server folders can be anywhere, even on another server (obviously, they will be generated on a pc and then uploaded wherever)
+* (to do) share buttons
 
 It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
 
@@ -199,8 +207,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 Copyright (C):
 * 2010 - 2014 Jason A. Donenfeld
-* 2016 Joachim Tingvold
+* 2016 Jerome Charaoui
 * 2017 Paolo Benvenuto
+
+Thanks to Joachim and all other contributors for their help!
 
 All Rights Reserved.
 
