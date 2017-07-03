@@ -227,18 +227,12 @@ class TreeWalker:
 		if subdir:
 			info = "in subdir " + subdir
 		message("searching", info)
-		deletable_files_suffixes = list()
-		deletable_files_suffixes.append(".json")
-		deletable_files_suffixes.append("_transcoded.mp4")
-		for thumb_size in Options.config['reduced_sizes']:
-			suffix = "_" + str(thumb_size)
-			suffix += ".jpg"
-			deletable_files_suffixes.append(suffix)
-		for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
-			suffix = "_" + str(thumb_size)
-			suffix += "s"
-			suffix += ".jpg"
-			deletable_files_suffixes.append(suffix)
+		deletable_files_suffixes_re ="\.json$"
+		deletable_files_suffixes_re += "|_transcoded\.mp4$"
+		# reduced sizes
+		deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}\.jpg$"
+		# thumbnails
+		deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}s\.jpg$"
 		next_level()
 		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):
@@ -250,15 +244,12 @@ class TreeWalker:
 					os.rmdir(os.path.join(self.cache_path, file_to_delete))
 				back_level()
 			else:
+				cache_with_subdir = os.path.join(subdir, cache)
 				# only delete json's, transcoded videos, reduced images and thumbnails
 				found = False
-				for suffix in deletable_files_suffixes:
-					index = cache.find(suffix)
-					if index != -1 and index + len(suffix) == len(cache):
-						found = True
-						continue
-				if not found:
-					message("not deleting", cache)
+				match = re.search(deletable_files_suffixes_re, cache)
+				if not match:
+					message("not deleting", cache_with_subdir)
 					continue
 				
 				try:
@@ -267,7 +258,6 @@ class TreeWalker:
 					raise
 				except:
 					pass
-				cache_with_subdir = os.path.join(subdir, cache)
 				if cache_with_subdir not in all_cache_entries:
 					message("cleanup", cache_with_subdir)
 					file_to_delete = os.path.join(self.cache_path, cache_with_subdir)
