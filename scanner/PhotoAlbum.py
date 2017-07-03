@@ -364,7 +364,7 @@ class Media(object):
 				is_thumbnail and not Options.config['recreate_thumbnails']
 			)
 		):
-			message("existing thumb", info_string)
+			message("existing reduced size", info_string)
 			back_level()
 			return image
 		gc.collect()
