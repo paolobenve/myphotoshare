@@ -20,9 +20,10 @@ def main():
 	default_config_file = os.path.join(project_dir, "photofloat.conf.defaults")
 	default_config = ConfigParser.ConfigParser()
 	default_config.readfp(open(default_config_file))
-	
 	usr_config = ConfigParser.ConfigParser()
-	usr_config = default_config
+	usr_config.add_section("options")
+	for option in default_config.options('options'):
+		usr_config.set("options", option, default_config.get("options", option))
 	
 	if len(sys.argv) == 2:
 		# 1 arguments: the config files
@@ -35,7 +36,7 @@ def main():
 	message("Options", "asterisk denotes options changed by config file")
 	next_level()
 	# pass config values to a dict, because ConfigParser objects are not reliable
-	for option in usr_config.options('options'):
+	for option in default_config.options('options'):
 		if option in ('max_verbose', 'jpeg_quality', 'thumb_spacing', 'album_thumb_size', 'media_thumb_size'):
 			Options.config[option] = usr_config.getint('options', option)
 		elif option in ('different_album_thumbnails', 'show_media_names_below_thumbs_in_albums'):
@@ -44,11 +45,26 @@ def main():
 			Options.config[option] = eval(usr_config.get('options', option))
 		else:
 			Options.config[option] = usr_config.get('options', option)
-		if default_config.get('options', option) == Options.config.get('options', option):
-			option_value = "  "
+		option_value = str(Options.config[option])
+		option_length = len(option_value)
+		max_length = 40
+		spaces = ""
+		for i in range(max_length - option_length):
+			spaces += " "
+		max_spaces = ""
+		for i in range(max_length):
+			max_spaces += " "
+		
+		default_option_value = str(default_config.get('options', option))
+		default_option_length = len(default_option_value)
+		default_spaces = ""
+		for i in range(max_length - default_option_length - 2):
+			default_spaces += " "
+		if default_config.get('options', option) == usr_config.get('options', option):
+			option_value = "  " + option_value + spaces + "[DEFAULT" + max_spaces + "]"
 		else:
-			option_value = "* "
-		option_value += str(Options.config[option])
+			option_value = "* " + option_value + spaces + "[DEFAULT: " + default_option_value + default_spaces + "]"
+		
 		message(option, option_value)
 	# values that have type != string
 	back_level()
