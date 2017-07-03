@@ -174,10 +174,17 @@
 		else
 			return Options['server_cache_path'] + hash;
 	};
-	PhotoFloat.photoPath = function(album, photo, thumb_size, square) {
+	PhotoFloat.photoPath = function(album, photo, thumb_size, isThumbnail) {
 		var suffix, hash;
-		if (square)
-			suffix = thumb_size.toString() + "s";
+		if (isThumbnail) {
+			suffix = thumb_size.toString() + "t";
+			if (Options['media_thumb_type'] == "square")
+				suffix += "s";
+			else if (Options['media_thumb_type'] == "fixed_height")
+				suffix += "f"
+			else if (Options['media_thumb_type'] == "canvas")
+				suffix += "c"
+		}
 		else
 			suffix = thumb_size.toString();
 		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, photo) + "_" + suffix + ".jpg");

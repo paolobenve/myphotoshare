@@ -50,11 +50,19 @@ def cache_base(path, filepath=False):
 	return path
 def json_name(path):
 	return cache_base(path) + ".json"
-def image_cache(path, size, square=False):
-	suffix = str(size)
-	if square:
-		suffix = str(size) + "s"
-	return cache_base(path, True) + "_" + suffix + ".jpg"
+def image_cache(path, size, is_thumbnail=False):
+	suffix = "_" + str(size)
+	if is_thumbnail:
+		suffix += "t"
+		if Options.config['media_thumb_type'] == "square": 
+			suffix += "s"
+		elif Options.config['media_thumb_type'] == "fixed_height": 
+			suffix += "f"
+		elif Options.config['media_thumb_type'] == "canvas": 
+			suffix += "c"
+	suffix += ".jpg"
+	result = cache_base(path, True) + suffix
+	return result
 def cache_subdir(path):
 	if Options.config['subdir_method'] == "md5":
 		subdir = hashlib.md5(path).hexdigest()[:2]
@@ -66,15 +74,15 @@ def cache_subdir(path):
 	else:
 		subdir = ""
 	return subdir
-def path_with_subdir(path, size, square=False):
+def path_with_subdir(path, size, is_thumbnail=False):
 	subdir = cache_subdir(path)
 	if subdir:
 		cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
 		if not os.path.exists(cache_path_with_subdir):
 			os.makedirs(cache_path_with_subdir)
-		image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, square))
+		image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, is_thumbnail))
 	else:
-		image_cache_with_subdir = image_cache(path, size, square)
+		image_cache_with_subdir = image_cache(path, size, is_thumbnail)
 	return image_cache_with_subdir
 def video_cache_with_subdir(path):
 	subdir = cache_subdir(path)

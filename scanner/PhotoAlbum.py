@@ -14,13 +14,13 @@ from VideoToolWrapper import *
 import math
 import Options
 
-def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, square):
+def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, is_thumbnail):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
 	# self._photo_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self._photo_thumbnail(image, original_path, thumbs_path, thumb_size, square)
+		self._photo_thumbnail(image, original_path, thumbs_path, thumb_size, is_thumbnail)
 	except KeyboardInterrupt:
 		raise
 
@@ -319,7 +319,7 @@ class Media(object):
 				break
 	
 	
-	def _photo_thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square=False):
+	def _photo_thumbnail(self, image, original_path, thumbs_path, thumbnail_size, is_thumbnail=False):
 		#~ try:
 			#~ image = Image.open(original_path)
 		#~ except KeyboardInterrupt:
@@ -352,14 +352,14 @@ class Media(object):
 			mirror = image.transpose(Image.ROTATE_90)
 
 		image = mirror
-		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, square)
+		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, is_thumbnail)
 
-	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, square):
-		#~ message("video", path_with_subdir(self.media_file_name, thumbnail_size, square))
-		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size, square))
+	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, is_thumbnail):
+		#~ message("video", path_with_subdir(self.media_file_name, thumbnail_size, is_thumbnail))
+		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size, is_thumbnail))
 		info_string = str(thumbnail_size)
 		next_level()
-		if square:
+		if is_thumbnail:
 			if Options.config['media_thumb_type'] == "square":
 				info_string += ", square thumbnail"
 			elif Options.config['media_thumb_type'] == "fixed_height":
@@ -369,8 +369,8 @@ class Media(object):
 		if (
 			os.path.exists(thumb_path) and
 			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
-				not square and not Options.config['recreate_reduced_photos'] or
-				square and not Options.config['recreate_thumbnails']
+				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
+				is_thumbnail and not Options.config['recreate_thumbnails']
 			)
 		):
 			message("existing thumb", info_string)
@@ -391,7 +391,7 @@ class Media(object):
 				self.is_valid = False
 				back_level()
 				return image
-		if square and Options.config['media_thumb_type'] == "square":
+		if is_thumbnail and Options.config['media_thumb_type'] == "square":
 			if image_copy.size[0] > image_copy.size[1]:
 				left = (image_copy.size[0] - image_copy.size[1]) / 2
 				top = 0
@@ -407,14 +407,14 @@ class Media(object):
 		image_size = max(image_copy.size[0], image_copy.size[1])
 		original_thumbnail_size = thumbnail_size
 		if (
-			square and Options.config['media_thumb_type'] == "fixed_height" and
+			is_thumbnail and Options.config['media_thumb_type'] == "fixed_height" and
 			thumbnail_size == Options.config['media_thumb_size'] and
 			image_copy.size[0] > image_copy.size[1]
 		):
 			thumbnail_size = int(round(float(thumbnail_size * image_copy.size[0]) / float(image_copy.size[1])))
 		if (image_size >= thumbnail_size):
 			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
-			if square and Options.config['media_thumb_type'] == "canvas":
+			if is_thumbnail and Options.config['media_thumb_type'] == "canvas":
 				image_copy = self.resize_canvas(image_copy, thumbnail_size, True)
 		else:
 			image_copy = self.resize_canvas(image_copy, thumbnail_size)
@@ -451,9 +451,9 @@ class Media(object):
 				pass
 			back_level()
 			return image
-	def resize_canvas(self, image, canvas_max_size, square = False):
+	def resize_canvas(self, image, canvas_max_size, is_thumbnail = False):
 		old_width, old_height = image.size
-		if (square):
+		if (is_thumbnail):
 			canvas_width = canvas_max_size
 			canvas_height = canvas_max_size
 		else:
