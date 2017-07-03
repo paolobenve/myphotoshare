@@ -151,17 +151,16 @@ $(document).ready(function() {
 		}
 	}
 	function showAlbum(populate) {
-		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnail_size, id;
+		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize, id;
 		var width, height, thumbWidth, thumbHeight;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
-			thumbnail_size = Options['media_thumb_size'];
+			thumbnailSize = Options['media_thumb_size'];
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
-				id = hashCode(hash);
-				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnail_size, true);
+				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnailSize, true);
 				bydateStringWithTrailingSeparator = Options['by_date_string'] + Options['cache_folder_separator'];
 				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 					thumbHash =
@@ -172,7 +171,8 @@ $(document).ready(function() {
 				link = $("<a href=\"#!/" + hash + "\"></a>");
 				width = currentAlbum.photos[i].size[0];
 				height = currentAlbum.photos[i].size[1];
-				imageString = "<div class=\"thumb-container\" style=\"width: ";
+				imageString = "<div class=\"thumb-container\" ";
+				imageString += "style=\"width: ";
 				if (Options['media_thumb_type'] == "fixed_height") {
 					thumbHeight = Options['media_thumb_size'];
 					thumbWidth = thumbHeight / height * width;
@@ -188,8 +188,8 @@ $(document).ready(function() {
 					imageString += 	"\" height=\"" + thumbHeight +
 							"\" width=\"" + thumbWidth;
 				} else {
-					imageString += 	"\" height=\"" + thumbnail_size +
-							"\" width=\"" + thumbnail_size;
+					imageString += 	"\" height=\"" + thumbnailSize +
+							"\" width=\"" + thumbnailSize;
 				}
 				imageString += 		"\" />" +
 							"<div class=\"thumb-caption-media\">" +
@@ -203,9 +203,6 @@ $(document).ready(function() {
 				image.get(0).photo = currentAlbum.photos[i];
 				link.append(image);
 				photos.push(link);
-				//~ if (Options['media_thumb_type'] == "fixed_height") {
-					//~ $("#" + id).css("width", thumbWidth.toString() + "px");
-				//~ }
 				(function(theLink, theImage, theAlbum) {
 					theImage.error(function() {
 						photos.splice(photos.indexOf(theLink), 1);
@@ -220,27 +217,44 @@ $(document).ready(function() {
 			
 			if (currentMedia === null) {
 				subalbums = [];
+				var imageTextAdd;
 				for (i = 0; i < currentAlbum.albums.length; ++i) {
 					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
-					var imageTextAdd = currentAlbum.albums[i].path;
+					imageTextAdd = currentAlbum.albums[i].path;
 					imageTextAdd = imageTextAdd.replace(Options['by_date_string'], $("#by-date-translation").html());
 					imageTextAdd = imageTextAdd.replace(Options['folders_string'], $("#folders-translation").html());
-					image = $("<div title=\"" + currentAlbum.albums[i].date + "\" class=\"album-button\">" +
-								"<span class='thumb-caption-album'>" +
-								imageTextAdd +
-								"</span>" +
-								"</div>");
+					imageString = "<div ";
+					imageString += "class=\"album-button\" ";
+					imageString += "title=\"" + currentAlbum.albums[i].date + "\">" +
+							"<span class='thumb-caption-album'>" +
+							imageTextAdd +
+							"</span>" +
+							"</div>";
+					image = $(imageString);
 					link.append(image);
 					subalbums.push(link);
 					(function(theContainer, theAlbum, theImage, theLink) {
 						photoFloat.albumPhoto(theAlbum, function(album, photo) {
-							var thumbnail_size = Options['album_thumb_size'];
-							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, thumbnail_size, true) + ")");
+							var distance;
+							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options['album_thumb_size'], true) + ")");
+										"\" src=\"" +  thumbHash;
+							if (Options['media_thumb_type'] == "fixed_height") {
+								if (photo.size[1] < photo.size[0]) {
+									thumbWidth = Options['album_thumb_size'];
+									thumbHeight = thumbWidth * photo.size[1] / photo.size[0];
+								} else {
+									thumbHeight = Options['album_thumb_size'];
+									thumbWidth = thumbHeight * photo.size[0] / photo.size[1];
+								}
+								distance = (Options['album_thumb_size'] - thumbHeight) / 2;
+								distance = distance + Options['album_thumb_size'] * 0.05;
+								theImage.css("background-position-y", distance.toString() + "px");
+								theImage.css("background-size", thumbWidth + "px " + thumbHeight + "px");
+							}
 						}, function error() {
 							theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 							theLink.remove();
 							subalbums.splice(subalbums.indexOf(theLink), 1);
-
 						});
 					})(currentAlbum, currentAlbum.albums[i], image, link);
 				}
@@ -324,7 +338,7 @@ $(document).ready(function() {
 			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
 	}
 	function showMedia(album, fullscreen = false) {
-		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation, thumbnail_size;
+		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation, thumbnailSize;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
 
@@ -493,10 +507,12 @@ $(document).ready(function() {
 		$("#metadata").html(text);
 		
 		$("#album-view").addClass("photo-view-container");
-		thumbnail_size = Options['media_thumb_size'];
-		$(".photo-view-container").css("height", (thumbnail_size + 5).toString() + "px");
-		if (currentAlbum.photos.length != 1)
-			$("#photo-view").css("bottom", (thumbnail_size + 5).toString() + "px");
+		thumbnailSize = Options['media_thumb_size'];
+		$(".photo-view-container").css("height", (thumbnailSize + 5).toString() + "px");
+		if (currentAlbum.photos.length != 1) {
+			$("#photo-view").css("bottom", (thumbnailSize + 15).toString() + "px");
+			$("#album-view").css("height", (thumbnailSize + 20).toString() + "px");
+		}
 		$("#subalbums").hide();
 		$("#photo-view").show();
 	}
@@ -573,9 +589,9 @@ $(document).ready(function() {
 	}
 
 	function setOptions() {
-		var thumbnail_size_big, thumbnail_size_little;
-		thumbnail_size_big = Options['album_thumb_size'];
-		thumbnail_size_little = Options['media_thumb_size'];
+		var albumThumbnailSize, mediaThumbnailSize;
+		albumThumbnailSize = Options['album_thumb_size'];
+		mediaThumbnailSize = Options['media_thumb_size'];
 		$("body").css("background-color", Options['background_color']);
 		$("#day-view-container").css("color", Options['switch_button_color']);
 		$("#day-view-container").hover(function() {
@@ -622,12 +638,13 @@ $(document).ready(function() {
 		$(".thumb-container").css("margin-right", Options['thumb_spacing'].toString() + "px");
 		$(".album-button").css("margin-right", Options['thumb_spacing'].toString() + "px");
 		if (Options['different_album_thumbnails']) {
-			$(".album-button").css("width", (thumbnail_size_big * 1.1).toString() + "px");
-			$(".album-button").css("padding-top", (thumbnail_size_big * 1.1).toString() + "px");
-			$(".album-button").css("background-position-y", (thumbnail_size_big * 0.1).toString() + "px");
+			
+			$(".album-button").css("width", (albumThumbnailSize * 1.1).toString() + "px");
+			$(".album-button").css("padding-top", (albumThumbnailSize * 1.05).toString() + "px");
+			$(".album-button").css("background-position-y", (albumThumbnailSize * 0.05).toString() + "px");
 		} else {
-			$(".album-button").css("width", thumbnail_size_big.toString() + "px");
-			$(".album-button").css("padding-top", thumbnail_size_big.toString() + "px");
+			$(".album-button").css("width", albumThumbnailSize.toString() + "px");
+			$(".album-button").css("padding-top", albumThumbnailSize.toString() + "px");
 			$(".album-button").css("background-position-y", "0");
 		}
 	}

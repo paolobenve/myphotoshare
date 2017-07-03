@@ -95,7 +95,7 @@ def main():
 		):
 			Options.config['recreate_thumbnails'] = True
 	except KeyError:
-		Options.config['recreate_thumbnails'] = False
+		Options.config['recreate_thumbnails'] = True
 	Options.config['retranscode_videos'] = False
 	try:
 		if str(old_options['video_transcode_bitrate']) != str(Options.config['video_transcode_bitrate']):

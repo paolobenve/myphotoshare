@@ -405,8 +405,10 @@ class Media(object):
 			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
 		image_size = max(image_copy.size[0], image_copy.size[1])
+		original_thumbnail_size = thumbnail_size
 		if (
 			square and Options.config['media_thumb_type'] == "fixed_height" and
+			thumbnail_size == Options.config['media_thumb_size'] and
 			image_copy.size[0] > image_copy.size[1]
 		):
 			thumbnail_size = int(round(float(thumbnail_size * image_copy.size[0]) / float(image_copy.size[1])))
@@ -418,9 +420,12 @@ class Media(object):
 			image_copy = self.resize_canvas(image_copy, thumbnail_size)
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			next_level(1)
-			message("thumbing", info_string)
-			back_level(1)
+			if original_thumbnail_size > Options.config['album_thumb_size']:
+				message("reducing", info_string)
+			elif original_thumbnail_size == Options.config['album_thumb_size']:
+				message("thumbing for albums", info_string)
+			else:
+				message("thumbing for media", info_string)
 			back_level()
 			return image_copy
 		except KeyboardInterrupt:
