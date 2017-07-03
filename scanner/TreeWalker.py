@@ -39,7 +39,6 @@ class TreeWalker:
 		message("complete", "")
 	def generate_date_album(self):
 		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
-		#~ bydateString = "_by_date"
 		by_date_path = os.path.join(self.album_path, Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
@@ -73,7 +72,6 @@ class TreeWalker:
 		self.all_albums.append(by_date_album)
 		root_cache = os.path.join(self.cache_path, json_name(self.album_path))
 		if not by_date_album.empty:
-			#~ message("cache_path", self.cache_path + "   " + os.path.basename(self.cache_path), 2)
 			by_date_album.cache(self.cache_path)
 		return by_date_album
 	def add_photo_to_tree_by_date(self, photo):

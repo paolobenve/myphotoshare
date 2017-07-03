@@ -304,9 +304,9 @@ class Media(object):
 			return
 		info = json.loads(p)
 		for s in info["streams"]:
-			#~ message("debug: codec_type", 'codec_type')
-			#~ if 'codec_type' in s:
-				#~ message("debug: s[codec_type]", s['codec_type'])
+			message("debug: codec_type", 'codec_type', 1)
+			if 'codec_type' in s:
+				message("debug: s[codec_type]", s['codec_type'], 1)
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
 				self._attributes["size"] = (int(s["width"]), int(s["height"]))
@@ -320,14 +320,6 @@ class Media(object):
 	
 	
 	def _photo_thumbnail(self, image, original_path, thumbs_path, thumbnail_size, is_thumbnail=False):
-		#~ try:
-			#~ image = Image.open(original_path)
-		#~ except KeyboardInterrupt:
-			#~ raise
-		#~ except:
-			#~ self.is_valid = False
-			#~ return
-		
 		mirror = image
 		if self._orientation == 2:
 			# Vertical Mirror
@@ -355,7 +347,6 @@ class Media(object):
 		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, is_thumbnail)
 
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, is_thumbnail):
-		#~ message("video", path_with_subdir(self.media_file_name, thumbnail_size, is_thumbnail))
 		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size, is_thumbnail))
 		info_string = str(thumbnail_size)
 		next_level()
@@ -468,12 +459,6 @@ class Media(object):
 		x1 = int(math.floor((canvas_width - old_width) / 2))
 		y1 = int(math.floor((canvas_height - old_height) / 2))
 		mode = image.mode
-		#~ if len(mode) == 1:  # L, 1
-			#~ new_background = (34)
-		#~ if len(mode) == 3:  # RGB
-			#~ new_background = (34, 34, 34)
-		#~ if len(mode) == 4:  # RGBA, CMYK
-			#~ new_background = (34, 34, 34, 1)
 		new_background = Options.config['background_color']
 		newImage = Image.new(mode, (canvas_width, canvas_height), new_background)
 		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
@@ -728,7 +713,6 @@ class Media(object):
 		return self.year_month + " " + self.day
 	@property
 	def year_album_path(self):
-		#~ bydateString = "_by_date"
 		return Options.config['by_date_string'] + "/" + self.year
 	@property
 	def month_album_path(self):
@@ -755,7 +739,6 @@ class Media(object):
 		for key, value in dictionary.items():
 			if key.startswith("dateTime"):
 				try:
-					#~ dictionary[key] = datetime.strptime(dictionary[key], "%a %b %d %T %Y")
 					dictionary[key] = datetime.strptime(dictionary[key], "%c")
 				except KeyboardInterrupt:
 					raise
@@ -763,7 +746,6 @@ class Media(object):
 					pass
 		return Media(path, None, dictionary)
 	def to_dict(self):
-		#photo = { "name": self.name, "albumName": self.album_path, "completeName": self.media_file_name, "date": self.date }
 		foldersAlbum = Options.config['folders_string']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
@@ -786,7 +768,6 @@ class Media(object):
 class PhotoAlbumEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, datetime):
-			#~ return obj.strftime("%a %b %d %H:%M:%S %Y")
 			return obj.strftime("%c")
 		if isinstance(obj, Album) or isinstance(obj, Media):
 			return obj.to_dict()

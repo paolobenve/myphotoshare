@@ -64,7 +64,6 @@ $(document).ready(function() {
 
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i;
-		//~ var originalTitle = translationsToTranslatedString($("#title-translation").html());
 		var originalTitle = Options['page_title'];
 		translate();
 		
@@ -273,6 +272,17 @@ $(document).ready(function() {
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#thumbs").show();
+			
+			if (currentAlbum.path == Options['folders_string']) {
+				$("#folders-view-container").hide();
+				$("#day-view-container").show();
+				$("#day-view").attr("href", "#!/" + Options['by_date_string']);
+			}
+			else if (currentAlbum.path == Options['by_date_string']) {
+				$("#folders-view-container").show();
+				$("#day-view-container").hide();
+				$("#folders-view").attr("href", "#!/" + Options['folders_string']);
+			}
 		} else {
 			if (currentAlbum.photos.length == 1)
 				$("#thumbs").hide();
@@ -280,16 +290,6 @@ $(document).ready(function() {
 				$("#thumbs").show();
 		}
 		
-		if (currentAlbum.path == Options['folders_string']) {
-			$("#folders-view-container").hide();
-			$("#day-view-container").show();
-			$("#day-view").attr("href", "#!/" + Options['by_date_string']);
-		}
-		else if (currentAlbum.path == Options['by_date_string']) {
-			$("#folders-view-container").show();
-			$("#day-view-container").hide();
-			$("#folders-view").attr("href", "#!/" + Options['folders_string']);
-		}
 		
 		setTimeout(scrollToThumb, 1);
 	}
@@ -656,7 +656,6 @@ $(document).ready(function() {
 		$("link[rel=image_src]").remove();
 		$("link[rel=video_src]").remove();
 		getOptions("", parseHash);
-		//~ photoFloat.parseHash(location.hash, hashParsed, die);
 	});
 	$(window).hashchange();
 	
