@@ -74,54 +74,42 @@ It is, essentially, the slickest and fastest, most minimal but still well-featur
     $ git clone https://github.com/paolobenve/photofloat.git
     $ cd photofloat
 
-#### Tweak the index.html page to have a custom title or copyright notice.
+#### Copy and tweak the configuration file
 
-    $ vim web/index.html
+    $ sudo mkdir /etc/photofloat
+    $ sudo cp photofloat.conf.defaults /etc/photofloat/myproject.conf
+    $ sudo vim /etc/photofloat/myproject.conf
+
+In your config file (myproject.conf, name can be whatever you want)set the proper folders for albums (your photo, they won't be modified) and cache (all the stuff photofloat requieres in order to work)
 
 #### Build the web page.
 
-This simply runs all the javascript through Google Closure Compiler and all the CSS through YUI Compressor to minify and concatenate everything. Be sure you have java installed.
+This simply minifies and concatenate everything of js and css.
 
-    $ cd web/js
-    $ ./js-minify.sh
-    $ cd ../css
-    $ ./css-minify.sh 
+    $ js-css-minify.sh
 
 #### Generate the albums:
 
-Go back to web directory:
+When you're done run the static generator (you need Python≥2.6 and the Python Imaging Library; for video something like libav-conv is requiered too):
 
-    $ cd ..
-
-Make a folder for the pictures:
-
-    $ mkdir albums
-
-Alternatively, you can use an existing photo dir:
-
-    $ ln -s /my/photo/folder albums
-
-Samelessly, make a folder for cache:
-
-    $ mkdir cache
-
-You can create a symlink to an existing folder, too.
-
-When you're done, fill albums folder with photos and directories of photos. You can also use symlinks. Run the static generator (you need Python≥2.6 and the Python Imaging Library):
-
-    $ cd ../scanner
-    $ ./main.py ../web/albums ../web/cache
+    $ /your/photofloat/installation/dir/scanner/main.py /etc/photofloat/myproject.conf
 
 After it finishes, you will be all set. Simply have your web server serve pages out of your web directory. You may want to do the scanning step in a cronjob, if you don't use the deployment makefiles mentioned below.
 
-Note: The albums web folder could be anywhere in the file system.
+Note: The albums web folder and the cache one could be anywhere in the file system or in web, the only requierement is that the web server has access to them.
 
 cron file example with albums and cache in /var/www:
 
     # update photofloat cache
     
-    58 1  * * *<--->root<-->cd /folder/where/you/have/photofloat  && ./scanner/main.py /web/site/root/albums /web/site/root/cache
+    58 1  * * *<--->root<-->/your/photofloat/installation/dir/scanner/main.py /etc/photofloat/myproject.conf > /var/log/myphotofloatproject.log
 
+instead or running photofloat as root, you can use whatever user that have access to the directories you set up in your config file
+
+#### Update your photofloat installation
+
+Go to the folder you cloned the repository in and execute:
+    $ git pull https://github.com/paolobenve/photofloat.git
 
 ## Optional: Server-side Authentication
 
