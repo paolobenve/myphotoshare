@@ -1,4 +1,3 @@
-var windowWidth, windowHeight, windowOrientation;
 var Options = {};
 
 $(document).ready(function() {
@@ -29,6 +28,7 @@ $(document).ready(function() {
 	var previousMedia = null;
 	var photoFloat = new PhotoFloat();
 	var maxSizeSet = false;
+	var fullScreenStatus = false;
 	
 	
 	/* Displays */
@@ -150,7 +150,7 @@ $(document).ready(function() {
 	}
 	function showAlbum(populate) {
 		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
-		var width, height, thumbWidth, thumbHeight;
+		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, imageTextAdd;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
@@ -159,7 +159,7 @@ $(document).ready(function() {
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
 				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnailSize, true);
-				var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
+				bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 					thumbHash =
 						PhotoFloat.cachePath(currentAlbum.photos[i].completeName.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
@@ -169,7 +169,7 @@ $(document).ready(function() {
 				link = $("<a href=\"#!/" + hash + "\"></a>");
 				width = currentAlbum.photos[i].size[0];
 				height = currentAlbum.photos[i].size[1];
-				var imageString = "<div class=\"thumb-container\" ";
+				imageString = "<div class=\"thumb-container\" ";
 				imageString += "style=\"width: ";
 				if (Options.media_thumb_type == "fixed_height") {
 					thumbHeight = Options.media_thumb_size;
@@ -215,7 +215,7 @@ $(document).ready(function() {
 			
 			if (currentMedia === null) {
 				subalbums = [];
-				var imageTextAdd;
+				imageTextAdd;
 				for (i = 0; i < currentAlbum.albums.length; ++i) {
 					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 					imageTextAdd = currentAlbum.albums[i].path;
@@ -336,8 +336,10 @@ $(document).ready(function() {
 		else
 			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
 	}
-	function showMedia(album, fullscreen = false) {
-		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation, thumbnailSize;
+	function showMedia(album) {
+		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation, thumbnailSize, j;
+		var maxSizeSet, mediaMaxSize, mediaMinSize, imageRatio, windowMaxSize, windowMinSize, reducedMinSize, reducedMaxSize;
+		var windowWidth, windowHeight, windowOrientation;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
 
@@ -347,8 +349,8 @@ $(document).ready(function() {
 			windowOrientation = "landscape";
 		else
 			windowOrientation = "portrait";
-		var windowMaxSize = Math.max(windowWidth, windowHeight);
-		var windowMinSize = Math.min(windowWidth, windowHeight);
+		windowMaxSize = Math.max(windowWidth, windowHeight);
+		windowMinSize = Math.min(windowWidth, windowHeight);
 
 
 		if (width > height)
@@ -356,19 +358,19 @@ $(document).ready(function() {
 		else
 			mediaOrientation = "portrait";
 			
-		var mediaMaxSize = Math.max(width, height);
-		var mediaMinSize = Math.min(width, height);
-		var imageRatio = mediaMaxSize / mediaMinSize;
+		mediaMaxSize = Math.max(width, height);
+		mediaMinSize = Math.min(width, height);
+		imageRatio = mediaMaxSize / mediaMinSize;
 		
-		if (fullscreen) {
-			var maxSize = Options.reduced_sizes[0];
-			var maxSizeSet = true;
+		if (fullScreenStatus) {
+			maxSize = Options.reduced_sizes[0];
+			maxSizeSet = true;
 		}
 		if (! maxSizeSet) {
 			maxSize = Options.reduced_sizes[0];
 			for (var i = 0; i < Options.reduced_sizes.length; i++) {
-				var reducedMinSize = Options.reduced_sizes[i] / imageRatio;
-				var reducedMaxSize = Options.reduced_sizes[i];
+				reducedMinSize = Options.reduced_sizes[i] / imageRatio;
+				reducedMaxSize = Options.reduced_sizes[i];
 				if (mediaOrientation == windowOrientation &&
 						(reducedMinSize < windowMinSize && reducedMaxSize < windowMaxSize) ||
 					mediaOrientation !== windowOrientation &&
@@ -417,7 +419,7 @@ $(document).ready(function() {
 				.attr("src", photoSrc)
 				.attr("alt", currentMedia.name)
 				.attr("title", currentMedia.date);
-			if (fullscreen)
+			if (fullScreenStatus)
 				$("#photo").load(scaleImageFullscreen);
 			else
 				$("#photo").load(scaleImageNormal);
@@ -430,7 +432,7 @@ $(document).ready(function() {
 			$("#metadata-hide").hide();
 		}
 		if (currentAlbum.photos.length > 1) {
-			var j = currentMediaIndex;
+			j = currentMediaIndex;
 			do {
 				j == 0 ? j = currentAlbum.photos.length - 1: j --;
 				previousMedia = currentAlbum.photos[j];
@@ -738,7 +740,8 @@ $(document).ready(function() {
 		$("#fullscreen").show().click(function() {
 			$("#photo").fullScreen({callback: function(isFullscreen) {
 				maxSizeSet = false;
-				showMedia(currentAlbum, isFullscreen);
+				fullScreenStatus = isFullscreen;
+				showMedia(currentAlbum);
 			}});
 		});
 	}
