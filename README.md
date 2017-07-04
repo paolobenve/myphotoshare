@@ -74,12 +74,6 @@ It is, essentially, the slickest and fastest, most minimal but still well-featur
     $ git clone https://github.com/paolobenve/photofloat.git
     $ cd photofloat
 
-#### (When photofloat code is updated) Update your photofloat installation
-
-Go to the folder you cloned the repository in and execute:
-
-    $ git pull https://github.com/paolobenve/photofloat.git
-
 #### Copy and tweak the configuration file
 
     $ sudo mkdir /etc/photofloat
@@ -92,7 +86,14 @@ In your config file (myproject.conf, name can be whatever you want)set the prope
 
 This simply minifies and concatenate everything of js and css.
 
-    $ js-css-minify.sh
+    $ ./js-css-minify.sh
+
+#### (When photofloat code is updated) Update your photofloat installation
+
+Go to the folder you cloned the repository in and execute:
+
+    $ git pull https://github.com/paolobenve/photofloat.git
+    $ ./js-css-minify.sh
 
 #### Generate the albums:
 
