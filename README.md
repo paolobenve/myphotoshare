@@ -74,6 +74,12 @@ It is, essentially, the slickest and fastest, most minimal but still well-featur
     $ git clone https://github.com/paolobenve/photofloat.git
     $ cd photofloat
 
+#### (When photofloat code is updated) Update your photofloat installation
+
+Go to the folder you cloned the repository in and execute:
+
+    $ git pull https://github.com/paolobenve/photofloat.git
+
 #### Copy and tweak the configuration file
 
     $ sudo mkdir /etc/photofloat
@@ -105,11 +111,6 @@ cron file example with albums and cache in /var/www:
     58 1  * * *<--->root<-->/your/photofloat/installation/dir/scanner/main.py /etc/photofloat/myproject.conf > /var/log/myphotofloatproject.log
 
 instead or running photofloat as root, you can use whatever user that have access to the directories you set up in your config file
-
-#### Update your photofloat installation
-
-Go to the folder you cloned the repository in and execute:
-    $ git pull https://github.com/paolobenve/photofloat.git
 
 ## Optional: Server-side Authentication
 
