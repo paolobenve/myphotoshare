@@ -8,7 +8,7 @@ echo
 ls -1 *.js|grep -Ev "min.js$" | while read jsfile; do
 	newfile="${jsfile%.*}.min.js"
 	echo "$jsfile --> $newfile"
-	curl -X POST -s --data-urlencode "input@$jsfile" http://javascript-minifier.com/raw > $newfile
+	curl -X POST -s --data-urlencode "input@$jsfile" https://javascript-minifier.com/raw > $newfile
 done
 
 # merge all into one single file
@@ -24,7 +24,7 @@ echo
 ls -1 *.css|grep -Ev "min.css$" | while read cssfile; do
 	newfile="${cssfile%.*}.min.css"
 	echo "$cssfile --> $newfile"
-	curl -X POST -s --data-urlencode "input@$cssfile" http://cssminifier.com/raw > $newfile
+	curl -X POST -s --data-urlencode "input@$cssfile" https://cssminifier.com/raw > $newfile
 done
 
 # merge all into one single file
