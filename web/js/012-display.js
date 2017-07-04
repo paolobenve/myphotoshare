@@ -542,6 +542,7 @@ $(document).ready(function() {
 	/* Entry point for most events */
 	
 	function hashParsed(album, photo, photoIndex) {
+		var populateAlbum;
 		undie();
 		$("#loading").hide();
 		if (album === currentAlbum && photo === currentMedia)
@@ -570,7 +571,7 @@ $(document).ready(function() {
 			$("#folders-view-container").hide();
 			$("#day-view-container").hide();
 		}
-		var populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
+		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
 		if (currentMedia !== null || ! Options.show_media_names_below_thumbs_in_albums)
 			$(".thumb-caption-media").hide();
