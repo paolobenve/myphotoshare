@@ -399,14 +399,14 @@ class Media(object):
 		original_thumbnail_size = thumbnail_size
 		if (
 			is_thumbnail and Options.config['media_thumb_type'] == "fixed_height" and
-			thumbnail_size == Options.config['media_thumb_size'] and
+			original_thumbnail_size == Options.config['media_thumb_size'] and
 			image_copy.size[0] > image_copy.size[1]
 		):
 			thumbnail_size = int(round(float(original_thumbnail_size * image_copy.size[0]) / float(image_copy.size[1])))
 		if (image_size >= thumbnail_size):
 			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
 			if is_thumbnail and Options.config['media_thumb_type'] == "canvas":
-				image_copy = self.resize_canvas(image_copy, thumbnail_size, True)
+				image_copy = image_copy.resize_canvas(image_copy, thumbnail_size, True)
 		else:
 			image_copy = self.resize_canvas(image_copy, thumbnail_size)
 		try:
@@ -518,8 +518,15 @@ class Media(object):
 					raise
 			for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 				try:
-					image_to_start_from = thumb
-					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, True)
+					if (
+						thumb_size == Options.config['media_thumb_size'] and
+						Options.config['media_thumb_type'] == "fixed_height" and
+						image.size[0] > image.size[1] and
+						thumb_size * image.size[0] / image.size[1] > Options.config['album_thumb_size']
+					):
+						# with portrait images, a canvas could be generated, better start from original image
+						thumb = image
+					thumb = self._thumbnail(thumb, photo_path, thumbs_path, thumb_size, True)
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
