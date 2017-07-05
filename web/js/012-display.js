@@ -29,6 +29,8 @@ $(document).ready(function() {
 	var photoFloat = new PhotoFloat();
 	var maxSizeSet = false;
 	var fullScreenStatus = false;
+	var previousHash = "";
+	var firstAlbumPopulation = true;
 	
 	
 	/* Displays */
@@ -102,7 +104,10 @@ $(document).ready(function() {
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
 		else {
 			// the arrows for changing sort
-			title += "<a id=\"sort-arrows\" href=\"javascript:void(0)\"><span title=\"sort ascending\" id=\"arrow-up\">🠙</span><span title=\"sort descending\" id=\"arrow-down\">🠛</span></a>";
+			title += "<a id=\"sort-arrows\" href=\"javascript:void(0)\">" +
+					"<span title=\"sort ascending\" id=\"arrow-up\">🠙</span>" +
+					"<span title=\"sort descending\" id=\"arrow-down\">🠛</span>" +
+				"</a>";
 			$("body").on('mouseenter', "#title", function() {
 				if (getCookie("sort") == "reverse") {
 					$("#arrow-up").hide();
@@ -118,6 +123,7 @@ $(document).ready(function() {
 			});
 			$("#title").unbind('click');
 			$("#title").on('click', "#sort-arrows", function() {
+				firstAlbumPopulation = false;
 				if (getCookie("sort") == "reverse") {
 					$("#arrow-down").hide();
 					$("#arrow-up").hide();
@@ -188,25 +194,28 @@ $(document).ready(function() {
 			thumb.addClass("current-thumb");
 		}
 	}
+	
+	
 	function showAlbum(populate) {
 		var i, j, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, imageTextAdd;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
+		if (! firstAlbumPopulation || getCookie("sort") == "reverse") {
+			currentAlbum.photos = currentAlbum.photos.reverse();
+			currentAlbum.albums = currentAlbum.albums.reverse();
+		}
 		if (populate) {
 			thumbnailSize = Options.media_thumb_size;
 			photos = [];
-			for (j = 0; j < currentAlbum.photos.length; ++j) {
-				if (getCookie("sort") == "reverse")
-					i = currentAlbum.photos.length - 1 - j;
-				else
-					i = j;
+			for (i = 0; i < currentAlbum.photos.length; ++i) {
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
 				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnailSize, true);
 				bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 					thumbHash =
-						PhotoFloat.cachePath(currentAlbum.photos[i].completeName.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
+						PhotoFloat.cachePath(currentAlbum.photos[i].completeName
+							.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
 						"/" +
 						PhotoFloat.cachePath(currentAlbum.photos[i].name);
 				}
@@ -253,18 +262,14 @@ $(document).ready(function() {
 					});
 				})(link, image, currentAlbum);
 			}
+			
 			thumbsElement = $("#thumbs");
 			thumbsElement.empty();
 			thumbsElement.append.apply(thumbsElement, photos);
 			
 			if (currentMedia === null) {
 				subalbums = [];
-				imageTextAdd;
-				for (j = 0; j < currentAlbum.albums.length; ++j) {
-					if (getCookie("sort") == "reverse")
-						i = currentAlbum.albums.length - 1 - j;
-					else
-						i = j;
+				for (i = 0; i < currentAlbum.albums.length; ++i) {
 					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 					imageTextAdd = currentAlbum.albums[i].path;
 					imageTextAdd = imageTextAdd.replace(Options.by_date_string, $("#by-date-translation").html());
@@ -282,8 +287,6 @@ $(document).ready(function() {
 					(function(theContainer, theAlbum, theImage, theLink) {
 						photoFloat.albumPhoto(theAlbum, function(album, photo) {
 							var distance;
-							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options.album_thumb_size, true) + ")");
-										"\" src=\"" +  thumbHash;
 							if (Options.media_thumb_type == "fixed_height") {
 								if (photo.size[1] < photo.size[0]) {
 									thumbWidth = Options.album_thumb_size;
@@ -292,11 +295,12 @@ $(document).ready(function() {
 									thumbHeight = Options.album_thumb_size;
 									thumbWidth = thumbHeight * photo.size[0] / photo.size[1];
 								}
-								distance = (Options.album_thumb_size - thumbHeight) / 2;
-								distance = distance + Options.album_thumb_size * 0.05;
+								distance = (Options.album_thumb_size - thumbHeight) / 2 + Options.album_thumb_size * 0.05;
 								theImage.css("background-position-y", distance.toString() + "px");
 								theImage.css("background-size", thumbWidth + "px " + thumbHeight + "px");
 							}
+							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options.album_thumb_size, true) + ")");
+										"\" src=\"" +  thumbHash;
 						}, function error() {
 							theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 							theLink.remove();
@@ -592,13 +596,17 @@ $(document).ready(function() {
 		var populateAlbum;
 		undie();
 		$("#loading").hide();
+		if (window.location.hash != previousHash) {
+			console.log(window.location.hash, previousHash);
+			firstAlbumPopulation = true;
+		}
 		if (album === currentAlbum && photo === currentMedia)
 			return;
 		if (album != currentAlbum)
 			currentAlbum = null;
 		if (currentAlbum && currentAlbum.path.indexOf(Options.by_date_string) === 0 && photo !== null) {
 			previousAlbum = currentAlbum;
-			album = currentAlbum;
+			//~ album = currentAlbum;
 			previousMedia = photo;
 			currentMedia = photo;
 			currentMediaIndex = photoIndex;
@@ -691,11 +699,21 @@ $(document).ready(function() {
 			
 			$(".album-button").css("width", (albumThumbnailSize * 1.1).toString() + "px");
 			$(".album-button").css("padding-top", (albumThumbnailSize * 1.05).toString() + "px");
-			$(".album-button").css("background-position-y", (albumThumbnailSize * 0.05).toString() + "px");
+			$(".album-button").each(function() {
+				if ($(this).css("background-position-y") === undefined) {
+					$(this).css("background-position-y", (albumThumbnailSize * 0.05).toString() + "px");
+					return;
+				}
+			});
 		} else {
 			$(".album-button").css("width", albumThumbnailSize.toString() + "px");
 			$(".album-button").css("padding-top", albumThumbnailSize.toString() + "px");
-			$(".album-button").css("background-position-y", "0");
+			$(".album-button").each(function() {
+				if (this.css("background-position-y") === undefined) {
+					$(this).css("background-position-y", "0");
+					return;
+				}
+			});
 		}
 	}
 	
