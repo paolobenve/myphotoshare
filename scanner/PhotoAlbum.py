@@ -364,7 +364,10 @@ class Media(object):
 				is_thumbnail and not Options.config['recreate_thumbnails']
 			)
 		):
-			message("existing reduced size", info_string)
+			if thumbnail_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
+				message("existing thumbnail", info_string)
+			else:
+				message("existing reduced size", info_string)
 			back_level()
 			return image
 		gc.collect()

@@ -102,7 +102,7 @@ $(document).ready(function() {
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
 		else {
 			// the arrows for changing sort
-			title += "<a id=\"sort-arrows\" href=\"javascript:void(0)\"><span id=\"arrow-up\">🠙</span><span id=\"arrow-down\">🠛</span></a>";
+			title += "<a id=\"sort-arrows\" href=\"javascript:void(0)\"><span title=\"sort ascending\" id=\"arrow-up\">🠙</span><span title=\"sort descending\" id=\"arrow-down\">🠛</span></a>";
 			$("body").on('mouseenter', "#title", function() {
 				if (getCookie("sort") == "reverse") {
 					$("#arrow-up").hide();
