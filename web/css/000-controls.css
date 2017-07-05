@@ -126,10 +126,10 @@ a#day-view, a#folders-view {
 	text-align: center;
 	z-index: -1;
 }
+#album-view.no-bottom-space {
+	height: 0;
+}
 #photo-view.no-bottom-space {
-/*
-	bottom: 2em;
-*/
 	bottom: 0;
 }
 #photo-box, #video-box {
@@ -320,3 +320,14 @@ a#day-view, a#folders-view {
 	padding: .5em;
 }
 
+#sort-arrows {
+	padding: 0 1em;
+}
+
+#arrow-up, #arrow-down {
+	display: none;
+}
+#arrow-down {
+}
+#arrow-up {
+}

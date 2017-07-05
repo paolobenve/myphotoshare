@@ -402,7 +402,7 @@ class Media(object):
 			thumbnail_size == Options.config['media_thumb_size'] and
 			image_copy.size[0] > image_copy.size[1]
 		):
-			thumbnail_size = int(round(float(thumbnail_size * image_copy.size[0]) / float(image_copy.size[1])))
+			thumbnail_size = int(round(float(original_thumbnail_size * image_copy.size[0]) / float(image_copy.size[1])))
 		if (image_size >= thumbnail_size):
 			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
 			if is_thumbnail and Options.config['media_thumb_type'] == "canvas":

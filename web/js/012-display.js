@@ -72,6 +72,8 @@ $(document).ready(function() {
 			components = currentAlbum.path.split("/");
 			components.unshift(originalTitle);
 		}
+		
+		// generate the title in the page
 		for (i = 0; i < components.length; ++i) {
 			if (i)
 				last += "/" + components[i];
@@ -98,7 +100,45 @@ $(document).ready(function() {
 		}
 		if (currentMedia !== null)
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
-		
+		else {
+			// the arrows for changing sort
+			title += "<a id=\"sort-arrows\" href=\"javascript:void(0)\"><span id=\"arrow-up\">🠙</span><span id=\"arrow-down\">🠛</span></a>";
+			$("body").on('mouseenter', "#title", function() {
+				if (getCookie("sort") == "reverse") {
+					$("#arrow-up").hide();
+					$("#arrow-down").show();
+				} else {
+					$("#arrow-up").show();
+					$("#arrow-down").hide();
+				}
+			});
+			$("body").on('mouseleave', "#title", function() {
+				$("#arrow-up").hide();
+				$("#arrow-down").hide();
+			});
+			$("#title").unbind('click');
+			$("#title").on('click', "#sort-arrows", function() {
+				if (getCookie("sort") == "reverse") {
+					$("#arrow-down").hide();
+					$("#arrow-up").hide();
+					setCookie("sort", "normal");
+					showAlbum(true);
+					setOptions();
+					$("#arrow-up").show();
+					$("#arrow-down").hide();
+				} else {
+					$("#arrow-down").hide();
+					$("#arrow-up").hide();
+					setCookie("sort", "reverse");
+					showAlbum(true);
+					setOptions();
+					$("#arrow-up").hide();
+					$("#arrow-down").show();
+				}
+				
+			});
+		}
+		// generate the html page title
 		for (i = 0; i < components.length; ++i) {
 			if (i == 0) {
 				documentTitle += components[0];
@@ -149,14 +189,18 @@ $(document).ready(function() {
 		}
 	}
 	function showAlbum(populate) {
-		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
+		var i, j, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, imageTextAdd;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
 			thumbnailSize = Options.media_thumb_size;
 			photos = [];
-			for (i = 0; i < currentAlbum.photos.length; ++i) {
+			for (j = 0; j < currentAlbum.photos.length; ++j) {
+				if (getCookie("sort") == "reverse")
+					i = currentAlbum.photos.length - 1 - j;
+				else
+					i = j;
 				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
 				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnailSize, true);
 				bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
@@ -173,7 +217,7 @@ $(document).ready(function() {
 				imageString += "style=\"width: ";
 				if (Options.media_thumb_type == "fixed_height") {
 					thumbHeight = Options.media_thumb_size;
-					thumbWidth = thumbHeight / height * width;
+					thumbWidth = thumbHeight * width / height;
 					imageString += thumbWidth.toString();
 				} else {
 					imageString += Options.media_thumb_size.toString().toString();
@@ -216,7 +260,11 @@ $(document).ready(function() {
 			if (currentMedia === null) {
 				subalbums = [];
 				imageTextAdd;
-				for (i = 0; i < currentAlbum.albums.length; ++i) {
+				for (j = 0; j < currentAlbum.albums.length; ++j) {
+					if (getCookie("sort") == "reverse")
+						i = currentAlbum.albums.length - 1 - j;
+					else
+						i = j;
 					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 					imageTextAdd = currentAlbum.albums[i].path;
 					imageTextAdd = imageTextAdd.replace(Options.by_date_string, $("#by-date-translation").html());
@@ -282,13 +330,14 @@ $(document).ready(function() {
 				$("#day-view-container").hide();
 				$("#folders-view").attr("href", "#!/" + Options.folders_string);
 			}
+			$("#powered-by").show();
 		} else {
 			if (currentAlbum.photos.length == 1)
 				$("#thumbs").hide();
 			else
 				$("#thumbs").show();
+			$("#powered-by").hide();
 		}
-		
 		
 		setTimeout(scrollToThumb, 1);
 	}
@@ -463,6 +512,7 @@ $(document).ready(function() {
 		}
 		$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
 		
+		thumbnailSize = Options.media_thumb_size;
 		if (currentAlbum.photos.length == 1) {
 			$("#next").hide();
 			$("#back").hide();
@@ -480,6 +530,10 @@ $(document).ready(function() {
 			$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
 			$("#photo-view").removeClass("no-bottom-space");
 			$("#album-view").removeClass("no-bottom-space");
+			$("#photo-view").css("bottom", (thumbnailSize + 15).toString() + "px");
+			$("#album-view").css("height", (thumbnailSize + 20).toString() + "px");
+			$("#album-view").addClass("photo-view-container");
+			$(".photo-view-container").css("height", (thumbnailSize + 5).toString() + "px");
 		}
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		
@@ -507,13 +561,6 @@ $(document).ready(function() {
 		text += "</table>";
 		$("#metadata").html(text);
 		
-		$("#album-view").addClass("photo-view-container");
-		thumbnailSize = Options.media_thumb_size;
-		$(".photo-view-container").css("height", (thumbnailSize + 5).toString() + "px");
-		if (currentAlbum.photos.length != 1) {
-			$("#photo-view").css("bottom", (thumbnailSize + 15).toString() + "px");
-			$("#album-view").css("height", (thumbnailSize + 20).toString() + "px");
-		}
 		$("#subalbums").hide();
 		$("#photo-view").show();
 	}
@@ -579,6 +626,16 @@ $(document).ready(function() {
 			$(".thumb-caption-media").show();
 		
 		setOptions();
+	}
+
+	function setCookie(key, value) {
+		var expires = new Date();
+		expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000));
+		document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+	}
+	function getCookie(key) {
+		var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+		return keyValue ? keyValue[2] : null;
 	}
 	
 	function setOptions() {
