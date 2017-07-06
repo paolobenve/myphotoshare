@@ -1,4 +1,4 @@
-# photofloat v. 2.0
+# photofloat v. 2.1
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -46,7 +46,7 @@ Features added by Joachim:
 * generate minified css and js through external api
 * parallel thumbnail generation
 
-Features added in version 2.0:
+Features added in version 2.0 (July 4, 2017):
 
 * A date tree is builded, permitting photo to be seen by year, month, date
 * When a photo is viewed, the user can switch between the folder and the date the photo was taken
@@ -65,7 +65,7 @@ the customization file, which adds many configuration variables; web site appear
 * - albums and cache server folders can be anywhere, even on another server (obviously, they will be generated on a pc and then uploaded wherever)
 * (to do) share buttons
 
-Features added in version 2.1:
+Features added in version 2.1 (July 6, 2017):
 
 * Images and directories can be sorted ascending/descending (via a cookie)
 
