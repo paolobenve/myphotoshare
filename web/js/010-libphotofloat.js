@@ -79,7 +79,6 @@
 		this.album(album, function(theAlbum) {
 			var i = -1;
 			if (photo !== null) {
-
 				for (i = 0; i < theAlbum.photos.length; ++i) {
 					if (PhotoFloat.cachePath(theAlbum.photos[i].name) === photo) {
 						photo = theAlbum.photos[i];
@@ -246,17 +245,6 @@
 		}
 		return hash;
 	};
-	PhotoFloat.getCookie = function(key) {
-		var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
-		return keyValue ? keyValue[2] : null;
-	}
-	PhotoFloat.setCookie = function(key, value) {
-		var expires = new Date();
-		expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000));
-		document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
-		return;
-	}
-
 	
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
@@ -272,8 +260,6 @@
 	PhotoFloat.prototype.photoYearAlbum = PhotoFloat.photoYearAlbum;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
-	PhotoFloat.prototype.getCookie = PhotoFloat.getCookie;
-	PhotoFloat.prototype.setCookie = PhotoFloat.setCookie;
 	/* expose class globally */
 	window.PhotoFloat = PhotoFloat;
 }());

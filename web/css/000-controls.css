@@ -131,7 +131,7 @@ a#day-view, a#folders-view {
 	bottom: 1em;
 }
 #photo-view.no-bottom-space {
-	bottom: 0;
+	bottom: 0 !important;
 }
 #photo-box, #video-box {
 	display: inline;
