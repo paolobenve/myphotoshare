@@ -500,9 +500,11 @@ $(document).ready(function() {
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#photo-box").show();
-			$("#metadata").hide();
-			$("#metadata-show").show();
-			$("#metadata-hide").hide();
+			if (! Options.persistent_metadata) {
+				$("#metadata").hide();
+				$("#metadata-show").show();
+				$("#metadata-hide").hide();
+			}
 		}
 		if (currentAlbum.photos.length > 1) {
 			j = currentMediaIndex;
@@ -850,9 +852,11 @@ $(document).ready(function() {
 	if ($.support.fullscreen) {
 		$("#fullscreen-divider").show();
 		$("#fullscreen").show().click(function() {
-			$("#photo").fullScreen({callback: function(isFullscreen) {
+			$("#photo-box").fullScreen({callback: function(isFullscreen) {
 				maxSizeSet = false;
 				fullScreenStatus = isFullscreen;
+				$("#fullscreen").toggle();
+				$("#fullscreen-divider").toggle();
 				showMedia(currentAlbum);
 			}});
 		});
