@@ -128,6 +128,7 @@ a#day-view, a#folders-view {
 }
 #album-view.no-bottom-space {
 	height: 0;
+	bottom: 1em;
 }
 #photo-view.no-bottom-space {
 	bottom: 0;
@@ -197,9 +198,8 @@ a#day-view, a#folders-view {
 #fullscreen, #fullscreen-divider {
 	display: none;
 }
-.photo-view-container {
+#album-view.photo-view-container {
 	position: absolute;
-	height: 0;
 	width: 100%;
 	bottom: 0;
 	top: auto !important;
@@ -209,11 +209,12 @@ a#day-view, a#folders-view {
 	padding: 0 !important;
 	text-align: center;
 }
-.photo-view-container.no-bottom-space {
+#album-view.photo-view-container.no-bottom-space {
 /*
 	height: 3em;
 */
 	height: 0;
+	bottom: 15px;
 }
 #powered-by {
 	clear: both;

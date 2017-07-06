@@ -29,8 +29,6 @@ $(document).ready(function() {
 	var photoFloat = new PhotoFloat();
 	var maxSizeSet = false;
 	var fullScreenStatus = false;
-	var previousHash = "";
-	var firstAlbumPopulation = true;
 	
 	
 	/* Displays */
@@ -68,6 +66,12 @@ $(document).ready(function() {
 		var originalTitle = Options.page_title;
 		translate();
 		
+		if (! PhotoFloat.firstAlbumPopulation || PhotoFloat.getCookie("sort") == "reverse") {
+			PhotoFloat.firstAlbumPopulation = false;
+			currentAlbum.photos = currentAlbum.photos.reverse();
+			currentAlbum.albums = currentAlbum.albums.reverse();
+		}
+
 		if (! currentAlbum.path.length)
 			components = [originalTitle];
 		else {
@@ -109,7 +113,7 @@ $(document).ready(function() {
 					"<span title=\"sort descending\" id=\"arrow-down\">🠛</span>" +
 				"</a>";
 			$("body").on('mouseenter', "#title", function() {
-				if (getCookie("sort") == "reverse") {
+				if (PhotoFloat.getCookie("sort") == "reverse") {
 					$("#arrow-up").hide();
 					$("#arrow-down").show();
 				} else {
@@ -123,11 +127,17 @@ $(document).ready(function() {
 			});
 			$("#title").unbind('click');
 			$("#title").on('click', "#sort-arrows", function() {
-				firstAlbumPopulation = false;
-				if (getCookie("sort") == "reverse") {
+				if (currentMedia !== null)
+					currentMediaIndex = currentAlbum.photos.lenght - 1 - currentMediaIndex;
+				currentAlbum.photos = currentAlbum.photos.reverse();
+				currentAlbum.albums = currentAlbum.albums.reverse();
+				if (currentMediaIndex !== -1)
+					currentMediaIndex = currentAlbum.photos.lenght - 1 - currentMediaIndex;
+
+				if (PhotoFloat.getCookie("sort") == "reverse") {
 					$("#arrow-down").hide();
 					$("#arrow-up").hide();
-					setCookie("sort", "normal");
+					PhotoFloat.setCookie("sort", "normal");
 					showAlbum(true);
 					setOptions();
 					$("#arrow-up").show();
@@ -135,7 +145,7 @@ $(document).ready(function() {
 				} else {
 					$("#arrow-down").hide();
 					$("#arrow-up").hide();
-					setCookie("sort", "reverse");
+					PhotoFloat.setCookie("sort", "reverse");
 					showAlbum(true);
 					setOptions();
 					$("#arrow-up").hide();
@@ -201,11 +211,7 @@ $(document).ready(function() {
 		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, imageTextAdd;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
-		if (! firstAlbumPopulation || getCookie("sort") == "reverse") {
-			currentAlbum.photos = currentAlbum.photos.reverse();
-			currentAlbum.albums = currentAlbum.albums.reverse();
-		}
-		if (populate) {
+		if (populate || ! PhotoFloat.firstAlbumPopulation) {
 			thumbnailSize = Options.media_thumb_size;
 			photos = [];
 			for (i = 0; i < currentAlbum.photos.length; ++i) {
@@ -375,6 +381,10 @@ $(document).ready(function() {
 			image.css("height", "100%").css("width", "auto").css("position", 0).css("bottom", 0);
 		$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) -
 					2 * parseInt($("#title").css("padding")));
+		if (! $("#album-view").is(":visible"))
+			$("#photo-view").css("bottom", "0");
+		else
+			$("#photo-view").css("bottom", (Options.media_thumb_size + 15).toString() + "px");
 	}
 	function scaleVideo() {
 		var video, container;
@@ -537,7 +547,7 @@ $(document).ready(function() {
 			$("#photo-view").css("bottom", (thumbnailSize + 15).toString() + "px");
 			$("#album-view").css("height", (thumbnailSize + 20).toString() + "px");
 			$("#album-view").addClass("photo-view-container");
-			$(".photo-view-container").css("height", (thumbnailSize + 5).toString() + "px");
+			$("#album-view.photo-view-container").css("height", (thumbnailSize + 22).toString() + "px");
 		}
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		
@@ -596,10 +606,6 @@ $(document).ready(function() {
 		var populateAlbum;
 		undie();
 		$("#loading").hide();
-		if (window.location.hash != previousHash) {
-			console.log(window.location.hash, previousHash);
-			firstAlbumPopulation = true;
-		}
 		if (album === currentAlbum && photo === currentMedia)
 			return;
 		if (album != currentAlbum)
@@ -636,16 +642,6 @@ $(document).ready(function() {
 		setOptions();
 	}
 
-	function setCookie(key, value) {
-		var expires = new Date();
-		expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000));
-		document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
-	}
-	function getCookie(key) {
-		var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
-		return keyValue ? keyValue[2] : null;
-	}
-	
 	function setOptions() {
 		var albumThumbnailSize, mediaThumbnailSize;
 		albumThumbnailSize = Options.album_thumb_size;
@@ -696,7 +692,6 @@ $(document).ready(function() {
 		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
 		$(".album-button").css("margin-right", Options.thumb_spacing.toString() + "px");
 		if (Options.different_album_thumbnails) {
-			
 			$(".album-button").css("width", (albumThumbnailSize * 1.1).toString() + "px");
 			$(".album-button").css("padding-top", (albumThumbnailSize * 1.05).toString() + "px");
 			$(".album-button").each(function() {
