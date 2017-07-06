@@ -129,6 +129,32 @@ $(document).ready(function() {
 				$("#arrow-up").hide();
 				$("#arrow-down").hide();
 			});
+			$("#title").unbind('click');
+			$("#title").on('click', "#sort-arrows", function() {
+				if (currentMedia !== null)
+					currentMediaIndex = currentAlbum.photos.lenght - 1 - currentMediaIndex;
+				currentAlbum.photos = currentAlbum.photos.reverse();
+				currentAlbum.albums = currentAlbum.albums.reverse();
+				
+				if (getBooleanCookie("reverseSort")) {
+					$("#arrow-down").hide();
+					$("#arrow-up").hide();
+					setBooleanCookie("reverseSort", false);
+					showAlbum(true);
+					setOptions();
+					$("#arrow-up").show();
+					$("#arrow-down").hide();
+				} else {
+					$("#arrow-down").hide();
+					$("#arrow-up").hide();
+					setBooleanCookie("reverseSort", true);
+					showAlbum(true);
+					setOptions();
+					$("#arrow-up").hide();
+					$("#arrow-down").show();
+				}
+				
+			});
 		}
 		// generate the html page title
 		for (i = 0; i < components.length; ++i) {
@@ -842,31 +868,6 @@ $(document).ready(function() {
 			.animate({ height: 0, paddingTop: 0, paddingBottom: 0 }, "slow", function() {
 				$(this).hide();
 			});
-	});
-	$("#sort-arrows").click(function() {
-		if (currentMedia !== null)
-			currentMediaIndex = currentAlbum.photos.lenght - 1 - currentMediaIndex;
-		currentAlbum.photos = currentAlbum.photos.reverse();
-		currentAlbum.albums = currentAlbum.albums.reverse();
-		
-		if (getBooleanCookie("reverseSort")) {
-			$("#arrow-down").hide();
-			$("#arrow-up").hide();
-			setBooleanCookie("reverseSort", false);
-			showAlbum(true);
-			setOptions();
-			$("#arrow-up").show();
-			$("#arrow-down").hide();
-		} else {
-			$("#arrow-down").hide();
-			$("#arrow-up").hide();
-			setBooleanCookie("reverseSort", true);
-			showAlbum(true);
-			setOptions();
-			$("#arrow-up").hide();
-			$("#arrow-down").show();
-		}
-		
 	});
 	$("#auth-form").submit(function() {
 		var password = $("#password");
