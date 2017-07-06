@@ -125,9 +125,17 @@ title_image_name_color = lime
 # the page background color (this is ~ gray)
 background_color = #222222
 
+# the album buttons background color (this is a dirty white, in order to be like an old slide)
+album_background_color = wheat
+
+# the album buttons background color
+album_caption_color = darkblue
+
 # The colors for the top right button which switches between folder and date view
 switch_button_background_color = black
 switch_button_background_color_hover = white
 switch_button_color = white
 switch_button_color_hover = black
 
+# shoud metadata be shown persistently until they are closed?
+persistent_metadata = false

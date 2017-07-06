@@ -4,8 +4,9 @@
 		bottom: 0;
 		margin: 0;
 	}
-	.photo-view-container {
+	#album-view.photo-view-container {
 		display: none;
+		height: 0;
 	}
 	#title {
 		font-size: .8em;
