@@ -1,4 +1,4 @@
-# photofloat v. 2.1
+# photofloat v. 2.1.1
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -68,6 +68,14 @@ the customization file, which adds many configuration variables; web site appear
 Features added in version 2.1 (July 6, 2017):
 
 * Images and directories can be sorted ascending/descending (via a cookie)
+
+Features added in version 2.1.1 (July 6, 2017):
+
+* bug fixes
+* new options:
+* - persistent_metadata (boolean): permits to have metadata persistently on image
+* - album_background_color
+* - album_caption_color
 
 It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
 
