@@ -125,6 +125,12 @@ title_image_name_color = lime
 # the page background color (this is ~ gray)
 background_color = #222222
 
+# the album buttons background color (this is ~ white)
+album_background_color = cornsilk
+
+# the album buttons background color (this is ~ white)
+album_caption_color = darkgreen
+
 # The colors for the top right button which switches between folder and date view
 switch_button_background_color = black
 switch_button_background_color_hover = white

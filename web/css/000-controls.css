@@ -89,7 +89,7 @@ a#day-view, a#folders-view {
 	background-position-x: center;
 	background-position-y: 0;
 	background-image: url(../img/image-placeholder.png);
-	background-color: gray;
+	background-color: #222222;
 	background-repeat: no-repeat;
 	margin: 0 3px 30px 3px;
 	line-height: 1.1em

@@ -287,7 +287,7 @@ $(document).ready(function() {
 					imageString = "<div ";
 					imageString += "class=\"album-button\" ";
 					imageString += "title=\"" + currentAlbum.albums[i].date + "\">" +
-							"<span class='thumb-caption-album'>" +
+							"<span class='thumb-caption-album' style=\"color:" + Options.album_caption_color + "\">" +
 							imageTextAdd +
 							"</span>" +
 							"</div>";
@@ -305,12 +305,18 @@ $(document).ready(function() {
 									thumbHeight = Options.album_thumb_size;
 									thumbWidth = thumbHeight * photo.size[0] / photo.size[1];
 								}
-								distance = (Options.album_thumb_size - thumbHeight) / 2 + Options.album_thumb_size * 0.05;
-								theImage.css("background-position-y", distance.toString() + "px");
+								if (Options.different_album_thumbnails) {
+									distance = (Options.album_thumb_size - thumbHeight) / 2 + Options.album_thumb_size * 0.05;
+									theImage.css("background-position-y", distance.toString() + "px");
+								} else {
+									distance = (Options.album_thumb_size - thumbHeight) / 2;
+									theImage.css("background-position-y", distance.toString() + "px");
+								}
 								theImage.css("background-size", thumbWidth + "px " + thumbHeight + "px");
 							}
 							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options.album_thumb_size, true) + ")");
 										"\" src=\"" +  thumbHash;
+							$(".thumb-caption-album").css("color", Options.album_caption_color);
 						}, function error() {
 							theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 							theLink.remove();
@@ -633,6 +639,7 @@ $(document).ready(function() {
 		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
 		$(".album-button").css("margin-right", Options.thumb_spacing.toString() + "px");
 		if (Options.different_album_thumbnails) {
+			$(".album-button").css("background-color", Options.album_background_color);
 			$(".album-button").css("width", (albumThumbnailSize * 1.1).toString() + "px");
 			$(".album-button").css("padding-top", (albumThumbnailSize * 1.05).toString() + "px");
 			$(".album-button").each(function() {
@@ -642,10 +649,11 @@ $(document).ready(function() {
 				}
 			});
 		} else {
+			$(".album-button").css("background-color", Options.background_color);
 			$(".album-button").css("width", albumThumbnailSize.toString() + "px");
 			$(".album-button").css("padding-top", albumThumbnailSize.toString() + "px");
 			$(".album-button").each(function() {
-				if (this.css("background-position-y") === undefined) {
+				if ($(this).css("background-position-y") === undefined) {
 					$(this).css("background-position-y", "0");
 					return;
 				}
