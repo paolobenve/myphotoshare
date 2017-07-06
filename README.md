@@ -65,6 +65,10 @@ the customization file, which adds many configuration variables; web site appear
 * - albums and cache server folders can be anywhere, even on another server (obviously, they will be generated on a pc and then uploaded wherever)
 * (to do) share buttons
 
+Features added in version 2.1:
+
+* Images and directories can be sorted ascending/descending (via a cookie)
+
 It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
 
 ## Installation
