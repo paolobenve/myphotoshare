@@ -65,10 +65,9 @@ $(document).ready(function() {
 		var originalTitle = Options.page_title;
 		translate();
 		
-		if (! PhotoFloat.firstAlbumPopulation || getBooleanCookie("reverseSort") || Options.initial_reverse_sort) {
+		if (! PhotoFloat.firstAlbumPopulation || getBooleanCookie("reverseSort")) {
 			if (PhotoFloat.firstAlbumPopulation) {
 				PhotoFloat.firstAlbumPopulation = false;
-				setBooleanCookie("reverseSort", Options.initial_reverse_sort);
 			}
 			if (needReverse()) {
 				currentAlbum.photos = currentAlbum.photos.reverse();
@@ -671,7 +670,9 @@ $(document).ready(function() {
 	}
 	function getBooleanCookie(key) {
 		var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
-		if (keyValue && keyValue[2])
+		if (! keyValue)
+			return null;
+		else if (keyValue[2])
 			return true;
 		else
 			return false;
@@ -775,6 +776,9 @@ $(document).ready(function() {
 						Options.server_cache_path += "/";
 					if (Options.server_album_path && Options.server_album_path.substr(-1) != "/")
 						Options.server_album_path += "/";
+					
+					if (getBooleanCookie("reverseSort") === null)
+						setBooleanCookie("reverseSort", Options.initial_reverse_sort);
 					
 					callback(location.hash, hashParsed, die);
 				},
