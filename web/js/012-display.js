@@ -65,9 +65,11 @@ $(document).ready(function() {
 		var originalTitle = Options.page_title;
 		translate();
 		
-		if (! PhotoFloat.firstAlbumPopulation || getBooleanCookie("reverseSort")) {
-			if (PhotoFloat.firstAlbumPopulation)
+		if (! PhotoFloat.firstAlbumPopulation || getBooleanCookie("reverseSort") || Options.initial_reverse_sort) {
+			if (PhotoFloat.firstAlbumPopulation) {
 				PhotoFloat.firstAlbumPopulation = false;
+				setBooleanCookie("reverseSort", Options.initial_reverse_sort);
+			}
 			if (needReverse()) {
 				currentAlbum.photos = currentAlbum.photos.reverse();
 				currentAlbum.albums = currentAlbum.albums.reverse();
@@ -113,8 +115,8 @@ $(document).ready(function() {
 		else {
 			// the arrows for changing sort
 			title += "<a id=\"sort-arrows\" href=\"javascript:void(0)\">" +
-					"<span title=\"sort ascending\" id=\"arrow-up\">🠙</span>" +
-					"<span title=\"sort descending\" id=\"arrow-down\">🠛</span>" +
+					"<span title=\"sort reverse (earlier content firt)\" id=\"arrow-up\">🠙</span>" +
+					"<span title=\"sort normal (older content first)\" id=\"arrow-down\">🠛</span>" +
 				"</a>";
 			$("body").on('mouseenter', "#title", function() {
 				if (getBooleanCookie("reverseSort")) {

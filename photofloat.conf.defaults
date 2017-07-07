@@ -139,3 +139,6 @@ switch_button_color_hover = black
 
 # shoud metadata be shown persistently until they are closed?
 persistent_metadata = false
+
+# should default sorting be reverse (more recent photos top)?
+initial_reverse_sort = true

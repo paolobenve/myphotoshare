@@ -39,7 +39,7 @@ def main():
 	for option in default_config.options('options'):
 		if option in ('max_verbose', 'jpeg_quality', 'thumb_spacing', 'album_thumb_size', 'media_thumb_size'):
 			Options.config[option] = usr_config.getint('options', option)
-		elif option in ('different_album_thumbnails', 'show_media_names_below_thumbs_in_albums', 'persistent_metadata'):
+		elif option in ('different_album_thumbnails', 'show_media_names_below_thumbs_in_albums', 'persistent_metadata', 'initial_reverse_sort'):
 			Options.config[option] = usr_config.getboolean('options', option)
 		elif option in ('reduced_sizes'):
 			Options.config[option] = eval(usr_config.get('options', option))
