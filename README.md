@@ -51,8 +51,8 @@ Features added in version 2.0 (July 4, 2017):
 * A date tree is builded, permitting photo to be seen by year, month, date
 * When a photo is viewed, the user can switch between the folder and the date the photo was taken
 * Better error management: if folder is wrong, show root folder; if image is wrong, show album
-* In addition to former invocation (with albums and cache paths), photofloat can be invoked with one parameter:
-the customization file, which adds many configuration variables; web site appearance now is very customizable:
+* In addition to former invocation (with albums and cache paths), photofloat can be invoked with one parameter: the customization file, which adds many configuration variables;
+* web site appearance now is very customizable:
 * - choose between cascade, parallel and mixed thumbnails generation
 * - fhoose between putting thumbnails in cache dir or in subdir, by 2-letters, from folder md5 or beginning of folder
 * - thumbnail can be spaced

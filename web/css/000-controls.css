@@ -91,7 +91,7 @@ a#day-view, a#folders-view {
 	background-image: url(../img/image-placeholder.png);
 	background-color: #222222;
 	background-repeat: no-repeat;
-	margin: 0 3px 30px 3px;
+	margin-bottom: 30px;
 	line-height: 1.1em
 }
 
