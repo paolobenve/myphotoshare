@@ -12,6 +12,9 @@ a {
 a:hover {
 	color: #FFAD27;
 }
+#title-container {
+	width: 100%;
+}
 #title, #title:hover, #day-view-container, #folders-view-container {
 	font-weight: bold;
 	font-size: medium;
@@ -321,14 +324,11 @@ a#day-view, a#folders-view {
 	padding: .5em;
 }
 
-#sort-arrows {
+#album-sort-arrows, #media-sort-arrows {
 	padding: 0 1em;
-}
-
-#arrow-up, #arrow-down {
 	display: none;
 }
-#arrow-down {
-}
-#arrow-up {
+
+#album-arrow-up, #album-arrow-down, #media-arrow-up, #media-arrow-down {
+	display: none;
 }

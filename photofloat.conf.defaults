@@ -141,4 +141,5 @@ switch_button_color_hover = black
 persistent_metadata = false
 
 # should default sorting be reverse (more recent photos top)?
-default_reverse_sort = true
+default_album_reverse_sort = true
+default_media_reverse_sort = true

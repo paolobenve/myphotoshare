@@ -65,16 +65,16 @@ $(document).ready(function() {
 		var originalTitle = Options.page_title;
 		translate();
 		
-		if (! PhotoFloat.firstAlbumPopulation || getBooleanCookie("reverseSort")) {
-			if (PhotoFloat.firstAlbumPopulation) {
+		if (! PhotoFloat.firstAlbumPopulation || getBooleanCookie("albumReverseSortRequested") || getBooleanCookie("mediaReverseSortRequested")) {
+			if (PhotoFloat.firstAlbumPopulation)
 				PhotoFloat.firstAlbumPopulation = false;
-			}
-			if (needReverse()) {
+			if (needMediaHtmlReverse()) {
 				currentAlbum.photos = currentAlbum.photos.reverse();
-				currentAlbum.albums = currentAlbum.albums.reverse();
-				//~ if (getBooleanCookie("reverseSort"))
-				currentMediaIndex = currentAlbum.photos.length - 1 - currentMediaIndex;
+				if (currentMediaIndex !== undefined && currentMediaIndex != -1)
+					currentMediaIndex = currentAlbum.photos.length - 1 - currentMediaIndex;
 			}
+			if (needAlbumHtmlReverse())
+				currentAlbum.albums = currentAlbum.albums.reverse();
 		}
 
 		if (! currentAlbum.path.length)
@@ -113,49 +113,18 @@ $(document).ready(function() {
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
 		else {
 			// the arrows for changing sort
-			title += "<a id=\"sort-arrows\" href=\"javascript:void(0)\">" +
-					"<span title=\"sort reverse (earlier content firt)\" id=\"arrow-up\">🠙</span>" +
-					"<span title=\"sort normal (older content first)\" id=\"arrow-down\">🠛</span>" +
-				"</a>";
-			$("body").on('mouseenter', "#title", function() {
-				if (getBooleanCookie("reverseSort")) {
-					$("#arrow-up").hide();
-					$("#arrow-down").show();
-				} else {
-					$("#arrow-up").show();
-					$("#arrow-down").hide();
-				}
-			});
-			$("body").on('mouseleave', "#title", function() {
-				$("#arrow-up").hide();
-				$("#arrow-down").hide();
-			});
-			$("#title").unbind('click');
-			$("#title").on('click', "#sort-arrows", function() {
-				if (currentMedia !== null)
-					currentMediaIndex = currentAlbum.photos.lenght - 1 - currentMediaIndex;
-				currentAlbum.photos = currentAlbum.photos.reverse();
-				currentAlbum.albums = currentAlbum.albums.reverse();
-				
-				if (getBooleanCookie("reverseSort")) {
-					$("#arrow-down").hide();
-					$("#arrow-up").hide();
-					setBooleanCookie("reverseSort", false);
-					showAlbum(true);
-					setOptions();
-					$("#arrow-up").show();
-					$("#arrow-down").hide();
-				} else {
-					$("#arrow-down").hide();
-					$("#arrow-up").hide();
-					setBooleanCookie("reverseSort", true);
-					showAlbum(true);
-					setOptions();
-					$("#arrow-up").hide();
-					$("#arrow-down").show();
-				}
-				
-			});
+			if (currentAlbum.albums.length > 1)
+				title += "<a id=\"album-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
+						"<img title=\"albums sort\" height=\"15px\" width=\"15px\" src=\"img/Folder_6_icon-72a7cf.png\">" +
+						"<span title=\"sort albums reverse (earlier content firt)\" id=\"album-arrow-up\">🠙</span>" +
+						"<span title=\"sort albums normal (older content first)\" id=\"album-arrow-down\">🠛</span>" +
+					"</a>";
+			if (currentAlbum.photos.length > 1)
+				title += "<a id=\"media-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
+						"<img title=\"media sort\" height=\"15px\" width=\"15px\" src=\"img/Creative-Tail-People-man.png\">" +
+						"<span title=\"sort media reverse (earlier content firt)\" id=\"media-arrow-up\">🠙</span>" +
+						"<span title=\"sort media normal (older content first)\" id=\"media-arrow-down\">🠛</span>" +
+					"</a>";
 		}
 		// generate the html page title
 		for (i = 0; i < components.length; ++i) {
@@ -176,8 +145,73 @@ $(document).ready(function() {
 		if (currentMedia !== null)
 			documentTitle = photoFloat.trimExtension(currentMedia.name) + documentTitle;
 		
-		$("#title").html(title);
 		document.title = documentTitle;
+		$("#title").html(title);
+		if (currentMedia === null) {
+			$("body").on('mouseenter', "#title-container", function() {
+				if (currentAlbum.albums.length > 1) {
+					$("#album-sort-arrows").show();
+					if (getBooleanCookie("albumReverseSortRequested")) {
+						$("#album-arrow-up").hide();
+						$("#album-arrow-down").show();
+					} else {
+						$("#album-arrow-up").show();
+						$("#album-arrow-down").hide();
+					}
+				}
+				if (currentAlbum.photos.length > 1) {
+					$("#media-sort-arrows").show();
+					if (getBooleanCookie("mediaReverseSortRequested")) {
+						$("#media-arrow-up").hide();
+						$("#media-arrow-down").show();
+					} else {
+						$("#media-arrow-up").show();
+						$("#media-arrow-down").hide();
+					}
+				}
+			});
+			$("body").on('mouseleave', "#title-container", function() {
+				$("#album-sort-arrows").hide();
+				$("#media-sort-arrows").hide();
+			});
+			$("#title").unbind('click');
+			if (currentAlbum.albums.length > 1) {
+				$("#title").on('click', "#album-sort-arrows", function() {
+					currentAlbum.albums = currentAlbum.albums.reverse();
+					
+					if (getBooleanCookie("albumReverseSortRequested")) {
+						setBooleanCookie("albumReverseSortRequested", false);
+						$("#album-arrow-up").show();
+						$("#album-arrow-down").hide();
+					} else {
+						setBooleanCookie("albumReverseSortRequested", true);
+						$("#album-arrow-up").hide();
+						$("#album-arrow-down").show();
+					}
+					showAlbum("conditional");
+					setOptions();
+				});
+			}
+			if (currentAlbum.photos.length > 1) {
+				$("#title").on('click', "#media-sort-arrows", function() {
+					if (currentMedia !== null)
+						currentMediaIndex = currentAlbum.photos.lenght - 1 - currentMediaIndex;
+					currentAlbum.photo = currentAlbum.photos.reverse();
+					
+					if (getBooleanCookie("mediaReverseSortRequested")) {
+						setBooleanCookie("mediaReverseSortRequested", false);
+						$("#media-arrow-up").show();
+						$("#media-arrow-down").hide();
+					} else {
+						setBooleanCookie("mediaReverseSortRequested", true);
+						$("#media-arrow-up").hide();
+						$("#media-arrow-down").show();
+					}
+					showAlbum("conditional");
+					setOptions();
+				});
+			}
+		}
 	}
 
 	function scrollToThumb() {
@@ -210,125 +244,134 @@ $(document).ready(function() {
 	
 	
 	function showAlbum(populate) {
-		var i, j, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
+		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, imageTextAdd;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
-		if (populate || ! PhotoFloat.firstAlbumPopulation || needReverse()) {
-			if (needReverse())
-				currentAlbum.reverseSort = ! currentAlbum.reverseSort;
+		if (populate) {
+		//~ if (populate || ! firstAlbumPopulation || needMediaHtmlReverse() || needAlbumHtmlReverse()) {
 			thumbnailSize = Options.media_thumb_size;
-			photos = [];
-			for (i = 0; i < currentAlbum.photos.length; ++i) {
-				hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
-				thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnailSize, true);
-				bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
-				if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
-					thumbHash =
-						PhotoFloat.cachePath(currentAlbum.photos[i].completeName
-							.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
-						"/" +
-						PhotoFloat.cachePath(currentAlbum.photos[i].name);
+			if (populate === true || populate && needMediaHtmlReverse()) {
+				photos = [];
+				for (i = 0; i < currentAlbum.photos.length; ++i) {
+					hash = photoFloat.photoHash(currentAlbum, currentAlbum.photos[i]);
+					thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnailSize, true);
+					bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
+					if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
+						thumbHash =
+							PhotoFloat.cachePath(currentAlbum.photos[i].completeName
+								.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
+							"/" +
+							PhotoFloat.cachePath(currentAlbum.photos[i].name);
+					}
+					link = $("<a href=\"#!/" + hash + "\"></a>");
+					width = currentAlbum.photos[i].size[0];
+					height = currentAlbum.photos[i].size[1];
+					imageString = "<div class=\"thumb-container\" ";
+					imageString += "style=\"width: ";
+					if (Options.media_thumb_type == "fixed_height") {
+						thumbHeight = Options.media_thumb_size;
+						thumbWidth = thumbHeight * width / height;
+						imageString += thumbWidth.toString();
+					} else {
+						imageString += Options.media_thumb_size.toString().toString();
+					}
+					imageString += 			"px;\">";
+					imageString += 		"<img title=\"" + currentAlbum.photos[i].name +
+								"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
+								"\" src=\"" +  thumbHash;
+					if (Options.media_thumb_type == "fixed_height") {
+						imageString += 	"\" height=\"" + thumbHeight +
+								"\" width=\"" + thumbWidth;
+					} else {
+						imageString += 	"\" height=\"" + thumbnailSize +
+								"\" width=\"" + thumbnailSize;
+					}
+					imageString += 		"\" />" +
+								"<div class=\"thumb-caption-media\">" +
+								currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
+								"</div>" +
+								"</div>";
+					image = $(imageString);
+					
+					
+					
+					image.get(0).photo = currentAlbum.photos[i];
+					link.append(image);
+					photos.push(link);
+					(function(theLink, theImage, theAlbum) {
+						theImage.error(function() {
+							photos.splice(photos.indexOf(theLink), 1);
+							theLink.remove();
+							theAlbum.photos.splice(theAlbum.photos.indexOf(theImage.get(0).photo), 1);
+						});
+					})(link, image, currentAlbum);
 				}
-				link = $("<a href=\"#!/" + hash + "\"></a>");
-				width = currentAlbum.photos[i].size[0];
-				height = currentAlbum.photos[i].size[1];
-				imageString = "<div class=\"thumb-container\" ";
-				imageString += "style=\"width: ";
-				if (Options.media_thumb_type == "fixed_height") {
-					thumbHeight = Options.media_thumb_size;
-					thumbWidth = thumbHeight * width / height;
-					imageString += thumbWidth.toString();
-				} else {
-					imageString += Options.media_thumb_size.toString().toString();
-				}
-				imageString += 			"px;\">";
-				imageString += 		"<img title=\"" + currentAlbum.photos[i].name +
-							"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-							"\" src=\"" +  thumbHash;
-				if (Options.media_thumb_type == "fixed_height") {
-					imageString += 	"\" height=\"" + thumbHeight +
-							"\" width=\"" + thumbWidth;
-				} else {
-					imageString += 	"\" height=\"" + thumbnailSize +
-							"\" width=\"" + thumbnailSize;
-				}
-				imageString += 		"\" />" +
-							"<div class=\"thumb-caption-media\">" +
-							currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
-							"</div>" +
-							"</div>";
-				image = $(imageString);
 				
+				thumbsElement = $("#thumbs");
+				thumbsElement.empty();
+				thumbsElement.append.apply(thumbsElement, photos);
 				
-				
-				image.get(0).photo = currentAlbum.photos[i];
-				link.append(image);
-				photos.push(link);
-				(function(theLink, theImage, theAlbum) {
-					theImage.error(function() {
-						photos.splice(photos.indexOf(theLink), 1);
-						theLink.remove();
-						theAlbum.photos.splice(theAlbum.photos.indexOf(theImage.get(0).photo), 1);
-					});
-				})(link, image, currentAlbum);
+				if (needMediaHtmlReverse())
+					currentAlbum.mediaReverseSort = ! currentAlbum.mediaReverseSort;
 			}
 			
-			thumbsElement = $("#thumbs");
-			thumbsElement.empty();
-			thumbsElement.append.apply(thumbsElement, photos);
-			
 			if (currentMedia === null) {
-				subalbums = [];
-				for (i = 0; i < currentAlbum.albums.length; ++i) {
-					link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
-					imageTextAdd = currentAlbum.albums[i].path;
-					imageTextAdd = imageTextAdd.replace(Options.by_date_string, $("#by-date-translation").html());
-					imageTextAdd = imageTextAdd.replace(Options.folders_string, $("#folders-translation").html());
-					imageString = "<div ";
-					imageString += "class=\"album-button\" ";
-					imageString += "title=\"" + currentAlbum.albums[i].date + "\">" +
-							"<span class='thumb-caption-album' style=\"color:" + Options.album_caption_color + "\">" +
-							imageTextAdd +
-							"</span>" +
-							"</div>";
-					image = $(imageString);
-					link.append(image);
-					subalbums.push(link);
-					(function(theContainer, theAlbum, theImage, theLink) {
-						photoFloat.albumPhoto(theAlbum, function(album, photo) {
-							var distance;
-							if (Options.media_thumb_type == "fixed_height") {
-								if (photo.size[1] < photo.size[0]) {
-									thumbWidth = Options.album_thumb_size;
-									thumbHeight = thumbWidth * photo.size[1] / photo.size[0];
-								} else {
-									thumbHeight = Options.album_thumb_size;
-									thumbWidth = thumbHeight * photo.size[0] / photo.size[1];
+				if (populate === true || populate && needAlbumHtmlReverse()) {
+					subalbums = [];
+					for (i = 0; i < currentAlbum.albums.length; ++i) {
+						link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
+						imageTextAdd = currentAlbum.albums[i].path;
+						imageTextAdd = imageTextAdd.replace(Options.by_date_string, $("#by-date-translation").html());
+						imageTextAdd = imageTextAdd.replace(Options.folders_string, $("#folders-translation").html());
+						imageString = "<div ";
+						imageString += "class=\"album-button\" ";
+						imageString += "title=\"" + currentAlbum.albums[i].date + "\">" +
+								"<span class='thumb-caption-album' style=\"color:" + Options.album_caption_color + "\">" +
+								imageTextAdd +
+								"</span>" +
+								"</div>";
+						image = $(imageString);
+						link.append(image);
+						subalbums.push(link);
+						(function(theContainer, theAlbum, theImage, theLink) {
+							photoFloat.albumPhoto(theAlbum, function(album, photo) {
+								var distance;
+								if (Options.media_thumb_type == "fixed_height") {
+									if (photo.size[1] < photo.size[0]) {
+										thumbWidth = Options.album_thumb_size;
+										thumbHeight = thumbWidth * photo.size[1] / photo.size[0];
+									} else {
+										thumbHeight = Options.album_thumb_size;
+										thumbWidth = thumbHeight * photo.size[0] / photo.size[1];
+									}
+									if (Options.different_album_thumbnails) {
+										distance = (Options.album_thumb_size - thumbHeight) / 2 + Options.album_thumb_size * 0.05;
+										theImage.css("background-position-y", distance.toString() + "px");
+									} else {
+										distance = (Options.album_thumb_size - thumbHeight) / 2;
+										theImage.css("background-position-y", distance.toString() + "px");
+									}
+									theImage.css("background-size", thumbWidth + "px " + thumbHeight + "px");
 								}
-								if (Options.different_album_thumbnails) {
-									distance = (Options.album_thumb_size - thumbHeight) / 2 + Options.album_thumb_size * 0.05;
-									theImage.css("background-position-y", distance.toString() + "px");
-								} else {
-									distance = (Options.album_thumb_size - thumbHeight) / 2;
-									theImage.css("background-position-y", distance.toString() + "px");
-								}
-								theImage.css("background-size", thumbWidth + "px " + thumbHeight + "px");
-							}
-							theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options.album_thumb_size, true) + ")");
-										"\" src=\"" +  thumbHash;
-							$(".thumb-caption-album").css("color", Options.album_caption_color);
-						}, function error() {
-							theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
-							theLink.remove();
-							subalbums.splice(subalbums.indexOf(theLink), 1);
-						});
-					})(currentAlbum, currentAlbum.albums[i], image, link);
+								theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options.album_thumb_size, true) + ")");
+											"\" src=\"" +  thumbHash;
+								$(".thumb-caption-album").css("color", Options.album_caption_color);
+							}, function error() {
+								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
+								theLink.remove();
+								subalbums.splice(subalbums.indexOf(theLink), 1);
+							});
+						})(currentAlbum, currentAlbum.albums[i], image, link);
+					}
+					subalbumsElement = $("#subalbums");
+					subalbumsElement.empty();
+					subalbumsElement.append.apply(subalbumsElement, subalbums);
+					subalbumsElement.insertBefore(thumbsElement);
+					
+					if (needAlbumHtmlReverse())
+						currentAlbum.albumReverseSort = ! currentAlbum.albumReverseSort;
 				}
-				subalbumsElement = $("#subalbums");
-				subalbumsElement.empty();
-				subalbumsElement.append.apply(subalbumsElement, subalbums);
-				subalbumsElement.insertBefore(thumbsElement);
 			}
 		}
 		
@@ -412,7 +455,7 @@ $(document).ready(function() {
 	}
 	function showMedia(album) {
 		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation, thumbnailSize, j;
-		var maxSizeSet, mediaMaxSize, mediaMinSize, imageRatio, windowMaxSize, windowMinSize, reducedMinSize, reducedMaxSize;
+		var maxSize, maxSizeSet, mediaMaxSize, mediaMinSize, imageRatio, windowMaxSize, windowMinSize, reducedMinSize, reducedMaxSize;
 		var windowWidth, windowHeight, windowOrientation;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
@@ -672,7 +715,7 @@ $(document).ready(function() {
 		var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
 		if (! keyValue)
 			return null;
-		else if (keyValue[2])
+		else if (keyValue[2] == 1)
 			return true;
 		else
 			return false;
@@ -687,12 +730,22 @@ $(document).ready(function() {
 		document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
 		return;
 	}
-	function needReverse() {
-		if (currentAlbum.reverseSort === undefined)
-			currentAlbum.reverseSort = false;
+	function needAlbumHtmlReverse() {
+		if (currentAlbum.albumReverseSort === undefined)
+			//~ currentAlbum.albumReverseSort = Options.default_album_reverse_sort;
+			currentAlbum.albumReverseSort = false;
 		var needReverse =
-			currentAlbum.reverseSort && ! getBooleanCookie("reverseSort") ||
-			! currentAlbum.reverseSort && getBooleanCookie("reverseSort");
+			currentAlbum.albumReverseSort && ! getBooleanCookie("albumReverseSortRequested") ||
+			! currentAlbum.albumReverseSort && getBooleanCookie("albumReverseSortRequested");
+		return needReverse;
+	}
+	function needMediaHtmlReverse() {
+		if (currentAlbum.mediaReverseSort === undefined)
+			//~ currentAlbum.mediaReverseSort = Options.default_media_reverse_sort;
+			currentAlbum.mediaReverseSort = false;
+		var needReverse =
+			currentAlbum.mediaReverseSort && ! getBooleanCookie("mediaReverseSortRequested") ||
+			! currentAlbum.mediaReverseSort && getBooleanCookie("mediaReverseSortRequested");
 		return needReverse;
 	}
 
@@ -777,8 +830,10 @@ $(document).ready(function() {
 					if (Options.server_album_path && Options.server_album_path.substr(-1) != "/")
 						Options.server_album_path += "/";
 					
-					if (getBooleanCookie("reverseSort") === null)
-						setBooleanCookie("reverseSort", Options.initial_reverse_sort);
+					if (getBooleanCookie("albumReverseSortRequested") === null)
+						setBooleanCookie("albumReverseSortRequested", Options.default_album_reverse_sort);
+					if (getBooleanCookie("mediaReverseSortRequested") === null)
+						setBooleanCookie("mediaReverseSortRequested", Options.default_media_reverse_sort);
 					
 					callback(location.hash, hashParsed, die);
 				},

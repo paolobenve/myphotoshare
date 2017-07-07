@@ -24,9 +24,9 @@ class TreeWalker:
 		self.all_albums = list()
 		self.tree_by_date = {}
 		self.all_photos = list()
+		self.save_json_options()
 		folders_album = self.walk(self.album_path)
 		self.big_lists()
-		self.save_json_options()
 		by_date_album = self.generate_date_album()
 		origin_album = Album(self.album_path)
 		origin_album.add_album(folders_album)
@@ -205,8 +205,6 @@ class TreeWalker:
 			message("saving json options file", json_options_file + " (couldn not save " + json_options_file_old + ")")
 			fp = open(json_options_file, 'w')
 		back_level()
-		optionSave = {}
-		
 		json.dump(Options.config, fp)
 		fp.close()
 	def remove_stale(self, subdir = "", cache_list = {}):
