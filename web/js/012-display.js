@@ -61,7 +61,7 @@ $(document).ready(function() {
 	}
 
 	function setTitle() {
-		var title = "", documentTitle = "", last = "", components, i;
+		var title = "", documentTitle = "", last = "", components, i, dateTitle;
 		var originalTitle = Options.page_title;
 		translate();
 		
@@ -84,26 +84,39 @@ $(document).ready(function() {
 			components.unshift(originalTitle);
 		}
 		
+		dateTitle = components.length > 1 && components[1] == Options.by_date_string;
+		// textComponents = components doesn't work: textComponents becomes a pointer to components
+		textComponents = [];
+		for (i = 0; i < components.length; ++i)
+			textComponents[i] = components[i];
+		if (dateTitle) {
+			if (components.length >= 4) {
+				textComponents[3] = components[3].replace(components[2], '').trim();
+				if (components.length >= 5) {
+					textComponents[4] = components[4].replace(textComponents[3], '').replace(textComponents[2], '').trim();
+				}
+			}
+		}
 		// generate the title in the page
 		for (i = 0; i < components.length; ++i) {
 			if (i)
 				last += "/" + components[i];
 			if (i != 1 || components[i] != Options.folders_string) {
 				if (i < components.length - 1 || currentMedia !== null)
-					if (! (i == 0 && components.length > 1 && components[i + 1] == Options.by_date_string))
-						if (i == 1 && components[i] == Options.by_date_string)
+					if (! (i == 0 && dateTitle))
+						if (i == 1 && dateTitle)
 							title = "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">" + title;
 						else
 							title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
-				if (i == 1 && components[i] == Options.by_date_string)
+				if (i == 1 && dateTitle)
 					title += translationsToTranslatedString($("#by-date-translation").html());
 				else
-					title += components[i];
+					title += textComponents[i];
 				if (i < components.length - 1 || currentMedia !== null)
-					if (! (i == 0 && components.length > 1 && components[i + 1] == Options.by_date_string))
+					if (! (i == 0 && dateTitle))
 						title += "</a>";
 			}
-			if (i == 0 && components.length > 1 && components[i + 1] == Options.by_date_string)
+			if (i == 0 && dateTitle)
 				title += " ";
 			else if ((i < components.length - 1 || currentMedia !== null) &&
 				(i == components.length - 1 || components[i + 1] != Options.folders_string))
@@ -133,11 +146,11 @@ $(document).ready(function() {
 				if (components.length > 2 || currentMedia !== null)
 					documentTitle = " \u00ab " + documentTitle;
 			}
-			else if (i == 1 && components[1] == Options.by_date_string) {
+			else if (i == 1 && dateTitle) {
 				documentTitle += " " + translationsToTranslatedString($("#by-date-translation").html());
 			}
 			else if (i > 1) {
-				documentTitle = components[i] + documentTitle;
+				documentTitle = textComponents[i] + documentTitle;
 				if (i < components.length - 1 || currentMedia !== null)
 					documentTitle = " \u00ab " + documentTitle;
 			}
@@ -402,7 +415,7 @@ $(document).ready(function() {
 				$("#thumbs").show();
 			$("#powered-by").hide();
 		}
-		
+		$("#title").width($(window).width() - $("#buttons-container").width());
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
@@ -433,12 +446,12 @@ $(document).ready(function() {
 			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
 		else if (image.css("height") !== "100%")
 			image.css("height", "100%").css("width", "auto").css("position", 0).css("bottom", 0);
-		$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) -
-					2 * parseInt($("#title").css("padding")));
+		//~ $("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
 		if (! $("#album-view").is(":visible"))
 			$("#photo-view").css("bottom", "0");
 		else
 			$("#photo-view").css("bottom", (Options.media_thumb_size + 15).toString() + "px");
+		$("#title").width($(window).width() - $("#buttons-container").width());
 	}
 	function scaleVideo() {
 		var video, container;
@@ -452,6 +465,7 @@ $(document).ready(function() {
 			video.css("height", container.height()).css("width", container.height() * video.attr("ratio")).parent().css("height", "100%").css("margin-top", "0").css("top", "0");
 		else
 			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
+		$("#title").width($(window).width() - $("#buttons-container").width());
 	}
 	function showMedia(album) {
 		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation, thumbnailSize, j;
@@ -580,7 +594,8 @@ $(document).ready(function() {
 			$("#folders-view-container").show();
 			$("#day-view-container").hide();
 		}
-		$("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
+		//~ $("#title").width($(window).width() - $("#buttons-container").width() - em2px("#photo-name", 2) - 2 * parseInt($("#title").css("padding")));
+		//~ $("#title").width($(window).width() - $("#buttons-container").width());
 		
 		thumbnailSize = Options.media_thumb_size;
 		if (currentAlbum.photos.length == 1) {
