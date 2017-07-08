@@ -793,20 +793,16 @@ $(document).ready(function() {
 		if (album != currentAlbum)
 			currentAlbum = null;
 		
+		previousAlbum = currentAlbum;
 		if (currentAlbum && currentAlbum.path.indexOf(Options.by_date_string) === 0 && photo !== null) {
-			previousAlbum = currentAlbum;
-			//~ album = currentAlbum;
 			previousMedia = photo;
-			currentMedia = photo;
-			currentMediaIndex = photoIndex;
 		}
 		else {
-			previousAlbum = currentAlbum;
 			previousMedia = currentMedia;
-			currentAlbum = album;
-			currentMedia = photo;
-			currentMediaIndex = photoIndex;
 		}
+		currentAlbum = album;
+		currentMedia = photo;
+		currentMediaIndex = photoIndex;
 		
 		setTitle();
 		if (currentMedia !== null)
