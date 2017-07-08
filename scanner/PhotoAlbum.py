@@ -344,7 +344,8 @@ class Media(object):
 			mirror = image.transpose(Image.ROTATE_90)
 
 		image = mirror
-		self._thumbnail(image, original_path, thumbs_path, thumbnail_size, is_thumbnail)
+		thumb = self._thumbnail(image, original_path, thumbs_path, thumbnail_size, is_thumbnail)
+		return thumb
 
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size, is_thumbnail):
 		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size, is_thumbnail))
@@ -380,11 +381,11 @@ class Media(object):
 				image_copy = image.copy() # we try again to work around PIL bug
 			except KeyboardInterrupt:
 				raise
-			except:
-				message("corrupt image", os.path.basename(original_path))
-				self.is_valid = False
-				back_level()
-				return image
+			#~ except:
+				#~ message("corrupt image", os.path.basename(original_path))
+				#~ self.is_valid = False
+				#~ back_level()
+				#~ return image
 		if is_thumbnail and Options.config['media_thumb_type'] == "square":
 			if image_copy.size[0] > image_copy.size[1]:
 				left = (image_copy.size[0] - image_copy.size[1]) / 2
@@ -501,7 +502,7 @@ class Media(object):
 					image_to_start_from = image
 				else:
 					image_to_start_from = thumb
-				thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, False)
+				thumb = self._photo_thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, False)
 				self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
 			except KeyboardInterrupt:
 				raise
@@ -516,7 +517,7 @@ class Media(object):
 						image_to_start_from = image
 					else:
 						image_to_start_from = thumb
-					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, False)
+					thumb = self._photo_thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size, False)
 				except KeyboardInterrupt:
 					raise
 			for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
