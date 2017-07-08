@@ -132,6 +132,7 @@ a#day-view, a#folders-view {
 	text-align: center;
 	z-index: -1;
 }
+
 #album-view.no-bottom-space {
 	height: 0;
 	bottom: 1em;
