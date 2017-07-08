@@ -409,10 +409,17 @@ class Media(object):
 			thumbnail_size = int(round(float(original_thumbnail_size * image_copy.size[0]) / float(image_copy.size[1])))
 		if (image_size >= thumbnail_size):
 			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
-			if is_thumbnail and Options.config['media_thumb_type'] == "canvas":
-				image_copy = image_copy.resize_canvas(image_copy, thumbnail_size, True)
+			if is_thumbnail:
+				if Options.config['media_thumb_type'] == "canvas":
+					image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['background_color'])
+				elif Options.config['media_thumb_type'] == "fixed_height" and original_thumbnail_size == Options.config['album_thumb_size']:
+					image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['album_button_canvas_background_color'])
 		else:
-			image_copy = self.resize_canvas(image_copy, thumbnail_size)
+			# we can arrive here:
+			# - if the start image is not quite big => make the square canvas
+			# - if Options.config['media_thumb_type'] == "fixed_height" and thumbnail_size == Options.config['media_thumb_size'] => don't make canvas
+			if not (Options.config['media_thumb_type'] == "fixed_height" and original_thumbnail_size == Options.config['media_thumb_size']):
+				image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['background_color'])
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			if original_thumbnail_size > Options.config['album_thumb_size']:
@@ -422,7 +429,10 @@ class Media(object):
 			else:
 				message("thumbing for media", info_string)
 			back_level()
-			return image_copy
+			if Options.config['media_thumb_type'] == "fixed_height" and original_thumbnail_size == Options.config['album_thumb_size']:
+				return image
+			else:
+				return image_copy
 		except KeyboardInterrupt:
 			try:
 				os.unlink(thumb_path)
@@ -446,9 +456,9 @@ class Media(object):
 				pass
 			back_level()
 			return image
-	def resize_canvas(self, image, canvas_max_size, is_thumbnail = False):
+	def resize_canvas(self, image, canvas_max_size, background_color, square_thumbnail = True):
 		old_width, old_height = image.size
-		if (is_thumbnail):
+		if (square_thumbnail):
 			canvas_width = canvas_max_size
 			canvas_height = canvas_max_size
 		else:
@@ -463,8 +473,7 @@ class Media(object):
 		x1 = int(math.floor((canvas_width - old_width) / 2))
 		y1 = int(math.floor((canvas_height - old_height) / 2))
 		mode = image.mode
-		new_background = Options.config['background_color']
-		newImage = Image.new(mode, (canvas_width, canvas_height), new_background)
+		newImage = Image.new(mode, (canvas_width, canvas_height), background_color)
 		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
 		return newImage
 	def _photo_thumbnails_parallel(self, image, photo_path, thumbs_path):
@@ -530,7 +539,7 @@ class Media(object):
 					):
 						# with portrait images, a canvas could be generated, better start from original image
 						thumb = image
-					thumb = self._thumbnail(thumb, photo_path, thumbs_path, thumb_size, True)
+					thumb = self._photo_thumbnail(thumb, photo_path, thumbs_path, thumb_size, True)
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:

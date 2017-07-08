@@ -17,7 +17,7 @@ def message(category, text, verbose = 0):
 			sep = "  "
 		else:
 			sep = "--"
-		print "%s %s%s[%s]%s%s" % (datetime.now().isoformat(), max(0, message.level) * "  |", sep, str(category), max(1, (40 - len(str(category)))) * " ", str(text))
+		print "%s %s%s[%s]%s%s" % (datetime.now().isoformat(), max(0, message.level) * "  |", sep, str(category), max(1, (45 - len(str(category)))) * " ", str(text))
 
 message.level = 0
 def next_level(verbose = 0):

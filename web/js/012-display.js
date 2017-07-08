@@ -333,9 +333,9 @@ $(document).ready(function() {
 				
 				if (needMediaHtmlReverse())
 					currentAlbum.mediaReverseSort = ! currentAlbum.mediaReverseSort;
-			} else {
-				$("#thumbs").empty();
+			} else if (currentAlbum.photos.length < Options.big_date_folders_threshold) {
 				$("#thumbs").html("Too many images: " + currentAlbum.photos.length + " (limit for date album is " + Options.big_date_folders_threshold +  ")");
+				$("#thumbs").empty();
 			}
 			
 			if (currentMedia === null) {
@@ -360,13 +360,15 @@ $(document).ready(function() {
 							photoFloat.albumPhoto(theAlbum, function(album, photo) {
 								var distance;
 								if (Options.media_thumb_type == "fixed_height") {
-									if (photo.size[1] < photo.size[0]) {
-										thumbWidth = Options.album_thumb_size;
-										thumbHeight = thumbWidth * photo.size[1] / photo.size[0];
-									} else {
-										thumbHeight = Options.album_thumb_size;
-										thumbWidth = thumbHeight * photo.size[0] / photo.size[1];
-									}
+									thumbWidth = Options.album_thumb_size;
+									thumbHeight = Options.album_thumb_size;
+									//~ if (photo.size[1] < photo.size[0]) {
+										//~ thumbWidth = Options.album_thumb_size;
+										//~ thumbHeight = thumbWidth * photo.size[1] / photo.size[0];
+									//~ } else {
+										//~ thumbHeight = Options.album_thumb_size;
+										//~ thumbWidth = thumbHeight * photo.size[0] / photo.size[1];
+									//~ }
 									if (Options.different_album_thumbnails) {
 										distance = (Options.album_thumb_size - thumbHeight) / 2 + Options.album_thumb_size * 0.05;
 										theImage.css("background-position-y", distance.toString() + "px");
@@ -709,7 +711,7 @@ $(document).ready(function() {
 		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
 		$(".album-button").css("margin-right", Options.thumb_spacing.toString() + "px");
 		if (Options.different_album_thumbnails) {
-			$(".album-button").css("background-color", Options.album_background_color);
+			$(".album-button").css("background-color", Options.album_button_background_color);
 			$(".album-button").css("width", (albumThumbnailSize * 1.1).toString() + "px");
 			$(".album-button").css("padding-top", (albumThumbnailSize * 1.05).toString() + "px");
 			$(".album-button").each(function() {

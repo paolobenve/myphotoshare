@@ -126,7 +126,10 @@ title_image_name_color = lime
 background_color = #222222
 
 # the album buttons background color (this is a dirty white, in order to be like an old slide)
-album_background_color = wheat
+album_button_background_color = Cornsilk
+
+# the album buttons background color for canvas, used when fixed heigth thumbnails are set (this is a dirty white)
+album_button_canvas_background_color = wheat
 
 # the album buttons background color
 album_caption_color = darkblue
@@ -143,9 +146,6 @@ persistent_metadata = false
 # should default sorting be reverse (more recent photos top)?
 default_album_reverse_sort = false
 default_media_reverse_sort = true
-
-# Should media thumbnail be showen when showing a big year album?
-show_media_thumbnail_in_big_year_folders = false
 
 # When should a year album be considered big?
 big_date_folders_threshold = 500

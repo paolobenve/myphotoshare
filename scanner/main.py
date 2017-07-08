@@ -103,7 +103,10 @@ def main():
 	
 	Options.config['recreate_reduced_photos'] = False
 	try:
-		if old_options['jpeg_quality'] != Options.config['jpeg_quality']:
+		if (
+			old_options['jpeg_quality'] != Options.config['jpeg_quality'] or
+			old_options['album_button_canvas_background_color'] != Options.config['album_button_canvas_background_color']
+		):
 			Options.config['recreate_reduced_photos'] = True
 	except KeyError:
 		Options.config['recreate_reduced_photos'] = False

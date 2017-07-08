@@ -74,7 +74,7 @@ Features added in version 2.1.1 (July 6, 2017):
 * bug fixes
 * new options:
 * - persistent_metadata (boolean): permits to have metadata persistently on image
-* - album_background_color
+* - album_button_background_color
 * - album_caption_color
 
 It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
