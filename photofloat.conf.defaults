@@ -141,5 +141,12 @@ switch_button_color_hover = black
 persistent_metadata = false
 
 # should default sorting be reverse (more recent photos top)?
-default_album_reverse_sort = true
+default_album_reverse_sort = false
 default_media_reverse_sort = true
+
+# Should media thumbnail be showen when showing a big year album?
+show_media_thumbnail_in_big_year_folders = false
+
+# When should a year album be considered big?
+big_date_folders_threshold = 200
+

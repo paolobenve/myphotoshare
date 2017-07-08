@@ -37,9 +37,13 @@ def main():
 	next_level()
 	# pass config values to a dict, because ConfigParser objects are not reliable
 	for option in default_config.options('options'):
-		if option in ('max_verbose', 'jpeg_quality', 'thumb_spacing', 'album_thumb_size', 'media_thumb_size'):
+		if option in ('max_verbose', 'jpeg_quality', 'thumb_spacing', 'album_thumb_size', 'media_thumb_size', 'big_date_folders_threshold'):
 			Options.config[option] = usr_config.getint('options', option)
-		elif option in ('different_album_thumbnails', 'show_media_names_below_thumbs_in_albums', 'persistent_metadata', 'default_album_reverse_sort', 'default_media_reverse_sort'):
+		elif option in ('different_album_thumbnails',
+				'show_media_names_below_thumbs_in_albums',
+				'persistent_metadata',
+				'default_album_reverse_sort',
+				'default_media_reverse_sort'):
 			Options.config[option] = usr_config.getboolean('options', option)
 		elif option in ('reduced_sizes'):
 			Options.config[option] = eval(usr_config.get('options', option))
