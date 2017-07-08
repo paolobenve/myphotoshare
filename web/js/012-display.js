@@ -335,6 +335,7 @@ $(document).ready(function() {
 					currentAlbum.mediaReverseSort = ! currentAlbum.mediaReverseSort;
 			} else {
 				$("#thumbs").empty();
+				$("#thumbs").html("Too many images: " + currentAlbum.photos.length + " (limit for date album is " + Options.big_date_folders_threshold +  ")");
 			}
 			
 			if (currentMedia === null) {
