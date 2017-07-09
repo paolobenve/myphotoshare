@@ -39,8 +39,8 @@
 		};
 		if (typeof error !== "undefined" && error !== null) {
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-				$("#error-text-folder").fadeIn(1500);
-				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(500);
+				$("#error-text-folder").fadeIn(2000);
+				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(1000);
 				window.location.hash = Options.folders_string;
 			};
 		}
@@ -86,8 +86,8 @@
 					}
 				}
 				if (i >= theAlbum.photos.length) {
-					$("#error-text-image").fadeIn(1500);
-					$("#error-text-image, #error-overlay, #auth-text").fadeOut(500);
+					$("#error-text-image").fadeIn(2000);
+					$("#error-text-image, #error-overlay, #auth-text").fadeOut(1000);
 					window.location.hash = album;
 					i = -1;
 				}

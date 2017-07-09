@@ -831,7 +831,8 @@ $(document).ready(function() {
 		currentMedia = photo;
 		currentMediaIndex = photoIndex;
 		
-		setTitle();
+		if (currentMedia === null || typeof currentMedia === "object")
+			setTitle();
 		if (currentMedia !== null)
 			showMedia(currentAlbum);
 		else {
@@ -881,15 +882,15 @@ $(document).ready(function() {
 					if (errorThrown == "Not Found" && ! cacheSubDir)
 						getOptions(Options.server_cache_path, callback);
 					else {
-						$("#error-options-file").fadeIn(1500);
-						$("#error-options-file, #error-overlay, #auth-text").fadeOut(500);
+						$("#error-options-file").fadeIn(2000);
+						$("#error-options-file, #error-overlay, #auth-text").fadeOut(1000);
 					}
 				}
 			};
 			if (typeof error !== "undefined" && error !== null) {
 				ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-					$("#error-options-file").fadeIn(1500);
-					$("#error-options-file, #error-overlay, #auth-text").fadeOut(500);
+					$("#error-options-file").fadeIn(2000);
+					$("#error-options-file, #error-overlay, #auth-text").fadeOut(1000);
 				};
 			}
 			$.ajax(ajaxOptions);
