@@ -34,32 +34,40 @@ $(document).ready(function() {
 	
 	/* Displays */
 	
-	function language() {
-		if (Options.language)
-			return Options.language;
+	function getLanguage() {
+		var language = "en";
+		if (Options.language && translations[Options.language] !== undefined)
+			language = Options.language;
 		else {
 			var userLang = navigator.language || navigator.userLanguage;
-			return userLang.split('-')[0];
+			language = userLang.split('-')[0];
 		}
+		return language;
 	}
 	
 	function translate() {
-		
-		if($('.translation-' + language()).length) {
-			$('.translation').removeClass('translation-active');
-			$('.translation-' + language()).addClass('translation-active');
-		} else {
-			$('.translation-en').addClass('translation-active');
+		var language = getLanguage();
+		var selector;
+		for (var key in translations[language]) {
+			selector = $("#" + key);
+			if (selector.length) {
+				selector.html(translations[language][key]);
+			}
 		}
 	}
 	
-	function translationsToTranslatedString(translations) {
-		var translationsLines = translations.split("\n");
-		for (var i in translationsLines) {
-			if (translationsLines[i].indexOf("translation-active") != -1)
-				return translationsLines[i].replace(/<\/?[^>]+(>|$)/g, "").trim();
-		}
+	function _t(id) {
+		var language = getLanguage();
+		return translations[language][id];
 	}
+	
+	//~ function translationsToTranslatedString(translations) {
+		//~ var translationsLines = translations.split("\n");
+		//~ for (var i in translationsLines) {
+			//~ if (translationsLines[i].indexOf("translation-active") != -1)
+				//~ return translationsLines[i].replace(/<\/?[^>]+(>|$)/g, "").trim();
+		//~ }
+	//~ }
 
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i, dateTitle;
@@ -87,7 +95,7 @@ $(document).ready(function() {
 		
 		dateTitle = components.length > 1 && components[1] == Options.by_date_string;
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
-		textComponents = [];
+		var textComponents = [];
 		for (i = 0; i < components.length; ++i)
 			textComponents[i] = components[i];
 		if (dateTitle) {
@@ -110,7 +118,7 @@ $(document).ready(function() {
 						else
 							title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && dateTitle)
-					title += translationsToTranslatedString($("#by-date-translation").html());
+					title += _t("by-date");
 				else
 					title += textComponents[i];
 				if (i < components.length - 1 || currentMedia !== null)
@@ -129,15 +137,15 @@ $(document).ready(function() {
 			// the arrows for changing sort
 			if (currentAlbum.albums.length > 1)
 				title += "<a id=\"album-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
-						"<img title=\"albums sort\" height=\"15px\" width=\"15px\" src=\"img/Folder_6_icon-72a7cf.png\">" +
-						"<span title=\"sort albums reverse (earlier content firt)\" id=\"album-arrow-up\">🠙</span>" +
-						"<span title=\"sort albums normal (older content first)\" id=\"album-arrow-down\">🠛</span>" +
+						"<img title=\"albums sort\" height=\"15px\" id=\"album-sort-icon\" width=\"15px\" src=\"img/Folder_6_icon-72a7cf.png\">" +
+						"<span id=\"album-arrow-up\">🠙</span>" +
+						"<span id=\"album-arrow-down\">🠛</span>" +
 					"</a>";
 			if (currentAlbum.photos.length > 1)
 				title += "<a id=\"media-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
-						"<img title=\"media sort\" height=\"15px\" width=\"15px\" src=\"img/Creative-Tail-People-man.png\">" +
-						"<span title=\"sort media reverse (earlier content firt)\" id=\"media-arrow-up\">🠙</span>" +
-						"<span title=\"sort media normal (older content first)\" id=\"media-arrow-down\">🠛</span>" +
+						"<img title=\"media sort\" height=\"15px\" id=\"media-sort-icon\" width=\"15px\" src=\"img/Creative-Tail-People-man.png\">" +
+						"<span id=\"media-arrow-up\">🠙</span>" +
+						"<span id=\"media-arrow-down\">🠛</span>" +
 					"</a>";
 		}
 		// generate the html page title
@@ -148,7 +156,7 @@ $(document).ready(function() {
 					documentTitle = " \u00ab " + documentTitle;
 			}
 			else if (i == 1 && dateTitle) {
-				documentTitle += " " + translationsToTranslatedString($("#by-date-translation").html());
+				documentTitle += " " + _t("by-date");
 			}
 			else if (i > 1) {
 				documentTitle = textComponents[i] + documentTitle;
@@ -166,9 +174,13 @@ $(document).ready(function() {
 				if (currentAlbum.albums.length > 1) {
 					$("#album-sort-arrows").show();
 					if (getBooleanCookie("albumReverseSortRequested")) {
+						$("#album-sort-arrows").attr("title", _t("sort-reverse"));
+						$("#album-sort-icon").attr("title", _t("sort-reverse"));
 						$("#album-arrow-up").hide();
 						$("#album-arrow-down").show();
 					} else {
+						$("#album-sort-arrows").attr("title", _t("sort-normal"));
+						$("#album-sort-icon").attr("title", _t("sort-normal"));
 						$("#album-arrow-up").show();
 						$("#album-arrow-down").hide();
 					}
@@ -176,9 +188,13 @@ $(document).ready(function() {
 				if (currentAlbum.photos.length > 1 && ! (currentAlbum.path.match(byDateRegex) && currentAlbum.photos.length >= Options.big_date_folders_threshold)) {
 					$("#media-sort-arrows").show();
 					if (getBooleanCookie("mediaReverseSortRequested")) {
+						$("#media-sort-arrows").attr("title", _t("sort-reverse"));
+						$("#media-sort-icon").attr("title", _t("sort-reverse"));
 						$("#media-arrow-up").hide();
 						$("#media-arrow-down").show();
 					} else {
+						$("#media-sort-arrows").attr("title", _t("sort-normal"));
+						$("#media-sort-icon").attr("title", _t("sort-normal"));
 						$("#media-arrow-up").show();
 						$("#media-arrow-down").hide();
 					}
@@ -334,7 +350,7 @@ $(document).ready(function() {
 				if (needMediaHtmlReverse())
 					currentAlbum.mediaReverseSort = ! currentAlbum.mediaReverseSort;
 			} else if (currentAlbum.photos.length < Options.big_date_folders_threshold) {
-				$("#thumbs").html("Too many images: " + currentAlbum.photos.length + " (limit for date album is " + Options.big_date_folders_threshold +  ")");
+				$("#thumbs").html("<span id=\"too-many-images\">Too many images: " + currentAlbum.photos.length + " (limit for date album is " + Options.big_date_folders_threshold +  ")</span>");
 				$("#thumbs").empty();
 			}
 			
@@ -733,10 +749,10 @@ $(document).ready(function() {
 		}
 	}
 	
-	function em2px(selector, em) {
-		var emSize = parseFloat($(selector).css("font-size"));
-		return (em * emSize);
-	}
+	//~ function em2px(selector, em) {
+		//~ var emSize = parseFloat($(selector).css("font-size"));
+		//~ return (em * emSize);
+	//~ }
 	function getBooleanCookie(key) {
 		var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
 		if (! keyValue)
@@ -834,7 +850,7 @@ $(document).ready(function() {
 
 	function getOptions(cacheSubDir, callback) {
 		if (Object.keys(Options).length > 0)
-			photoFloat.parseHash(location.hash, hashParsed, die);
+			callback(location.hash, hashParsed, die);
 		else {
 			if (cacheSubDir && cacheSubDir.substr(-1) != "/")
 				cacheSubDir += "/";
@@ -863,7 +879,7 @@ $(document).ready(function() {
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					if (errorThrown == "Not Found" && ! cacheSubDir)
-						getOptions("cache", parseHash);
+						getOptions(Options.server_cache_path, callback);
 					else {
 						$("#error-options-file").fadeIn(1500);
 						$("#error-options-file, #error-overlay, #auth-text").fadeOut(500);

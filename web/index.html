@@ -22,6 +22,7 @@
 	<script type="text/javascript" src="js/003-mousewheel.js"></script>
 	<script type="text/javascript" src="js/004-fullscreen.js"></script>
 	<script type="text/javascript" src="js/005-modernizr.js"></script>
+	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
 
@@ -31,23 +32,14 @@
 	<div id="buttons-container">
 		<div id="day-view-container" style="display:none;">
 			<a id="day-view" href="javascript:void(0)">
-				<span class="translation-en">by date</span>
-				<span class="translation-it">per data</span>
-				<span class="translation-es">por fecha</span>
 			</a>
 		</div>
 		<div id="folders-view-container" style="display:none;">
 			<a id="folders-view" href="javascript:void(0)">
-				<span class="translation-en">by folder</span>
-				<span class="translation-it">cartelle</span>
-				<span class="translation-es">por carpetas</span>
 			</a>
 		</div>
 	</div>
 	<div id="title">
-		<span class="translation-en">Photos</span>
-		<span class="translation-it">Foto</span>
-		<span class="translation-es">Foto</span>
 		<a id="album-sort-arrows"></a>
 		<a id="media-sort-arrows"></a>
 	</div>
@@ -57,27 +49,11 @@
 		<a class="next-media"><img id="photo" /></a>
 		<div id="photo-bar">
 			<div id="photo-links">
-				<a id="metadata-show" href="javascript:void(0)">
-					<span class="translation-en">show metadata</span>
-					<span class="translation-it">metadati</span>
-					<span class="translation-es">metadatos</span>
-				</a>
-				<a id="metadata-hide" style="display:none;" href="javascript:void(0)">
-					<span class="translation-en">hide metadata</span>
-					<span class="translation-it">nascondi metadati</span>
-					<span class="translation-es">esconde metadatos</span>
-				</a> |
-				<a id="original-link" target="_blank">
-					<span class="translation-en">download original</span>
-					<span class="translation-it">scarica originale</span>
-					<span class="translation-es">descarga original</span>
-				</a>
+				<a id="metadata-show" href="javascript:void(0)"></a>
+				<a id="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
+				<a id="original-link" target="_blank"></a>
 				<span id="fullscreen-divider"> | </span>
-				<a id="fullscreen" href="javascript:void(0)">
-					<span class="translation-en">fullscreen</span>
-					<span class="translation-it">schermo intero</span>
-					<span class="translation-es">pantalla completa</span>
-				</a>
+				<a id="fullscreen" href="javascript:void(0)"></a>
 			</div>
 			<div id="metadata"></div>
 		</div>
@@ -95,54 +71,19 @@
 <div id="album-view">
 	<div id="subalbums"></div>
 	<div id="thumbs">
-		<div id="loading">
-			<span class="translation-en">Loading...</span>
-			<span class="translation-it">Sto caricando...</span>
-			<span class="translation-es">Cargando...</span>
-		</div>
+		<div id="loading"></div>
 	</div>
-	<div id="powered-by"><span id="powered-by-string">
-					<span class="translation-en">Powered by</span>
-					<span class="translation-it">Realizzato con</span>
-					<span class="translation-es">Realizado con</span>
-				</span> <a href="https://github.com/paolobenve/photofloat" target="_blank">PhotoFloat</a></div>
+	<div id="powered-by">
+		<span id="powered-by-string"></span>
+		<a href="https://github.com/paolobenve/photofloat" target="_blank">PhotoFloat</a>
+	</div>
 </div>
 
 <div id="error-overlay"></div>
-<div id="error-options-file">
-	<span class="translation-en">Missing options.json file in cache dir</span>
-	<span class="translation-it">File options.json mancante nella cartella di cache</span>
-	<span class="translation-es">Falta el file options.json en la carpeta de cache</span>
-</div>
-<div id="error-text-folder">
-	<span class="translation-en">Wrong folder, going to root album</span>
-	<span class="translation-it">Album sbagliato, vado all'inizio</span>
-	<span class="translation-es">Error en la carpeta, voy al comienzo</span>
-</div>
-<div id="error-text-image">
-	<span class="translation-en">Wrong image, showing the album</span>
-	<span class="translation-it">Immagine sbagliata, mostro l'album</span>
-	<span class="translation-es">Error en la imágen, muestro la carpeta</span>
-</div>
+<div id="error-options-file"></div>
+<div id="error-text-folder"></div>
+<div id="error-text-image"></div>
 <div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form</div>
-
-<div style="display:none">
-<span id="by-date-translation">
-	<span class='translation-en'>(by date)</span>
-	<span class='translation-it'>(per data)</span>
-	<span class='translation-es'>(por fecha)</span>
-</span>
-<span id="folders-translation">
-	<span class='translation-en'>Folders</span>
-	<span class='translation-it'>Cartelle</span>
-	<span class='translation-es'>Carpetas</span>
-</span>
-<span id="title-translation">
-	<span class="translation-en">My photos</span>
-	<span class="translation-it">Foto</span>
-	<span class="translation-es">Mis fotos</span>
-</span>
-</div>
 
 </body>
 </html>
