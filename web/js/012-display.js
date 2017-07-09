@@ -396,6 +396,7 @@ $(document).ready(function() {
 								}
 								theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options.album_thumb_size, true) + ")");
 											"\" src=\"" +  thumbHash;
+								theImage.attr("title", photo.albumName.substr(7));
 								$(".thumb-caption-album").css("color", Options.album_caption_color);
 							}, function error() {
 								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
