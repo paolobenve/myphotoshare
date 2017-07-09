@@ -148,5 +148,5 @@ default_album_reverse_sort = false
 default_media_reverse_sort = true
 
 # When should a year album be considered big?
-big_date_folders_threshold = 500
+big_date_folders_threshold = 9999
 

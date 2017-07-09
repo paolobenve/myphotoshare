@@ -18,33 +18,33 @@ photofloat consists of two segments – a Python script and a JavaScript applica
 
 The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. The scanner extracts metadata from EXIF tags in JPEG photos. photofloat is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be very fast if there are few or zero changes since the last time you ran it.
 
-The JavaScript application consists of a single `index.html` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface. Features include:
+The JavaScript application consists of a single `index.html` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface.
 
-* Animations to make the interface feel nice
-* Separate album view and photo view
-* Album metadata pre-fetching
-* Photo pre-loading
-* Recursive async randomized tree walking album thumbnail algorithm
-* Smooth up and down scaling
-* Mouse-wheel support
-* Metadata display
-* Consistant hash url format
-* Linkable states via ajax urls
-* Static rendering for googlebot conforming to the AJAX crawling spec.
-* Facebook meta tags for thumbnail and post type
-* Link to original images (can be turned off)
-* Optional Google Analytics integration
-* Optional server-side authentication support
-* A thousand other tweaks here and there...
+It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
 
-Features added by Jerome:
+## Changelog
 
-* manage videos
+Features added in version 2.2 (July 10, 2017):
 
-Features added by Joachim:
+* translations are now managed via a separate js file
+* separated albums and media sorting
+* better managing of errors
+* new options:
+* - album_button_canvas_background_color (for fixed heigth thumbnails)
+* - big_date_folders_threshold: doesn't make thumbnails show for date albums too big
+* - default_media_reverse_sort: default sorting for media
+* - default_album_reverse_sort: default sorting for albums
 
-* generate minified css and js through external api
-* parallel thumbnail generation
+Features added in version 2.1.1 (July 6, 2017):
+
+* new options:
+* - persistent_metadata (boolean): permits to have metadata shown persistently on image
+* - album_button_background_color
+* - album_caption_color
+
+Features added in version 2.1 (July 6, 2017):
+
+* Images and directories can be sorted ascending/descending (via a cookie)
 
 Features added in version 2.0 (July 4, 2017):
 
@@ -65,19 +65,33 @@ Features added in version 2.0 (July 4, 2017):
 * - albums and cache server folders can be anywhere, even on another server (obviously, they will be generated on a pc and then uploaded wherever)
 * (to do) share buttons
 
-Features added in version 2.1 (July 6, 2017):
+Features added by Joachim (2015):
 
-* Images and directories can be sorted ascending/descending (via a cookie)
+* generate minified css and js through external api
+* parallel thumbnail generation
 
-Features added in version 2.1.1 (July 6, 2017):
+Features added by Jerome (2013):
 
-* bug fixes
-* new options:
-* - persistent_metadata (boolean): permits to have metadata persistently on image
-* - album_button_background_color
-* - album_caption_color
+* manage videos
 
-It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
+Features by Jason (2012):
+
+* Animations to make the interface feel nice
+* Separate album view and photo view
+* Album metadata pre-fetching
+* Photo pre-loading
+* Recursive async randomized tree walking album thumbnail algorithm
+* Smooth up and down scaling
+* Mouse-wheel support
+* Metadata display
+* Consistent hash url format
+* Linkable states via ajax urls
+* Static rendering for googlebot conforming to the AJAX crawling spec.
+* Facebook meta tags for thumbnail and post type
+* Link to original images (can be turned off)
+* Optional Google Analytics integration
+* Optional server-side authentication support
+* A thousand other tweaks here and there...
 
 ## Installation
 
