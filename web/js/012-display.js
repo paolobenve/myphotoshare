@@ -174,13 +174,13 @@ $(document).ready(function() {
 				if (currentAlbum.albums.length > 1) {
 					$("#album-sort-arrows").show();
 					if (getBooleanCookie("albumReverseSortRequested")) {
-						$("#album-sort-arrows").attr("title", _t("sort-reverse"));
-						$("#album-sort-icon").attr("title", _t("sort-reverse"));
+						$("#album-sort-arrows").attr("title", _t("sort-normal"));
+						$("#album-sort-icon").removeAttr("title");
 						$("#album-arrow-up").hide();
 						$("#album-arrow-down").show();
 					} else {
-						$("#album-sort-arrows").attr("title", _t("sort-normal"));
-						$("#album-sort-icon").attr("title", _t("sort-normal"));
+						$("#album-sort-arrows").attr("title", _t("sort-reverse"));
+						$("#album-sort-icon").removeAttr("title");
 						$("#album-arrow-up").show();
 						$("#album-arrow-down").hide();
 					}
@@ -188,15 +188,11 @@ $(document).ready(function() {
 				if (currentAlbum.photos.length > 1 && ! (currentAlbum.path.match(byDateRegex) && currentAlbum.photos.length >= Options.big_date_folders_threshold)) {
 					$("#media-sort-arrows").show();
 					if (getBooleanCookie("mediaReverseSortRequested")) {
-						$("#media-sort-arrows").attr("title", _t("sort-reverse"));
-						$("#media-sort-icon").attr("title", _t("sort-reverse"));
-						$("#media-arrow-up").hide();
-						$("#media-arrow-down").show();
-					} else {
 						$("#media-sort-arrows").attr("title", _t("sort-normal"));
-						$("#media-sort-icon").attr("title", _t("sort-normal"));
-						$("#media-arrow-up").show();
-						$("#media-arrow-down").hide();
+						$("#media-sort-icon").removeAttr("title");
+					} else {
+						$("#media-sort-arrows").attr("title", _t("sort-reverse"));
+						$("#media-sort-icon").removeAttr("title");
 					}
 				}
 			});
@@ -241,6 +237,20 @@ $(document).ready(function() {
 					setOptions();
 				});
 			}
+		}
+		if (getBooleanCookie("albumReverseSortRequested")) {
+			$("#album-arrow-up").hide();
+			$("#album-arrow-down").show();
+		} else {
+			$("#album-arrow-up").show();
+			$("#album-arrow-down").hide();
+		}
+		if (getBooleanCookie("mediaReverseSortRequested")) {
+			$("#media-arrow-up").hide();
+			$("#media-arrow-down").show();
+		} else {
+			$("#media-arrow-up").show();
+			$("#media-arrow-down").hide();
 		}
 	}
 

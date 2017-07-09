@@ -329,7 +329,7 @@ a#day-view, a#folders-view {
 }
 
 #album-sort-arrows, #media-sort-arrows {
-	padding: 0 1em;
+	padding: 0 2em;
 	display: none;
 }
 

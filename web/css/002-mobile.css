@@ -1,4 +1,4 @@
-@media (max-height: 600px) {
+@media (max-height: 700px) {
 	#photo-view {
 		top: 0;
 		bottom: 0;
@@ -11,5 +11,13 @@
 	#title {
 		font-size: .8em;
 		z-index: 1;
+	}
+	#album-sort-arrows, #media-sort-arrows {
+		padding: 0 .5em;
+		display: inline !important;
+	}
+	#photo-links {
+		display: inline !important;
+		opacity: 0.5;
 	}
 }

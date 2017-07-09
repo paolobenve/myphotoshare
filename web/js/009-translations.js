@@ -35,8 +35,8 @@ var translations =
 			"by-date": "(per data)",
 			"by-folder": "Cartelle",
 			"too-many-images": "Troppe immagini: %s (il limite per gli album per data è %s)",
-			"sort-normal": "ordine normale (contenuti più vecchi prima)",
-			"sort-reverse": "ordine inverso (contenuti più recenti prima)"
+			"sort-normal": "ordina normale (contenuti più vecchi prima)",
+			"sort-reverse": "ordina inverso (contenuti più recenti prima)"
 		},
 		'es': {
 			"metadata-show": "metadatos",
