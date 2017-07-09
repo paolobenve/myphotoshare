@@ -882,8 +882,12 @@ $(document).ready(function() {
 					if (errorThrown == "Not Found" && ! cacheSubDir)
 						getOptions(Options.server_cache_path, callback);
 					else {
-						$("#error-options-file").fadeIn(2000);
-						$("#error-options-file, #error-overlay, #auth-text").fadeOut(1000);
+						$("#album-view").fadeOut(200);
+						$("#photo-view").fadeOut(200);
+						$("#album-view").fadeIn(3500);
+						$("#photo-view").fadeIn(3500);
+						$("#error-options-file").fadeIn(200);
+						$("#error-options-file, #error-overlay, #auth-text").fadeOut(2500);
 					}
 				}
 			};

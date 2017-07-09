@@ -39,8 +39,12 @@
 		};
 		if (typeof error !== "undefined" && error !== null) {
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-				$("#error-text-folder").fadeIn(2000);
-				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(1000);
+				$("#album-view").fadeOut(200);
+				$("#photo-view").fadeOut(200);
+				$("#album-view").fadeIn(3500);
+				$("#photo-view").fadeIn(3500);
+				$("#error-text-folder").fadeIn(200);
+				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(2500);
 				window.location.hash = Options.folders_string;
 			};
 		}
@@ -86,8 +90,11 @@
 					}
 				}
 				if (i >= theAlbum.photos.length) {
-					$("#error-text-image").fadeIn(2000);
-					$("#error-text-image, #error-overlay, #auth-text").fadeOut(1000);
+					$("#album-view").fadeOut(200);
+					$("#photo-view").fadeOut(200);
+					$("#album-view").fadeIn(3500);
+					$("#error-text-image").fadeIn(200);
+					$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
 					window.location.hash = album;
 					i = -1;
 				}
