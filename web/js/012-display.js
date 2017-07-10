@@ -118,7 +118,7 @@ $(document).ready(function() {
 						else
 							title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && dateTitle)
-					title += _t("by-date");
+					title += "(" + _t("by-date") + ")";
 				else
 					title += textComponents[i];
 				if (i < components.length - 1 || currentMedia !== null)
@@ -156,7 +156,7 @@ $(document).ready(function() {
 					documentTitle = " \u00ab " + documentTitle;
 			}
 			else if (i == 1 && dateTitle) {
-				documentTitle += " " + _t("by-date");
+				documentTitle += " (" + _t("by-date") + ")";
 			}
 			else if (i > 1) {
 				documentTitle = textComponents[i] + documentTitle;
@@ -168,7 +168,7 @@ $(document).ready(function() {
 			documentTitle = photoFloat.trimExtension(currentMedia.name) + documentTitle;
 		
 		document.title = documentTitle;
-		$("#title").html(title);
+		$("#title-string	").html(title);
 		if (currentMedia === null) {
 			$("body").on('mouseenter', "#title-container", function() {
 				if (currentAlbum.albums.length > 1) {
