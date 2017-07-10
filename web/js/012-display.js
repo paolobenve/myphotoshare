@@ -433,10 +433,10 @@ $(document).ready(function() {
 								html += 	"height: " + ButtonAndCaptionHeight.toString() + "px; " +
 										"margin-right: " + Options.thumb_spacing + "px; ";
 								if (Options.different_album_thumbnails)
-									html += "width: " + (Options.album_thumb_size * 1.1).toString() + "px;";
+									html += "width: " + Math.round(Options.album_thumb_size * 1.1).toString() + "px; ";
 								else
 									html += "width: " + Options.album_thumb_size.toString() + "px; ";
-								html += "padding-top: " + (Options.album_thumb_size * 0.05).toString() + "px; ";
+								html += "padding-top: " + Math.round(Options.album_thumb_size * 0.05).toString() + "px; ";
 								html += "background-color: " + Options.album_button_background_color + "; ";
 								html += "\"";
 								html += ">";
@@ -497,7 +497,6 @@ $(document).ready(function() {
 			$("#powered-by").hide();
 		}
 		$("#title").width($(window).width() - $("#buttons-container").width());
-		$(".album-button-and-caption").css("height", "auto");
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
