@@ -285,7 +285,7 @@ $(document).ready(function() {
 	
 	function showAlbum(populate) {
 		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
-		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, imageTextAdd;
+		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
@@ -333,7 +333,7 @@ $(document).ready(function() {
 								"\" width=\"" + thumbnailSize;
 					}
 					imageString += 		"\" />" +
-								"<div class=\"thumb-caption-media\">" +
+								"<div class=\"media-caption\">" +
 								currentAlbum.photos[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
 								"</div>" +
 								"</div>";
@@ -369,16 +369,14 @@ $(document).ready(function() {
 					subalbums = [];
 					for (i = 0; i < currentAlbum.albums.length; ++i) {
 						link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
-						imageTextAdd = currentAlbum.albums[i].path;
-						imageTextAdd = imageTextAdd.replace(Options.by_date_string, $("#by-date-translation").html());
-						imageTextAdd = imageTextAdd.replace(Options.folders_string, $("#folders-translation").html());
-						imageString = "<div ";
-						imageString += "class=\"album-button\" ";
-						imageString += "title=\"" + currentAlbum.albums[i].date + "\">" +
-								"<span class='thumb-caption-album' style=\"color:" + Options.album_caption_color + "\">" +
-								imageTextAdd +
-								"</span>" +
+						imageString = "<div class=\"album-button\"";
+						//~ imageString += 		" title=\"" + currentAlbum.albums[i].date + "\"";
+						imageString += 		" style=\"width: " + Options.album_thumb_size + "px; height: " + Options.album_thumb_size + "px;\"";
+						imageString += ">"
+						imageString += "<div class='album-caption' style=\"color:" + Options.album_caption_color + "\">" +
+								currentAlbum.albums[i].path +
 								"</div>";
+						imageString += "</div>";
 						image = $(imageString);
 						link.append(image);
 						subalbums.push(link);
@@ -407,7 +405,6 @@ $(document).ready(function() {
 								theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options.album_thumb_size, true) + ")");
 											"\" src=\"" +  thumbHash;
 								theImage.attr("title", photo.albumName.substr(7));
-								$(".thumb-caption-album").css("color", Options.album_caption_color);
 							}, function error() {
 								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 								theLink.remove();
@@ -415,6 +412,8 @@ $(document).ready(function() {
 							});
 						})(currentAlbum, currentAlbum.albums[i], image, link);
 					}
+					
+					
 					subalbumsElement = $("#subalbums");
 					subalbumsElement.empty();
 					subalbumsElement.append.apply(subalbumsElement, subalbums);
@@ -853,9 +852,9 @@ $(document).ready(function() {
 		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
 		if (currentMedia !== null || ! Options.show_media_names_below_thumbs_in_albums)
-			$(".thumb-caption-media").hide();
+			$(".media-caption").hide();
 		else
-			$(".thumb-caption-media").show();
+			$(".media-caption").show();
 		
 		setOptions();
 	}

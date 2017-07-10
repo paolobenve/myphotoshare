@@ -286,19 +286,23 @@ a#day-view, a#folders-view {
 	top: 0;
 	margin-bottom: 1em;
 }
-.thumb-caption-media, .thumb-caption-album {
+.media-caption, .album-caption {
 	display: block;
 	text-align: center;
-	color: chartreuse;
 	overflow: hidden;
 	padding: 0 .2em;
 }
 
-.thumb-caption-media {
-	font-size: 75%;
+.album-caption {
+	color: white;
 }
 
-.thumb-caption-album {
+.media-caption {
+	font-size: 75%;
+	color: chartreuse;
+}
+
+.album-caption {
 	font-size: inherit;
 }
 
