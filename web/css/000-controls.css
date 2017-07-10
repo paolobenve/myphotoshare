@@ -84,8 +84,17 @@ a#day-view, a#folders-view {
 #subalbums {
 	padding-top: 1.5em;
 }
-.album-button {
+
+.album-button-and-caption {
 	float: left;
+	height: 200px;
+	width: 180px;
+	margin-bottom: 2em;
+}
+.album-caption {
+	margin: 0 auto 0 auto;
+}
+.album-button {
 	display: block;
 	height: 40px;
 	text-align: center;
@@ -97,7 +106,7 @@ a#day-view, a#folders-view {
 	background-image: url(../img/image-placeholder.png);
 	background-color: #222222;
 	background-repeat: no-repeat;
-	margin-bottom: 30px;
+	margin: 0 auto 3px auto;
 	line-height: 1.1em
 }
 
@@ -304,6 +313,7 @@ a#day-view, a#folders-view {
 
 .album-caption {
 	font-size: inherit;
+	height: 3em;
 }
 
 #thumbs a {
@@ -321,15 +331,6 @@ a#day-view, a#folders-view {
 	left: 0;  
 	right: 0;  
 	margin: auto;
-}
-
-.translation, .translation-en, .translation-it, .translation-es {
-	display: none;
-}
-
-.translation-active {
-	display: inline;
-	padding: .5em;
 }
 
 #album-sort-arrows, #media-sort-arrows {

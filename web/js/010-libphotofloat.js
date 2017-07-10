@@ -6,7 +6,7 @@
 	}
 	
 	/* public member functions */
-	PhotoFloat.prototype.album = function(subalbum, callback, error) {
+	PhotoFloat.prototype.getAlbum = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
 		
 		if (typeof subalbum.photos !== "undefined" && subalbum.photos !== null) {
@@ -50,21 +50,21 @@
 		}
 		$.ajax(ajaxOptions);
 	};
-	PhotoFloat.prototype.albumPhoto = function(subalbum, callback, error) {
+	PhotoFloat.prototype.pickRandomPhoto = function(subalbum, container, callback, error) {
 		var nextAlbum, self;
 		self = this;
 		nextAlbum = function(album) {
 			var index = Math.floor(Math.random() * (album.photos.length + album.albums.length));
 			if (index >= album.photos.length) {
 				index -= album.photos.length;
-				self.album(album.albums[index], nextAlbum, error);
+				self.getAlbum(album.albums[index], nextAlbum, error);
 			} else
-				callback(album, album.photos[index]);
+				callback(album, album.photos[index], container);
 		};
 		if (typeof subalbum.photos !== "undefined" && subalbum.photos !== null)
 			nextAlbum(subalbum);
 		else
-			this.album(subalbum, nextAlbum, error);
+			this.getAlbum(subalbum, nextAlbum, error);
 	};
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		var index, album, photo;
@@ -80,7 +80,7 @@
 			album = hash;
 			photo = null;
 		}
-		this.album(album, function(theAlbum) {
+		this.getAlbum(album, function(theAlbum) {
 			var i = -1;
 			if (photo !== null) {
 				for (i = 0; i < theAlbum.photos.length; ++i) {

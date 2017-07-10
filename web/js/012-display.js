@@ -254,6 +254,18 @@ $(document).ready(function() {
 		}
 	}
 
+	function addCaptions() {
+		var album;
+		album = currentAlbum;
+		if (album === null) {
+			return;
+		}
+		$("#subalbums img").each(function() {
+			var pathArray = this.title.split("/");
+			var folder = pathArray[pathArray.length - 2];
+			$(this).after("<div class=\"album-caption\">" + folder + "</div>");
+		});
+	}
 	function scrollToThumb() {
 		var photo, thumb;
 		photo = currentMedia;
@@ -373,46 +385,77 @@ $(document).ready(function() {
 						//~ imageString += 		" title=\"" + currentAlbum.albums[i].date + "\"";
 						imageString += 		" style=\"width: " + Options.album_thumb_size + "px; height: " + Options.album_thumb_size + "px;\"";
 						imageString += ">"
-						imageString += "<div class='album-caption' style=\"color:" + Options.album_caption_color + "\">" +
-								currentAlbum.albums[i].path +
-								"</div>";
+						//~ imageString += "<div class='album-caption' style=\"color:" + Options.album_caption_color + "\">" +
+								//~ currentAlbum.albums[i].path +
+								//~ "</div>";
 						imageString += "</div>";
 						image = $(imageString);
+						//~ foldedImageString = "<div class=\"album-button-and-caption\">";
+						//~ foldedImageString += imageString;
+						//~ foldedImageString += "<div class='album-caption' style=\"color:" + Options.album_caption_color + "\">" +
+									//~ currentAlbum.albums[i].path +
+									//~ "</div>";
+						//~ foldedImageString += "</div>";
+						//~ foldedImage = $(foldedImageString);
 						link.append(image);
+						//~ link.append(foldedImage);
 						subalbums.push(link);
 						(function(theContainer, theAlbum, theImage, theLink) {
-							photoFloat.albumPhoto(theAlbum, function(album, photo) {
-								var distance;
+							photoFloat.pickRandomPhoto(theAlbum, theContainer, function(randomAlbum, randomPhoto, originalAlbum) {
+								var distance, folderArray, originalAlbumFoldersArray, folder, captionHeight, ButtonAndCaptionHeight, html;
 								if (Options.media_thumb_type == "fixed_height") {
 									thumbWidth = Options.album_thumb_size;
 									thumbHeight = Options.album_thumb_size;
-									//~ if (photo.size[1] < photo.size[0]) {
-										//~ thumbWidth = Options.album_thumb_size;
-										//~ thumbHeight = thumbWidth * photo.size[1] / photo.size[0];
-									//~ } else {
-										//~ thumbHeight = Options.album_thumb_size;
-										//~ thumbWidth = thumbHeight * photo.size[0] / photo.size[1];
-									//~ }
 									if (Options.different_album_thumbnails) {
 										distance = (Options.album_thumb_size - thumbHeight) / 2 + Options.album_thumb_size * 0.05;
-										theImage.css("background-position-y", distance.toString() + "px");
 									} else {
 										distance = (Options.album_thumb_size - thumbHeight) / 2;
-										theImage.css("background-position-y", distance.toString() + "px");
 									}
-									theImage.css("background-size", thumbWidth + "px " + thumbHeight + "px");
 								}
-								theImage.css("background-image", "url(" + photoFloat.photoPath(album, photo, Options.album_thumb_size, true) + ")");
-											"\" src=\"" +  thumbHash;
-								theImage.attr("title", photo.albumName.substr(7));
+								var htmlText = "<img " +
+										"title=\"" + randomPhoto.albumName.substr(7) + "\"" +
+										" src=\"" + photoFloat.photoPath(randomAlbum, randomPhoto, Options.album_thumb_size, true) + "\"" +
+										" style=\"width:" + thumbWidth + "px; height:" + thumbHeight + "px;\"" +
+										">"
+								theImage.html(htmlText);
+								
+								if (originalAlbum.path.indexOf(Options.by_date_string) === 0)
+									folderArray = randomPhoto.dayAlbum.split("/");
+								else
+									folderArray = randomPhoto.albumName.split("/");
+								originalAlbumFoldersArray = originalAlbum.path.split("/");
+								folder = folderArray[originalAlbumFoldersArray.length];
+								
+								captionHeight = em2px("body", 3);
+								ButtonAndCaptionHeight = Options.album_thumb_size + captionHeight;
+								html = "<div class=\"album-button-and-caption\" ";
+								html += "style=\"";
+								html += 	"height: " + ButtonAndCaptionHeight.toString() + "px; " +
+										"margin-right: " + Options.thumb_spacing + "px; ";
+								if (Options.different_album_thumbnails)
+									html += "width: " + (Options.album_thumb_size * 1.1).toString() + "px;";
+								else
+									html += "width: " + Options.album_thumb_size.toString() + "px; ";
+								html += "padding-top: " + (Options.album_thumb_size * 0.05).toString() + "px; ";
+								html += "background-color: " + Options.album_button_background_color + "; ";
+								html += "\"";
+								html += ">";
+								theImage.wrap(html);
+								html = "<div class=\"album-caption\"";
+								html += " style=\"width: " + Options.album_thumb_size.toString() + "px; height: " + captionHeight.toString() + "px; ";
+								html += 	"color: " + Options.album_caption_color + "; ";
+								html += "\"";
+								html += ">" + folder + "</div>"
+								theImage.parent().append(html);
 							}, function error() {
 								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 								theLink.remove();
 								subalbums.splice(subalbums.indexOf(theLink), 1);
 							});
+							i++;i--;
 						})(currentAlbum, currentAlbum.albums[i], image, link);
+						
 					}
-					
 					
 					subalbumsElement = $("#subalbums");
 					subalbumsElement.empty();
@@ -423,6 +466,7 @@ $(document).ready(function() {
 						currentAlbum.albumReverseSort = ! currentAlbum.albumReverseSort;
 				}
 			}
+			
 		}
 		
 		if (currentMedia === null) {
@@ -453,6 +497,7 @@ $(document).ready(function() {
 			$("#powered-by").hide();
 		}
 		$("#title").width($(window).width() - $("#buttons-container").width());
+		$(".album-button-and-caption").css("height", "auto");
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
@@ -735,11 +780,9 @@ $(document).ready(function() {
 		});
 		$("#photo-name").css("color", Options.title_image_name_color);
 		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
-		$(".album-button").css("margin-right", Options.thumb_spacing.toString() + "px");
+		$(".album-button").css("width", albumThumbnailSize.toString() + "px");
 		if (Options.different_album_thumbnails) {
 			$(".album-button").css("background-color", Options.album_button_background_color);
-			$(".album-button").css("width", (albumThumbnailSize * 1.1).toString() + "px");
-			$(".album-button").css("padding-top", (albumThumbnailSize * 1.05).toString() + "px");
 			$(".album-button").each(function() {
 				if ($(this).css("background-position-y") === undefined) {
 					$(this).css("background-position-y", (albumThumbnailSize * 0.05).toString() + "px");
@@ -748,8 +791,6 @@ $(document).ready(function() {
 			});
 		} else {
 			$(".album-button").css("background-color", Options.background_color);
-			$(".album-button").css("width", albumThumbnailSize.toString() + "px");
-			$(".album-button").css("padding-top", albumThumbnailSize.toString() + "px");
 			$(".album-button").each(function() {
 				if ($(this).css("background-position-y") === undefined) {
 					$(this).css("background-position-y", "0");
@@ -757,12 +798,13 @@ $(document).ready(function() {
 				}
 			});
 		}
+		//~ $(".album-button-and-caption").css("height", "auto"); //albumThumbnailSize.toString() + "px");
 	}
 	
-	//~ function em2px(selector, em) {
-		//~ var emSize = parseFloat($(selector).css("font-size"));
-		//~ return (em * emSize);
-	//~ }
+	function em2px(selector, em) {
+		var emSize = parseFloat($(selector).css("font-size"));
+		return (em * emSize);
+	}
 	function getBooleanCookie(key) {
 		var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
 		if (! keyValue)
