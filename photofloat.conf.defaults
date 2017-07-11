@@ -131,9 +131,6 @@ background_color = #222222
 # the album buttons background color (this is a dirty white, in order to be like an old slide)
 album_button_background_color = Cornsilk
 
-# the album buttons background color for canvas, used when fixed heigth thumbnails are set (this is a dirty white)
-album_button_canvas_background_color = wheat
-
 # the album buttons background color
 album_caption_color = white
 

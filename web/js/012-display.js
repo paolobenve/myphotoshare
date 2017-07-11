@@ -246,18 +246,6 @@ $(document).ready(function() {
 		}
 	}
 
-	function addCaptions() {
-		var album;
-		album = currentAlbum;
-		if (album === null) {
-			return;
-		}
-		$("#subalbums img").each(function() {
-			var pathArray = this.title.split("/");
-			var folder = pathArray[pathArray.length - 2];
-			$(this).after("<div class=\"album-caption\">" + folder + "</div>");
-		});
-	}
 	function scrollToThumb() {
 		var photo, thumb;
 		photo = currentMedia;
@@ -289,7 +277,8 @@ $(document).ready(function() {
 	
 	function showAlbum(populate) {
 		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
-		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator;
+		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, populateMedia;
+		var photoWidth, photoHeight;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
@@ -379,7 +368,7 @@ $(document).ready(function() {
 						if (! Options.albums_slide_style)
 							imageString +=		" background-color: " + Options.album_button_background_color + ";";
 						imageString += 			"\"";
-						imageString += ">"
+						imageString += ">";
 						imageString += "</div>";
 						image = $(imageString);
 						link.append(image);
@@ -390,12 +379,12 @@ $(document).ready(function() {
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, ButtonAndCaptionHeight, html;
 								if (Options.album_thumb_type == "fit") {
 									photoWidth = randomPhoto.size[0];
-									photoHeigth = randomPhoto.size[1];
-									if (photoWidth > photoHeigth) {
+									photoHeight = randomPhoto.size[1];
+									if (photoWidth > photoHeight) {
 										thumbWidth = Options.album_thumb_size;
-										thumbHeight = Options.album_thumb_size * photoHeigth / photoWidth;
+										thumbHeight = Options.album_thumb_size * photoHeight / photoWidth;
 									} else {
-										thumbWidth = Options.album_thumb_size * photoWidth / photoHeigth;
+										thumbWidth = Options.album_thumb_size * photoWidth / photoHeight;
 										thumbHeight = Options.album_thumb_size;
 									}
 									distance = (Options.album_thumb_size - thumbHeight) / 2;
@@ -403,9 +392,11 @@ $(document).ready(function() {
 								var htmlText = "<img " +
 										"title=\"" + randomPhoto.albumName.substr(7) + "\"" +
 										" src=\"" + photoFloat.photoPath(randomAlbum, randomPhoto, Options.album_thumb_size) + "\"" +
-										" style=\"width:" + thumbWidth + "px; height:" + thumbHeight + "px; " +
-											"margin-top: " + distance + "px;\"" +
-										">"
+										" style=\"width:" + thumbWidth + "px;" +
+											" height:" + thumbHeight + "px;" +
+											" margin-top: " + distance + "px" +
+											"\"" +
+										">";
 								theImage.html(htmlText);
 								
 								if (originalAlbum.path.indexOf(Options.by_date_string) === 0)
@@ -438,7 +429,7 @@ $(document).ready(function() {
 								html += " style=\"width: " + Options.album_thumb_size.toString() + "px; height: " + captionHeight.toString() + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
-								html += ">" + folder + "</div>"
+								html += ">" + folder + "</div>";
 								theImage.parent().append(html);
 							}, function error() {
 								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
@@ -498,34 +489,48 @@ $(document).ready(function() {
 		return (fraction[0] / fraction[1]).toString();
 	}
 	function scaleImageFullscreen() {
-		var image;
+		var image, bottom;
 		image = $("#photo");
 		if (image.get(0) === this) {
 			$(window).unbind("resize", scaleImageNormal);
 			$(window).bind("resize", scaleImageFullscreen);
 		}
 		scaleImage($(window), image);
+		bottom = (($(window).height() - image.height()) / 2) + "px";
+		image.css("bottom", bottom);
+		$("#photo-bar").css("bottom", bottom);
 	}
 	function scaleImageNormal() {
-		var image;
+		var image, bottom;
 		image = $("#photo");
 		if (image.get(0) === this) {
 			$(window).unbind("resize", scaleImageFullscreen);
 			$(window).bind("resize", scaleImageNormal);
 		}
 		scaleImage($("#photo-view"), image);
-	}
-	function scaleImage(container, image) {
-		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
-			image.css("width", "100%").css("height", "auto").css("position", "absolute").css("bottom", 0);
-		else if (image.css("height") !== "100%")
-			image.css("height", "100%").css("width", "auto").css("position", 0).css("bottom", 0);
 		if (! $("#album-view").is(":visible"))
 			$("#photo-view").css("bottom", "0");
 		else
-			$("#photo-view").css("bottom", (Options.media_thumb_size + 15).toString() + "px");
-		$("#photo-box").css("height", $("#photo").css("height"));
+			$("#photo-view").css("bottom", $("#album-view").height() + "px");
+		$("#photo-view").css("top", ($("#title").height() + parseInt($("#title").css("padding-top")) + parseInt($("#title").css("padding-bottom"))) + "px");
+		$("#photo-view").css("height", (window.innerHeight - parseInt($("#photo-view").css("top")) + $("#photo-view").css("bottom")) + "px");
+		bottom = (($("#photo-view").height() - image.height()) / 2) + "px";
+		//~ image.css("bottom", "initial");
+		$("#photo").css("bottom", bottom);
+		$("#photo-bar").css("bottom", bottom);
 		$("#title").width($(window).width() - $("#buttons-container").width());
+	}
+	function scaleImage(container, image) {
+		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
+			image.css("width", "100%").css("height", "auto")
+				.css("position", "absolute")
+				.css("bottom", 0)
+				;
+		else if (image.css("height") !== "100%")
+			image.css("height", "100%").css("width", "auto")
+			.css("position", 0)
+			.css("bottom", 0)
+			;
 	}
 	function scaleVideo() {
 		var video, container;
