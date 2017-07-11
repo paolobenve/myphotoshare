@@ -387,11 +387,6 @@ class Media(object):
 				image_copy = image.copy() # we try again to work around PIL bug
 			except KeyboardInterrupt:
 				raise
-			#~ except:
-				#~ message("corrupt image", os.path.basename(original_path))
-				#~ self.is_valid = False
-				#~ back_level()
-				#~ return image
 		image_width = image.size[0]
 		image_heigth = image.size[1]
 		if is_thumbnail and Options.config['media_thumb_type'] == "square":
