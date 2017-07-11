@@ -116,8 +116,7 @@ def main():
 	try:
 		if (
 			old_options['media_thumb_type'] != Options.config['media_thumb_type'] or
-			old_options['album_thumb_type'] != Options.config['album_thumb_type'] or
-			old_options['album_button_canvas_background_color'] != Options.config['album_button_canvas_background_color']
+			old_options['album_thumb_type'] != Options.config['album_thumb_type']
 		):
 			Options.config['recreate_thumbnails'] = True
 	except KeyError:

@@ -106,9 +106,6 @@ page_title = My photos
 # spacing between thumbnails, pixels (integer)
 thumb_spacing = 3
 
-# should we show album thumbnails different from photo ones?
-different_album_thumbnails = true
-
 # should be used a slide-like style?
 albums_slide_style = true
 

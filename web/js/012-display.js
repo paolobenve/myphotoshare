@@ -373,7 +373,12 @@ $(document).ready(function() {
 					for (i = 0; i < currentAlbum.albums.length; ++i) {
 						link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
-						imageString += 		" style=\"width: " + Options.album_thumb_size + "px; height: " + Options.album_thumb_size + "px;\"";
+						imageString += 		" style=\"";
+						imageString += 			"width: " + Options.album_thumb_size + "px;";
+						imageString += 			" height: " + Options.album_thumb_size + "px;";
+						if (! Options.albums_slide_style)
+							imageString +=		" background-color: " + Options.album_button_background_color + ";";
+						imageString += 			"\"";
 						imageString += ">"
 						imageString += "</div>";
 						image = $(imageString);
@@ -419,12 +424,13 @@ $(document).ready(function() {
 								html += "style=\"";
 								html += 	"height: " + ButtonAndCaptionHeight.toString() + "px; " +
 										"margin-right: " + Options.thumb_spacing + "px; ";
-								if (Options.different_album_thumbnails)
+								if (Options.albums_slide_style)
 									html += "width: " + Math.round(Options.album_thumb_size * 1.1).toString() + "px; ";
 								else
 									html += "width: " + Options.album_thumb_size.toString() + "px; ";
 								html += "padding-top: " + Math.round(Options.album_thumb_size * 0.05).toString() + "px; ";
-								html += "background-color: " + Options.album_button_background_color + "; ";
+								if (Options.albums_slide_style)
+									html += "background-color: " + Options.album_button_background_color + "; ";
 								html += "\"";
 								html += ">";
 								theImage.wrap(html);
@@ -765,23 +771,6 @@ $(document).ready(function() {
 		$("#photo-name").css("color", Options.title_image_name_color);
 		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
 		$(".album-button").css("width", albumThumbnailSize.toString() + "px");
-		//~ if (Options.different_album_thumbnails) {
-			//~ $(".album-button").css("background-color", Options.album_button_background_color);
-			//~ $(".album-button").each(function() {
-				//~ if ($(this).css("background-position-y") === undefined) {
-					//~ $(this).css("background-position-y", (albumThumbnailSize * 0.05).toString() + "px");
-					//~ return;
-				//~ }
-			//~ });
-		//~ } else {
-			//~ $(".album-button").css("background-color", Options.background_color);
-			//~ $(".album-button").each(function() {
-				//~ if ($(this).css("background-position-y") === undefined) {
-					//~ $(this).css("background-position-y", "0");
-					//~ return;
-				//~ }
-			//~ });
-		//~ }
 	}
 	
 	function em2px(selector, em) {
