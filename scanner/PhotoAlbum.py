@@ -353,14 +353,14 @@ class Media(object):
 		next_level()
 		if thumbnail_size == Options.config['album_thumb_size']:
 			if Options.config['album_thumb_type'] == "square": 
-				info_string += ", square album thumbnail"
+				info_string += ", square"
 			elif Options.config['album_thumb_type'] == "fit": 
-				info_string += ", fit size album thumbnail"
+				info_string += ", fit size"
 		elif thumbnail_size == Options.config['media_thumb_size']:
 			if Options.config['media_thumb_type'] == "square": 
-				info_string += ", square thumbnail"
+				info_string += ", square"
 			elif Options.config['media_thumb_type'] == "fixed_height": 
-				info_string += ", fixed height thumbnail"
+				info_string += ", fixed height"
 		is_thumbnail = (thumbnail_size == Options.config['album_thumb_size'] or thumbnail_size == Options.config['media_thumb_size'])
 		if (
 			os.path.exists(thumb_path) and
@@ -597,7 +597,7 @@ class Media(object):
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
 		for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
-			self._thumbnail(mirror, original_path, thumbs_path, thumb_size, True)
+			self._thumbnail(mirror, original_path, thumbs_path, thumb_size)
 		try:
 			os.unlink(tfn)
 		except:

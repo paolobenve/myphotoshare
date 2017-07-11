@@ -399,7 +399,7 @@ $(document).ready(function() {
 										"title=\"" + randomPhoto.albumName.substr(7) + "\"" +
 										" src=\"" + photoFloat.photoPath(randomAlbum, randomPhoto, Options.album_thumb_size) + "\"" +
 										" style=\"width:" + thumbWidth + "px; height:" + thumbHeight + "px; " +
-											"padding-top: " + distance + "px;\"" +
+											"margin-top: " + distance + "px;\"" +
 										">"
 								theImage.html(htmlText);
 								
@@ -412,7 +412,10 @@ $(document).ready(function() {
 								
 								captionHeight = em2px("body", 3);
 								ButtonAndCaptionHeight = Options.album_thumb_size + captionHeight;
-								html = "<div class=\"album-button-and-caption\" ";
+								html = "<div class=\"album-button-and-caption";
+								if (Options.albums_slide_style)
+									html += " slide";
+								html += "\"";
 								html += "style=\"";
 								html += 	"height: " + ButtonAndCaptionHeight.toString() + "px; " +
 										"margin-right: " + Options.thumb_spacing + "px; ";

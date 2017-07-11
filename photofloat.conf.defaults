@@ -73,6 +73,13 @@ folders_string = _folders
 by_date_string = _by_date
 cache_folder_separator = -
 
+# what method will be used to generate tumbnails?
+# permitted values:
+#    cascade : the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
+#    parallel: every thumbnail is generated from the image, and the processes are launched parallely on the various cores of the cpu
+#    mixed   : the biggest thumbnail is generated from image, the following are generate in a parallel way from the biggest thumbnail
+thumbnail_generation_mode = cascade
+
 ###########################################################
 # js options
 ###########################################################
@@ -102,12 +109,8 @@ thumb_spacing = 3
 # should we show album thumbnails different from photo ones?
 different_album_thumbnails = true
 
-# what method will be used to generate tumbnails?
-# permitted values:
-#    cascade : the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
-#    parallel: every thumbnail is generated from the image, and the processes are launched parallely on the various cores of the cpu
-#    mixed   : the biggest thumbnail is generated from image, the following are generate in a parallel way from the biggest thumbnail
-thumbnail_generation_mode = cascade
+# should be used a slide-like style?
+albums_slide_style = true
 
 # will photos/videos names be shown below the thumbnail in albums?
 show_media_names_below_thumbs_in_albums = True

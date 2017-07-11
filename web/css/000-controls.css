@@ -91,9 +91,29 @@ a#day-view, a#folders-view {
 	width: 240px;
 	margin-bottom: 2em;
 }
+.album-button-and-caption.slide {
+	border: 3px solid gray;
+	border-left-color: whitesmoke;
+	border-top-color: whitesmoke;
+}
+.album-button-and-caption.slide:hover {
+	border: 3px solid gray;
+	border-right-color: whitesmoke;
+	border-bottom-color: whitesmoke;
+}
 .album-caption {
 	margin: 0 auto 0 auto;
 	height: 40px;
+}
+.album-button-and-caption.slide img {
+	border: 3px solid gray;
+	border-right-color: whitesmoke;
+	border-bottom-color: whitesmoke;
+}
+.album-button-and-caption.slide:hover  img {
+	border: 3px solid gray;
+	border-left-color: whitesmoke;
+	border-top-color: whitesmoke;
 }
 .album-button {
 	display: block;

@@ -40,6 +40,7 @@ def main():
 		if option in ('max_verbose', 'jpeg_quality', 'thumb_spacing', 'album_thumb_size', 'media_thumb_size', 'big_date_folders_threshold'):
 			Options.config[option] = usr_config.getint('options', option)
 		elif option in ('different_album_thumbnails',
+				'albums_slide_style',
 				'show_media_names_below_thumbs_in_albums',
 				'persistent_metadata',
 				'default_album_reverse_sort',
