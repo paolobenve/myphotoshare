@@ -1,4 +1,4 @@
-# photofloat v. 2.1.1
+# photofloat v. 2.2
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -24,16 +24,21 @@ It is, essentially, the slickest and fastest, most minimal but still well-featur
 
 ## Changelog
 
-Features added in version 2.2 (July 10, 2017):
+Features added in version 2.2 (July 11, 2017):
 
-* translations are now managed via a separate js file
-* separated albums and media sorting
+* translations are now managed via a separate js file: enthusiasts and followers are encouraged to provide the translation for their language 
 * better managing of errors
-* new options:
-* - album_button_canvas_background_color (for fixed heigth thumbnails)
+* separated albums and media sorting
+* - default_album_reverse_sort (boolean) set default sorting for albums
+* - default_media_reverse_sort (boolean) sets the default sorting for images/video
+* separate managing of album and media thumbnails
+* - albums thumbs can have square (classic behaviour) or fit (rectangular thumbnail) type, according to new album_thumb_type option
+* - images/video thumbs can have square (classic behaviour) or fixed height (rectangular thumbnail) type, according to new media_thumb_type option
+* more new options:
 * - big_date_folders_threshold: doesn't make thumbnails show for date albums too big
-* - default_media_reverse_sort: default sorting for media
-* - default_album_reverse_sort: default sorting for albums
+* - albums_slide_style (boolean): albums are shown in a simple way or with slide style
+* removed options:
+* - different_album_thumbnails
 
 Features added in version 2.1.1 (July 6, 2017):
 
