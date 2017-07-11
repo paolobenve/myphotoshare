@@ -39,6 +39,7 @@ Features added in version 2.2 (July 11, 2017):
 * - albums_slide_style (boolean): albums are shown in a simple way or with slide style
 * removed options:
 * - different_album_thumbnails
+* buttons appearing on mouse over are shown persistently on mobile
 
 Features added in version 2.1.1 (July 6, 2017):
 
