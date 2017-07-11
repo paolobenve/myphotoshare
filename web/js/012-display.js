@@ -410,7 +410,7 @@ $(document).ready(function() {
 								originalAlbumFoldersArray = originalAlbum.path.split("/");
 								folder = folderArray[originalAlbumFoldersArray.length];
 								
-								captionHeight = em2px("body", 3);
+								captionHeight = em2px("body", 4);
 								ButtonAndCaptionHeight = Options.album_thumb_size + captionHeight;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
