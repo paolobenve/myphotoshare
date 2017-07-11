@@ -40,6 +40,7 @@ Features added in version 2.2 (July 11, 2017):
 * removed options:
 * - different_album_thumbnails
 * buttons appearing on mouse over are shown persistently on mobile
+* landscape photos are shown vertically centered
 
 Features added in version 2.1.1 (July 6, 2017):
 
