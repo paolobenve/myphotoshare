@@ -496,7 +496,7 @@ $(document).ready(function() {
 			$(window).bind("resize", scaleImageFullscreen);
 		}
 		scaleImage($(window), image);
-		bottom = (($(window).height() - image.height()) / 2) + "px";
+		bottom = (($(window).outerHeight(true) - image.outerHeight()) / 2) + "px";
 		image.css("bottom", bottom);
 		$("#photo-bar").css("bottom", bottom);
 	}
@@ -511,8 +511,8 @@ $(document).ready(function() {
 		if (! $("#album-view").is(":visible"))
 			$("#photo-view").css("bottom", "0");
 		else
-			$("#photo-view").css("bottom", $("#album-view").height() + "px");
-		$("#photo-view").css("top", ($("#title").height() + parseInt($("#title").css("padding-top")) + parseInt($("#title").css("padding-bottom"))) + "px");
+			$("#photo-view").css("bottom", $("#album-view").outerHeight(true) + "px");
+		$("#photo-view").css("top", ($("#title").outerHeight(true)) + "px");
 		$("#photo-view").css("height", (window.innerHeight - parseInt($("#photo-view").css("top")) + $("#photo-view").css("bottom")) + "px");
 		bottom = (($("#photo-view").height() - image.height()) / 2) + "px";
 		//~ image.css("bottom", "initial");
