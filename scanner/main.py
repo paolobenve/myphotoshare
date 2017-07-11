@@ -107,13 +107,15 @@ def main():
 			old_options['jpeg_quality'] != Options.config['jpeg_quality']
 		):
 			Options.config['recreate_reduced_photos'] = True
+			Options.config['recreate_thumbnails'] = True
 	except KeyError:
-		Options.config['recreate_reduced_photos'] = False
+		Options.config['recreate_reduced_photos'] = True
+		Options.config['recreate_thumbnails'] = True
 	Options.config['recreate_thumbnails'] = False
 	try:
 		if (
-			old_options['jpeg_quality'] != Options.config['jpeg_quality'] or
 			old_options['media_thumb_type'] != Options.config['media_thumb_type'] or
+			old_options['album_thumb_type'] != Options.config['album_thumb_type'] or
 			old_options['album_button_canvas_background_color'] != Options.config['album_button_canvas_background_color']
 		):
 			Options.config['recreate_thumbnails'] = True

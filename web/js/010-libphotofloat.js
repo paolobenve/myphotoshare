@@ -182,16 +182,22 @@
 		else
 			return Options.server_cache_path + hash;
 	};
-	PhotoFloat.photoPath = function(album, photo, thumb_size, isThumbnail) {
+	PhotoFloat.photoPath = function(album, photo, thumb_size) {
 		var suffix, hash;
-		if (isThumbnail) {
-			suffix = thumb_size.toString() + "t";
+		suffix = thumb_size.toString()
+		if (thumb_size == Options.album_thumb_size) {
+			suffix += "a";
+			if (Options.album_thumb_type == "square")
+				suffix += "s";
+			else if (Options.album_thumb_type == "fit")
+				suffix += "f";
+		}
+		else if (thumb_size == Options.media_thumb_size) {
+			suffix += "t";
 			if (Options.media_thumb_type == "square")
 				suffix += "s";
 			else if (Options.media_thumb_type == "fixed_height")
 				suffix += "f";
-			else if (Options.media_thumb_type == "canvas")
-				suffix += "c";
 		}
 		else
 			suffix = thumb_size.toString();

@@ -88,24 +88,26 @@ a#day-view, a#folders-view {
 .album-button-and-caption {
 	float: left;
 	height: 200px;
-	width: 180px;
+	width: 240px;
 	margin-bottom: 2em;
 }
 .album-caption {
 	margin: 0 auto 0 auto;
+	height: 40px;
 }
 .album-button {
 	display: block;
-	height: 40px;
+	height: 200px;
 	text-align: center;
 	font-style: italic;
 	font-size: 90%;
-	background-repeat: no-repeat;
+/*
 	background-position-x: center;
 	background-position-y: 0;
 	background-image: url(../img/image-placeholder.png);
-	background-color: #222222;
 	background-repeat: no-repeat;
+*/
+	background-color: inherit;
 	margin: 0 auto 3px auto;
 	line-height: 1.1em
 }

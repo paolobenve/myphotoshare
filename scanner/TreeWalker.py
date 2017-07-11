@@ -226,7 +226,7 @@ class TreeWalker:
 		deletable_files_suffixes_re ="\.json$"
 		deletable_files_suffixes_re += "|_transcoded\.mp4$"
 		# reduced sizes, thumbnails, old style thumbnails
-		deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(t[sfc]|s)?\.jpg$"
+		deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(s|[at][sf])?\.jpg$"
 		next_level()
 		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):

@@ -52,17 +52,20 @@ reduced_sizes = [1600, 1200, 800]
 
 # The sizes for the thumbnails to use for albums
 album_thumb_size = 200
-# The sizes for the thumbnails for images/videos
-media_thumb_size = 110
 
-# How should we generate the media thumbnail?
+# How should we generate the album thumbnails?
+# permitted values:
+#    square	: photofloat's classical cropped square thumbnail
+#    fit	: rectangular thumbnail fitting in the given size
+album_thumb_type = fit
+
+# The sizes for the thumbnails for images/videos
+media_thumb_size = 150
+
+# How should we generate the media thumbnails?
 # permitted values:
 #    square		: photofloat's classical thumbnail
-#    fixed_height	: the size determines the height, the width will depend on orientation
-#    canvas		: square thumbnail containing the whole image
-# fixed_height: TOO MANY PROBLEMS WITH VISUALIZING THEM
-#   many css values should be decided according to actual thumbnail width
-# 
+#    fixed_height	: whole image, the size determines the height, the width will depend on orientation
 media_thumb_type = fixed_height
 
 # strings used internally, do not change them unless you know what you are doing
