@@ -233,8 +233,11 @@ a#day-view, a#folders-view {
 	width: 100%;
 	text-align: center;
 }
-#fullscreen, #fullscreen-divider {
+#exit-fullscreen {
 	display: none;
+}
+#fullscreen, #enter-fullscreen, #fullscreen-divider {
+	display: inline;
 }
 #album-view.photo-view-container {
 	position: absolute;

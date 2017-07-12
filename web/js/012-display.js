@@ -988,8 +988,8 @@ $(document).ready(function() {
 			$("#photo-box").fullScreen({callback: function(isFullscreen) {
 				maxSizeSet = false;
 				fullScreenStatus = isFullscreen;
-				$("#fullscreen").toggle();
-				$("#fullscreen-divider").toggle();
+				$("#enter-fullscreen").toggle();
+				$("#exit-fullscreen").toggle();
 				showMedia(currentAlbum);
 			}});
 		});
