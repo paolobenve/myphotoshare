@@ -862,8 +862,10 @@ $(document).ready(function() {
 			setTitle();
 		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1)
 		{
-			currentMedia = currentAlbum.photos[0];
-			currentMediaIndex = 1;
+			if (currentMedia === null) {
+				currentMedia = currentAlbum.photos[0];
+				currentMediaIndex = 1;
+			}
 			showMedia(currentAlbum);
 		}
 		else {
