@@ -860,8 +860,12 @@ $(document).ready(function() {
 		
 		if (currentMedia === null || typeof currentMedia === "object")
 			setTitle();
-		if (currentMedia !== null)
+		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1)
+		{
+			currentMedia = currentAlbum.photos[0];
+			currentMediaIndex = 1;
 			showMedia(currentAlbum);
+		}
 		else {
 			$("#folders-view-container").hide();
 			$("#day-view-container").hide();
