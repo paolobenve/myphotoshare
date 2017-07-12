@@ -690,10 +690,10 @@ $(document).ready(function() {
 			}
 			$("head").append("<link rel=\"video_src\" href=\"" + videoSrc + "\" />");
 			$("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
-			//~ if (fullScreenStatus)
-				//~ $("#photo-view").load(scaleVideoFullscreen);
-			//~ else
-				//~ $("#photo-view").load(scaleVideoNormal);
+			if (fullScreenStatus)
+				$("#photo-view").load(scaleVideoFullscreen);
+			else
+				$("#photo-view").load(scaleVideoNormal);
 			$("#photo-box").hide();
 			$("#video-box").show();
 		} else {
