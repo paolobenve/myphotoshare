@@ -615,10 +615,10 @@ $(document).ready(function() {
 			$("#video-box").show();
 		} else {
 			if (width > height) {
-				height = height / width * maxSize;
+				height = Math.round(height * maxSize / width);
 				width = maxSize;
 			} else {
-				width = width / height * maxSize;
+				width = Math.round(width * maxSize / height);
 				height = maxSize;
 			}
 			$(window).unbind("resize", scaleVideo);

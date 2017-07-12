@@ -17,10 +17,10 @@ import Options
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
-	# self._photo_thumbnail is not defined at the top level, it's not pickable.
+	# self._thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self._photo_thumbnail(image, original_path, thumbs_path, thumb_size)
+		self._thumbnail(image, original_path, thumbs_path, thumb_size)
 	except KeyboardInterrupt:
 		raise
 
@@ -156,6 +156,7 @@ class Media(object):
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
 		self.is_valid = True
 		image = None
+		self.last_thumbnail_was_canvas = False
 		try:
 			mtime = file_mtime(media_path)
 		except KeyboardInterrupt:
@@ -317,36 +318,6 @@ class Media(object):
 				if original:
 					self._attributes["originalSize"] = (int(s["width"]), int(s["height"]))
 				break
-	
-	
-	def _photo_thumbnail(self, image, original_path, thumbs_path, thumbnail_size):
-		mirror = image
-		if self._orientation == 2:
-			# Vertical Mirror
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
-		elif self._orientation == 3:
-			# Rotation 180
-			mirror = image.transpose(Image.ROTATE_180)
-		elif self._orientation == 4:
-			# Horizontal Mirror
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
-		elif self._orientation == 5:
-			# Horizontal Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
-		elif self._orientation == 6:
-			# Rotation 270
-			mirror = image.transpose(Image.ROTATE_270)
-		elif self._orientation == 7:
-			# Vertical Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
-		elif self._orientation == 8:
-			# Rotation 90
-			mirror = image.transpose(Image.ROTATE_90)
-
-		image = mirror
-		thumb = self._thumbnail(image, original_path, thumbs_path, thumbnail_size)
-		return thumb
-
 	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size):
 		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size))
 		info_string = str(thumbnail_size)
@@ -389,32 +360,48 @@ class Media(object):
 				raise
 		image_width = image.size[0]
 		image_heigth = image.size[1]
-		if is_thumbnail and Options.config['media_thumb_type'] == "square":
-			if image_width > image_copy.size[1]:
+		if (
+			thumbnail_size == Options.config['album_thumb_size'] and Options.config['album_thumb_type'] == "square" or
+			thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "square"
+		):
+			if image_width > image_heigth:
 				left = (image_width - image_heigth) / 2
 				top = 0
-				right = image_width - ((image_width - image_heigth) / 2)
+				right = image_width - left
 				bottom = image_heigth
 			else:
 				left = 0
 				top = (image_heigth - image_width) / 2
 				right = image_width
-				bottom = image_heigth - ((image_heigth - image_width) / 2)
+				bottom = image_heigth - top
 			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
-		image_size = max(image_width, image_heigth)
+			thumbnail_width = thumbnail_size
+			thumbnail_heigth = thumbnail_size
+		else:
+			if image_width > image_heigth:
+				thumbnail_width = thumbnail_size
+				thumbnail_heigth = round(thumbnail_size * image_heigth / float(image_width))
+			else:
+				thumbnail_width = round(thumbnail_size * image_width / float(image_heigth))
+				thumbnail_heigth = thumbnail_size
 		original_thumbnail_size = thumbnail_size
 		if (
 			original_thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "fixed_height" and
 			image_width > image_heigth
 		):
-			thumbnail_size = int(round(float(original_thumbnail_size * image_width) / float(image_heigth)))
-		if (image_size >= thumbnail_size):
+			thumbnail_size = round(original_thumbnail_size * image_width / float(image_heigth))
+			thumbnail_width = round(thumbnail_size * image_width / float(image_heigth))
+			thumbnail_heigth = thumbnail_size
+		if (image_width >= thumbnail_width and image_heigth > thumbnail_heigth):
+			# both width and height of thumbnail are less then width and height of image, no blurring can happen
 			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
+			self.last_thumbnail_was_canvas = False
 		elif not is_thumbnail:
-			# we can arrive here:
-			# - if the start image is not quite big => make the square canvas
+			# we arrive here when at least one size the start image is less than the corresponding thumbnail size => make the canvas
 			image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['background_color'])
+			# don't start from a canvas for next thumbnail
+			self.last_thumbnail_was_canvas = True
 		try:
 			image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			if original_thumbnail_size > Options.config['album_thumb_size']:
@@ -503,45 +490,72 @@ class Media(object):
 					image_to_start_from = image
 				else:
 					image_to_start_from = thumb
-				thumb = self._photo_thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size)
+				thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size)
 				self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
 			except KeyboardInterrupt:
 				raise
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
+		self.last_thumbnail_was_canvas = False
 		thumb = image
+		image_width = image.size[0]
+		image_heigth = image.size[1]
 		try:
 			for thumb_size in Options.config['reduced_sizes']:
 				try:
-					if (max(image.size[0], image.size[1]) < thumb_size):
+					if (min(image_width, image_heigth) < thumb_size or self.last_thumbnail_was_canvas):
 						image_to_start_from = image
 					else:
 						image_to_start_from = thumb
-					thumb = self._photo_thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size)
+					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size)
 				except KeyboardInterrupt:
 					raise
 			for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
 				try:
-					image_width = image.size[0]
-					image_heigth = image.size[1]
 					if (
-						thumb_size == Options.config['media_thumb_size'] and
-						Options.config['media_thumb_type'] == "fixed_height" and
-						(
-							Options.config['album_thumb_type'] == "square" or
-							image_width > image_heigth and thumb_size * image_width / image_heigth > Options.config['album_thumb_size']
-						)
+						thumb_size == Options.config['media_thumb_size'] and (
+							Options.config['media_thumb_type'] == "fixed_height" and (
+								Options.config['album_thumb_type'] == "square" or
+								image_width > image_heigth and thumb_size * image_width / float(image_heigth) > Options.config['album_thumb_size']
+							) 
+						) or Options.config['album_thumb_type'] == "square" and 
+							image_width > image_heigth and thumb_size * image_width / float(image_heigth) > Options.config['album_thumb_size']
 					):
 						# if album thumbnail was square, and media thumbnail fixed height, or with portrait images,
 						# a wider image than the previous thumbnail could be generated, better start from original image
 						thumb = image
-					thumb = self._photo_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
+					thumb = self._thumbnail(thumb, photo_path, thumbs_path, thumb_size)
 				except KeyboardInterrupt:
 					raise
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
+		# give image the correct orientation
+		mirror = image
+		if self._orientation == 2:
+			# Vertical Mirror
+			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
+		elif self._orientation == 3:
+			# Rotation 180
+			mirror = image.transpose(Image.ROTATE_180)
+		elif self._orientation == 4:
+			# Horizontal Mirror
+			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
+		elif self._orientation == 5:
+			# Horizontal Mirror + Rotation 270
+			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
+		elif self._orientation == 6:
+			# Rotation 270
+			mirror = image.transpose(Image.ROTATE_270)
+		elif self._orientation == 7:
+			# Vertical Mirror + Rotation 270
+			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
+		elif self._orientation == 8:
+			# Rotation 90
+			mirror = image.transpose(Image.ROTATE_90)
+		image = mirror
+		
 		if (Options.config['thumbnail_generation_mode'] == "parallel"):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
 		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
@@ -692,7 +706,7 @@ class Media(object):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
-				caches.append(path_with_subdir(self.media_file_name, thumb_size, True))
+				caches.append(path_with_subdir(self.media_file_name, thumb_size))
 			caches.append(video_cache_with_subdir(self.media_file_name))
 		else:
 			caches = []

@@ -149,9 +149,9 @@ class TreeWalker:
 						else:
 							# image
 							for thumb_size in Options.config['reduced_sizes']:
-								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size, False)))
+								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size)))
 							for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
-								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size, False)))
+								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry, thumb_size)))
 						# at this point we have full path to cache image/video
 						# check if it actually exists
 						cache_hit = True
@@ -242,20 +242,21 @@ class TreeWalker:
 				# only delete json's, transcoded videos, reduced images and thumbnails
 				found = False
 				match = re.search(deletable_files_suffixes_re, cache)
-				if not match:
+				if match:
+					try:
+						cache = cache.decode(sys.getfilesystemencoding())
+					except KeyboardInterrupt:
+						raise
+					except:
+						pass
+					if cache_with_subdir not in all_cache_entries:
+						message("cleanup", cache_with_subdir)
+						file_to_delete = os.path.join(self.cache_path, cache_with_subdir)
+						os.unlink(os.path.join(self.cache_path, file_to_delete))
+				else:
 					message("not deleting", cache_with_subdir)
 					continue
 				
-				try:
-					cache = cache.decode(sys.getfilesystemencoding())
-				except KeyboardInterrupt:
-					raise
-				except:
-					pass
-				if cache_with_subdir not in all_cache_entries:
-					message("cleanup", cache_with_subdir)
-					file_to_delete = os.path.join(self.cache_path, cache_with_subdir)
-					os.unlink(os.path.join(self.cache_path, file_to_delete))
 		if not subdir:
 			back_level()
 		back_level()
