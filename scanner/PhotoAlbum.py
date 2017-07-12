@@ -318,123 +318,6 @@ class Media(object):
 				if original:
 					self._attributes["originalSize"] = (int(s["width"]), int(s["height"]))
 				break
-	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size):
-		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size))
-		info_string = str(thumbnail_size)
-		next_level()
-		if thumbnail_size == Options.config['album_thumb_size']:
-			if Options.config['album_thumb_type'] == "square": 
-				info_string += ", square"
-			elif Options.config['album_thumb_type'] == "fit": 
-				info_string += ", fit size"
-		elif thumbnail_size == Options.config['media_thumb_size']:
-			if Options.config['media_thumb_type'] == "square": 
-				info_string += ", square"
-			elif Options.config['media_thumb_type'] == "fixed_height": 
-				info_string += ", fixed height"
-		is_thumbnail = (thumbnail_size == Options.config['album_thumb_size'] or thumbnail_size == Options.config['media_thumb_size'])
-		if (
-			os.path.exists(thumb_path) and
-			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
-				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
-				is_thumbnail and not Options.config['recreate_thumbnails']
-			)
-		):
-			if thumbnail_size == Options.config['album_thumb_size']:
-				message("existing album thumbnail", info_string)
-			elif thumbnail_size == Options.config['media_thumb_size']:
-				message("existing thumbnail", info_string)
-			else:
-				message("existing reduced size", info_string)
-			back_level()
-			return image
-		gc.collect()
-		try:
-			image_copy = image.copy()
-		except KeyboardInterrupt:
-			raise
-		except:
-			try:
-				image_copy = image.copy() # we try again to work around PIL bug
-			except KeyboardInterrupt:
-				raise
-		image_width = image.size[0]
-		image_heigth = image.size[1]
-		if (
-			thumbnail_size == Options.config['album_thumb_size'] and Options.config['album_thumb_type'] == "square" or
-			thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "square"
-		):
-			if image_width > image_heigth:
-				left = (image_width - image_heigth) / 2
-				top = 0
-				right = image_width - left
-				bottom = image_heigth
-			else:
-				left = 0
-				top = (image_heigth - image_width) / 2
-				right = image_width
-				bottom = image_heigth - top
-			image_copy = image_copy.crop((left, top, right, bottom))
-			gc.collect()
-			thumbnail_width = thumbnail_size
-			thumbnail_heigth = thumbnail_size
-		else:
-			if image_width > image_heigth:
-				thumbnail_width = thumbnail_size
-				thumbnail_heigth = round(thumbnail_size * image_heigth / float(image_width))
-			else:
-				thumbnail_width = round(thumbnail_size * image_width / float(image_heigth))
-				thumbnail_heigth = thumbnail_size
-		original_thumbnail_size = thumbnail_size
-		if (
-			original_thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "fixed_height" and
-			image_width > image_heigth
-		):
-			thumbnail_size = round(original_thumbnail_size * image_width / float(image_heigth))
-			thumbnail_width = round(thumbnail_size * image_width / float(image_heigth))
-			thumbnail_heigth = thumbnail_size
-		if (image_width >= thumbnail_width and image_heigth > thumbnail_heigth):
-			# both width and height of thumbnail are less then width and height of image, no blurring can happen
-			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
-			self.last_thumbnail_was_canvas = False
-		elif not is_thumbnail:
-			# we arrive here when at least one size the start image is less than the corresponding thumbnail size => make the canvas
-			image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['background_color'])
-			# don't start from a canvas for next thumbnail
-			self.last_thumbnail_was_canvas = True
-		try:
-			image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			if original_thumbnail_size > Options.config['album_thumb_size']:
-				message("reduced size image", info_string)
-			elif original_thumbnail_size == Options.config['album_thumb_size']:
-				message("thumbing for albums", info_string)
-			else:
-				message("thumbing for media", info_string)
-			back_level()
-			return image_copy
-		except KeyboardInterrupt:
-			try:
-				os.unlink(thumb_path)
-			except:
-				pass
-			raise
-		except IOError:
-			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			next_level(1)
-			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
-			back_level(1)
-			back_level()
-			return image_copy
-		except:
-			next_level()
-			message(str(thumbnail_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
-			back_level()
-			try:
-				os.unlink(thumb_path)
-			except:
-				pass
-			back_level()
-			return image
 	def resize_canvas(self, image, canvas_max_size, background_color, square_thumbnail = True):
 		old_width, old_height = image.size
 		if (square_thumbnail):
@@ -455,6 +338,38 @@ class Media(object):
 		newImage = Image.new(mode, (canvas_width, canvas_height), background_color)
 		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
 		return newImage
+	def _photo_thumbnails(self, image, photo_path, thumbs_path):
+		# give image the correct orientation
+		mirror = image
+		if self._orientation == 2:
+			# Vertical Mirror
+			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
+		elif self._orientation == 3:
+			# Rotation 180
+			mirror = image.transpose(Image.ROTATE_180)
+		elif self._orientation == 4:
+			# Horizontal Mirror
+			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
+		elif self._orientation == 5:
+			# Horizontal Mirror + Rotation 270
+			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
+		elif self._orientation == 6:
+			# Rotation 270
+			mirror = image.transpose(Image.ROTATE_270)
+		elif self._orientation == 7:
+			# Vertical Mirror + Rotation 270
+			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
+		elif self._orientation == 8:
+			# Rotation 90
+			mirror = image.transpose(Image.ROTATE_90)
+		image = mirror
+		
+		if (Options.config['thumbnail_generation_mode'] == "parallel"):
+			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
+		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
+			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
+		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
+			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 	def _photo_thumbnails_parallel(self, image, photo_path, thumbs_path):
 		try:
 			# get number of cores on the system, and use all minus one
@@ -530,38 +445,123 @@ class Media(object):
 					raise
 		except KeyboardInterrupt:
 			raise
-	def _photo_thumbnails(self, image, photo_path, thumbs_path):
-		# give image the correct orientation
-		mirror = image
-		if self._orientation == 2:
-			# Vertical Mirror
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
-		elif self._orientation == 3:
-			# Rotation 180
-			mirror = image.transpose(Image.ROTATE_180)
-		elif self._orientation == 4:
-			# Horizontal Mirror
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
-		elif self._orientation == 5:
-			# Horizontal Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
-		elif self._orientation == 6:
-			# Rotation 270
-			mirror = image.transpose(Image.ROTATE_270)
-		elif self._orientation == 7:
-			# Vertical Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
-		elif self._orientation == 8:
-			# Rotation 90
-			mirror = image.transpose(Image.ROTATE_90)
-		image = mirror
-		
-		if (Options.config['thumbnail_generation_mode'] == "parallel"):
-			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
-		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
-			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
-		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
-			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
+	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size):
+		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size))
+		info_string = str(thumbnail_size)
+		original_thumbnail_size = thumbnail_size
+		next_level()
+		if thumbnail_size == Options.config['album_thumb_size']:
+			if Options.config['album_thumb_type'] == "square": 
+				info_string += ", square"
+			elif Options.config['album_thumb_type'] == "fit": 
+				info_string += ", fit size"
+		elif thumbnail_size == Options.config['media_thumb_size']:
+			if Options.config['media_thumb_type'] == "square": 
+				info_string += ", square"
+			elif Options.config['media_thumb_type'] == "fixed_height": 
+				info_string += ", fixed height"
+		is_thumbnail = (thumbnail_size == Options.config['album_thumb_size'] or thumbnail_size == Options.config['media_thumb_size'])
+		if (
+			os.path.exists(thumb_path) and
+			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
+				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
+				is_thumbnail and not Options.config['recreate_thumbnails']
+			)
+		):
+			if original_thumbnail_size == Options.config['album_thumb_size']:
+				message("existing album thumbnail", info_string)
+			elif original_thumbnail_size == Options.config['media_thumb_size']:
+				message("existing thumbnail", info_string)
+			else:
+				message("existing reduced size", info_string)
+			back_level()
+			return image
+		gc.collect()
+		try:
+			image_copy = image.copy()
+		except KeyboardInterrupt:
+			raise
+		except:
+			try:
+				image_copy = image.copy() # we try again to work around PIL bug
+			except KeyboardInterrupt:
+				raise
+		image_width = image.size[0]
+		image_heigth = image.size[1]
+		if (
+			thumbnail_size == Options.config['album_thumb_size'] and Options.config['album_thumb_type'] == "square" or
+			thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "square"
+		):
+			if image_width > image_heigth:
+				left = (image_width - image_heigth) / 2
+				top = 0
+				right = image_width - left
+				bottom = image_heigth
+			else:
+				left = 0
+				top = (image_heigth - image_width) / 2
+				right = image_width
+				bottom = image_heigth - top
+			image_copy = image_copy.crop((left, top, right, bottom))
+			gc.collect()
+			thumbnail_width = thumbnail_size
+			thumbnail_heigth = thumbnail_size
+		else:
+			if image_width > image_heigth:
+				thumbnail_width = thumbnail_size
+				thumbnail_heigth = round(thumbnail_size * image_heigth / float(image_width))
+			else:
+				thumbnail_width = round(thumbnail_size * image_width / float(image_heigth))
+				thumbnail_heigth = thumbnail_size
+		if (
+			original_thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "fixed_height" and
+			image_width > image_heigth
+		):
+			thumbnail_size = round(original_thumbnail_size * image_width / float(image_heigth))
+			thumbnail_width = round(thumbnail_size * image_width / float(image_heigth))
+			thumbnail_heigth = thumbnail_size
+		if (image_width >= thumbnail_width and image_heigth > thumbnail_heigth):
+			# both width and height of thumbnail are less then width and height of image, no blurring can happen
+			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
+			self.last_thumbnail_was_canvas = False
+		elif not is_thumbnail:
+			# we arrive here when at least one size the start image is less than the corresponding thumbnail size => make the canvas
+			image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['background_color'])
+			# don't start from a canvas for next thumbnail
+			self.last_thumbnail_was_canvas = True
+		try:
+			image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			if original_thumbnail_size > Options.config['album_thumb_size']:
+				message("reduced size image", info_string)
+			elif original_thumbnail_size == Options.config['album_thumb_size']:
+				message("thumbing for albums", info_string)
+			else:
+				message("thumbing for media", info_string)
+			back_level()
+			return image_copy
+		except KeyboardInterrupt:
+			try:
+				os.unlink(thumb_path)
+			except:
+				pass
+			raise
+		except IOError:
+			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			next_level(1)
+			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
+			back_level(1)
+			back_level()
+			return image_copy
+		except:
+			next_level()
+			message(str(thumbnail_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
+			back_level()
+			try:
+				os.unlink(thumb_path)
+			except:
+				pass
+			back_level()
+			return image
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(
