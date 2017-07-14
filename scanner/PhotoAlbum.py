@@ -526,7 +526,7 @@ class Media(object):
 			self.last_thumbnail_was_canvas = False
 		elif not is_thumbnail:
 			# we arrive here when at least one size the start image is less than the corresponding thumbnail size => make the canvas
-			image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['background_color'])
+			image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['background_color'], False)
 			# don't start from a canvas for next thumbnail
 			self.last_thumbnail_was_canvas = True
 		try:

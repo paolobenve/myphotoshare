@@ -233,10 +233,10 @@ a#day-view, a#folders-view {
 	width: 100%;
 	text-align: center;
 }
-#exit-fullscreen {
+#fullscreen, #exit-fullscreen {
 	display: none;
 }
-#fullscreen, #enter-fullscreen, #fullscreen-divider {
+#enter-fullscreen, #fullscreen-divider {
 	display: inline;
 }
 #album-view.photo-view-container {

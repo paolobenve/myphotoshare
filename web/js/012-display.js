@@ -39,7 +39,7 @@ $(document).ready(function() {
 		if (Options.language && translations[Options.language] !== undefined)
 			language = Options.language;
 		else {
-			var userLang = navigator.language || navigator.userLanguage;
+			var userLang = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage;
 			language = userLang.split('-')[0];
 		}
 		return language;
@@ -64,7 +64,6 @@ $(document).ready(function() {
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i, dateTitle;
 		var originalTitle = Options.page_title;
-		translate();
 		
 		if (! PhotoFloat.firstAlbumPopulation || getBooleanCookie("albumReverseSortRequested") || getBooleanCookie("mediaReverseSortRequested")) {
 			if (PhotoFloat.firstAlbumPopulation)
@@ -489,52 +488,60 @@ $(document).ready(function() {
 		return (fraction[0] / fraction[1]).toString();
 	}
 	function scaleImageFullscreen() {
-		var image, bottom;
+		var image, bottom, container;
 		image = $("#photo");
 		if (image.get(0) === this) {
+			$(window).unbind("resize", scaleVideo);
 			$(window).unbind("resize", scaleImageNormal);
 			$(window).bind("resize", scaleImageFullscreen);
 		}
-		scaleImage($(window), image);
-		bottom = (($(window).outerHeight(true) - image.outerHeight()) / 2) + "px";
-		image.css("bottom", bottom);
+		
+		$("#photo-view").css("top", "0");
+		$("#photo-view").css("height", "100%");
+		$("#photo-view").css("bottom", 0);
+		container = $(window);
+		if (image.css("width") !== "100%" && image.attr("ratio") > container.width() / container.height()) {
+			image.css("width", "100%").css("height", "auto");
+			bottom = ((container.height() - image.height()) / 2).toString() + "px";
+		}
+		else if (image.css("height") !== "100%") {
+			bottom = "0";
+			image.css("height", "100%").css("width", "auto");
+		}
+		image.css("position", "absolute").css("bottom", bottom);
+		
 		$("#photo-bar").css("bottom", bottom);
 	}
 	function scaleImageNormal() {
-		var image, bottom;
+		var image, imageBottom, container, containerHeight;
 		image = $("#photo");
 		if (image.get(0) === this) {
-			$(window).unbind("resize", scaleImageFullscreen);
+			$(window).unbind("resize", scaleVideo);
 			$(window).bind("resize", scaleImageNormal);
+			$(window).unbind("resize", scaleImageFullscreen);
 		}
-		scaleImage($("#photo-view"), image);
+		container = $("#photo-view");
+		container.css("height", "");
+		containerHeight = (window.innerHeight - $("#album-view").outerHeight(true)) - $("#title").outerHeight(true);
+		if (image.css("width") !== "100%" && image.attr("ratio") > container.width() / container.height()) {
+			imageBottom = ((containerHeight - image.height()) / 2) + "px";
+			image.css("width", "100%").css("height", "auto").css("bottom", imageBottom);
+			$("#photo-bar").css("bottom", imageBottom);
+		}
+		else if (image.css("height") !== "100%") {
+			image.css("height", "100%").css("width", "auto").css("bottom", 0);
+			$("#photo-bar").css("bottom", 0);
+		}
 		if (! $("#album-view").is(":visible"))
-			$("#photo-view").css("bottom", "0");
+			container.css("bottom", "0");
 		else
-			$("#photo-view").css("bottom", $("#album-view").outerHeight(true) + "px");
-		$("#photo-view").css("top", ($("#title").outerHeight(true)) + "px");
-		$("#photo-view").css("height", (window.innerHeight - parseInt($("#photo-view").css("top")) + $("#photo-view").css("bottom")) + "px");
-		bottom = (($("#photo-view").height() - image.height()) / 2) + "px";
-		//~ image.css("bottom", "initial");
-		$("#photo").css("bottom", bottom);
-		$("#photo-bar").css("bottom", bottom);
+			container.css("bottom", $("#album-view").outerHeight(true) + "px");
+		container.css("top", ($("#title").outerHeight(true)) + "px");
 		$("#title").width($(window).width() - $("#buttons-container").width());
 	}
-	function scaleImage(container, image) {
-		if (image.css("width") !== "100%" && container.height() * image.attr("ratio") > container.width())
-			image.css("width", "100%").css("height", "auto")
-				.css("position", "absolute")
-				.css("bottom", 0)
-				;
-		else if (image.css("height") !== "100%")
-			image.css("height", "100%").css("width", "auto")
-			.css("position", 0)
-			.css("bottom", 0)
-			;
-	}
 	function scaleVideo() {
-		var video, container;
-		video = $("#video");
+ 		var video, container;
+ 		video = $("#video");
 		if (video.get(0) === this)
 			$(window).bind("resize", scaleVideo);
 		container = $("#photo-view");
@@ -542,10 +549,8 @@ $(document).ready(function() {
 			video.css("width", container.width()).css("height", container.width() / video.attr("ratio")).parent().css("height", container.width() / video.attr("ratio")).css("margin-top", - container.width() / video.attr("ratio") / 2).css("top", "50%");
 		else if (video.attr("height") > container.height() && container.height() * video.attr("ratio") < container.width())
 			video.css("height", container.height()).css("width", container.height() * video.attr("ratio")).parent().css("height", "100%").css("margin-top", "0").css("top", "0");
-		else
-			video.css("height", "").css("width", "").parent().css("height", video.attr("height")).css("margin-top", - video.attr("height") / 2).css("top", "50%");
-		$("#title").width($(window).width() - $("#buttons-container").width());
-	}
+ 		$("#title").width($(window).width() - $("#buttons-container").width());
+ 	}
 	function showMedia(album) {
 		var width, height, photoSrc, videoSrc, previousMedia, nextMedia, nextLink, text, mediaOrientation, thumbnailSize, j;
 		var maxSize, maxSizeSet, mediaMaxSize, mediaMinSize, imageRatio, windowMaxSize, windowMinSize, reducedMinSize, reducedMaxSize;
@@ -599,18 +604,35 @@ $(document).ready(function() {
 			else if (! Modernizr.video.h264) {
 				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the H.264 video format!</p></div>').appendTo('#video-box-inner');
 			} else {
-				$(window).unbind("resize", scaleVideo);
-				$(window).unbind("resize", scaleImageNormal);
-				$(window).unbind("resize", scaleImageFullscreen);
-				videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
+				if (fullScreenStatus) {
+					//~ $(window).unbind("resize", scaleVideoNormal);
+					$(window).bind("resize", scaleVideo);
+					$(window).unbind("resize", scaleImageNormal);
+					$(window).unbind("resize", scaleImageFullscreen);
+				} else {
+					$(window).bind("resize", scaleVideo);
+					//~ $(window).unbind("resize", scaleVideoFullscreen);
+					$(window).unbind("resize", scaleImageNormal);
+					$(window).unbind("resize", scaleImageFullscreen);
+				}
+				if (fullScreenStatus) {
+					videoSrc = currentMedia.albumName;
+				} else {
+					videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
+				}
 				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
 					.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
 					.attr("src", videoSrc)
 					.attr("alt", currentMedia.name)
-					.on('loadstart', scaleVideo);
+					//~ .on('loadstart', scaleVideo);
+					;
 			}
 			$("head").append("<link rel=\"video_src\" href=\"" + videoSrc + "\" />");
 			$("#video-box-inner").css('height', height + 'px').css('margin-top', - height / 2);
+			if (true || fullScreenStatus)
+				$("#photo-view").load(scaleVideo);
+			else
+				$("#photo-view").load(scaleVideoNormal);
 			$("#photo-box").hide();
 			$("#video-box").show();
 		} else {
@@ -621,8 +643,17 @@ $(document).ready(function() {
 				width = Math.round(width * maxSize / height);
 				height = maxSize;
 			}
-			$(window).unbind("resize", scaleVideo);
-			$(window).unbind("resize", scaleImageNormal);
+			if (fullScreenStatus) {
+				$(window).unbind("resize", scaleVideo);
+				//~ $(window).unbind("resize", scaleVideoFullscreen);
+				$(window).unbind("resize", scaleImageNormal);
+				$(window).bind("resize", scaleImageFullscreen);
+			} else {
+				$(window).unbind("resize", scaleVideo);
+				//~ $(window).unbind("resize", scaleVideoFullscreen);
+				$(window).bind("resize", scaleImageNormal);
+				$(window).unbind("resize", scaleImageFullscreen);
+			}
 			photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, maxSize);
 			$("#photo")
 				.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
@@ -901,6 +932,7 @@ $(document).ready(function() {
 						Options.server_cache_path += "/";
 					if (Options.server_album_path && Options.server_album_path.substr(-1) != "/")
 						Options.server_album_path += "/";
+					translate();
 					
 					if (getBooleanCookie("albumReverseSortRequested") === null)
 						setBooleanCookie("albumReverseSortRequested", Options.default_album_reverse_sort);
@@ -976,10 +1008,10 @@ $(document).ready(function() {
 		return true;
 	});
 	
-	$("#photo-box").mouseenter(function() {
+	$("#photo-view").mouseenter(function() {
 		$("#photo-links").stop().fadeTo("slow", 0.50).css("display", "inline");
 	});
-	$("#photo-box").mouseleave(function() {
+	$("#photo-view").mouseleave(function() {
 		$("#photo-links").stop().fadeOut("slow");
 	});
 	$("#next, #back").mouseenter(function() {
@@ -989,9 +1021,38 @@ $(document).ready(function() {
 		$(this).stop().fadeTo("slow", 0.35);
 	});
 	if ($.support.fullscreen) {
-		$("#fullscreen-divider").show();
-		$("#fullscreen").show().click(function() {
-			$("#photo-box").fullScreen({callback: function(isFullscreen) {
+		$("#fullscreen").show();
+		$("#fullscreen").click(function(e) {
+			e.preventDefault();
+			$("#photo-view").fullScreen({callback: function(isFullscreen) {
+				if (isFullscreen) {
+					$("#photo-view").css("position", "initial");
+					if (currentMedia.mediaType == "video") {
+						//~ $(window).unbind("resize", scaleVideoNormal);
+						//~ $(window).bind("resize", scaleVideoFullscreen);
+						$(window).unbind("resize", scaleImageNormal);
+						$(window).unbind("resize", scaleImageFullscreen);
+					} else {
+						//~ $(window).unbind("resize", scaleVideoNormal);
+						//~ $(window).unbind("resize", scaleVideoFullscreen);
+						$(window).unbind("resize", scaleImageNormal);
+						$(window).bind("resize", scaleImageFullscreen);
+					}
+				}
+				else {
+					$("#photo-view").css("position", "absolute");
+					if (currentMedia.mediaType == "video") {
+						$(window).bind("resize", scaleVideo);
+						//~ $(window).unbind("resize", scaleVideoFullscreen);
+						$(window).unbind("resize", scaleImageNormal);
+						$(window).unbind("resize", scaleImageFullscreen);
+					} else {
+						$(window).unbind("resize", scaleVideo);
+						//~ $(window).unbind("resize", scaleVideoFullscreen);
+						$(window).bind("resize", scaleImageNormal);
+						$(window).unbind("resize", scaleImageFullscreen);
+					}
+				}
 				maxSizeSet = false;
 				fullScreenStatus = isFullscreen;
 				$("#enter-fullscreen").toggle();
