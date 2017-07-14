@@ -1,5 +1,5 @@
 @media (max-height: 700px) {
-	#photo-view {
+	#media-view {
 		top: 0;
 		bottom: 0;
 		margin: 0;
@@ -16,7 +16,7 @@
 		padding: 0 .5em;
 		display: inline !important;
 	}
-	#photo-links {
+	.links {
 		display: inline !important;
 		opacity: 0.5;
 	}

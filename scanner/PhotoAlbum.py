@@ -415,11 +415,11 @@ class Media(object):
 		self.last_thumbnail_was_canvas = False
 		thumb = image
 		image_width = image.size[0]
-		image_heigth = image.size[1]
+		image_height = image.size[1]
 		try:
 			for thumb_size in Options.config['reduced_sizes']:
 				try:
-					if (min(image_width, image_heigth) < thumb_size or self.last_thumbnail_was_canvas):
+					if (min(image_width, image_height) < thumb_size or self.last_thumbnail_was_canvas):
 						image_to_start_from = image
 					else:
 						image_to_start_from = thumb
@@ -432,10 +432,10 @@ class Media(object):
 						thumb_size == Options.config['media_thumb_size'] and (
 							Options.config['media_thumb_type'] == "fixed_height" and (
 								Options.config['album_thumb_type'] == "square" or
-								image_width > image_heigth and thumb_size * image_width / float(image_heigth) > Options.config['album_thumb_size']
+								image_width > image_height and thumb_size * image_width / float(image_height) > Options.config['album_thumb_size']
 							) 
 						) or Options.config['album_thumb_type'] == "square" and 
-							image_width > image_heigth and thumb_size * image_width / float(image_heigth) > Options.config['album_thumb_size']
+							image_width > image_height and thumb_size * image_width / float(image_height) > Options.config['album_thumb_size']
 					):
 						# if album thumbnail was square, and media thumbnail fixed height, or with portrait images,
 						# a wider image than the previous thumbnail could be generated, better start from original image
@@ -487,40 +487,40 @@ class Media(object):
 			except KeyboardInterrupt:
 				raise
 		image_width = image.size[0]
-		image_heigth = image.size[1]
+		image_height = image.size[1]
 		if (
 			thumbnail_size == Options.config['album_thumb_size'] and Options.config['album_thumb_type'] == "square" or
 			thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "square"
 		):
-			if image_width > image_heigth:
-				left = (image_width - image_heigth) / 2
+			if image_width > image_height:
+				left = (image_width - image_height) / 2
 				top = 0
 				right = image_width - left
-				bottom = image_heigth
+				bottom = image_height
 			else:
 				left = 0
-				top = (image_heigth - image_width) / 2
+				top = (image_height - image_width) / 2
 				right = image_width
-				bottom = image_heigth - top
+				bottom = image_height - top
 			image_copy = image_copy.crop((left, top, right, bottom))
 			gc.collect()
 			thumbnail_width = thumbnail_size
-			thumbnail_heigth = thumbnail_size
+			thumbnail_height = thumbnail_size
 		else:
-			if image_width > image_heigth:
+			if image_width > image_height:
 				thumbnail_width = thumbnail_size
-				thumbnail_heigth = round(thumbnail_size * image_heigth / float(image_width))
+				thumbnail_height = round(thumbnail_size * image_height / float(image_width))
 			else:
-				thumbnail_width = round(thumbnail_size * image_width / float(image_heigth))
-				thumbnail_heigth = thumbnail_size
+				thumbnail_width = round(thumbnail_size * image_width / float(image_height))
+				thumbnail_height = thumbnail_size
 		if (
 			original_thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "fixed_height" and
-			image_width > image_heigth
+			image_width > image_height
 		):
-			thumbnail_size = round(original_thumbnail_size * image_width / float(image_heigth))
-			thumbnail_width = round(thumbnail_size * image_width / float(image_heigth))
-			thumbnail_heigth = thumbnail_size
-		if (image_width >= thumbnail_width and image_heigth > thumbnail_heigth):
+			thumbnail_size = round(original_thumbnail_size * image_width / float(image_height))
+			thumbnail_width = round(thumbnail_size * image_width / float(image_height))
+			thumbnail_height = thumbnail_size
+		if (image_width >= thumbnail_width and image_height > thumbnail_height):
 			# both width and height of thumbnail are less then width and height of image, no blurring can happen
 			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
 			self.last_thumbnail_was_canvas = False

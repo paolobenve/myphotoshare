@@ -1,3 +1,8 @@
+html, body, /*#media-view*/ {
+	height: 100%;
+}
+
+
 body {
 	margin: 0;
 	padding: 0;
@@ -13,39 +18,45 @@ a:hover {
 	color: #FFAD27;
 }
 #title-container {
+/*
 	width: 100%;
+*/
 }
 #title, #title:hover, #day-view-container, #folders-view-container {
 	font-weight: bold;
 	font-size: medium;
+/*
 	float: left;
+*/
 }
+
 
 #title, #title:hover {
-	padding: 0.4em;
-}
-
-#title, #title:hover {
+/*
 	position: absolute;
+*/
+/*
 	top: 0;
-}
-
-#title {
-	position: absolute;
-	top: 0;
+*/
 	padding: 0.4em;
 	font-weight: bold;
 	line-height: 1.3em;
+/*
+	height: auto;
+*/
 /*
 	width: 100%;
 */
 }
 
 .title-anchor {
+/*
 	cursor: pointer;
+*/
 }
 #buttons-container {
 	float: right;
+	margin-left: .5em;
 }
 
 #day-view-container, #folders-view-container {
@@ -149,37 +160,40 @@ a#day-view, a#folders-view {
 #next {
 	right: 0.1em;
 }
+/*
 #photo {
 	border: 0;
 	left: 0;
 }
-#photo-view {
+*/
+#media-view {
 	position: absolute;
 	top: 3em;
 	overflow: hidden;
-	margin-bottom: 0.5em;
+	margin-bottom: 8px;
 	left: 0;
 	right: 0;
 	text-align: center;
 	z-index: -1;
+	width: 100%;
 }
 
 #album-view.no-bottom-space {
 	height: 0;
 	bottom: 1em;
 }
-#photo-view.no-bottom-space {
+#media-view.no-bottom-space {
 	bottom: 0 !important;
 }
 #photo-box, #video-box {
 	display: inline;
 }
-#video-box-inner {
+#video-box-inner, #photo-box-inner {
 	position: absolute;
 	top: 50%;
 	width: 100%;
 }
-#photo-links {
+.links {
 	background-color: #000000;
 	font-weight: bold;
 	height: 10px;
@@ -197,7 +211,7 @@ a#day-view, a#folders-view {
 	-webkit-border-top-right-radius: 5px;
 	-webkit-border-top-left-radius: 5px;
 }
-#metadata {
+.metadata {
 	background-color: #000000;
 	width: 340px;
 	font-size: 75%;
@@ -220,11 +234,11 @@ a#day-view, a#folders-view {
 	filter: alpha(opacity=50);
 	overflow: auto;
 }
-#metadata table {
+.metadata table {
 	margin: auto auto;
 	text-align: left;
 }
-#metadata tr {
+.metadata tr {
 	height: 14px;
 }
 #photo-bar {
@@ -233,10 +247,16 @@ a#day-view, a#folders-view {
 	width: 100%;
 	text-align: center;
 }
-#fullscreen, #exit-fullscreen {
+#video-bar {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	text-align: center;
+}
+.fullscreen, .exit-fullscreen {
 	display: none;
 }
-#enter-fullscreen, #fullscreen-divider {
+.enter-fullscreen, .fullscreen-divider {
 	display: inline;
 }
 #album-view.photo-view-container {
@@ -347,6 +367,7 @@ a#day-view, a#folders-view {
 	text-decoration: none;
 }
 
+/*
 #photo-box img {
 	max-height: 100%;
 	max-width: 100%;
@@ -358,6 +379,7 @@ a#day-view, a#folders-view {
 	right: 0;  
 	margin: auto;
 }
+*/
 
 #album-sort-arrows, #media-sort-arrows {
 	padding: 0 2em;

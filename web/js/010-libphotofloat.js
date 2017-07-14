@@ -40,9 +40,9 @@
 		if (typeof error !== "undefined" && error !== null) {
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
 				$("#album-view").fadeOut(200);
-				$("#photo-view").fadeOut(200);
+				$("#media-view").fadeOut(200);
 				$("#album-view").fadeIn(3500);
-				$("#photo-view").fadeIn(3500);
+				$("#media-view").fadeIn(3500);
 				$("#error-text-folder").fadeIn(200);
 				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(2500);
 				window.location.hash = Options.folders_string;
@@ -91,7 +91,7 @@
 				}
 				if (i >= theAlbum.photos.length) {
 					$("#album-view").fadeOut(200);
-					$("#photo-view").fadeOut(200);
+					$("#media-view").fadeOut(200);
 					$("#album-view").fadeIn(3500);
 					$("#error-text-image").fadeIn(200);
 					$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);

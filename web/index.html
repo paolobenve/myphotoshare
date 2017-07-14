@@ -28,65 +28,81 @@
 
 </head>
 <body>
-<div id="title-container">
-	<div id="buttons-container">
-		<div id="day-view-container" style="display:none;">
-			<a id="day-view" href="javascript:void(0)">
-			</a>
+	<div id="title-container">
+		<div id="buttons-container">
+			<div id="day-view-container" style="display:none;">
+				<a id="day-view" href="javascript:void(0)">
+				</a>
+			</div>
+			<div id="folders-view-container" style="display:none;">
+				<a id="folders-view" href="javascript:void(0)">
+				</a>
+			</div>
 		</div>
-		<div id="folders-view-container" style="display:none;">
-			<a id="folders-view" href="javascript:void(0)">
-			</a>
+		<div id="title">
+			<span id="title-string"></span>
+			<a id="album-sort-arrows"></a>
+			<a id="media-sort-arrows"></a>
 		</div>
 	</div>
-	<div id="title">
-		<div id="title-string"></div>
-		<a id="album-sort-arrows"></a>
-		<a id="media-sort-arrows"></a>
-	</div>
-</div>
-<div id="photo-view">
-	<div id="photo-box">
-		<a class="next-media"><img id="photo" /></a>
-	</div>
-	<div id="video-box">
-		<a class="next-media">
-			<div id="video-box-inner"></div>
-		</a>
-	</div>
-	<div id="photo-bar">
-		<div id="photo-links">
-			<a id="metadata-show" href="javascript:void(0)"></a>
-			<a id="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
-			<a id="original-link" target="_blank"></a>
-			<span id="fullscreen-divider"> | </span>
-			<a id="fullscreen" href="javascript:void(0)">
-				<span id="enter-fullscreen"></span>
-				<span id="exit-fullscreen"></span>
-			</a>
+	<div id="media-view">
+		<div id="media-box">
+			<div id="photo-box">
+				<a class="next-media">
+					<div id="photo-box-inner" ></div>
+					<div id="photo-bar">
+						<div class="links">
+							<a class="metadata-show" href="javascript:void(0)"></a>
+							<a class="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
+							<a class="original-link" target="_blank"></a>
+							<span class="fullscreen-divider"> | </span>
+							<a class="fullscreen" href="javascript:void(0)">
+								<span class="enter-fullscreen"></span>
+								<span class="exit-fullscreen"></span>
+							</a>
+						</div>
+						<div class="metadata"></div>
+					</div>
+				</a>
+			</div>
+			<div id="video-box">
+				<a class="next-media">
+					<div id="video-box-inner"></div>
+					<div id="video-bar">
+						<div class="links">
+							<a class="metadata-show" href="javascript:void(0)"></a>
+							<a class="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
+							<a class="original-link" target="_blank"></a>
+							<span class="fullscreen-divider"> | </span>
+							<a class="fullscreen" href="javascript:void(0)">
+								<span class="enter-fullscreen"></span>
+								<span class="exit-fullscreen"></span>
+							</a>
+						</div>
+						<div class="metadata"></div>
+					</div>
+				</a>
+			</div>
 		</div>
-		<div id="metadata"></div>
+		
+		<a id="back">&lsaquo;</a>
+		<a id="next">&rsaquo;</a>
 	</div>
-	
-	<a id="back">&lsaquo;</a>
-	<a id="next">&rsaquo;</a>
-</div>
-<div id="album-view">
-	<div id="subalbums"></div>
-	<div id="thumbs">
-		<div id="loading"></div>
+	<div id="album-view">
+		<div id="subalbums"></div>
+		<div id="thumbs">
+			<div id="loading"></div>
+		</div>
+		<div id="powered-by">
+			<span id="powered-by-string"></span>
+			<a href="https://github.com/paolobenve/photofloat" target="_blank">PhotoFloat</a>
+		</div>
 	</div>
-	<div id="powered-by">
-		<span id="powered-by-string"></span>
-		<a href="https://github.com/paolobenve/photofloat" target="_blank">PhotoFloat</a>
-	</div>
-</div>
 
-<div id="error-overlay"></div>
-<div id="error-options-file"></div>
-<div id="error-text-folder"></div>
-<div id="error-text-image"></div>
-<div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form</div>
-
+	<div id="error-overlay"></div>
+	<div id="error-options-file"></div>
+	<div id="error-text-folder"></div>
+	<div id="error-text-image"></div>
+	<div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form</div>
 </body>
 </html>
