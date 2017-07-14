@@ -16,8 +16,10 @@ var translations =
 			"#error-text-image": "Wrong image, showing the album",
 			"#by-date": "by date",
 			"#too-many-images": "Too many images: %s (limit for date album is %s)",
-			"#sort-normal": "sort albums normal (older content first)",
-			"#sort-reverse": "sort albums reverse (earlier content firt)"
+			"#album-sort-normal": "sort albums normal (older content first)",
+			"#album-sort-reverse": "sort albums reverse (earlier content firt)",
+			"#media-sort-normal": "sort photos and videos normal (older content first)",
+			"#media-sort-reverse": "sort photos and videos reverse (earlier content first)",
 		},
 		'it': {
 			".metadata-show": "metadati",
@@ -35,8 +37,10 @@ var translations =
 			"#error-text-image": "Immagine sbagliata, mostro l'album", 
 			"#by-date": "per data",
 			"#too-many-images": "Troppe immagini: %s (il limite per gli album per data è %s)",
-			"#sort-normal": "ordina normale (contenuti più vecchi prima)",
-			"#sort-reverse": "ordina inverso (contenuti più recenti prima)"
+			"#album-sort-normal": "ordina normale gli album (contenuti più vecchi prima)",
+			"#album-sort-reverse": "ordina inverso gli album (contenuti più recenti prima)",
+			"#media-sort-normal": "ordina normale foto e video (contenuti più vecchi prima)",
+			"#media-sort-reverse": "ordina inverso foto e video (contenuti più recenti prima)",
 		},
 		'es': {
 			".metadata-show": "metadatos",
@@ -54,7 +58,9 @@ var translations =
 			"#error-text-image": "Error en la imágen, muestro la carpeta", 
 			"#by-date": "por fecha",
 			"#too-many-images": "Demasiadas imágenes: %s (el límite por date album es %s)",
-			"#sort-normal": "ordena normal (contenido más viejo primero)",
-			"#sort-reverse": "ordena inverso (contenido más reciente primero)"
+			"#album-sort-normal": "ordena normal los álbum (contenido más viejo primero)",
+			"#album-sort-reverse": "ordena inverso los álbum (contenido más reciente primero)",
+			"#media-sort-normal": "ordena normal fotos y videos (contenido más viejo primero)",
+			"#media-sort-reverse": "ordena inverso fotos y videos (contenido más reciente primero)",
 		}
 	};

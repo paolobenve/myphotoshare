@@ -110,7 +110,7 @@ $(document).ready(function() {
 						else
 							title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 				if (i == 1 && dateTitle)
-					title += "(" + _t("by-date") + ")";
+					title += "(" + _t("#by-date") + ")";
 				else
 					title += textComponents[i];
 				if (i < components.length - 1 || currentMedia !== null)
@@ -130,14 +130,14 @@ $(document).ready(function() {
 			if (currentAlbum.albums.length > 1)
 				title += "<a id=\"album-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
 						"<img title=\"albums sort\" height=\"15px\" id=\"album-sort-icon\" width=\"15px\" src=\"img/Folder_6_icon-72a7cf.png\">" +
-						"<span id=\"album-arrow-up\">🠙</span>" +
-						"<span id=\"album-arrow-down\">🠛</span>" +
+						"<span id=\"album-arrow-up\" title=\"" + _t("#album-sort-reverse") + "\">🠙</span>" +
+						"<span id=\"album-arrow-down\" title=\"" + _t("#album-sort-normal") + "\">🠛</span>" +
 					"</a>";
 			if (currentAlbum.photos.length > 1)
 				title += "<a id=\"media-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
 						"<img title=\"media sort\" height=\"15px\" id=\"media-sort-icon\" width=\"15px\" src=\"img/Creative-Tail-People-man.png\">" +
-						"<span id=\"media-arrow-up\">🠙</span>" +
-						"<span id=\"media-arrow-down\">🠛</span>" +
+						"<span id=\"media-arrow-up\" title=\"" + _t("#media-sort-reverse") + "\">🠙</span>" +
+						"<span id=\"media-arrow-down\" title=\"" + _t("#media-sort-normal") + "\">🠛</span>" +
 					"</a>";
 		}
 		// generate the html page title
@@ -148,7 +148,7 @@ $(document).ready(function() {
 					documentTitle = " \u00ab " + documentTitle;
 			}
 			else if (i == 1 && dateTitle) {
-				documentTitle += " (" + _t("by-date") + ")";
+				documentTitle += " (" + _t("#by-date") + ")";
 			}
 			else if (i > 1) {
 				documentTitle = textComponents[i] + documentTitle;
@@ -166,12 +166,12 @@ $(document).ready(function() {
 				if (currentAlbum.albums.length > 1) {
 					$("#album-sort-arrows").show();
 					if (getBooleanCookie("albumReverseSortRequested")) {
-						$("#album-sort-arrows").attr("title", _t("sort-normal"));
+						$("#album-sort-arrows").attr("title", _t("#album-sort-normal"));
 						$("#album-sort-icon").removeAttr("title");
 						$("#album-arrow-up").hide();
 						$("#album-arrow-down").show();
 					} else {
-						$("#album-sort-arrows").attr("title", _t("sort-reverse"));
+						$("#album-sort-arrows").attr("title", _t("#album-sort-reverse"));
 						$("#album-sort-icon").removeAttr("title");
 						$("#album-arrow-up").show();
 						$("#album-arrow-down").hide();
@@ -180,10 +180,10 @@ $(document).ready(function() {
 				if (currentAlbum.photos.length > 1 && ! (currentAlbum.path.match(byDateRegex) && currentAlbum.photos.length >= Options.big_date_folders_threshold)) {
 					$("#media-sort-arrows").show();
 					if (getBooleanCookie("mediaReverseSortRequested")) {
-						$("#media-sort-arrows").attr("title", _t("sort-normal"));
+						$("#media-sort-arrows").attr("title", _t("#media-sort-normal"));
 						$("#media-sort-icon").removeAttr("title");
 					} else {
-						$("#media-sort-arrows").attr("title", _t("sort-reverse"));
+						$("#media-sort-arrows").attr("title", _t("#media-sort-reverse"));
 						$("#media-sort-icon").removeAttr("title");
 					}
 				}
@@ -495,15 +495,18 @@ $(document).ready(function() {
 		container = $(window);
 		image = $("#photo");
 		var photoSrc = chooseMediaForScaling(currentMedia, container);
+		// chooseMediaForScaling() sets maxSize to 0 if it returns the original image
 		var previousSrc = image.attr("src");
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
-		if (width > height) {
-			height = Math.round(height * maxSize / width);
-			width = maxSize;
-		} else {
-			width = Math.round(width * maxSize / height);
-			height = maxSize;
+		if (maxSize) {
+			if (width > height) {
+				height = Math.round(height * maxSize / width);
+				width = maxSize;
+			} else {
+				width = Math.round(width * maxSize / height);
+				height = maxSize;
+			}
 		}
 		if (photoSrc != previousSrc) {
 			$("link[rel=image_src]").remove();
@@ -514,6 +517,7 @@ $(document).ready(function() {
 				.attr("width", width).attr("height", height).attr("ratio", width / height)
 		}
 		
+		bottom = ((container.height() - parseInt(image.css("height"))) / 2) + "px";
 		if (image.attr("width") > container.width() && image.attr("ratio") > container.width() / container.height()) {
 			var height = container.width() / image.attr("ratio");
 			image.css("width", "100%").
@@ -522,28 +526,21 @@ $(document).ready(function() {
 					css("height", height).
 					css("margin-top", - height / 2).
 					css("top", "50%");
-		}
-		else if (image.attr("height") > container.height() && image.attr("ratio") < container.width() / container.height())
+		} else if (image.attr("height") > container.height() && image.attr("ratio") < container.width() / container.height()) {
 			image.css("height", "100%").
 				css("width", "auto").
 				parent().
 					css("height", "100%").
 					css("margin-top", "0").
 					css("top", "0");
-		else
+			bottom = 0;
+		} else {
 			image.css("height", "").css("width", "").
 				parent().
 					css("height", image.attr("height")).
 					css("margin-top", - image.attr("height") / 2).
 					css("top", "50%");
-		//~ if (image.css("width") !== "100%" && image.attr("ratio") > container.width() / container.height()) {
-			//~ image.css("width", "100%").css("height", "auto");
-			//~ bottom = ((container.height() - image.height()) / 2) + "px";
-		//~ }
-		//~ else if (image.css("height") !== "100%") {
-			//~ bottom = 0;
-			//~ image.css("height", "100%").css("width", "auto");
-		//~ }
+		}
 		image.css("bottom", bottom);
 		$("#photo-bar").css("bottom", bottom);
 	}
@@ -559,15 +556,18 @@ $(document).ready(function() {
 		container.css("top", $("#title-container").outerHeight() + "px");
 		image = $("#photo");
 		var photoSrc = chooseMediaForScaling(currentMedia, container);
+		// chooseMediaForScaling() sets maxSize to 0 if it returns the original image
 		var previousSrc = image.attr("src");
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
-		if (width > height) {
-			height = Math.round(height * maxSize / width);
-			width = maxSize;
-		} else {
-			width = Math.round(width * maxSize / height);
-			height = maxSize;
+		if (maxSize) {
+			if (width > height) {
+				height = Math.round(height * maxSize / width);
+				width = maxSize;
+			} else {
+				width = Math.round(width * maxSize / height);
+				height = maxSize;
+			}
 		}
 		if (photoSrc != previousSrc) {
 			$("link[rel=image_src]").remove();
@@ -578,7 +578,7 @@ $(document).ready(function() {
 				.attr("width", width).attr("height", height).attr("ratio", width / height)
 		}
 		
-		
+		bottom = ((container.height() - parseInt(image.css("height"))) / 2) + "px";
 		if (image.attr("width") > container.width() && image.attr("ratio") > container.width() / container.height()) {
 			var height = container.width() / image.attr("ratio");
 			image.css("width", "100%").
@@ -587,29 +587,21 @@ $(document).ready(function() {
 					css("height", height).
 					css("margin-top", - height / 2).
 					css("top", "50%");
-		}
-		else if (image.attr("height") > container.height() && image.attr("ratio") < container.width() / container.height())
+		} else if (image.attr("height") > container.height() && image.attr("ratio") < container.width() / container.height()) {
 			image.css("height", "100%").
 				css("width", "auto").
 				parent().
 					css("height", "100%").
 					css("margin-top", "0").
 					css("top", "0");
-		else
+			bottom = 0;
+		} else {
 			image.css("height", "").css("width", "").
 				parent().
 					css("height", image.attr("height")).
 					css("margin-top", - image.attr("height") / 2).
 					css("top", "50%");
-		//~ if (image.css("width") !== "100%" && image.attr("ratio") > container.width() / container.height()) {
-			//~ bottom = ((container.height() - image.height()) / 2).toString() + "px";
-			//~ image.css("width", "100%").css("height", "auto");
-		//~ }
-		//~ else if (image.css("height") !== "100%" && image.attr("ratio") < container.width() / container.height()) {
-			//~ image.css("height", "100%").css("width", "auto");
-			//~ bottom = 0;
-		//~ }
-
+		}
 		image.css("bottom", bottom);
 		$("#photo-bar").css("bottom", bottom);
 	}
@@ -752,7 +744,7 @@ $(document).ready(function() {
 					videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
 				}
 				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
-					.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
+					.attr("width", width).attr("height", height).attr("ratio", width / height)
 					.attr("src", videoSrc)
 					.attr("alt", currentMedia.name);
 				if (fullScreenStatus)
@@ -770,6 +762,7 @@ $(document).ready(function() {
 			$("#video-box").show();
 		} else {
 			$("#photo-box-inner").empty();
+			maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1]
 			if (width > height) {
 				height = Math.round(height * maxSize / width);
 				width = maxSize;
@@ -779,7 +772,7 @@ $(document).ready(function() {
 			}
 			photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]);
 			$('<img/>', { id: 'photo' }).appendTo('#photo-box-inner')
-				.attr("width", width).attr("height", height).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
+				.attr("width", width).attr("height", height).attr("ratio", height / height)
 				.attr("src", photoSrc)
 				.attr("alt", currentMedia.name)
 				.attr("title", currentMedia.date);
