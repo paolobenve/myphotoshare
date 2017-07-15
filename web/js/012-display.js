@@ -375,6 +375,7 @@ $(document).ready(function() {
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomPhoto(theAlbum, theContainer, function(randomAlbum, randomPhoto, originalAlbum) {
 								var distance = 0;
+								var htmlText;
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, ButtonAndCaptionHeight, html;
 								if (Options.album_thumb_type == "fit") {
 									photoWidth = randomPhoto.size[0];
@@ -388,7 +389,7 @@ $(document).ready(function() {
 									}
 									distance = (Options.album_thumb_size - thumbHeight) / 2;
 								}
-								var htmlText = "<img " +
+								htmlText = "<img " +
 										"title=\"" + randomPhoto.albumName.substr(7) + "\"" +
 										" src=\"" + photoFloat.photoPath(randomAlbum, randomPhoto, Options.album_thumb_size) + "\"" +
 										" style=\"width:" + thumbWidth + "px;" +
@@ -715,7 +716,7 @@ $(document).ready(function() {
 				else
 					i --;
 				previousMedia = currentAlbum.photos[i];
-			} while (previousMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName);
+			} while (previousMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
 			
 			i = currentMediaIndex;
 			do {
@@ -724,7 +725,7 @@ $(document).ready(function() {
 				else
 					i ++;
 				nextMedia = currentAlbum.photos[i];
-			} while (nextMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName);
+			} while (nextMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
 			
 			if (nextMedia.mediaType == "video") {
 				$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia));
