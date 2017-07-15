@@ -603,13 +603,22 @@ $(document).ready(function() {
 		image.css("bottom", bottom);
 		$("#photo-bar").css("bottom", bottom);
 	}
-	function scaleVideoFullscreen() {
+	function scaleVideo() {
 		var video, container;
-		$("#video");
-		video = $("#video");
-		container = $(window);
 		$(window).unbind("resize");
-		$(window).bind("resize", scaleVideoFullscreen);
+		$(window).bind("resize", scaleVideo);
+		video = $("#video");
+		if (fullScreenStatus)
+			container = $(window);
+		else {
+			container = $("#media-view");
+			var albumViewHeight = 0;
+			if ($("#album-view").is(":visible"))
+				albumViewHeight = $("#album-view").outerHeight();
+			container.css("bottom", albumViewHeight + "px");
+			container.css("top", $("#title-container").outerHeight() + "px");
+		}
+		
 		if (video.attr("width") > container.width() && video.attr("ratio") > container.width() / container.height()) {
 			var height = container.width() / video.attr("ratio");
 			video.css("width", "100%").
@@ -632,44 +641,9 @@ $(document).ready(function() {
 					css("height", video.attr("height")).
 					css("margin-top", - video.attr("height") / 2).
 					css("top", "50%");
-	}
-	function scaleVideoNormal() {
-		var video, container, bottom;
-		$(window).unbind("resize");
-		$(window).bind("resize", scaleVideoNormal);
-		container = $("#media-view");
-		var albumViewHeight = 0;
-		if ($("#album-view").is(":visible"))
-			albumViewHeight = $("#album-view").outerHeight();
-		container.css("bottom", albumViewHeight + "px");
-		container.css("top", $("#title-container").outerHeight() + "px");
-		video = $("#video");
-		$(window).unbind("resize");
-		$(window).bind("resize", scaleVideoNormal);
-		if (video.attr("width") > container.width() && video.attr("ratio") > container.width() / container.height()) {
-			var height = container.width() / video.attr("ratio");
-			video.css("width", "100%").
-				css("height", "auto").
-				parent().
-					css("height", height).
-					css("margin-top", - height / 2).
-					css("top", "50%");
+		if (! fullScreenStatus) {
+			$("#video-bar").css("bottom", 0);
 		}
-		else if (video.attr("height") > container.height() && video.attr("ratio") < container.width() / container.height())
-			video.css("height", "100%").
-				css("width", "auto").
-				parent().
-					css("height", "100%").
-					css("margin-top", "0").
-					css("top", "0");
-		else
-			video.css("height", "").css("width", "").
-				parent().
-					css("height", video.attr("height")).
-					css("margin-top", - video.attr("height") / 2).
-					css("top", "50%");
-		bottom = 0;
-		$("#video-bar").css("bottom", bottom);
 	}
 	function chooseMediaForScaling(media, container) {
 		var chosenMedia, reducedWidth, reducedHeight;
@@ -745,10 +719,7 @@ $(document).ready(function() {
 					.attr("width", width).attr("height", height).attr("ratio", width / height)
 					.attr("src", videoSrc)
 					.attr("alt", currentMedia.name);
-				if (fullScreenStatus)
-					$('#video').on('loadstart', scaleVideoFullscreen());
-				else
-					$('#video').on('loadstart', scaleVideoNormal());
+				$('#video').on('loadstart', scaleVideo());
 			}
 			$("link[rel=image_src]").remove();
 			$('link[rel="video_src"]').remove();
