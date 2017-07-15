@@ -132,7 +132,7 @@ background_color = #222222
 album_button_background_color = Cornsilk
 
 # the album buttons background color
-album_caption_color = white
+album_caption_color = black
 
 # The colors for the top right button which switches between folder and date view
 switch_button_background_color = black

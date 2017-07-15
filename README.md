@@ -2,9 +2,10 @@
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
-![Screenshot](screenshot.jpg)
-![Screenshot](screenshot-root.jpg)
-![Screenshot](screenshot-bydate.jpg)
+![Screenshot](screnshot-panorama-2.2.png)
+![Screenshot](screnshot-classic-square-2.2.png)
+![Screenshot](screnshot-no-slide-mode-fit-2.2.png)
+![Screenshot](screnshot-slide-mode-2.2.png)
 
 It's an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
