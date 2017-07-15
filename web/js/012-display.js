@@ -130,16 +130,12 @@ $(document).ready(function() {
 			if (currentAlbum.albums.length > 1)
 				title += "<a id=\"album-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
 						"<img title=\"albums sort\" height=\"15px\" id=\"album-sort-icon\" width=\"15px\" src=\"img/Folder_6_icon-72a7cf.png\">" +
-						//~ "<span id=\"album-arrow-up\" title=\"" + _t("#album-sort-reverse") + "\">🠙</span>" +
-						//~ "<span id=\"album-arrow-down\" title=\"" + _t("#album-sort-normal") + "\">🠛</span>" +
 						"<span id=\"album-arrow-up\">🠙</span>" +
 						"<span id=\"album-arrow-down\">🠛</span>" +
 					"</a>";
 			if (currentAlbum.photos.length > 1)
 				title += "<a id=\"media-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
 						"<img title=\"media sort\" height=\"15px\" id=\"media-sort-icon\" width=\"15px\" src=\"img/Creative-Tail-People-man.png\">" +
-						//~ "<span id=\"media-arrow-up\" title=\"" + _t("#media-sort-reverse") + "\">🠙</span>" +
-						//~ "<span id=\"media-arrow-down\" title=\"" + _t("#media-sort-normal") + "\">🠛</span>" +
 						"<span id=\"media-arrow-up\">🠙</span>" +
 						"<span id=\"media-arrow-down\">🠛</span>" +
 					"</a>";
@@ -493,7 +489,7 @@ $(document).ready(function() {
 		return (fraction[0] / fraction[1]).toString();
 	}
 	function scaleImageFullscreen() {
-		var image, bottom, width, height;
+		var image, bottom, width, height, container;
 		$(window).unbind("resize");
 		$(window).bind("resize", scaleImageFullscreen);
 		container = $(window);
@@ -517,13 +513,12 @@ $(document).ready(function() {
 			$('link[rel="video_src"]').remove();
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
 			image.attr("src", photoSrc)
-				//~ .attr("width", currentMedia.size[0]).attr("height", currentMedia.size[1]).attr("ratio", currentMedia.size[0] / currentMedia.size[1]);
-				.attr("width", width).attr("height", height).attr("ratio", width / height)
+				.attr("width", width).attr("height", height).attr("ratio", width / height);
 		}
 		
 		bottom = ((container.height() - parseInt(image.css("height"))) / 2) + "px";
 		if (image.attr("width") > container.width() && image.attr("ratio") > container.width() / container.height()) {
-			var height = container.width() / image.attr("ratio");
+			height = container.width() / image.attr("ratio");
 			image.css("width", "100%").
 				css("height", "auto").
 				parent().
@@ -549,7 +544,7 @@ $(document).ready(function() {
 		$("#photo-bar").css("bottom", bottom);
 	}
 	function scaleImageNormal() {
-		var image, bottom, width, height;
+		var image, bottom, width, height, container;
 		$(window).unbind("resize");
 		$(window).bind("resize", scaleImageNormal);
 		container = $("#media-view");
@@ -578,13 +573,12 @@ $(document).ready(function() {
 			$('link[rel="video_src"]').remove();
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
 			image.attr("src", photoSrc)
-				//~ .attr("width", currentMedia.size[0]).attr("height", currentMedia.size[1]).attr("ratio", currentMedia.size[0] / currentMedia.size[1])
-				.attr("width", width).attr("height", height).attr("ratio", width / height)
+				.attr("width", width).attr("height", height).attr("ratio", width / height);
 		}
 		
 		bottom = ((container.height() - parseInt(image.css("height"))) / 2) + "px";
 		if (image.attr("width") > container.width() && image.attr("ratio") > container.width() / container.height()) {
-			var height = container.width() / image.attr("ratio");
+			height = container.width() / image.attr("ratio");
 			image.css("width", "100%").
 				css("height", "auto").
 				parent().
@@ -753,9 +747,7 @@ $(document).ready(function() {
 					.attr("alt", currentMedia.name);
 				if (fullScreenStatus)
 					$('#video').on('loadstart', scaleVideoFullscreen());
-					//~ $('<video/>').on('loadstart', scaleVideoFullscreen());
 				else
-					//~ $('<video/>').on('loadstart', scaleVideoNormal());
 					$('#video').on('loadstart', scaleVideoNormal());
 			}
 			$("link[rel=image_src]").remove();
@@ -766,7 +758,7 @@ $(document).ready(function() {
 			$("#video-box").show();
 		} else {
 			$("#photo-box-inner").empty();
-			maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1]
+			maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
 			if (width > height) {
 				height = Math.round(height * maxSize / width);
 				width = maxSize;
@@ -780,10 +772,6 @@ $(document).ready(function() {
 				.attr("src", photoSrc)
 				.attr("alt", currentMedia.name)
 				.attr("title", currentMedia.date);
-			//~ $("#photo").attr("src", photoSrc)
-				//~ .attr("width", width).attr("height", height).attr("ratio", width / height)
-				//~ .attr("alt", currentMedia.name)
-				//~ .attr("title", currentMedia.date);
 			$("link[rel=image_src]").remove();
 			$('link[rel="video_src"]').remove();
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
@@ -791,7 +779,6 @@ $(document).ready(function() {
 				$("#photo").load(scaleImageFullscreen);
 			else
 				$("#photo").load(scaleImageNormal);
-			//~ $("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#photo-box").show();
@@ -897,9 +884,6 @@ $(document).ready(function() {
 			$(this).css("color", Options.switch_button_color);
 			$(this).css("background-color", Options.switch_button_background_color);
 		});
-		//~ $("#day-view").css("color", Options.switch_button_color);
-		//~ $("#folders-view").css("color", Options.switch_button_color);
-		//~ $("#folders-view-container").css("background-color", Options.switch_button_background_color);
 		
 		$("#title").css("font-size", Options.title_font_size);
 		$(".title-anchor").css("color", Options.title_color);
