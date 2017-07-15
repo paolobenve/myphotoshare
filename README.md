@@ -25,7 +25,7 @@ It is, essentially, the slickest and fastest, most minimal but still well-featur
 
 ## Changelog
 
-Features added in version 2.2 (July 11, 2017):
+Features added in version 2.2 (July 15, 2017):
 
 * translations are now managed via a separate js file: enthusiasts and followers are encouraged to provide the translation for their language 
 * better managing of errors
@@ -42,6 +42,8 @@ Features added in version 2.2 (July 11, 2017):
 * - different_album_thumbnails
 * buttons appearing on mouse over are shown persistently on mobile
 * landscape photos are shown vertically centered
+* if the window is resized, the reduced size image shown is changed according to window size, so that it never shows blurred
+* videos now works perfectly in fullscreen mode
 
 Features added in version 2.1.1 (July 6, 2017):
 
