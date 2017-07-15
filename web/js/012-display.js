@@ -488,71 +488,21 @@ $(document).ready(function() {
 			return fraction[0] + "/" + fraction[1];
 		return (fraction[0] / fraction[1]).toString();
 	}
-	function scaleImageFullscreen() {
+	function scaleImage() {
 		var image, bottom, width, height, container;
 		$(window).unbind("resize");
-		$(window).bind("resize", scaleImageFullscreen);
-		container = $(window);
-		image = $("#photo");
-		var photoSrc = chooseMediaForScaling(currentMedia, container);
-		// chooseMediaForScaling() sets maxSize to 0 if it returns the original image
-		var previousSrc = image.attr("src");
-		width = currentMedia.size[0];
-		height = currentMedia.size[1];
-		if (maxSize) {
-			if (width > height) {
-				height = Math.round(height * maxSize / width);
-				width = maxSize;
-			} else {
-				width = Math.round(width * maxSize / height);
-				height = maxSize;
-			}
-		}
-		if (photoSrc != previousSrc) {
-			$("link[rel=image_src]").remove();
-			$('link[rel="video_src"]').remove();
-			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-			image.attr("src", photoSrc)
-				.attr("width", width).attr("height", height).attr("ratio", width / height);
+		$(window).bind("resize", scaleImage);
+		if (fullScreenStatus)
+			container = $(window);
+		else {
+			container = $("#media-view");
+			var albumViewHeight = 0;
+			if ($("#album-view").is(":visible"))
+				albumViewHeight = $("#album-view").outerHeight();
+			container.css("bottom", albumViewHeight + "px");
+			container.css("top", $("#title-container").outerHeight() + "px");
 		}
 		
-		bottom = ((container.height() - parseInt(image.css("height"))) / 2) + "px";
-		if (image.attr("width") > container.width() && image.attr("ratio") > container.width() / container.height()) {
-			height = container.width() / image.attr("ratio");
-			image.css("width", "100%").
-				css("height", "auto").
-				parent().
-					css("height", height).
-					css("margin-top", - height / 2).
-					css("top", "50%");
-		} else if (image.attr("height") > container.height() && image.attr("ratio") < container.width() / container.height()) {
-			image.css("height", "100%").
-				css("width", "auto").
-				parent().
-					css("height", "100%").
-					css("margin-top", "0").
-					css("top", "0");
-			bottom = 0;
-		} else {
-			image.css("height", "").css("width", "").
-				parent().
-					css("height", image.attr("height")).
-					css("margin-top", - image.attr("height") / 2).
-					css("top", "50%");
-		}
-		image.css("bottom", bottom);
-		$("#photo-bar").css("bottom", bottom);
-	}
-	function scaleImageNormal() {
-		var image, bottom, width, height, container;
-		$(window).unbind("resize");
-		$(window).bind("resize", scaleImageNormal);
-		container = $("#media-view");
-		var albumViewHeight = 0;
-		if ($("#album-view").is(":visible"))
-			albumViewHeight = $("#album-view").outerHeight();
-		container.css("bottom", albumViewHeight + "px");
-		container.css("top", $("#title-container").outerHeight() + "px");
 		image = $("#photo");
 		var photoSrc = chooseMediaForScaling(currentMedia, container);
 		// chooseMediaForScaling() sets maxSize to 0 if it returns the original image
@@ -746,10 +696,7 @@ $(document).ready(function() {
 			$("link[rel=image_src]").remove();
 			$('link[rel="video_src"]').remove();
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-			if (fullScreenStatus)
-				$("#photo").load(scaleImageFullscreen);
-			else
-				$("#photo").load(scaleImageNormal);
+			$("#photo").load(scaleImage);
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#photo-box").show();

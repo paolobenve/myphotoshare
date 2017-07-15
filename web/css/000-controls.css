@@ -35,6 +35,7 @@ a:hover {
 	text-align: center;
 	border-radius: .5em;
 	padding: .5em;
+	opacity: 0.5;
 }
 
 a#day-view, a#folders-view {
