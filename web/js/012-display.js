@@ -491,11 +491,11 @@ $(document).ready(function() {
 	}
 	function scaleMedia() {
 		var media, container, height, albumViewHeight, bottom, width, photoSrc, previousSrc;
-		$(window).unbind("resize");
+		$(window).off("resize");
 		if (currentMedia.mediaType == "video") {
 			$('#video').off('loadstart');
 		} else {
-			$("#photo").unbind("load");
+			$("#photo").off("load");
 		}
 		if (fullScreenStatus)
 			container = $(window);
