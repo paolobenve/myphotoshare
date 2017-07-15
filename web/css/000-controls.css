@@ -22,12 +22,15 @@ a:hover {
 #title, #title:hover {
 	padding: 0.4em;
 	font-weight: bold;
-	line-height: 1.3em;
 }
 
 #buttons-container {
 	float: right;
 	margin-left: .5em;
+}
+
+#title, #title:hover, #buttons-container {
+	line-height: 1.3em;
 }
 
 #day-folders-view-container {
