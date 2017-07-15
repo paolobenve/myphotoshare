@@ -1,4 +1,4 @@
-html, body, /*#media-view*/ {
+html, body {
 	height: 100%;
 }
 
@@ -17,50 +17,25 @@ a {
 a:hover {
 	color: #FFAD27;
 }
-#title-container {
-/*
-	width: 100%;
-*/
-}
-#title, #title:hover, #day-view-container, #folders-view-container {
+
+#title, #title:hover, #day-folders-view-container{
 	font-weight: bold;
 	font-size: medium;
-/*
-	float: left;
-*/
 }
 
 
 #title, #title:hover {
-/*
-	position: absolute;
-*/
-/*
-	top: 0;
-*/
 	padding: 0.4em;
 	font-weight: bold;
 	line-height: 1.3em;
-/*
-	height: auto;
-*/
-/*
-	width: 100%;
-*/
 }
 
-.title-anchor {
-/*
-	cursor: pointer;
-*/
-}
 #buttons-container {
 	float: right;
 	margin-left: .5em;
 }
 
-#day-view-container, #folders-view-container {
-	display: none;
+#day-folders-view-container {
 	font-variant: small-caps;
 	text-align: center;
 	border-radius: .5em;
@@ -271,9 +246,6 @@ a#day-view, a#folders-view {
 	text-align: center;
 }
 #album-view.photo-view-container.no-bottom-space {
-/*
-	height: 3em;
-*/
 	height: 0;
 	bottom: 15px;
 }
@@ -366,20 +338,6 @@ a#day-view, a#folders-view {
 	display: inline-flex;
 	text-decoration: none;
 }
-
-/*
-#photo-box img {
-	max-height: 100%;
-	max-width: 100%;
-	width: auto;
-	height: auto;
-	position: absolute;
-	bottom: 0;  
-	left: 0;  
-	right: 0;  
-	margin: auto;
-}
-*/
 
 #album-sort-arrows, #media-sort-arrows {
 	padding: 0 2em;

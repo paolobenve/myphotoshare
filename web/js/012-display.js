@@ -130,14 +130,18 @@ $(document).ready(function() {
 			if (currentAlbum.albums.length > 1)
 				title += "<a id=\"album-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
 						"<img title=\"albums sort\" height=\"15px\" id=\"album-sort-icon\" width=\"15px\" src=\"img/Folder_6_icon-72a7cf.png\">" +
-						"<span id=\"album-arrow-up\" title=\"" + _t("#album-sort-reverse") + "\">🠙</span>" +
-						"<span id=\"album-arrow-down\" title=\"" + _t("#album-sort-normal") + "\">🠛</span>" +
+						//~ "<span id=\"album-arrow-up\" title=\"" + _t("#album-sort-reverse") + "\">🠙</span>" +
+						//~ "<span id=\"album-arrow-down\" title=\"" + _t("#album-sort-normal") + "\">🠛</span>" +
+						"<span id=\"album-arrow-up\">🠙</span>" +
+						"<span id=\"album-arrow-down\">🠛</span>" +
 					"</a>";
 			if (currentAlbum.photos.length > 1)
 				title += "<a id=\"media-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
 						"<img title=\"media sort\" height=\"15px\" id=\"media-sort-icon\" width=\"15px\" src=\"img/Creative-Tail-People-man.png\">" +
-						"<span id=\"media-arrow-up\" title=\"" + _t("#media-sort-reverse") + "\">🠙</span>" +
-						"<span id=\"media-arrow-down\" title=\"" + _t("#media-sort-normal") + "\">🠛</span>" +
+						//~ "<span id=\"media-arrow-up\" title=\"" + _t("#media-sort-reverse") + "\">🠙</span>" +
+						//~ "<span id=\"media-arrow-down\" title=\"" + _t("#media-sort-normal") + "\">🠛</span>" +
+						"<span id=\"media-arrow-up\">🠙</span>" +
+						"<span id=\"media-arrow-down\">🠛</span>" +
 					"</a>";
 		}
 		// generate the html page title
@@ -462,16 +466,16 @@ $(document).ready(function() {
 			$("#photo-box-inner").empty();
 			$("#photo-box").hide();
 			$("#thumbs").show();
-			
+			$("#day-folders-view-container").show();
 			if (currentAlbum.path == Options.folders_string) {
-				$("#folders-view-container").hide();
-				$("#day-view-container").show();
-				$("#day-view").attr("href", "#!/" + Options.by_date_string);
+				$("#folders-view").hide();
+				$("#day-view").show();
+				$("#day-folders-view-link").attr("href", "#!/" + Options.by_date_string);
 			}
 			else if (currentAlbum.path == Options.by_date_string) {
-				$("#folders-view-container").show();
-				$("#day-view-container").hide();
-				$("#folders-view").attr("href", "#!/" + Options.folders_string);
+				$("#folders-view").show();
+				$("#day-view").hide();
+				$("#day-folders-view-link").attr("href", "#!/" + Options.folders_string);
 			}
 			$("#powered-by").show();
 		} else {
@@ -694,7 +698,7 @@ $(document).ready(function() {
 		return chosenMedia;
 	}
 	function showMedia(album) {
-		var width, height, previousMedia, nextMedia, nextLink, text, thumbnailSize, i;
+		var width, height, previousMedia, nextMedia, nextLink, text, thumbnailSize, i, changeViewLink;
 		var windowWidth, windowHeight;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
@@ -829,12 +833,12 @@ $(document).ready(function() {
 			}
 		}
 		if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
-			$("#folders-view-container").hide();
-			$("#day-view-container").show();
+			$("#folders-view").hide();
+			$("#day-view").show();
 		}
 		else {
-			$("#folders-view-container").show();
-			$("#day-view-container").hide();
+			$("#folders-view").show();
+			$("#day-view").hide();
 		}
 		
 		if (currentAlbum.photos.length == 1) {
@@ -848,8 +852,11 @@ $(document).ready(function() {
 		}
 		$(".original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		
-		$("#folders-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
-		$("#day-view").attr("href", "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name));
+		if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
+			changeViewLink = "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name);
+		else
+			changeViewLink = "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name);
+		$("#day-folders-view-link").attr("href", changeViewLink);
 		
 		text = "<table>";
 		if (typeof currentMedia.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentMedia.make + "</td></tr>";
@@ -881,38 +888,19 @@ $(document).ready(function() {
 		albumThumbnailSize = Options.album_thumb_size;
 		mediaThumbnailSize = Options.media_thumb_size;
 		$("body").css("background-color", Options.background_color);
-		$("#day-view-container").css("color", Options.switch_button_color);
-		$("#day-view-container").hover(function() {
+		$("#day-folders-view-container").hover(function() {
 			//mouse over
 			$(this).css("color", Options.switch_button_color_hover);
-		}, function() {
-			//mouse out
-			$(this).css("color", Options.switch_button_color);
-		});
-		$("#folders-view-container").css("color", Options.switch_button_color);
-		$("#folders-view-container").hover(function() {
-			//mouse over
-			$(this).css("color", Options.switch_button_color_hover);
-		}, function() {
-			//mouse out
-			$(this).css("color", Options.switch_button_color);
-		});
-		$("#day-view-container").css("background-color", Options.switch_button_background_color);
-		$("#day-view-container").hover(function() {
-			//mouse over
 			$(this).css("background-color", Options.switch_button_background_color_hover);
 		}, function() {
 			//mouse out
+			$(this).css("color", Options.switch_button_color);
 			$(this).css("background-color", Options.switch_button_background_color);
 		});
-		$("#folders-view-container").css("background-color", Options.switch_button_background_color);
-		$("#folders-view-container").hover(function() {
-			//mouse over
-			$(this).css("background-color", Options.switch_button_background_color_hover);
-		}, function() {
-			//mouse out
-			$(this).css("background-color", Options.switch_button_background_color);
-		});
+		//~ $("#day-view").css("color", Options.switch_button_color);
+		//~ $("#folders-view").css("color", Options.switch_button_color);
+		//~ $("#folders-view-container").css("background-color", Options.switch_button_background_color);
+		
 		$("#title").css("font-size", Options.title_font_size);
 		$(".title-anchor").css("color", Options.title_color);
 		$(".title-anchor").hover(function() {
@@ -1015,11 +1003,11 @@ $(document).ready(function() {
 				currentMedia = currentAlbum.photos[0];
 				currentMediaIndex = 1;
 			}
+			$("#day-folders-view-container").show();
 			showMedia(currentAlbum);
 		}
 		else {
-			$("#folders-view-container").hide();
-			$("#day-view-container").hide();
+			$("#day-folders-view-container").hide();
 		}
 		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
