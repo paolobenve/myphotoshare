@@ -492,7 +492,7 @@ $(document).ready(function() {
 	function scaleImage() {
 		var image, bottom, width, height, container;
 		$(window).unbind("resize");
-		$(window).bind("resize", scaleImage);
+		$("#photo").unbind("load");
 		if (fullScreenStatus)
 			container = $(window);
 		else {
@@ -553,11 +553,13 @@ $(document).ready(function() {
 		}
 		image.css("bottom", bottom);
 		$("#photo-bar").css("bottom", bottom);
+		$(window).bind("resize", scaleImage);
+
 	}
 	function scaleVideo() {
 		var video, container;
 		$(window).unbind("resize");
-		$(window).bind("resize", scaleVideo);
+		$('#video').off('loadstart');
 		video = $("#video");
 		if (fullScreenStatus)
 			container = $(window);
@@ -595,6 +597,7 @@ $(document).ready(function() {
 		if (! fullScreenStatus) {
 			$("#video-bar").css("bottom", 0);
 		}
+		$(window).bind("resize", scaleVideo);
 	}
 	function chooseMediaForScaling(media, container) {
 		var chosenMedia, reducedWidth, reducedHeight;
