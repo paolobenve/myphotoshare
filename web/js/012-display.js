@@ -489,115 +489,84 @@ $(document).ready(function() {
 			return fraction[0] + "/" + fraction[1];
 		return (fraction[0] / fraction[1]).toString();
 	}
-	function scaleImage() {
-		var image, bottom, width, height, container;
+	function scaleMedia() {
+		var media, container, height, albumViewHeight, bottom, width, photoSrc, previousSrc;
 		$(window).unbind("resize");
-		$("#photo").unbind("load");
-		if (fullScreenStatus)
-			container = $(window);
-		else {
-			container = $("#media-view");
-			var albumViewHeight = 0;
-			if ($("#album-view").is(":visible"))
-				albumViewHeight = $("#album-view").outerHeight();
-			container.css("bottom", albumViewHeight + "px");
-			container.css("top", $("#title-container").outerHeight() + "px");
-		}
-		
-		image = $("#photo");
-		var photoSrc = chooseMediaForScaling(currentMedia, container);
-		// chooseMediaForScaling() sets maxSize to 0 if it returns the original image
-		var previousSrc = image.attr("src");
-		width = currentMedia.size[0];
-		height = currentMedia.size[1];
-		if (maxSize) {
-			if (width > height) {
-				height = Math.round(height * maxSize / width);
-				width = maxSize;
-			} else {
-				width = Math.round(width * maxSize / height);
-				height = maxSize;
-			}
-		}
-		if (photoSrc != previousSrc) {
-			$("link[rel=image_src]").remove();
-			$('link[rel="video_src"]').remove();
-			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-			image.attr("src", photoSrc)
-				.attr("width", width).attr("height", height).attr("ratio", width / height);
-		}
-		
-		bottom = ((container.height() - parseInt(image.css("height"))) / 2) + "px";
-		if (image.attr("width") > container.width() && image.attr("ratio") > container.width() / container.height()) {
-			height = container.width() / image.attr("ratio");
-			image.css("width", "100%").
-				css("height", "auto").
-				parent().
-					css("height", height).
-					css("margin-top", - height / 2).
-					css("top", "50%");
-		} else if (image.attr("height") > container.height() && image.attr("ratio") < container.width() / container.height()) {
-			image.css("height", "100%").
-				css("width", "auto").
-				parent().
-					css("height", "100%").
-					css("margin-top", "0").
-					css("top", "0");
-			bottom = 0;
+		if (currentMedia.mediaType == "video") {
+			$('#video').off('loadstart');
 		} else {
-			image.css("height", "").css("width", "").
-				parent().
-					css("height", image.attr("height")).
-					css("margin-top", - image.attr("height") / 2).
-					css("top", "50%");
+			$("#photo").unbind("load");
 		}
-		image.css("bottom", bottom);
-		$("#photo-bar").css("bottom", bottom);
-		$(window).bind("resize", scaleImage);
-
-	}
-	function scaleVideo() {
-		var video, container;
-		$(window).unbind("resize");
-		$('#video').off('loadstart');
-		video = $("#video");
 		if (fullScreenStatus)
 			container = $(window);
 		else {
 			container = $("#media-view");
-			var albumViewHeight = 0;
+			albumViewHeight = 0;
 			if ($("#album-view").is(":visible"))
 				albumViewHeight = $("#album-view").outerHeight();
 			container.css("bottom", albumViewHeight + "px");
 			container.css("top", $("#title-container").outerHeight() + "px");
 		}
 		
-		if (video.attr("width") > container.width() && video.attr("ratio") > container.width() / container.height()) {
-			var height = container.width() / video.attr("ratio");
-			video.css("width", "100%").
+		if (currentMedia.mediaType == "video") {
+			media = $("#video");
+		} else {
+			media = $("#photo");
+			photoSrc = chooseMediaForScaling(currentMedia, container);
+			// chooseMediaForScaling() sets maxSize to 0 if it returns the original media
+			previousSrc = media.attr("src");
+			width = currentMedia.size[0];
+			height = currentMedia.size[1];
+			if (maxSize) {
+				if (width > height) {
+					height = Math.round(height * maxSize / width);
+					width = maxSize;
+				} else {
+					width = Math.round(width * maxSize / height);
+					height = maxSize;
+				}
+			}
+			if (photoSrc != previousSrc) {
+				$("link[rel=image_src]").remove();
+				$('link[rel="video_src"]').remove();
+				$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
+				media.attr("src", photoSrc)
+					.attr("width", width).attr("height", height).attr("ratio", width / height);
+			}
+			
+			bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
+		}
+		if (media.attr("width") > container.width() && media.attr("ratio") > container.width() / container.height()) {
+			height = container.width() / media.attr("ratio");
+			media.css("width", "100%").
 				css("height", "auto").
 				parent().
 					css("height", height).
 					css("margin-top", - height / 2).
 					css("top", "50%");
-		}
-		else if (video.attr("height") > container.height() && video.attr("ratio") < container.width() / container.height())
-			video.css("height", "100%").
+		} else if (media.attr("height") > container.height() && media.attr("ratio") < container.width() / container.height()) {
+			media.css("height", "100%").
 				css("width", "auto").
 				parent().
 					css("height", "100%").
 					css("margin-top", "0").
 					css("top", "0");
-		else
-			video.css("height", "").css("width", "").
+			if (currentMedia.mediaType != "video")
+				bottom = 0;
+		} else {
+			media.css("height", "").css("width", "").
 				parent().
-					css("height", video.attr("height")).
-					css("margin-top", - video.attr("height") / 2).
+					css("height", media.attr("height")).
+					css("margin-top", - media.attr("height") / 2).
 					css("top", "50%");
-		if (! fullScreenStatus) {
-			$("#video-bar").css("bottom", 0);
 		}
-		$(window).bind("resize", scaleVideo);
+		if (currentMedia.mediaType == "video" && ! fullScreenStatus) {
+			$("#video-bar").css("bottom", 0);
+		} else {
+			media.css("bottom", bottom);
+			$("#photo-bar").css("bottom", bottom);
+		}
+		$(window).bind("resize", scaleMedia);
 	}
 	function chooseMediaForScaling(media, container) {
 		var chosenMedia, reducedWidth, reducedHeight;
@@ -673,7 +642,7 @@ $(document).ready(function() {
 					.attr("width", width).attr("height", height).attr("ratio", width / height)
 					.attr("src", videoSrc)
 					.attr("alt", currentMedia.name);
-				$('#video').on('loadstart', scaleVideo());
+				$('#video').on('loadstart', scaleMedia());
 			}
 			$("link[rel=image_src]").remove();
 			$('link[rel="video_src"]').remove();
@@ -700,7 +669,7 @@ $(document).ready(function() {
 			$("link[rel=image_src]").remove();
 			$('link[rel="video_src"]').remove();
 			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-			$("#photo").load(scaleImage);
+			$("#photo").load(scaleMedia);
 			$("#video-box-inner").empty();
 			$("#video-box").hide();
 			$("#photo-box").show();
