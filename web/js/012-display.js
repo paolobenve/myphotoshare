@@ -689,7 +689,7 @@ $(document).ready(function() {
 			}
 			photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]);
 			$('<img/>', { id: 'photo' }).appendTo('#photo-box-inner')
-				.attr("width", width).attr("height", height).attr("ratio", height / height)
+				.attr("width", width).attr("height", height).attr("ratio", width / height)
 				.attr("src", photoSrc)
 				.attr("alt", currentMedia.name)
 				.attr("title", currentMedia.date);
