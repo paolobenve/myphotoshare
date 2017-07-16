@@ -31,12 +31,13 @@ $(document).ready(function() {
 	var maxSize;
 	var fullScreenStatus = false;
 	var photoSrc, videoSrc;
+	var language;
 	
 	
 	/* Displays */
 	
 	function getLanguage() {
-		var language = "en";
+		language = "en";
 		if (Options.language && translations[Options.language] !== undefined)
 			language = Options.language;
 		else {
@@ -47,24 +48,30 @@ $(document).ready(function() {
 	}
 	
 	function translate() {
-		var language = getLanguage();
+		language = getLanguage();
 		var selector;
 		for (var key in translations[language]) {
+			if (key == '#title-string' && document.title != "")
+				continue;
 			selector = $(key);
 			if (selector.length) {
+				// don't set page title, php has already set it
 				selector.html(translations[language][key]);
 			}
 		}
 	}
 	
 	function _t(id) {
-		var language = getLanguage();
+		language = getLanguage();
 		return translations[language][id];
 	}
 	
 	function setTitle() {
-		var title = "", documentTitle = "", last = "", components, i, dateTitle;
-		var originalTitle = Options.page_title;
+		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle;
+		if (document.title != "")
+			originalTitle = document.title;
+		else
+			originalTitle = translations[language]["#title-string"];
 		
 		if (! PhotoFloat.firstAlbumPopulation || getBooleanCookie("albumReverseSortRequested") || getBooleanCookie("mediaReverseSortRequested")) {
 			if (PhotoFloat.firstAlbumPopulation)

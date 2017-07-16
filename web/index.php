@@ -6,7 +6,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="fragment" content="!" />
 	<meta name="medium" content="image" />
-	<title>My photos!</title>
+	<?php
+		$jsonString = file_get_contents('options.json');
+		$options = json_decode($jsonString, true);
+	?>
+	<title><?php if ($options['page_title']) echo $options['page_title']; ?></title>
 <!--
 	<link href="css/styles.min.css" rel="stylesheet" type="text/css" /> 
 -->
