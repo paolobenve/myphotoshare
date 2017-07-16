@@ -17,6 +17,7 @@
 	<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 	<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 	<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
+	<link href="css/003-social.css" rel="stylesheet" type="text/css" />
 <!--
 	<script type="text/javascript" src="js/scripts.min.js"></script> 
 -->
@@ -26,12 +27,23 @@
 	<script type="text/javascript" src="js/003-mousewheel.js"></script>
 	<script type="text/javascript" src="js/004-fullscreen.js"></script>
 	<script type="text/javascript" src="js/005-modernizr.js"></script>
+	<script type="text/javascript" src="js/008-social.js"></script>
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
 
 </head>
 <body>
+	<div id="social">
+		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-count">
+			<a href="" class="ssk ssk-facebook" data-ssk-ready="true"></a>
+			<a href="" class="ssk ssk-twitter" data-ssk-ready="true"></a>
+			<a href="" class="ssk ssk-google-plus" data-ssk-ready="true"></a>
+			<a href="" class="ssk ssk-pinterest" data-ssk-ready="true"></a>
+			<a href="" class="ssk ssk-tumblr" data-ssk-ready="true"></a>
+			<a href="" class="ssk ssk-email" data-ssk-ready="true"></a>
+		</div>
+	</div>
 	<div id="title-container">
 		<div id="buttons-container">
 			<a id="day-folders-view-link" href="javascript:void(0)">

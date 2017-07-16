@@ -33,6 +33,8 @@ $(document).ready(function() {
 	var photoSrc, videoSrc;
 	var language;
 	
+	// initialize social buttons (http://socialsharekit.com/)
+	SocialShareKit.init();
 	
 	/* Displays */
 	
