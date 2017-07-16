@@ -6,7 +6,7 @@ AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css a
 <FilesMatch "\.(css|js)$">
         Header set Cache-Control "max-age=5184000, public"
 </FilesMatch>
-<FilesMatch "index.html">
+<FilesMatch "index.php">
 	Header set Cache-Control "max-age=2678400, public"
 </FilesMatch>
 <FilesMatch "\.json$">
