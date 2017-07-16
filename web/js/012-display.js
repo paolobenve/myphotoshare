@@ -33,10 +33,34 @@ $(document).ready(function() {
 	var photoSrc, videoSrc;
 	var language;
 	
-	// initialize social buttons (http://socialsharekit.com/)
-	SocialShareKit.init();
-	
 	/* Displays */
+	
+	function socialButtons() {
+		url = document.location.protocol +"//"+ document.location.hostname + document.location.pathname;
+		hash = location.hash;
+		cleanHash = location.hash.substring(3);
+		albums = cleanHash.substring(0, cleanHash.indexOf('/'));
+		media = cleanHash.substring(cleanHash.indexOf('/') + 1);
+		console.log(cleanHash, albums, media);
+		myUrl = url + '?a=' + albums + '&m=' + media + hash;
+		console.log(myUrl);
+		// initialize social buttons (http://socialsharekit.com/)
+		SocialShareKit.init({
+			//~ selector: '.custom-parent .ssk',
+			url: myUrl,
+			//~ text: 'Share text default',
+			//~ twitter: {
+				//~ url: 'http://url-for-twitter',
+				//~ text: 'Share text for twitter',
+				//~ via: 'twitter-screen-name',
+				//~ countCallback: function(shareUrl, onCountReady) {
+					//~ // Get count somewhere manually and call onCountReady() whenever you got the count.
+					//~ var count = 5;
+					//~ return onCountReady(count);
+				//~ }
+			//~ }
+		});
+	}
 	
 	function getLanguage() {
 		language = "en";
@@ -901,6 +925,7 @@ $(document).ready(function() {
 			$(".media-caption").show();
 		// function must be called again in order to set elements previously absent
 		setOptions();
+		socialButtons();
 	}
 
 	function getOptions(cacheSubDir, callback) {
