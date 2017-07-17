@@ -31,9 +31,26 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
-
+	<?php
+		if ($_GET['t']) {
+			$image = $_GET['a'] . '/' . $_GET['m'];
+			$linkTag = '<link ';
+			if ($_GET['t'] == 'i' || $_GET['t'] == 'a')
+				$linkTag .= 'rel="image_src" ';
+			else if ($_GET['t'] == 'v')
+				$linkTag .= 'rel="video_src" ';
+			$linkTag .= 'href="' . $image . '"';
+			$linkTag .= '>';
+			echo $linkTag;
+		}
+	?>
+	
 </head>
 <body>
+	<?php
+		echo "<img title='$image' src='$image' alt='$image'>";
+	?>
+	
 	<div id="social">
 		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-count">
 			<a href="" class="ssk ssk-facebook" data-ssk-ready="true"></a>

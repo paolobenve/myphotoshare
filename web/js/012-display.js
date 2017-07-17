@@ -35,14 +35,11 @@ $(document).ready(function() {
 	
 	/* Displays */
 	
-	function socialButtons() {
+	function socialButtons(albums, media, type) {
+		var url, hash, albums, media, myUrl;
 		url = document.location.protocol +"//"+ document.location.hostname + document.location.pathname;
 		hash = location.hash;
-		cleanHash = location.hash.substring(3);
-		albums = cleanHash.substring(0, cleanHash.indexOf('/'));
-		media = cleanHash.substring(cleanHash.indexOf('/') + 1);
-		console.log(cleanHash, albums, media);
-		myUrl = url + '?a=' + albums + '&m=' + media + hash;
+		myUrl = url + '?a=' + encodeURIComponent(albums) + '&m=' + encodeURIComponent(media) + '&t=' + type + hash;
 		console.log(myUrl);
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
@@ -884,7 +881,7 @@ $(document).ready(function() {
 	/* Entry point for most events */
 	
 	function hashParsed(album, photo, photoIndex) {
-		var populateAlbum;
+		var populateAlbum, albums, type;
 		undie();
 		$("#loading").hide();
 		if (album === currentAlbum && photo === currentMedia)
@@ -925,7 +922,11 @@ $(document).ready(function() {
 			$(".media-caption").show();
 		// function must be called again in order to set elements previously absent
 		setOptions();
-		socialButtons();
+		albums = currentMedia.albumName.substring(0, currentMedia.albumName.lastIndexOf('/'));
+		type = "i";
+		if (currentMedia.mediaType == "video")
+			type = "v"
+		socialButtons(albums, currentMedia.name, type);
 	}
 
 	function getOptions(cacheSubDir, callback) {
