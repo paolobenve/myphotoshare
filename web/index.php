@@ -33,16 +33,18 @@
 	<script type="text/javascript" src="js/012-display.js"></script>
 	<?php
 		if ($_GET['t']) {
-			$image = $_GET['a'] . '/' . $_GET['m'];
+			$image = $_GET['s'];
+			echo "i=$image\n";
 			$pathInfo = pathinfo($_SERVER['PHP_SELF'])['dirname'];
-			$imageWithPath = $pathInfo . $image;
-			$encodedImageWithPath = urlencode($pathInfo . $image);
+			echo "p=$pathInfo\n";
+			$imageWithPath = $pathInfo . '/' .$image;
+			echo "iwp=$imageWithPath\n";
 			$linkTag = '<link ';
 			if ($_GET['t'] == 'i' || $_GET['t'] == 'a')
 				$linkTag .= 'rel="image_src" ';
 			else if ($_GET['t'] == 'v')
 				$linkTag .= 'rel="video_src" ';
-			$linkTag .= 'href="' . $encodedImageWithPath . '"';
+			$linkTag .= 'href="' . $imageWithPath . '"';
 			$linkTag .= '>';
 			echo "$linkTag\n";
 		}

@@ -921,7 +921,6 @@ $(document).ready(function() {
 			$(".media-caption").show();
 		// function must be called again in order to set elements previously absent
 		setOptions();
-		albums = currentMedia.albumName.substring(0, currentMedia.albumName.lastIndexOf('/'));
 		if (currentMedia === null) {
 			type = "a";
 		}
