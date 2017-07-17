@@ -35,15 +35,14 @@
 		if ($_GET['t']) {
 			$image = $_GET['a'] . '/' . $_GET['m'];
 			$pathInfo = pathinfo($_SERVER['PHP_SELF'])['dirname'];
-			if ($pathInfo)
-				$pathInfo .= '/';
 			$imageWithPath = $pathInfo . $image;
+			$encodedImageWithPath = urlencode($pathInfo . $image);
 			$linkTag = '<link ';
 			if ($_GET['t'] == 'i' || $_GET['t'] == 'a')
 				$linkTag .= 'rel="image_src" ';
 			else if ($_GET['t'] == 'v')
 				$linkTag .= 'rel="video_src" ';
-			$linkTag .= 'href="' . $imageWithPath . '"';
+			$linkTag .= 'href="' . $encodedImageWithPath . '"';
 			$linkTag .= '>';
 			echo "$linkTag\n";
 		}
