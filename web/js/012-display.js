@@ -77,11 +77,11 @@ $(document).ready(function() {
 		language = getLanguage();
 		var selector;
 		for (var key in translations[language]) {
-			if (key == '#title-string' && document.title != "")
+			if (key == '#title-string' && document.title.substr(0, 5) != "<?php")
+				// don't set page title, php has already set it
 				continue;
 			selector = $(key);
 			if (selector.length) {
-				// don't set page title, php has already set it
 				selector.html(translations[language][key]);
 			}
 		}
@@ -94,8 +94,8 @@ $(document).ready(function() {
 	
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle;
-		if (document.title != "")
-			originalTitle = document.title;
+		if (Options.page_title !== "")
+			originalTitle = Options.page_title;
 		else
 			originalTitle = translations[language]["#title-string"];
 		
