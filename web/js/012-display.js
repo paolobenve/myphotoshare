@@ -35,11 +35,14 @@ $(document).ready(function() {
 	
 	/* Displays */
 	
-	function socialButtons(src, type) {
-		var url, hash, albums, media, myUrl;
+	function socialButtons(srcArray, type) {
+		var url, hash, myUrl = "";
 		url = document.location.pathname;
 		hash = location.hash;
-		myUrl = url + '?s=' + encodeURIComponent(src) + '&t=' + type + hash;
+		myUrl = url + '?';
+		for (var i = 0; i < srcArray.lenght; i ++)
+			myUrl += 's' + i + '=' + encodeURIComponent(srcArray[i]) + '&';
+		myUrl += 't=' + type + hash;
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
@@ -275,7 +278,31 @@ $(document).ready(function() {
 	}
 
 	function scrollToThumb() {
-		var photo, thumb;
+		var photo, thumb, type, MediaArray = [];
+
+
+		if (currentMedia === null) {
+			type = "a";
+			var maxImageNumber = 3;
+			$(".thumbnail").each(function() {
+				MediaArray.push($(this).attr("src"));
+				if (MediaArray.lenght = maxImageNumber)
+					return;
+			});
+			
+		}
+		else if (currentMedia.mediaType == "video") {
+			MediaArray = $("#video").attr("src");
+			type = "v";
+		}
+		else {
+			type = "i";
+			MediaArray = $("#photo").attr("src");
+		}
+		socialButtons(MediaArray, type);
+
+
+
 		photo = currentMedia;
 		if (photo === null) {
 			photo = previousMedia;
@@ -344,7 +371,8 @@ $(document).ready(function() {
 					imageString += 			"px;\">";
 					imageString += 		"<img title=\"" + currentAlbum.photos[i].name +
 								"\" alt=\"" + photoFloat.trimExtension(currentAlbum.photos[i].name) +
-								"\" src=\"" +  thumbHash;
+								"\" src=\"" +  thumbHash +
+								"\" class=\"thumbnail";
 					if (Options.media_thumb_type == "fixed_height") {
 						imageString += 	"\" height=\"" + thumbHeight +
 								"\" width=\"" + thumbWidth;
@@ -419,7 +447,9 @@ $(document).ready(function() {
 									distance = (Options.album_thumb_size - thumbHeight) / 2;
 								}
 								htmlText = "<img " +
-										"title=\"" + randomPhoto.albumName.substr(7) + "\"" +
+										//~ "title=\"" + randomPhoto.albumName.substr(7) + "\"" +
+										"title=\"" + randomPhoto.albumName + "\"" +
+										" class=\"thumbnail\"" +
 										" src=\"" + photoFloat.photoPath(randomAlbum, randomPhoto, Options.album_thumb_size) + "\"" +
 										" style=\"width:" + thumbWidth + "px;" +
 											" height:" + thumbHeight + "px;" +
@@ -880,7 +910,7 @@ $(document).ready(function() {
 	/* Entry point for most events */
 	
 	function hashParsed(album, photo, photoIndex) {
-		var populateAlbum, albums, type;
+		var populateAlbum;
 		undie();
 		$("#loading").hide();
 		if (album === currentAlbum && photo === currentMedia)
@@ -921,18 +951,6 @@ $(document).ready(function() {
 			$(".media-caption").show();
 		// function must be called again in order to set elements previously absent
 		setOptions();
-		if (currentMedia === null) {
-			type = "a";
-		}
-		else if (currentMedia.mediaType == "video") {
-			selector = $("#video");
-			type = "v";
-		}
-		else {
-			type = "i";
-			selector = $("#photo");
-		}
-		socialButtons(selector.attr("src"), type);
 	}
 
 	function getOptions(cacheSubDir, callback) {

@@ -14,13 +14,13 @@ from VideoToolWrapper import *
 import math
 import Options
 
-def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size):
+def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
 	# self._thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self._thumbnail(image, original_path, thumbs_path, thumb_size)
+		self._thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
 	except KeyboardInterrupt:
 		raise
 
@@ -185,8 +185,8 @@ class Media(object):
 			except KeyboardInterrupt:
 				raise
 		elif self._attributes["mediaType"] == "video":
-			self._video_thumbnails(thumbs_path, media_path)
 			self._video_transcode(thumbs_path, media_path)
+			self._video_thumbnails(thumbs_path, media_path)
 		else:
 			self.is_valid = False
 			return
@@ -383,9 +383,12 @@ class Media(object):
 						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size))
 					except KeyboardInterrupt:
 						raise
-				for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
+				for (thumb_size, thumb_type) in (
+					(Options.config['album_thumb_size'], Options.config['album_thumb_type']),
+					(Options.config['media_thumb_size'], Options.config['media_thumb_type'])
+				):
 					try:
-						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size))
+						pool.apply_async(make_photo_thumbs, args = (self, image, photo_path, thumbs_path, thumb_size, thumb_type))
 					except KeyboardInterrupt:
 						raise
 			except KeyboardInterrupt:
@@ -426,41 +429,42 @@ class Media(object):
 					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size)
 				except KeyboardInterrupt:
 					raise
-			for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
+			smallest_reduced_size_image = thumb
+			# album size: square thumbnail are generated anyway, because they are needed by the php code that permits sharing albums
+			thumb_size = Options.config['album_thumb_size']
+			thumb_type = Options.config['album_thumb_type']
+			for i in range(2):
 				try:
-					if (
-						thumb_size == Options.config['media_thumb_size'] and (
-							Options.config['media_thumb_type'] == "fixed_height" and (
-								Options.config['album_thumb_type'] == "square" or
-								image_width > image_height and thumb_size * image_width / float(image_height) > Options.config['album_thumb_size']
-							) 
-						) or Options.config['album_thumb_type'] == "square" and 
-							image_width > image_height and thumb_size * image_width / float(image_height) > Options.config['album_thumb_size']
-					):
-						# if album thumbnail was square, and media thumbnail fixed height, or with portrait images,
-						# a wider image than the previous thumbnail could be generated, better start from original image
-						thumb = image
-					thumb = self._thumbnail(thumb, photo_path, thumbs_path, thumb_size)
+					thumb = self._thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
 				except KeyboardInterrupt:
 					raise
+				if i == 0:
+					if thumb_type == "square":
+						# no need for a second iteration
+						break
+					else:
+						thumb_type = "square"
+			# media size
+			thumb_type = Options.config['media_thumb_type']
+			thumb_size = Options.config['media_thumb_size']
+			try:
+				thumb = self._thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
+			except KeyboardInterrupt:
+				raise
 		except KeyboardInterrupt:
 			raise
-	def _thumbnail(self, image, original_path, thumbs_path, thumbnail_size):
-		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumbnail_size))
-		info_string = str(thumbnail_size)
-		original_thumbnail_size = thumbnail_size
+	def _thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
+		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumb_size))
+		info_string = str(thumb_size)
+		original_thumb_size = thumb_size
 		next_level()
-		if thumbnail_size == Options.config['album_thumb_size']:
-			if Options.config['album_thumb_type'] == "square": 
-				info_string += ", square"
-			elif Options.config['album_thumb_type'] == "fit": 
-				info_string += ", fit size"
-		elif thumbnail_size == Options.config['media_thumb_size']:
-			if Options.config['media_thumb_type'] == "square": 
-				info_string += ", square"
-			elif Options.config['media_thumb_type'] == "fixed_height": 
-				info_string += ", fixed height"
-		is_thumbnail = (thumbnail_size == Options.config['album_thumb_size'] or thumbnail_size == Options.config['media_thumb_size'])
+		if thumb_type == "square": 
+			info_string += ", square"
+		if thumb_size == Options.config['album_thumb_size'] and thumb_type == "fit":
+			info_string += ", fit size"
+		elif thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height":
+			info_string += ", fixed height"
+		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
 		if (
 			os.path.exists(thumb_path) and
 			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
@@ -468,77 +472,74 @@ class Media(object):
 				is_thumbnail and not Options.config['recreate_thumbnails']
 			)
 		):
-			if original_thumbnail_size == Options.config['album_thumb_size']:
+			if original_thumb_size == Options.config['album_thumb_size']:
 				message("existing album thumbnail", info_string)
-			elif original_thumbnail_size == Options.config['media_thumb_size']:
+			elif original_thumb_size == Options.config['media_thumb_size']:
 				message("existing thumbnail", info_string)
 			else:
 				message("existing reduced size", info_string)
 			back_level()
-			return image
+			return start_image
 		gc.collect()
 		try:
-			image_copy = image.copy()
+			start_image_copy = start_image.copy()
 		except KeyboardInterrupt:
 			raise
 		except:
 			try:
-				image_copy = image.copy() # we try again to work around PIL bug
+				start_image_copy = start_image.copy() # we try again to work around PIL bug
 			except KeyboardInterrupt:
 				raise
-		image_width = image.size[0]
-		image_height = image.size[1]
-		if (
-			thumbnail_size == Options.config['album_thumb_size'] and Options.config['album_thumb_type'] == "square" or
-			thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "square"
-		):
-			if image_width > image_height:
-				left = (image_width - image_height) / 2
+		start_image_width = start_image.size[0]
+		start_image_height = start_image.size[1]
+		if thumb_type == "square":
+			if start_image_width > start_image_height:
+				left = (start_image_width - start_image_height) / 2
 				top = 0
-				right = image_width - left
-				bottom = image_height
+				right = start_image_width - left
+				bottom = start_image_height
 			else:
 				left = 0
-				top = (image_height - image_width) / 2
-				right = image_width
-				bottom = image_height - top
-			image_copy = image_copy.crop((left, top, right, bottom))
+				top = (start_image_height - start_image_width) / 2
+				right = start_image_width
+				bottom = start_image_height - top
+			start_image_copy = start_image_copy.crop((left, top, right, bottom))
 			gc.collect()
-			thumbnail_width = thumbnail_size
-			thumbnail_height = thumbnail_size
+			thumbnail_width = thumb_size
+			thumbnail_height = thumb_size
 		else:
-			if image_width > image_height:
-				thumbnail_width = thumbnail_size
-				thumbnail_height = round(thumbnail_size * image_height / float(image_width))
+			if start_image_width > start_image_height:
+				thumbnail_width = thumb_size
+				thumbnail_height = round(thumb_size * start_image_height / float(start_image_width))
 			else:
-				thumbnail_width = round(thumbnail_size * image_width / float(image_height))
-				thumbnail_height = thumbnail_size
+				thumbnail_width = round(thumb_size * start_image_width / float(start_image_height))
+				thumbnail_height = thumb_size
 		if (
-			original_thumbnail_size == Options.config['media_thumb_size'] and Options.config['media_thumb_type'] == "fixed_height" and
-			image_width > image_height
+			original_thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height" and
+			start_image_width > start_image_height
 		):
-			thumbnail_size = round(original_thumbnail_size * image_width / float(image_height))
-			thumbnail_width = round(thumbnail_size * image_width / float(image_height))
-			thumbnail_height = thumbnail_size
-		if (image_width >= thumbnail_width and image_height > thumbnail_height):
-			# both width and height of thumbnail are less then width and height of image, no blurring can happen
-			image_copy.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
+			thumb_size = round(original_thumb_size * start_image_width / float(start_image_height))
+			thumbnail_width = round(thumb_size * start_image_width / float(start_image_height))
+			thumbnail_height = thumb_size
+		if (start_image_width >= thumbnail_width and start_image_height > thumbnail_height):
+			# both width and height of thumbnail are less then width and height of start_image, no blurring can happen
+			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
 			self.last_thumbnail_was_canvas = False
 		elif not is_thumbnail:
 			# we arrive here when at least one size the start image is less than the corresponding thumbnail size => make the canvas
-			image_copy = self.resize_canvas(image_copy, thumbnail_size, Options.config['background_color'], False)
+			start_image_copy = self.resize_canvas(start_image_copy, thumb_size, Options.config['background_color'], False)
 			# don't start from a canvas for next thumbnail
 			self.last_thumbnail_was_canvas = True
 		try:
-			image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			if original_thumbnail_size > Options.config['album_thumb_size']:
+			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reduced size image", info_string)
-			elif original_thumbnail_size == Options.config['album_thumb_size']:
+			elif original_thumb_size == Options.config['album_thumb_size']:
 				message("thumbing for albums", info_string)
 			else:
 				message("thumbing for media", info_string)
 			back_level()
-			return image_copy
+			return start_image_copy
 		except KeyboardInterrupt:
 			try:
 				os.unlink(thumb_path)
@@ -546,22 +547,22 @@ class Media(object):
 				pass
 			raise
 		except IOError:
-			image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			next_level(1)
-			message(str(thumbnail_size) + " thumbnail", "OK (bug workaround)", 1)
+			message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 1)
 			back_level(1)
 			back_level()
-			return image_copy
+			return start_image_copy
 		except:
 			next_level()
-			message(str(thumbnail_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns original image")
+			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns start image")
 			back_level()
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
 			back_level()
-			return image
+			return start_image
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(
@@ -610,8 +611,11 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
-			self._thumbnail(mirror, original_path, thumbs_path, thumb_size)
+		for (thumb_size, thumb_type) in (
+			(Options.config['album_thumb_size'], Options.config['album_thumb_type']),
+			(Options.config['media_thumb_size'], Options.config['media_thumb_type'])
+		):
+			self._thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		try:
 			os.unlink(tfn)
 		except:

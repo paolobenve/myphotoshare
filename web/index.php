@@ -32,32 +32,88 @@
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
 	<?php
+		// put in the page the link rel for getting the image when sharing
 		if ($_GET['t']) {
-			$image = $_GET['s'];
-			echo "i=$image\n";
+			if ($_GET['t'] == 'a') {
+				$i = 0;
+				$srcImagePaths = array();
+				while (array_key_exists('s' . $i, $_GET)) {
+					$srcImagePaths[] = $_GET['s' . $i];
+					$i ++;
+				}
+				
+				/*
+				 * INIT BASE IMAGE FILLED WITH BACKGROUND COLOR
+				 */
+				 
+				$tileWidth = $tileHeight = 28;
+				$numberOfTiles = 3;
+				$pxBetweenTiles = 1;
+				$leftOffSet = $topOffSet = 1;
+				 
+				$mapWidth = $mapHeight = ($tileWidth + $pxBetweenTiles) * $numberOfTiles;
+				 
+				$mapImage = imagecreatetruecolor($mapWidth, $mapHeight);
+				$bgColor = imagecolorallocate($mapImage, 50, 40, 0);
+				imagefill($mapImage, 0, 0, $bgColor);
+				 
+				/*
+				 *  PUT SRC IMAGES ON BASE IMAGE
+				 */
+				 
+				function indexToCoords($index)
+				{
+				 global $tileWidth, $pxBetweenTiles, $leftOffSet, $topOffSet, $numberOfTiles;
+				 
+				 $x = ($index % 12) * ($tileWidth + $pxBetweenTiles) + $leftOffSet;
+				 $y = floor($index / 12) * ($tileWidth + $pxBetweenTiles) + $topOffSet;
+				 return Array($x, $y);
+				}
+				 
+				foreach ($srcImagePaths as $index => $srcImagePath)
+				{
+				 list ($x, $y) = indexToCoords($index);
+				 $tileImg = imagecreatefrompng($srcImagePath);
+				 
+				 imagecopy($mapImage, $tileImg, $x, $y, 0, 0, $tileWidth, $tileHeight);
+				 imagedestroy($tileImg);
+				}
+				 
+				/*
+				 * RESCALE TO THUMB FORMAT
+				 */
+				$thumbSize = 200;
+				$thumbImage = imagecreatetruecolor($thumbSize, $thumbSize);
+				imagecopyresampled($thumbImage, $mapImage, 0, 0, 0, 0, $thumbSize, $thumbSize, $mapWidth, $mapWidth);
+				 
+				header ("Content-type: image/png");
+				$imagePath = options['server_cache_path'] . "/albumcache";
+				mkdir($imagePath);
+				$imagePath += "/" . rand();
+				imagejpeg($thumbImage, $imagePath);
+				$media = $imagePath;
+			} else {
+				$media = $_GET['s0'];
+			}
+			//echo "i=$media\n";
 			$pathInfo = pathinfo($_SERVER['PHP_SELF'])['dirname'];
-			echo "p=$pathInfo\n";
-			$imageWithPath = '/' .$image;
+			//echo "p=$pathInfo\n";
+			$mediaWithPath = '/' .$media;
 			if ($pathInfo != '/')
-				$imageWithPath = $pathInfo .$imageWithPath;
-			echo "iwp=$imageWithPath\n";
+				$mediaWithPath = $pathInfo .$mediaWithPath;
+			//echo "iwp=$mediaWithPath\n";
 			$linkTag = '<link ';
 			if ($_GET['t'] == 'i' || $_GET['t'] == 'a')
 				$linkTag .= 'rel="image_src" ';
 			else if ($_GET['t'] == 'v')
 				$linkTag .= 'rel="video_src" ';
-			$linkTag .= 'href="' . $imageWithPath . '"';
+			$linkTag .= 'href="' . $mediaWithPath . '"';
 			$linkTag .= '>';
 			echo "$linkTag\n";
 		}
 	?>
 </head>
 <body>
-	<?php
-		if (false && $_GET['t'] == 'i') {
-			echo "<img id='share-img' title='$image' src='$imageWithPath' alt='$image'>\n";
-		}
-	?>
 	<div id="social">
 		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-count">
 			<a href="" class="ssk ssk-facebook" data-ssk-ready="true"></a>
