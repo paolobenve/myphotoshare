@@ -35,13 +35,11 @@ $(document).ready(function() {
 	
 	/* Displays */
 	
-	function socialButtons(albums, media, type) {
+	function socialButtons(src, type) {
 		var url, hash, albums, media, myUrl;
-		//~ url = document.location.protocol +"//"+ document.location.hostname + document.location.pathname;
 		url = document.location.pathname;
 		hash = location.hash;
-		myUrl = url + '?a=' + encodeURIComponent(albums) + '&m=' + encodeURIComponent(media) + '&t=' + type + hash;
-		console.log(myUrl);
+		myUrl = url + '?s=' + encodeURIComponent(src) + '&t=' + type + hash;
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
@@ -924,10 +922,18 @@ $(document).ready(function() {
 		// function must be called again in order to set elements previously absent
 		setOptions();
 		albums = currentMedia.albumName.substring(0, currentMedia.albumName.lastIndexOf('/'));
-		type = "i";
-		if (currentMedia.mediaType == "video")
-			type = "v"
-		socialButtons(albums, currentMedia.name, type);
+		if (currentMedia === null) {
+			type = "a";
+		}
+		else if (currentMedia.mediaType == "video") {
+			selector = $("#video");
+			type = "v";
+		}
+		else {
+			type = "i";
+			selector = $("#photo");
+		}
+		socialButtons(selector.attr("src"), type);
 	}
 
 	function getOptions(cacheSubDir, callback) {
