@@ -9,7 +9,7 @@
 
 It's an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
-This is a Jason A. Donenfeld's Photofloat fork. It also received and merged Joachim Tingvold's patches about showing videos.
+This is a Jason A. Donenfeld's Photofloat fork, enriched by following contributors: Jerome Charaoui's patches about showing videos, and Paolo Benvenuto's following development.
 
 [Check out a demo!](http://palmaro.qumran2.net/#!/_folders-giovani-biscotti_natale_2016/giovani_preparazione_biscotti_2016-12-16-17.17.27.jpg)
 
@@ -19,9 +19,17 @@ photofloat consists of two segments – a Python script and a JavaScript applica
 
 The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. It writes an `options.json` file too, putting inside it all the options from default config file or user config file. The scanner extracts metadata from EXIF tags in JPEG photos. photofloat is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be very fast if there are few or zero changes since the last time you ran it.
 
-The JavaScript application consists of a single `index.html` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the `options.json` file and the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface.
+The JavaScript application consists of a single `index.php` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the `options.json` file and the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface.
 
 It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
+
+### Dependencies
+
+Photofloat needs:
+
+* `python` 2.7
+* a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
+* `avconv`/`ffmpeg` in order to be able to manage videos.
 
 ## Changelog
 
