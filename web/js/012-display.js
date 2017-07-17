@@ -37,7 +37,8 @@ $(document).ready(function() {
 	
 	function socialButtons(albums, media, type) {
 		var url, hash, albums, media, myUrl;
-		url = document.location.protocol +"//"+ document.location.hostname + document.location.pathname;
+		//~ url = document.location.protocol +"//"+ document.location.hostname + document.location.pathname;
+		url = document.location.pathname;
 		hash = location.hash;
 		myUrl = url + '?a=' + encodeURIComponent(albums) + '&m=' + encodeURIComponent(media) + '&t=' + type + hash;
 		console.log(myUrl);

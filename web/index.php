@@ -34,24 +34,22 @@
 	<?php
 		if ($_GET['t']) {
 			$image = $_GET['a'] . '/' . $_GET['m'];
-			$imageWithPath = $options['server_album_path'] . '/' . $image;
+			$imageWithPath = pathinfo($_SERVER['PHP_SELF'])['dirname'] . '/' . $image;
 			$linkTag = '<link ';
 			if ($_GET['t'] == 'i' || $_GET['t'] == 'a')
 				$linkTag .= 'rel="image_src" ';
 			else if ($_GET['t'] == 'v')
 				$linkTag .= 'rel="video_src" ';
 			$linkTag .= 'href="' . $imageWithPath . '"';
-			$linkTag .= '>
-			';
-			echo $linkTag;
+			$linkTag .= '>';
+			echo "$linkTag\n";
 		}
 	?>
 </head>
 <body>
 	<?php
 		if (false && $_GET['t'] == 'i') {
-			echo "<img id='share-img' title='$image' src='$imageWithPath' alt='$image'>
-			";
+			echo "<img id='share-img' title='$image' src='$imageWithPath' alt='$image'>\n";
 		}
 	?>
 	<div id="social">
