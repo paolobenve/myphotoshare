@@ -278,30 +278,48 @@ $(document).ready(function() {
 	}
 
 	function scrollToThumb() {
-		var photo, thumb, type, MediaArray = [];
-
+		var photo, thumb, type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex, selectedMediaIndexes = [];
 
 		if (currentMedia === null) {
 			type = "a";
-			var maxImageNumber = 3;
+			re = new  RegExp("_(" + Options.album_thumb_size.toString() + "af\\.jpg|" +
+				Options.media_thumb_size.toString() + "tf\\.jpg)$");
 			$(".thumbnail").each(function() {
-				MediaArray.push($(this).attr("src"));
-				if (MediaArray.lenght = maxImageNumber)
-					return;
+				src = $(this).attr("src");
+				position = src.search(re);
+				if (position != -1) {
+					// always use square album thumbnail
+					src = src.substring(0, position + 1) + Options.album_thumb_size.toString() + "as.jpg";
+				}
+				allThumbnails.push(src);
 			});
-			
+			console.log(allThumbnails);
+			// four random thumbnail will be passed to php as url parameters
+			for (var i = 0; i < allThumbnails.length; i ++) {
+				randomIndex = Math.floor(Math.random() * (allThumbnails.length - 1)) + 1;
+				if (selectedMediaIndexes.indexOf(randomIndex) == -1)
+					selectedMediaIndexes.push(randomIndex);
+				if (selectedMediaIndexes.length == 4)
+					break;
+			}
+			i = 0;
+			while (selectedMediaIndexes.length < 4) {
+				selectedMediaIndexes.push(selectedMediaIndexes[i]);
+				i ++;
+			}
+			for (i = 0; i < 4; i ++) {
+				mediaArray.push(allThumbnails[selectedMediaIndexes[i]]);
+			}
 		}
 		else if (currentMedia.mediaType == "video") {
-			MediaArray = $("#video").attr("src");
+			mediaArray = $("#video").attr("src");
 			type = "v";
 		}
 		else {
 			type = "i";
-			MediaArray = $("#photo").attr("src");
+			mediaArray = $("#photo").attr("src");
 		}
-		socialButtons(MediaArray, type);
-
-
+		socialButtons(mediaArray, type);
 
 		photo = currentMedia;
 		if (photo === null) {

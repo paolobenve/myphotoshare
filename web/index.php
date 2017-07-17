@@ -90,6 +90,7 @@
 				$imagePath = options['server_cache_path'] . "/albumcache";
 				mkdir($imagePath);
 				$imagePath += "/" . rand();
+				// save the image in cache path
 				imagejpeg($thumbImage, $imagePath);
 				$media = $imagePath;
 			} else {
