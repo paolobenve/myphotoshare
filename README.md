@@ -33,6 +33,14 @@ Photofloat needs:
 
 ## Changelog
 
+Features added in version 2.3 (July 25, 2017):
+
+* social buttons
+* web page isn't index.html any more, it's index.php: that permits php:
+* - set page title (by reading the options.json file)
+* - set the `<link rel"..." ...>` tag in <head></head> which permits social media to get the image when sharing
+* an image made of 4 thumbnail is presented when sharing an album (in order to get that, album-size square thumbnail is always generated)
+
 Features added in version 2.2 (July 15, 2017):
 
 * translations are now managed via a separate js file: enthusiasts and followers are encouraged to provide the translation for their language 

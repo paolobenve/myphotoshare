@@ -32,7 +32,7 @@
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
 	<?php
-		// put in the page the link rel for getting the image when sharing
+		// put the <link rel=".."> tag in <head> for getting the image thumbnail when sharing
 		if ($_GET['t']) {
 			if ($_GET['t'] == 'a') {
 				$i = 0;
