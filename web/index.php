@@ -37,7 +37,9 @@
 			echo "i=$image\n";
 			$pathInfo = pathinfo($_SERVER['PHP_SELF'])['dirname'];
 			echo "p=$pathInfo\n";
-			$imageWithPath = $pathInfo . '/' .$image;
+			$imageWithPath = '/' .$image;
+			if ($pathInfo != '/')
+				$imageWithPath = $pathInfo .$imageWithPath;
 			echo "iwp=$imageWithPath\n";
 			$linkTag = '<link ';
 			if ($_GET['t'] == 'i' || $_GET['t'] == 'a')
