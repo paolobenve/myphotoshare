@@ -28,6 +28,16 @@ album_path =
 # cache folder absolute path, for use in python 
 cache_path = 
 
+# what method will be used to generate tumbnails?
+# permitted values:
+#    cascade : the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
+#    parallel: every thumbnail is generated from the image, and the processes are launched parallely on the various cores of the cpu
+#    mixed   : the biggest thumbnail is generated from image, the following are generate in a parallel way from the biggest thumbnail
+thumbnail_generation_mode = cascade
+
+# How many processors shouldn't be used in parallel mode?
+respected_processors = 1
+
 # the method to use for generating cache 2-charachters subdirs
 # permitted values:
 #    md5	: the leading 2 characters of the md5 of the image/video path relative to albums dir
@@ -73,12 +83,6 @@ folders_string = _folders
 by_date_string = _by_date
 cache_folder_separator = -
 
-# what method will be used to generate tumbnails?
-# permitted values:
-#    cascade : the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
-#    parallel: every thumbnail is generated from the image, and the processes are launched parallely on the various cores of the cpu
-#    mixed   : the biggest thumbnail is generated from image, the following are generate in a parallel way from the biggest thumbnail
-thumbnail_generation_mode = cascade
 
 ###########################################################
 # js options

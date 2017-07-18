@@ -60,6 +60,7 @@ Features added in version 2.2 (July 15, 2017):
 * landscape photos are shown vertically centered
 * if the window is resized, the reduced size image shown is changed according to window size, so that it never shows blurred
 * videos now works perfectly in fullscreen mode
+* new option `respected_processors`: tells the scanner how many processor not to use
 
 Features added in version 2.1.1 (July 6, 2017):
 
