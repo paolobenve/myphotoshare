@@ -110,6 +110,7 @@ $(document).ready(function() {
 		if (shareTextAdd)
 			shareText += ": " + shareTextAdd.substring(shareTextAdd.lastIndexOf('/') + 1);
 		
+		jQuery.removeData(".ssk");
 		
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
@@ -586,7 +587,7 @@ $(document).ready(function() {
 				$("#thumbs").show();
 			$("#powered-by").hide();
 		}
-		setTimeout(socialButtons, 1);
+		//~ setTimeout(socialButtons, 1);
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
@@ -864,6 +865,7 @@ $(document).ready(function() {
 		
 		$("#subalbums").hide();
 		$("#media-view").show();
+		//~ socialButtons();
 	}
 	
 	function setOptions() {
@@ -995,8 +997,9 @@ $(document).ready(function() {
 			$(".media-caption").hide();
 		else
 			$(".media-caption").show();
-		// function must be called again in order to set elements previously absent
+		// options function must be called again in order to set elements previously absent
 		setOptions();
+		socialButtons(); 
 	}
 
 	function getOptions(cacheSubDir, callback) {

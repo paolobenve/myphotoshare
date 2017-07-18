@@ -41,7 +41,7 @@ Features added in version 2.3 (July 25, 2017):
 * - set page title (by reading the options.json file)
 * - set the `<link rel"..." ...>` tag in <head></head> which permits social media to get the image when sharing
 * an image made of n x n thumbnail is presented when sharing an album (in order to get that, album-size square thumbnail is always generated)
-* new options `album_share_thumbnails_number`: how many thumbnails will be used in order to create the image for shareing folders
+* new options `max_album_share_thumbnails_number`: how many thumbnails will be used at most when creating the composite image for sharing albums
 
 Features added in version 2.2 (July 15, 2017):
 
