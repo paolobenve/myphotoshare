@@ -346,3 +346,12 @@ a#day-view, a#folders-view {
 #album-arrow-up, #album-arrow-down, #media-arrow-up, #media-arrow-down {
 	display: none;
 }
+
+#social, #social:hover {
+	opacity: 0.5;
+	position: absolute;
+	z-index: 1000;
+}
+#social:hover {
+	opacity: 1;
+}

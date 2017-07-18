@@ -37,7 +37,8 @@ $(document).ready(function() {
 	
 	function socialButtons() {
 		var url, hash, myUrl = "";
-		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex, i, iCorrected, folders;
+		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex;
+		var i, iCorrected, folders, shareText, shareTextAdd;
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
@@ -86,7 +87,7 @@ $(document).ready(function() {
 			mediaArray.push($("#photo").attr("src"));
 		}
 		
-		url = location.protocol + "//" + location.host;
+		url = location.origin;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
 		url += folders;
@@ -95,11 +96,18 @@ $(document).ready(function() {
 		for (var i = 0; i < mediaArray.length; i ++)
 			myUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
 		myUrl += 't=' + type + '#' + hash.substring(1);
+		
+		shareText = Options.page_title
+		shareTextAdd = currentAlbum.physicalPath;
+		if (shareTextAdd)
+			shareText += ": " + shareTextAdd.substring(shareTextAdd.lastIndexOf('/') + 1);
+		
+		
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
 			url: myUrl,
-			//~ text: 'Share text default',
+			text: shareText,
 			//~ twitter: {
 				//~ url: 'http://url-for-twitter',
 				//~ text: 'Share text for twitter',
