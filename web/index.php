@@ -45,13 +45,17 @@
 					$i ++;
 				}
 				
+				// following code got from
+				// https://stackoverflow.com/questions/30429383/combine-16-images-into-1-big-image-with-php#30429557
+				// thanks to Adarsh Vardhan who wrote it!
+				
 				/*
 				 * INIT BASE IMAGE FILLED WITH BACKGROUND COLOR
 				 */
 				 
 				$tileWidth = $tileHeight = $options['album_thumb_size'];
 				$numberOfTiles = intval(sqrt($options['album_share_thumbnails_number']));
-				$pxBetweenTiles = 1;
+				$pxBetweenTiles = 0;
 				$leftOffSet = $topOffSet = 1;
 				 
 				$mapWidth = $mapHeight = ($tileWidth + $pxBetweenTiles) * $numberOfTiles - $pxBetweenTiles;
@@ -65,22 +69,22 @@
 				 
 				function indexToCoords($index)
 				{
-				 global $tileWidth, $pxBetweenTiles, $leftOffSet, $topOffSet, $numberOfTiles;
-				 
-				 $x = ($index % $numberOfTiles) * ($tileWidth + $pxBetweenTiles) + $leftOffSet;
-				 $y = floor($index / $numberOfTiles) * ($tileWidth + $pxBetweenTiles) + $topOffSet;
-				 return Array($x, $y);
+					global $tileWidth, $pxBetweenTiles, $leftOffSet, $topOffSet, $numberOfTiles;
+
+					$x = ($index % $numberOfTiles) * ($tileWidth + $pxBetweenTiles) + $leftOffSet;
+					$y = floor($index / $numberOfTiles) * ($tileWidth + $pxBetweenTiles) + $topOffSet;
+					return Array($x, $y);
 				}
 				 
 				foreach ($srcImagePaths as $index => $srcImagePath)
 				{
-				 list ($x, $y) = indexToCoords($index);
-				 $tileImg = imagecreatefromjpeg($srcImagePath);
-				 
-				 imagecopy($mapImage, $tileImg, $x, $y, 0, 0, $tileWidth, $tileHeight);
-				 imagedestroy($tileImg);
+					list ($x, $y) = indexToCoords($index);
+					$tileImg = imagecreatefromjpeg($srcImagePath);
+
+					imagecopy($mapImage, $tileImg, $x, $y, 0, 0, $tileWidth, $tileHeight);
+					imagedestroy($tileImg);
 				}
-				 
+				
 				$imageFile = join_paths("album", strval(rand()) . ".jpg");
 				$absoluteImagePath = join_paths($options['cache_path'], $imageFile);
 				$serverImagePath = join_paths($options['server_cache_path'], $imageFile);
@@ -111,6 +115,18 @@
 	?>
 </head>
 <body>
+	<?php
+		if ($_GET)
+			// redirect to parameters-less page
+			echo "
+	<script>
+		$(document).ready(
+			function() {
+				window.location.href = location.origin + location.pathname + location.hash;
+			});
+	</script>
+";
+	?>
 	<div id="social">
 		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-count">
 			<a href="" class="ssk ssk-facebook"></a>
