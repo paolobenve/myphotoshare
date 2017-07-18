@@ -11,6 +11,7 @@
 		$options = json_decode($jsonString, true);
 	?>
 	<title><?php if ($options['page_title']) echo $options['page_title']; ?></title>
+	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 <!--
 	<link href="css/styles.min.css" rel="stylesheet" type="text/css" /> 
 -->
