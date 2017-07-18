@@ -210,6 +210,6 @@
 	<div id="error-options-file"></div>
 	<div id="error-text-folder"></div>
 	<div id="error-text-image"></div>
-	<div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form</div>
+	<div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form></div>
 </body>
 </html>
