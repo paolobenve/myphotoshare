@@ -36,6 +36,7 @@
 		function join_paths() {
 			return preg_replace('~[/\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
 		}
+		
 		// put the <link rel=".."> tag in <head> for getting the image thumbnail when sharing
 		if ($_GET['t']) {
 			if ($_GET['t'] == 'a') {
@@ -45,7 +46,7 @@
 					$srcImagePaths[] = $_GET['s' . $i];
 					$i ++;
 				}
-				
+				$maxThumbnailNumber = count($srcImagePaths);
 				// following code got from
 				// https://stackoverflow.com/questions/30429383/combine-16-images-into-1-big-image-with-php#30429557
 				// thanks to Adarsh Vardhan who wrote it!
@@ -55,7 +56,7 @@
 				 */
 				 
 				$tileWidth = $tileHeight = $options['album_thumb_size'];
-				$numberOfTiles = intval(sqrt($options['album_share_thumbnails_number']));
+				$numberOfTiles = intval(sqrt($maxThumbnailNumber));
 				$pxBetweenTiles = 0;
 				$leftOffSet = $topOffSet = 1;
 				 
@@ -133,8 +134,6 @@
 			<a href="" class="ssk ssk-facebook"></a>
 			<a href="" class="ssk ssk-twitter"></a>
 			<a href="" class="ssk ssk-google-plus"></a>
-			<a href="" class="ssk ssk-pinterest"></a>
-			<a href="" class="ssk ssk-tumblr"></a>
 			<a href="" class="ssk ssk-email"></a>
 		</div>
 	</div>

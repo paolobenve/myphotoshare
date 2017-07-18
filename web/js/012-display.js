@@ -38,7 +38,7 @@ $(document).ready(function() {
 	function socialButtons() {
 		var url, hash, myUrl = "";
 		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex;
-		var i, iCorrected, folders, shareText, shareTextAdd;
+		var i, iCorrected, folders, shareText, shareTextAdd, maxThumbnailNumber;
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
@@ -56,26 +56,34 @@ $(document).ready(function() {
 				if (allThumbnails.indexOf(src) == -1)
 					allThumbnails.push(src);
 			});
-			// album_share_thumbnails_number random thumbnail will be passed to php as url parameters
-			if (allThumbnails.length <= Options.album_share_thumbnails_number) {
-				mediaArray = allThumbnails;
-				if (allThumbnails.length < Options.album_share_thumbnails_number) {
-					// repeat the thumbnails until length is Options.album_share_thumbnails_number
-					iCorrected = 0;
-					for (i = 0; allThumbnails.length < Options.album_share_thumbnails_number; i ++) {
-						mediaArray.push(allThumbnails[iCorrected]);
-						iCorrected ++;
-						if (iCorrected == allThumbnails.length)
-							iCorrected = 0;
-					}
+			
+			if (allThumbnails.length < 4 || Options.max_album_share_thumbnails_number == 4)
+				maxThumbnailNumber = 4;
+			else if (allThumbnails.length < 9 || Options.max_album_share_thumbnails_number == 9)
+				maxThumbnailNumber = 9;
+			else if (allThumbnails.length < 16 || Options.max_album_share_thumbnails_number == 16)
+				maxThumbnailNumber = 16;
+			else if (allThumbnails.length < 25 || Options.max_album_share_thumbnails_number == 25)
+				maxThumbnailNumber = 25;
+			else
+				maxThumbnailNumber = Options.max_album_share_thumbnails_number;
+			// maxThumbnailNumber random thumbnail will be passed to php as url parameters
+			if (allThumbnails.length <= maxThumbnailNumber) {
+				// add the thumbnails (repeating them) until length is maxThumbnailNumber
+				iCorrected = 0;
+				for (i = 0; i < maxThumbnailNumber; i ++) {
+					mediaArray.push(allThumbnails[iCorrected]);
+					iCorrected ++;
+					if (iCorrected == allThumbnails.length)
+						iCorrected = 0;
 				}
-			} else if (allThumbnails.length > Options.album_share_thumbnails_number) {
+			} else if (allThumbnails.length > maxThumbnailNumber) {
 				for (i = 0; i < allThumbnails.length * 5; i ++) {
 					// 0 <= random index < allThumbnails.length
 					randomIndex = Math.floor(Math.random() * (allThumbnails.length - 1)) + 1;
 					if (mediaArray.indexOf(allThumbnails[randomIndex]) == -1)
 						mediaArray.push(allThumbnails[randomIndex]);
-					if (mediaArray.length == Options.album_share_thumbnails_number)
+					if (mediaArray.length == maxThumbnailNumber)
 						break;
 				}
 			}
@@ -93,7 +101,7 @@ $(document).ready(function() {
 		url += folders;
 		hash = location.hash;
 		myUrl = url + '?';
-		for (var i = 0; i < mediaArray.length; i ++)
+		for (i = 0; i < mediaArray.length; i ++)
 			myUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
 		myUrl += 't=' + type + '#' + hash.substring(1);
 		
