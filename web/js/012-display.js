@@ -37,7 +37,7 @@ $(document).ready(function() {
 	
 	function socialButtons() {
 		var url, hash, myUrl = "";
-		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex, i, folders;
+		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex, i, iCorrected, folders;
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
@@ -55,19 +55,21 @@ $(document).ready(function() {
 				if (allThumbnails.indexOf(src) == -1)
 					allThumbnails.push(src);
 			});
-			// four random thumbnail will be passed to php as url parameters
+			// album_share_thumbnails_number random thumbnail will be passed to php as url parameters
 			if (allThumbnails.length <= Options.album_share_thumbnails_number) {
 				mediaArray = allThumbnails;
 				if (allThumbnails.length < Options.album_share_thumbnails_number) {
-					// repeate the thumbnails until length is Options.album_share_thumbnails_number
-					for (i = 0; i < Options.album_share_thumbnails_number - allThumbnails.length; i ++) {
-						mediaArray.push(allThumbnails[i]);
-						if (allThumbnails.length + i == Options.album_share_thumbnails_number)
-							break;
+					// repeat the thumbnails until length is Options.album_share_thumbnails_number
+					iCorrected = 0;
+					for (i = 0; allThumbnails.length < Options.album_share_thumbnails_number; i ++) {
+						mediaArray.push(allThumbnails[iCorrected]);
+						iCorrected ++;
+						if (iCorrected == allThumbnails.length)
+							iCorrected = 0;
 					}
 				}
 			} else if (allThumbnails.length > Options.album_share_thumbnails_number) {
-				for (var i = 0; i < allThumbnails.length * 2; i ++) {
+				for (i = 0; i < allThumbnails.length * 5; i ++) {
 					// 0 <= random index < allThumbnails.length
 					randomIndex = Math.floor(Math.random() * (allThumbnails.length - 1)) + 1;
 					if (mediaArray.indexOf(allThumbnails[randomIndex]) == -1)
