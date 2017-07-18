@@ -86,7 +86,7 @@
 				$serverImagePath = join_paths($options['server_cache_path'], $imageFile);
 				
 				// save the image
-				imagejpeg($mapImage, $absoluteImagePath);
+				$result = imagejpeg($mapImage, $absoluteImagePath);
 				$media = $serverImagePath;
 				
 			} else {
