@@ -32,6 +32,9 @@
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
 	<?php
+		function join_paths() {
+			return preg_replace('~[/\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
+		}
 		// put the <link rel=".."> tag in <head> for getting the image thumbnail when sharing
 		if ($_GET['t']) {
 			if ($_GET['t'] == 'a') {
@@ -46,13 +49,12 @@
 				 * INIT BASE IMAGE FILLED WITH BACKGROUND COLOR
 				 */
 				 
-				$tileWidth = $tileHeight = 28;
-				$numberOfTiles = 3;
+				$tileWidth = $tileHeight = $options['album_thumb_size'];
+				$numberOfTiles = intval(sqrt($options['album_share_thumbnails_number']));
 				$pxBetweenTiles = 1;
 				$leftOffSet = $topOffSet = 1;
 				 
-				$mapWidth = $mapHeight = ($tileWidth + $pxBetweenTiles) * $numberOfTiles;
-				 
+				$mapWidth = $mapHeight = ($tileWidth + $pxBetweenTiles) * $numberOfTiles - $pxBetweenTiles;
 				$mapImage = imagecreatetruecolor($mapWidth, $mapHeight);
 				$bgColor = imagecolorallocate($mapImage, 50, 40, 0);
 				imagefill($mapImage, 0, 0, $bgColor);
@@ -65,34 +67,28 @@
 				{
 				 global $tileWidth, $pxBetweenTiles, $leftOffSet, $topOffSet, $numberOfTiles;
 				 
-				 $x = ($index % 12) * ($tileWidth + $pxBetweenTiles) + $leftOffSet;
-				 $y = floor($index / 12) * ($tileWidth + $pxBetweenTiles) + $topOffSet;
+				 $x = ($index % $numberOfTiles) * ($tileWidth + $pxBetweenTiles) + $leftOffSet;
+				 $y = floor($index / $numberOfTiles) * ($tileWidth + $pxBetweenTiles) + $topOffSet;
 				 return Array($x, $y);
 				}
 				 
 				foreach ($srcImagePaths as $index => $srcImagePath)
 				{
 				 list ($x, $y) = indexToCoords($index);
-				 $tileImg = imagecreatefrompng($srcImagePath);
+				 $tileImg = imagecreatefromjpeg($srcImagePath);
 				 
 				 imagecopy($mapImage, $tileImg, $x, $y, 0, 0, $tileWidth, $tileHeight);
 				 imagedestroy($tileImg);
 				}
 				 
-				/*
-				 * RESCALE TO THUMB FORMAT
-				 */
-				$thumbSize = 200;
-				$thumbImage = imagecreatetruecolor($thumbSize, $thumbSize);
-				imagecopyresampled($thumbImage, $mapImage, 0, 0, 0, 0, $thumbSize, $thumbSize, $mapWidth, $mapWidth);
-				 
-				header ("Content-type: image/png");
-				$imagePath = options['server_cache_path'] . "/albumcache";
-				mkdir($imagePath);
-				$imagePath += "/" . rand();
-				// save the image in cache path
-				imagejpeg($thumbImage, $imagePath);
-				$media = $imagePath;
+				$imageFile = join_paths("album", strval(rand()) . ".jpg");
+				$absoluteImagePath = join_paths($options['cache_path'], $imageFile);
+				$serverImagePath = join_paths($options['server_cache_path'], $imageFile);
+				
+				// save the image
+				imagejpeg($mapImage, $absoluteImagePath);
+				$media = $serverImagePath;
+				
 			} else {
 				$media = $_GET['s0'];
 			}
@@ -117,12 +113,12 @@
 <body>
 	<div id="social">
 		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-count">
-			<a href="" class="ssk ssk-facebook" data-ssk-ready="true"></a>
-			<a href="" class="ssk ssk-twitter" data-ssk-ready="true"></a>
-			<a href="" class="ssk ssk-google-plus" data-ssk-ready="true"></a>
-			<a href="" class="ssk ssk-pinterest" data-ssk-ready="true"></a>
-			<a href="" class="ssk ssk-tumblr" data-ssk-ready="true"></a>
-			<a href="" class="ssk ssk-email" data-ssk-ready="true"></a>
+			<a href="" class="ssk ssk-facebook"></a>
+			<a href="" class="ssk ssk-twitter"></a>
+			<a href="" class="ssk ssk-google-plus"></a>
+			<a href="" class="ssk ssk-pinterest"></a>
+			<a href="" class="ssk ssk-tumblr"></a>
+			<a href="" class="ssk ssk-email"></a>
 		</div>
 	</div>
 	<div id="title-container">

@@ -30,6 +30,7 @@ Photofloat needs:
 * `python` 2.7
 * a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
 * `avconv`/`ffmpeg` in order to be able to manage videos.
+* `php5-gd` in order to create albumb share images
 
 ## Changelog
 
@@ -39,7 +40,8 @@ Features added in version 2.3 (July 25, 2017):
 * web page isn't index.html any more, it's index.php: that permits php:
 * - set page title (by reading the options.json file)
 * - set the `<link rel"..." ...>` tag in <head></head> which permits social media to get the image when sharing
-* an image made of 4 thumbnail is presented when sharing an album (in order to get that, album-size square thumbnail is always generated)
+* an image made of n x n thumbnail is presented when sharing an album (in order to get that, album-size square thumbnail is always generated)
+* new options `album_share_thumbnails_number`: how many thumbnails will be used in order to create the image for shareing folders
 
 Features added in version 2.2 (July 15, 2017):
 

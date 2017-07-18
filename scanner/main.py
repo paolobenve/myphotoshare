@@ -4,7 +4,7 @@ from TreeWalker import TreeWalker
 from CachePath import message, next_level, back_level
 import sys
 import os
-import os.path
+#~ import os.path
 import ConfigParser
 import Options
 import json
@@ -43,7 +43,8 @@ def main():
 				'album_thumb_size',
 				'media_thumb_size',
 				'big_date_folders_threshold',
-				'respected_processors'
+				'respected_processors',
+				'album_share_thumbnails_number'
 		):
 			Options.config[option] = usr_config.getint('options', option)
 		elif option in ('different_album_thumbnails',
@@ -136,6 +137,20 @@ def main():
 	except KeyError:
 		Options.config['retranscode_videos'] = False
 
+	# create the directory where php will put album composite images
+	albumCacheDir = Options.config['cache_path']
+	if albumCacheDir[-1] != '/':
+		albumCacheDir += '/'
+	albumCacheDir += 'album'
+	try:
+		os.stat(albumCacheDir)
+	except:
+		message("creating album cache directory for php", albumCacheDir)
+		os.mkdir(albumCacheDir)
+	message("changing permissions", albumCacheDir)
+	os.chmod(albumCacheDir, 0777)
+	
+	
 	try:
 		os.umask(002)
 		message("Browsing", "start!")

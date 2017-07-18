@@ -35,14 +35,64 @@ $(document).ready(function() {
 	
 	/* Displays */
 	
-	function socialButtons(srcArray, type) {
+	function socialButtons() {
 		var url, hash, myUrl = "";
-		url = document.location.pathname;
+		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex, i, folders;
+		url = location.protocol + "//" + location.host;
+		folders = location.pathname;
+		folders = folders.substring(0, folders.lastIndexOf('/'));
+		url += folders;
+		if (currentMedia === null) {
+			// album: prepare the thumbnail names, they will be passed to php code for generating a n-thumbnail image
+			type = "a";
+			re = new  RegExp("_(" + Options.album_thumb_size.toString() + "af\\.jpg|" +
+				Options.media_thumb_size.toString() + "tf\\.jpg)$");
+			// recollect all the thumbnails showed in page
+			$(".thumbnail").each(function() {
+				src = $(this).attr("src");
+				position = src.search(re);
+				src = url + '/' + src.substring(0, position + 1) + Options.album_thumb_size.toString() + "as.jpg";
+				if (allThumbnails.indexOf(src) == -1)
+					allThumbnails.push(src);
+			});
+			// four random thumbnail will be passed to php as url parameters
+			if (allThumbnails.length <= Options.album_share_thumbnails_number) {
+				mediaArray = allThumbnails;
+				if (allThumbnails.length < Options.album_share_thumbnails_number) {
+					// repeate the thumbnails until length is Options.album_share_thumbnails_number
+					for (i = 0; i < Options.album_share_thumbnails_number - allThumbnails.length; i ++) {
+						mediaArray.push(allThumbnails[i]);
+						if (allThumbnails.length + i == Options.album_share_thumbnails_number)
+							break;
+					}
+				}
+			} else if (allThumbnails.length > Options.album_share_thumbnails_number) {
+				for (var i = 0; i < allThumbnails.length * 2; i ++) {
+					// 0 <= random index < allThumbnails.length
+					randomIndex = Math.floor(Math.random() * (allThumbnails.length - 1)) + 1;
+					if (mediaArray.indexOf(allThumbnails[randomIndex]) == -1)
+						mediaArray.push(allThumbnails[randomIndex]);
+					if (mediaArray.length == Options.album_share_thumbnails_number)
+						break;
+				}
+			}
+		} else if (currentMedia.mediaType == "video") {
+			mediaArray.push($("#video").attr("src"));
+			type = "v";
+		} else {
+			type = "i";
+			mediaArray.push($("#photo").attr("src"));
+		}
+		
+		url = location.protocol + "//" + location.host;
+		folders = location.pathname;
+		folders = folders.substring(0, folders.lastIndexOf('/'));
+		url += folders;
 		hash = location.hash;
 		myUrl = url + '?';
-		for (var i = 0; i < srcArray.lenght; i ++)
-			myUrl += 's' + i + '=' + encodeURIComponent(srcArray[i]) + '&';
-		myUrl += 't=' + type + hash;
+		for (var i = 0; i < mediaArray.length; i ++)
+			myUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
+		myUrl += 't=' + type + '#' + hash.substring(1);
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
@@ -278,48 +328,7 @@ $(document).ready(function() {
 	}
 
 	function scrollToThumb() {
-		var photo, thumb, type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex, selectedMediaIndexes = [];
-
-		if (currentMedia === null) {
-			type = "a";
-			re = new  RegExp("_(" + Options.album_thumb_size.toString() + "af\\.jpg|" +
-				Options.media_thumb_size.toString() + "tf\\.jpg)$");
-			$(".thumbnail").each(function() {
-				src = $(this).attr("src");
-				position = src.search(re);
-				if (position != -1) {
-					// always use square album thumbnail
-					src = src.substring(0, position + 1) + Options.album_thumb_size.toString() + "as.jpg";
-				}
-				allThumbnails.push(src);
-			});
-			console.log(allThumbnails);
-			// four random thumbnail will be passed to php as url parameters
-			for (var i = 0; i < allThumbnails.length; i ++) {
-				randomIndex = Math.floor(Math.random() * (allThumbnails.length - 1)) + 1;
-				if (selectedMediaIndexes.indexOf(randomIndex) == -1)
-					selectedMediaIndexes.push(randomIndex);
-				if (selectedMediaIndexes.length == 4)
-					break;
-			}
-			i = 0;
-			while (selectedMediaIndexes.length < 4) {
-				selectedMediaIndexes.push(selectedMediaIndexes[i]);
-				i ++;
-			}
-			for (i = 0; i < 4; i ++) {
-				mediaArray.push(allThumbnails[selectedMediaIndexes[i]]);
-			}
-		}
-		else if (currentMedia.mediaType == "video") {
-			mediaArray = $("#video").attr("src");
-			type = "v";
-		}
-		else {
-			type = "i";
-			mediaArray = $("#photo").attr("src");
-		}
-		socialButtons(mediaArray, type);
+		var photo, thumb;
 
 		photo = currentMedia;
 		if (photo === null) {
@@ -559,6 +568,7 @@ $(document).ready(function() {
 				$("#thumbs").show();
 			$("#powered-by").hide();
 		}
+		setTimeout(socialButtons, 1);
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {

@@ -232,7 +232,7 @@ class TreeWalker:
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):
 				next_level()
 				self.remove_stale(cache, all_cache_entries)
-				if not os.listdir(os.path.join(self.cache_path, cache)):
+				if not os.listdir(os.path.join(self.cache_path, cache)) and not cache == "album":
 					message("empty subdir, deleting", "xxxx")
 					file_to_delete = os.path.join(self.cache_path, cache)
 					os.rmdir(os.path.join(self.cache_path, file_to_delete))
