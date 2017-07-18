@@ -111,7 +111,8 @@ $(document).ready(function() {
 			shareText += ": " + shareTextAdd.substring(shareTextAdd.lastIndexOf('/') + 1);
 		
 		jQuery.removeData(".ssk");
-		
+		$('.ssk').attr('data-url', myUrl);
+		$('.ssk').attr('data-texts', shareText);
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
@@ -128,6 +129,7 @@ $(document).ready(function() {
 				//~ }
 			//~ }
 		});
+		jQuery.removeData(".ssk");
 	}
 	
 	function getLanguage() {
