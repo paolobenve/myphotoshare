@@ -129,7 +129,6 @@ $(document).ready(function() {
 				//~ }
 			//~ }
 		});
-		jQuery.removeData(".ssk");
 	}
 	
 	function getLanguage() {
@@ -228,6 +227,9 @@ $(document).ready(function() {
 		}
 		if (currentMedia !== null)
 			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
+			
+		else if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1)
+			title += " &raquo; <span id=\"photo-name\">" + photoFloat.trimExtension(currentAlbum.photos[0].name) + "</span>";
 		else {
 			// the arrows for changing sort
 			if (currentAlbum.albums.length > 1)
@@ -261,6 +263,8 @@ $(document).ready(function() {
 		}
 		if (currentMedia !== null)
 			documentTitle = photoFloat.trimExtension(currentMedia.name) + documentTitle;
+		else if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1)
+			documentTitle =  photoFloat.trimExtension(currentAlbum.photos[0].name) + " \u00ab " + documentTitle;
 		
 		document.title = documentTitle;
 		$("#title-string").html(title);
