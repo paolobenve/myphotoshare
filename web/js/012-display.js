@@ -105,7 +105,7 @@ $(document).ready(function() {
 			myUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
 		myUrl += 't=' + type + '#' + hash.substring(1);
 		
-		shareText = Options.page_title
+		shareText = Options.page_title;
 		shareTextAdd = currentAlbum.physicalPath;
 		if (shareTextAdd)
 			shareText += ": " + shareTextAdd.substring(shareTextAdd.lastIndexOf('/') + 1);
