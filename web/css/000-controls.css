@@ -345,6 +345,7 @@ a:hover {
 }
 
 #album-arrow-up, #album-arrow-down, #media-arrow-up, #media-arrow-down {
+	padding: 0 2em;
 	display: none;
 }
 

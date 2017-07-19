@@ -232,15 +232,13 @@ $(document).ready(function() {
 			// the arrows for changing sort
 			if (currentAlbum.albums.length > 1)
 				title += "<a id=\"album-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
-						"<img title=\"albums sort\" height=\"15px\" id=\"album-sort-icon\" width=\"15px\" src=\"img/Folder_6_icon-72a7cf.png\">" +
-						"<span id=\"album-arrow-up\">🠙</span>" +
-						"<span id=\"album-arrow-down\">🠛</span>" +
+						"<img id=\"album-sort-reverse\" title=\"" + _t("#album-sort-reverse") + "\" height=\"15px\" src=\"img/Folder_sort_reverse.png\">" +
+						"<img id=\"album-sort-normal\" title=\"" + _t("#album-sort-normal") + "\" height=\"15px\" src=\"img/Folder_sort_normal.png\">" +
 					"</a>";
 			if (currentAlbum.photos.length > 1)
 				title += "<a id=\"media-sort-arrows\" class=\"arrows\" href=\"javascript:void(0)\">" +
-						"<img title=\"media sort\" height=\"15px\" id=\"media-sort-icon\" width=\"15px\" src=\"img/Creative-Tail-People-man.png\">" +
-						"<span id=\"media-arrow-up\">🠙</span>" +
-						"<span id=\"media-arrow-down\">🠛</span>" +
+						"<img id=\"media-sort-reverse\" title=\"" + _t("#media-sort-reverse") + "\" height=\"15px\" src=\"img/People_sort_reverse.png\">" +
+						"<img id=\"media-sort-normal\" title=\"" + _t("#media-sort-normal") + "\" height=\"15px\" src=\"img/People_sort_normal.png\">" +
 					"</a>";
 		}
 		// generate the html page title
@@ -271,26 +269,15 @@ $(document).ready(function() {
 				if (currentAlbum.albums.length > 1) {
 					$("#album-sort-arrows").show();
 					if (getBooleanCookie("albumReverseSortRequested")) {
-						$("#album-sort-arrows").attr("title", _t("#album-sort-normal"));
-						$("#album-sort-icon").removeAttr("title");
-						$("#album-arrow-up").hide();
-						$("#album-arrow-down").show();
+						$("#album-sort-reverse").hide();
+						$("#album-sort-normal").show();
 					} else {
-						$("#album-sort-arrows").attr("title", _t("#album-sort-reverse"));
-						$("#album-sort-icon").removeAttr("title");
-						$("#album-arrow-up").show();
-						$("#album-arrow-down").hide();
+						$("#album-sort-reverse").show();
+						$("#album-sort-normal").hide();
 					}
 				}
 				if (currentAlbum.photos.length > 1 && ! (currentAlbum.path.match(byDateRegex) && currentAlbum.photos.length >= Options.big_date_folders_threshold)) {
 					$("#media-sort-arrows").show();
-					if (getBooleanCookie("mediaReverseSortRequested")) {
-						$("#media-sort-arrows").attr("title", _t("#media-sort-normal"));
-						$("#media-sort-icon").removeAttr("title");
-					} else {
-						$("#media-sort-arrows").attr("title", _t("#media-sort-reverse"));
-						$("#media-sort-icon").removeAttr("title");
-					}
 				}
 			});
 			$("body").on('mouseleave', "#title-container", function() {
@@ -304,12 +291,12 @@ $(document).ready(function() {
 					
 					if (getBooleanCookie("albumReverseSortRequested")) {
 						setBooleanCookie("albumReverseSortRequested", false);
-						$("#album-arrow-up").show();
-						$("#album-arrow-down").hide();
+						$("#album-sort-reverse").show();
+						$("#album-sort-normal").hide();
 					} else {
 						setBooleanCookie("albumReverseSortRequested", true);
-						$("#album-arrow-up").hide();
-						$("#album-arrow-down").show();
+						$("#album-sort-reverse").hide();
+						$("#album-sort-normal").show();
 					}
 					showAlbum("conditional");
 				});
@@ -322,12 +309,12 @@ $(document).ready(function() {
 					
 					if (getBooleanCookie("mediaReverseSortRequested")) {
 						setBooleanCookie("mediaReverseSortRequested", false);
-						$("#media-arrow-up").show();
-						$("#media-arrow-down").hide();
+						$("#media-sort-reverse").show();
+						$("#media-sort-normal").hide();
 					} else {
 						setBooleanCookie("mediaReverseSortRequested", true);
-						$("#media-arrow-up").hide();
-						$("#media-arrow-down").show();
+						$("#media-sort-reverse").hide();
+						$("#media-sort-normal").show();
 					}
 					showAlbum("conditional");
 					});
@@ -335,18 +322,18 @@ $(document).ready(function() {
 			setOptions();
 		}
 		if (getBooleanCookie("albumReverseSortRequested")) {
-			$("#album-arrow-up").hide();
-			$("#album-arrow-down").show();
+			$("#album-sort-reverse").hide();
+			$("#album-sort-normal").show();
 		} else {
-			$("#album-arrow-up").show();
-			$("#album-arrow-down").hide();
+			$("#album-sort-reverse").show();
+			$("#album-sort-normal").hide();
 		}
 		if (getBooleanCookie("mediaReverseSortRequested")) {
-			$("#media-arrow-up").hide();
-			$("#media-arrow-down").show();
+			$("#media-sort-reverse").hide();
+			$("#media-sort-normal").show();
 		} else {
-			$("#media-arrow-up").show();
-			$("#media-arrow-down").hide();
+			$("#media-sort-reverse").show();
+			$("#media-sort-normal").hide();
 		}
 	}
 
