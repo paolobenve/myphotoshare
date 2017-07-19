@@ -199,7 +199,7 @@
 	};
 	PhotoFloat.photoPath = function(album, photo, thumb_size) {
 		var suffix, hash;
-		suffix = thumb_size.toString()
+		suffix = thumb_size.toString();
 		if (thumb_size == Options.album_thumb_size) {
 			suffix += "a";
 			if (Options.album_thumb_type == "square")

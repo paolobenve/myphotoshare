@@ -113,6 +113,7 @@ $(document).ready(function() {
 		jQuery.removeData(".ssk");
 		$('.ssk').attr('data-url', myUrl);
 		$('.ssk').attr('data-texts', shareText);
+		
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
@@ -542,6 +543,8 @@ $(document).ready(function() {
 								html += "\"";
 								html += ">" + folder + "</div>";
 								theImage.parent().append(html);
+								// this function must be called every time a album slide is created,
+								// in order to include this images in the composite php will create
 								socialButtons();
 							}, function error() {
 								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
