@@ -36,7 +36,7 @@ $(document).ready(function() {
 	/* Displays */
 	
 	function socialButtons() {
-		var url, hash, myUrl = "";
+		var url, hash, shareUrl = "";
 		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex;
 		var i, iCorrected, folders, shareText, shareTextAdd, maxThumbnailNumber;
 		url = location.protocol + "//" + location.host;
@@ -52,7 +52,7 @@ $(document).ready(function() {
 			$(".thumbnail").each(function() {
 				src = $(this).attr("src");
 				position = src.search(re);
-				src = url + '/' + src.substring(0, position + 1) + Options.album_thumb_size.toString() + "as.jpg";
+				src = src.substring(0, position + 1) + Options.album_thumb_size.toString() + "as.jpg";
 				if (allThumbnails.indexOf(src) == -1)
 					allThumbnails.push(src);
 			});
@@ -95,15 +95,11 @@ $(document).ready(function() {
 			mediaArray.push($("#photo").attr("src"));
 		}
 		
-		url = location.origin;
-		folders = location.pathname;
-		folders = folders.substring(0, folders.lastIndexOf('/'));
-		url += folders;
 		hash = location.hash;
-		myUrl = url + '?';
+		shareUrl = url + '?';
 		for (i = 0; i < mediaArray.length; i ++)
-			myUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
-		myUrl += 't=' + type + '#' + hash.substring(1);
+			shareUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
+		shareUrl += 't=' + type + '#' + hash.substring(1);
 		
 		shareText = Options.page_title;
 		shareTextAdd = currentAlbum.physicalPath;
@@ -111,13 +107,13 @@ $(document).ready(function() {
 			shareText += ": " + shareTextAdd.substring(shareTextAdd.lastIndexOf('/') + 1);
 		
 		jQuery.removeData(".ssk");
-		$('.ssk').attr('data-url', myUrl);
+		$('.ssk').attr('data-url', shareUrl);
 		$('.ssk').attr('data-texts', shareText);
 		
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
-			url: myUrl,
+			url: shareUrl,
 			text: shareText,
 			//~ twitter: {
 				//~ url: 'http://url-for-twitter',
