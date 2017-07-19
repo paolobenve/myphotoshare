@@ -1005,7 +1005,7 @@ $(document).ready(function() {
 			$(".media-caption").show();
 		// options function must be called again in order to set elements previously absent
 		setOptions();
-		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1) {
+		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length) {
 			// set social buttons events
 			setTimeout(socialButtons, 1);
 			alert('social (media)');
