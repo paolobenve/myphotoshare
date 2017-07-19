@@ -339,12 +339,7 @@ a:hover {
 	text-decoration: none;
 }
 
-#album-sort-arrows, #media-sort-arrows {
-	padding: 0 2em;
-	display: none;
-}
-
-#album-arrow-up, #album-arrow-down, #media-arrow-up, #media-arrow-down {
+.arrows img, .arrows img{
 	padding: 0 2em;
 	display: none;
 }
