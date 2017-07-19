@@ -182,7 +182,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-### version 2.3 (July 25, 2017):
+### version 2.3 (July 20, 2017):
 
 * social buttons
 * web page isn't `index.html` any more, it's `index.php`: this way we accomplish various things through php:
