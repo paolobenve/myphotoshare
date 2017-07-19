@@ -57,12 +57,13 @@
 				 
 				$tileWidth = $tileHeight = $options['album_thumb_size'];
 				$numberOfTiles = intval(sqrt($maxThumbnailNumber));
-				$pxBetweenTiles = 0;
+				$pxBetweenTiles = $options['thumb_spacing'];
 				$leftOffSet = $topOffSet = 1;
 				 
-				$mapWidth = $mapHeight = ($tileWidth + $pxBetweenTiles) * $numberOfTiles - $pxBetweenTiles;
+				$mapWidth = $mapHeight = ($tileWidth + $pxBetweenTiles) * $numberOfTiles;
 				$mapImage = imagecreatetruecolor($mapWidth, $mapHeight);
-				$bgColor = imagecolorallocate($mapImage, 50, 40, 0);
+				$bgColor = imagecolorallocate($mapImage, 255, 255, 255);
+				//~ $bgColor = imagecolorallocate($mapImage, 50, 40, 0);
 				imagefill($mapImage, 0, 0, $bgColor);
 				 
 				/*
