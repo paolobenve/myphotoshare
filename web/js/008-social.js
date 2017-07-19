@@ -5,6 +5,29 @@
  * https://github.com/darklow/social-share-kit/blob/master/LICENSE
  * ---
  */
+
+// modified!!!
+ 
+var isMobile = {
+	Android: function() {
+		return navigator.userAgent.match(/Android/i);
+	},
+	BlackBerry: function() {
+		return navigator.userAgent.match(/BlackBerry/i);
+	},
+	iOS: function() {
+		return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+	},
+	Opera: function() {
+		return navigator.userAgent.match(/Opera Mini/i);
+	},
+	Windows: function() {
+		return navigator.userAgent.match(/IEMobile/i);
+	},
+	any: function() {
+		return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+	}
+};
 var SocialShareKit = (function () {
     var supportsShare = /(whatsapp|twitter|facebook|google-plus|pinterest|tumblr|vk|linkedin|buffer|email)/,
         sep = '*|*', wrap, _wrap;
@@ -189,7 +212,13 @@ var SocialShareKit = (function () {
             opts = 'status=1,resizable=yes' +
                 ',width=' + width + ',height=' + height +
                 ',top=' + top + ',left=' + left;
-            win = window.open(url, '', opts);
+            if (url.indexOf("whatsapp:") === 0)
+                if(isMobile.any())
+                    window.location.href = url;
+                else
+                    alert(_t("whatsapp-mobile-only"));
+            else
+                win = window.open(url, '', opts);
         } else {
             win = window.open(url);
         }
@@ -217,8 +246,7 @@ var SocialShareKit = (function () {
             };
         switch (network) {
             case 'whatsapp':
-                whatsapp_url = 'whatsapp://send?text=' + encodeURIComponent(title + '\n' + shareUrl + '\n\n' + text + '\n');
-                window.location.href = whatsapp_url;
+                url = 'whatsapp://send?text=' + encodeURIComponent(title + '\n' + shareUrl + '\n\n' + text + '\n');
                 break;
             case 'facebook':
                 url = 'https://www.facebook.com/share.php?u=' + paramsObj.shareUrlEncoded();
