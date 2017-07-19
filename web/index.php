@@ -145,6 +145,7 @@
 	<div id="social">
 		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-count">
 			<a href="" class="ssk ssk-facebook"></a>
+			<a href="" class="ssk ssk-whatsapp"></a>
 			<a href="" class="ssk ssk-twitter"></a>
 			<a href="" class="ssk ssk-google-plus"></a>
 			<a href="" class="ssk ssk-email"></a>

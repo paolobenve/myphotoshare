@@ -23,6 +23,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+.ssk-whatsapp:before {
+    content: "w";
+    text-indent: 4px;
+    margin-right: -4px;
+}
 .ssk-facebook:before {
     content: "a";
     text-indent: 4px;
@@ -324,23 +329,49 @@
     top: -20px;
 }
 @media (min-width:768px) {
-    .ssk-count.ssk-sticky {
-    padding-top: 0;
+            .ssk-count.ssk-sticky {
+            padding-top: 0;
+        }
+        .ssk-count.ssk-sticky.ssk-left .ssk-num, .ssk-count.ssk-sticky.ssk-right .ssk-num {
+            top: 20%;
+            background-color: transparent;
+        }
+        .ssk-count.ssk-sticky.ssk-left .ssk-num {
+            left: 100%;
+            margin-left: 5px;
+        }
+        .ssk-count.ssk-sticky.ssk-right .ssk-num {
+            right: 115%;
+            margin-left: -100%;
+            text-align: right;
+        }
 }
-.ssk-count.ssk-sticky.ssk-left .ssk-num, .ssk-count.ssk-sticky.ssk-right .ssk-num {
-    top: 20%;
-    background-color: transparent;
+}.ssk-whatsapp {
+    background-color: #3B5998;
 }
-.ssk-count.ssk-sticky.ssk-left .ssk-num {
-    left: 100%;
-    margin-left: 5px;
+.ssk-grayscale>.ssk-whatsapp {
+    background-color: #757575;
 }
-.ssk-count.ssk-sticky.ssk-right .ssk-num {
-    right: 115%;
-    margin-left: -100%;
-    text-align: right;
+.ssk-whatsapp:hover {
+    background-color: #2d4373;
 }
-}.ssk-facebook {
+.ssk-whatsapp:hover {
+    background-color: #2d4373;
+}
+.ssk-grayscale>.ssk-whatsapp:hover {
+    background-color: #3B5998;
+}
+.ssk-whatsapp.ssk-icon {
+    color: #3B5998;
+}
+.ssk-whatsapp.ssk-icon:hover {
+    color: #2d4373;
+}
+.ssk-whatsapp.ssk-icon:before {
+    text-indent: 0;
+    margin-right: 0;
+}
+.ssk-facebook {
     background-color: #3B5998;
 }
 .ssk-grayscale>.ssk-facebook {

@@ -6,7 +6,7 @@
  * ---
  */
 var SocialShareKit = (function () {
-    var supportsShare = /(twitter|facebook|google-plus|pinterest|tumblr|vk|linkedin|buffer|email)/,
+    var supportsShare = /(whatsapp|twitter|facebook|google-plus|pinterest|tumblr|vk|linkedin|buffer|email)/,
         sep = '*|*', wrap, _wrap;
 
     // Wrapper to support multiple instances per page by selector
@@ -216,6 +216,10 @@ var SocialShareKit = (function () {
                 }
             };
         switch (network) {
+            case 'whatsapp':
+                whatsapp_url = 'whatsapp://send?text=' + encodeURIComponent(title + '\n' + shareUrl + '\n\n' + text + '\n');
+                window.location.href = whatsapp_url;
+                break;
             case 'facebook':
                 url = 'https://www.facebook.com/share.php?u=' + paramsObj.shareUrlEncoded();
                 break;
@@ -322,6 +326,12 @@ var SocialShareKit = (function () {
         var url, parseFunc, body,
             shareUrlEnc = encodeURIComponent(shareUrl);
         switch (network) {
+            case 'whatsapp':
+                url = 'https://graph.facebook.com/?id=' + shareUrlEnc;
+                parseFunc = function (r) {
+                    return onReady(r.share ? r.share.share_count : 0);
+                };
+                break;
             case 'facebook':
                 url = 'https://graph.facebook.com/?id=' + shareUrlEnc;
                 parseFunc = function (r) {

@@ -33,13 +33,34 @@ $(document).ready(function() {
 	var language;
 	var byDateRegex;
 	var numSubAlbumsReady = 0;
+	var isMobile = {
+		Android: function() {
+			return navigator.userAgent.match(/Android/i);
+		},
+		BlackBerry: function() {
+			return navigator.userAgent.match(/BlackBerry/i);
+		},
+		iOS: function() {
+			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+		},
+		Opera: function() {
+			return navigator.userAgent.match(/Opera Mini/i);
+		},
+		Windows: function() {
+			return navigator.userAgent.match(/IEMobile/i);
+		},
+		any: function() {
+			return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+		}
+	};
+	
 	
 	/* Displays */
 	
 	function socialButtons() {
-		var url, hash, shareUrl = "";
+		var url, hash, myShareUrl = "";
 		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex;
-		var i, iCorrected, folders, shareText, shareTextAdd, maxThumbnailNumber;
+		var i, iCorrected, folders, myShareText, myShareTextAdd, maxThumbnailNumber;
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
@@ -98,31 +119,32 @@ $(document).ready(function() {
 		}
 		
 		hash = location.hash;
-		shareUrl = url + '?';
+		myShareUrl = url + '?';
 		for (i = 0; i < mediaArray.length; i ++)
-			shareUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
-		shareUrl += 't=' + type + '#' + hash.substring(1);
+			myShareUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
+		myShareUrl += 't=' + type + '#' + hash.substring(1);
 		
-		shareText = Options.page_title;
-		shareTextAdd = currentAlbum.physicalPath;
-		if (shareTextAdd)
-			shareText += ": " + shareTextAdd.substring(shareTextAdd.lastIndexOf('/') + 1);
+		myShareText = Options.page_title;
+		console.log(Options.page_title);
+		myShareTextAdd = currentAlbum.physicalPath;
+		if (myShareTextAdd)
+			myShareText += ": " + myShareTextAdd.substring(myShareTextAdd.lastIndexOf('/') + 1);
 		
 		jQuery.removeData(".ssk");
-		$('.ssk').attr('data-texts', shareText);
-		$('.ssk-facebook').attr('data-url', shareUrl);
+		$('.ssk').attr('data-text', myShareText);
+		$('.ssk-facebook').attr('data-url', myShareUrl);
 		$('.ssk-twitter').attr('data-url', location.href);
-		$('.ssk-google-plus').attr('data-url', shareUrl);
+		$('.ssk-google-plus').attr('data-url', myShareUrl);
 		$('.ssk-email').attr('data-url', location.href);
 		
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
-			//~ url: shareUrl,
-			//~ text: shareText,
+			//~ url: myShareUrl,
+			//~ text: myShareText,
 			//~ twitter: {
 				//~ url: location.href,
-				//~ text: shareText,
+				//~ text: myShareText,
 				//~ via: 'twitter-screen-name',
 				//~ countCallback: function(shareUrl, onCountReady) {
 					//~ // Get count somewhere manually and call onCountReady() whenever you got the count.
