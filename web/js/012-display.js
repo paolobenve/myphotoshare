@@ -1,5 +1,4 @@
 var Options = {};
-var byDateRegex;
 
 $(document).ready(function() {
 	
@@ -32,6 +31,8 @@ $(document).ready(function() {
 	var fullScreenStatus = false;
 	var photoSrc, videoSrc;
 	var language;
+	var byDateRegex;
+	var numSubAlbumsReady = 0;
 	
 	/* Displays */
 	
@@ -108,24 +109,27 @@ $(document).ready(function() {
 			shareText += ": " + shareTextAdd.substring(shareTextAdd.lastIndexOf('/') + 1);
 		
 		jQuery.removeData(".ssk");
-		$('.ssk').attr('data-url', shareUrl);
 		$('.ssk').attr('data-texts', shareText);
+		$('.ssk-facebook').attr('data-url', shareUrl);
+		$('.ssk-twitter').attr('data-url', location.href);
+		$('.ssk-google-plus').attr('data-url', shareUrl);
+		$('.ssk-email').attr('data-url', location.href);
 		
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
 			//~ selector: '.custom-parent .ssk',
-			url: shareUrl,
-			text: shareText,
-			twitter: {
-				url: location.href,
-				text: shareText,
+			//~ url: shareUrl,
+			//~ text: shareText,
+			//~ twitter: {
+				//~ url: location.href,
+				//~ text: shareText,
 				//~ via: 'twitter-screen-name',
 				//~ countCallback: function(shareUrl, onCountReady) {
 					//~ // Get count somewhere manually and call onCountReady() whenever you got the count.
 					//~ var count = 5;
 					//~ return onCountReady(count);
 				//~ }
-			}
+			//~ }
 		});
 	}
 	
@@ -529,7 +533,12 @@ $(document).ready(function() {
 								theImage.parent().append(html);
 								// this function must be called every time a album slide is created,
 								// in order to include this images in the composite php will create
-								socialButtons();
+								numSubAlbumsReady ++;
+								if (numSubAlbumsReady == originalAlbum.albums.length) {
+									// only run the function when all the album has loaded their random image
+									socialButtons();
+									alert('social (subalbums)');
+								}
 							}, function error() {
 								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 								theLink.remove();
@@ -996,7 +1005,11 @@ $(document).ready(function() {
 			$(".media-caption").show();
 		// options function must be called again in order to set elements previously absent
 		setOptions();
-		setTimeout(socialButtons, 3);
+		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1) {
+			// set social buttons events
+			setTimeout(socialButtons, 1);
+			alert('social (media)');
+		}
 	}
 
 	function getOptions(cacheSubDir, callback) {
