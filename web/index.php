@@ -12,16 +12,15 @@
 	?>
 	<title><?php if ($options['page_title']) echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
-<!--
 	<link href="css/styles.min.css" rel="stylesheet" type="text/css" /> 
--->
+<!--
 	<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 	<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 	<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
 	<link href="css/003-social.css" rel="stylesheet" type="text/css" />
-<!--
-	<script type="text/javascript" src="js/scripts.min.js"></script> 
 -->
+	<script type="text/javascript" src="js/scripts.min.js"></script> 
+<!--
 	<script type="text/javascript" src="js/000-jquery-1.12.4.js"></script>
 	<script type="text/javascript" src="js/001-hashchange.js"></script>
 	<script type="text/javascript" src="js/002-preloadimages.js"></script>
@@ -32,6 +31,7 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
+-->
 	<?php
 		function join_paths() {
 			return preg_replace('~[/\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
@@ -42,9 +42,9 @@
 			if ($_GET['t'] == 'a') {
 				$i = 0;
 				$srcImagePaths = array();
-				$url = strtok($_SERVER['REQUEST_URI'],'?') + '/';
+				$url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['CONTEXT_PREFIX'] . '/';
 				while (array_key_exists('s' . $i, $_GET)) {
-					$srcImagePaths[] = $url + $_GET['s' . $i];
+					$srcImagePaths[] = $url . $_GET['s' . $i];
 					$i ++;
 				}
 				$maxThumbnailNumber = count($srcImagePaths);
@@ -100,13 +100,10 @@
 			} else {
 				$media = $_GET['s0'];
 			}
-			//echo "i=$media\n";
 			$pathInfo = pathinfo($_SERVER['PHP_SELF'])['dirname'];
-			//echo "p=$pathInfo\n";
 			$mediaWithPath = '/' .$media;
 			if ($pathInfo != '/')
 				$mediaWithPath = $pathInfo .$mediaWithPath;
-			//echo "iwp=$mediaWithPath\n";
 			$linkTag = '<link ';
 			if ($_GET['t'] == 'i' || $_GET['t'] == 'a')
 				$linkTag .= 'rel="image_src" ';
