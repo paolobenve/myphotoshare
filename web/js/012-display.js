@@ -482,7 +482,7 @@ $(document).ready(function() {
 						link.append(image);
 						subalbums.push(link);
 						(function(theContainer, theAlbum, theImage, theLink) {
-							photoFloat.pickRandomPhoto(theAlbum, theContainer, function(randomAlbum, randomPhoto, originalAlbum) {
+							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomPhoto, originalAlbum) {
 								var distance = 0;
 								var htmlText;
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, ButtonAndCaptionHeight, html;
@@ -542,6 +542,7 @@ $(document).ready(function() {
 								html += "\"";
 								html += ">" + folder + "</div>";
 								theImage.parent().append(html);
+								socialButtons();
 							}, function error() {
 								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
 								theLink.remove();

@@ -28,12 +28,25 @@
 			dataType: "json",
 			url: cacheFile,
 			success: function(album) {
+				//~ var i, setTreeMediaCount, thisSelf;
 				var i;
+				//~ thisSelf = self;
+				//begin counting the number of media in its tree
+				//~ setTreeMediaCount = function (thisAlbum) {
+					//~ thisAlbum.numMedia = thisAlbum.photos.length;
+					//~ for (i = 0; i < thisAlbum.albums.length; i ++) {
+						//~ if (typeof thisAlbum.albums[i].numMedia === "undefined")
+							//~ thisSelf.getAlbum(thisAlbum.albums[i], setTreeMediaCount, error);
+					//~ }
+					//~ return thisAlbum.numMedia;
+				//~ };
 				for (i = 0; i < album.albums.length; ++i)
 					album.albums[i].parent = album;
 				for (i = 0; i < album.photos.length; ++i)
 					album.photos[i].parent = album;
+				//~ setTreeMediaCount(album);
 				self.albumCache[cacheKey] = album;
+				
 				callback(album);
 			}
 		};
@@ -50,7 +63,8 @@
 		}
 		$.ajax(ajaxOptions);
 	};
-	PhotoFloat.prototype.pickRandomPhoto = function(subalbum, container, callback, error) {
+	
+	PhotoFloat.prototype.pickRandomMedia = function(subalbum, container, callback, error) {
 		var nextAlbum, self;
 		self = this;
 		nextAlbum = function(album) {
@@ -66,6 +80,7 @@
 		else
 			this.getAlbum(subalbum, nextAlbum, error);
 	};
+	
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		var index, album, photo;
 		hash = PhotoFloat.cleanHash(hash);
