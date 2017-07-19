@@ -57,13 +57,13 @@ $(document).ready(function() {
 					allThumbnails.push(src);
 			});
 			
-			if (allThumbnails.length < 4 || Options.max_album_share_thumbnails_number == 4)
+			if (allThumbnails.length < 9 || Options.max_album_share_thumbnails_number == 4)
 				maxThumbnailNumber = 4;
-			else if (allThumbnails.length < 9 || Options.max_album_share_thumbnails_number == 9)
+			else if (allThumbnails.length < 16 || Options.max_album_share_thumbnails_number == 9)
 				maxThumbnailNumber = 9;
-			else if (allThumbnails.length < 16 || Options.max_album_share_thumbnails_number == 16)
+			else if (allThumbnails.length < 25 || Options.max_album_share_thumbnails_number == 16)
 				maxThumbnailNumber = 16;
-			else if (allThumbnails.length < 25 || Options.max_album_share_thumbnails_number == 25)
+			else if (allThumbnails.length < 36 || Options.max_album_share_thumbnails_number == 25)
 				maxThumbnailNumber = 25;
 			else
 				maxThumbnailNumber = Options.max_album_share_thumbnails_number;
@@ -1005,7 +1005,7 @@ $(document).ready(function() {
 			$(".media-caption").show();
 		// options function must be called again in order to set elements previously absent
 		setOptions();
-		socialButtons(); 
+		setTimeout(socialButtons, 3);
 	}
 
 	function getOptions(cacheSubDir, callback) {
