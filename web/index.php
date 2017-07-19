@@ -113,6 +113,19 @@
 			$linkTag .= 'href="' . $mediaWithPath . '"';
 			$linkTag .= '>';
 			echo "$linkTag\n";
+			
+			// php generated composite images only are needed for the moment when the user share the album
+			// delete files older than 1 hour
+			$files = glob(join_paths(join_paths($options['cache_path'],"album"), "*"));
+			$now   = time();
+			foreach ($files as $file) {
+				if (is_file($file)) {
+					if ($now - filemtime($file) >= 60 * 60) { // 1 hour
+						unlink($file);
+						echo "<!-- removed file $file\n -->";
+					}
+				}
+			}
 		}
 	?>
 </head>
