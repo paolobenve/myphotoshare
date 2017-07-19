@@ -537,7 +537,6 @@ $(document).ready(function() {
 								if (numSubAlbumsReady == originalAlbum.albums.length) {
 									// only run the function when all the album has loaded their random image
 									socialButtons();
-									alert('social (subalbums)');
 								}
 							}, function error() {
 								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
@@ -1008,7 +1007,6 @@ $(document).ready(function() {
 		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length) {
 			// set social buttons events
 			setTimeout(socialButtons, 1);
-			alert('social (media)');
 		}
 	}
 
