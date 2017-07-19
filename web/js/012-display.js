@@ -116,16 +116,16 @@ $(document).ready(function() {
 			//~ selector: '.custom-parent .ssk',
 			url: shareUrl,
 			text: shareText,
-			//~ twitter: {
-				//~ url: 'http://url-for-twitter',
-				//~ text: 'Share text for twitter',
+			twitter: {
+				url: location.href,
+				text: shareText,
 				//~ via: 'twitter-screen-name',
 				//~ countCallback: function(shareUrl, onCountReady) {
 					//~ // Get count somewhere manually and call onCountReady() whenever you got the count.
 					//~ var count = 5;
 					//~ return onCountReady(count);
 				//~ }
-			//~ }
+			}
 		});
 	}
 	
