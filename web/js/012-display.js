@@ -588,6 +588,9 @@ $(document).ready(function() {
 				$("#folders-view").show();
 				$("#day-view").hide();
 				$("#day-folders-view-link").attr("href", "#!/" + Options.folders_string);
+			} else {
+				$("#folders-view").hide();
+				$("#day-view").hide();
 			}
 			$("#powered-by").show();
 		} else {

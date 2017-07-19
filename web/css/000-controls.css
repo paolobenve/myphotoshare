@@ -41,8 +41,9 @@ a:hover {
 	opacity: 0.5;
 }
 
-a#day-view, a#folders-view {
+#day-view, #folders-view {
 	color: inherit;
+	display: none;
 }
 
 #loading {
