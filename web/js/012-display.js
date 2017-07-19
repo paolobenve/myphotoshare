@@ -46,13 +46,14 @@ $(document).ready(function() {
 		if (currentMedia === null) {
 			// album: prepare the thumbnail names, they will be passed to php code for generating a n-thumbnail image
 			type = "a";
-			re = new  RegExp("_(" + Options.album_thumb_size.toString() + "af\\.jpg|" +
-				Options.media_thumb_size.toString() + "tf\\.jpg)$");
+			re = new  RegExp("_(" + Options.album_thumb_size.toString() + "a(s|f)\\.jpg|" +
+				Options.media_thumb_size.toString() + "t(s|f)\\.jpg)$");
 			// recollect all the thumbnails showed in page
 			$(".thumbnail").each(function() {
 				src = $(this).attr("src");
 				position = src.search(re);
 				src = src.substring(0, position + 1) + Options.album_thumb_size.toString() + "as.jpg";
+				src = src.substring(Options.server_cache_path.length);
 				if (allThumbnails.indexOf(src) == -1)
 					allThumbnails.push(src);
 			});

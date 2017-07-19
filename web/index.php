@@ -44,7 +44,7 @@
 				$srcImagePaths = array();
 				$url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['CONTEXT_PREFIX'] . '/';
 				while (array_key_exists('s' . $i, $_GET)) {
-					$srcImagePaths[] = $url . $_GET['s' . $i];
+					$srcImagePaths[] = $url . $options['server_cache_path'] . '/' . $_GET['s' . $i];
 					$i ++;
 				}
 				$maxThumbnailNumber = count($srcImagePaths);
@@ -57,14 +57,15 @@
 				 */
 				 
 				$tileWidth = $tileHeight = $options['album_thumb_size'];
-				$numberOfTiles = intval(sqrt($maxThumbnailNumber));
+				$linearNumberOfTiles = intval(sqrt($maxThumbnailNumber));
 				$pxBetweenTiles = $options['thumb_spacing'];
-				$leftOffSet = $topOffSet = 1;
+				$sideOffSet = 1;
 				 
-				$mapWidth = $mapHeight = ($tileWidth + $pxBetweenTiles) * $numberOfTiles;
+				$mapWidth = $sideOffSet + ($tileWidth + $pxBetweenTiles) * $linearNumberOfTiles - $pxBetweenTiles + $sideOffSet;
+				$mapHeight = $sideOffSet + ($tileWidth + $pxBetweenTiles) * $linearNumberOfTiles - $pxBetweenTiles + $sideOffSet;
 				$mapImage = imagecreatetruecolor($mapWidth, $mapHeight);
-				$bgColor = imagecolorallocate($mapImage, 255, 255, 255);
-				//~ $bgColor = imagecolorallocate($mapImage, 50, 40, 0);
+				//~ $bgColor = imagecolorallocate($mapImage, 255, 255, 255);
+				$bgColor = imagecolorallocate($mapImage, 50, 40, 0);
 				imagefill($mapImage, 0, 0, $bgColor);
 				 
 				/*
@@ -73,10 +74,10 @@
 				 
 				function indexToCoords($index)
 				{
-					global $tileWidth, $pxBetweenTiles, $leftOffSet, $topOffSet, $numberOfTiles;
+					global $tileWidth, $pxBetweenTiles, $sideOffSet, $linearNumberOfTiles;
 
-					$x = ($index % $numberOfTiles) * ($tileWidth + $pxBetweenTiles) + $leftOffSet;
-					$y = floor($index / $numberOfTiles) * ($tileWidth + $pxBetweenTiles) + $topOffSet;
+					$x = $sideOffSet + ($index % $linearNumberOfTiles) * ($tileWidth + $pxBetweenTiles);
+					$y = $sideOffSet + floor($index / $linearNumberOfTiles) * ($tileWidth + $pxBetweenTiles);
 					return Array($x, $y);
 				}
 				 
