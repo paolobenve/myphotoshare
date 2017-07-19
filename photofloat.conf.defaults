@@ -157,7 +157,3 @@ big_date_folders_threshold = 9999
 # How many thumbnails should we put at most in the image that php generates for sharing albums?
 # it must be an integer, and a square: 4, 9, 16,..
 max_album_share_thumbnails_number = 16
-
-# Your key, useful to shorten shared urls
-google_api_key = 
-
