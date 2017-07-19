@@ -35,6 +35,7 @@ Photofloat needs:
 * `avconv` / `ffmpeg` in order to be able to manage videos.
 * a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
 * `php5-gd` in order to create albums share images
+* `curl`, used by minify script
 
 ### Download the source code from the git repository:
 
