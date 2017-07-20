@@ -53,8 +53,10 @@ a:hover {
 
 #album-view {
 	position: absolute;
+/*
 	top: 2.5em;
-	padding: 1em;
+*/
+	padding: .5em;
 }
 #thumbs {
 	clear: both;
@@ -68,7 +70,7 @@ a:hover {
 	margin-top: 0;
 }
 #subalbums {
-	padding-top: 1.5em;
+	padding-top: .2em;
 }
 
 .album-button-and-caption {
