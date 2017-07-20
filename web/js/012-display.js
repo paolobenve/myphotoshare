@@ -63,6 +63,7 @@ $(document).ready(function() {
 	var language;
 	var byDateRegex;
 	var numSubAlbumsReady = 0;
+	var nextLink, backLink;
 	var isMobile = {
 		Android: function() {
 			return navigator.userAgent.match(/Android/i);
@@ -129,11 +130,24 @@ $(document).ready(function() {
 
 	function swipe(el,d) {
 		if (d == "r") {
-			location.href = nextLink;
+			$("#" + el).animate({
+				opacity: 0.5,
+				right: "-=200"
+			}, 500, function() {
+				location.href = nextLink;
+				$("#" + el).css('right', "");
+				$("#" + el).css('opacity', "");
+			});
 		} else if (d == "l") {
-			location.href = backLink;
+			$("#" + el).animate({
+				opacity: 0.5,
+				left: "-=200",
+			}, 500, function() {
+				location.href = backLink;
+				$("#" + el).css('left', "");
+				$("#" + el).css('opacity', "");
+			});
 		}
-		alert("you swiped on element with id '"+el+"' to "+d+" direction");
 	}
 	
 	
@@ -774,7 +788,7 @@ $(document).ready(function() {
 		return chosenMedia;
 	}
 	function showMedia(album) {
-		var width, height, previousMedia, nextMedia, nextLink, text, thumbnailSize, i, changeViewLink;
+		var width, height, previousMedia, nextMedia, text, thumbnailSize, i, changeViewLink;
 		var windowWidth, windowHeight;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
@@ -914,8 +928,11 @@ $(document).ready(function() {
 			$(".next-media").attr("href", nextLink);
 			$("#next").attr("href", nextLink);
 			$("#back").attr("href", backLink);
-			$("#photo").load(detectswipe('#photo',swipe));
-			$("#photo").load(detectswipe('#video',swipe));
+			
+			if (currentMedia.mediaType == "video")
+				$("#video").load(detectswipe('video-box-inner',swipe));
+			else
+				$("#photo").load(detectswipe('photo-box-inner',swipe));
 		}
 		$(".original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		

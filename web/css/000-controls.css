@@ -143,6 +143,11 @@ a:hover {
 	left: 0;
 }
 */
+#media-box {
+/*
+	position: absolute;
+*/
+}
 #media-view {
 	position: absolute;
 	top: 3em;
