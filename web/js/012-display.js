@@ -133,6 +133,7 @@ $(document).ready(function() {
 		jQuery.removeData(".ssk");
 		$('.ssk').attr('data-text', myShareText);
 		$('.ssk-facebook').attr('data-url', myShareUrl);
+		$('.ssk-whatsapp').attr('data-url', myShareUrl);
 		$('.ssk-twitter').attr('data-url', location.href);
 		$('.ssk-google-plus').attr('data-url', myShareUrl);
 		$('.ssk-email').attr('data-url', location.href);
