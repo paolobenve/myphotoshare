@@ -84,8 +84,59 @@ $(document).ready(function() {
 		}
 	};
 	
-	
 	/* Displays */
+	
+	// from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
+	function detectswipe(el,func) {
+		swipe_det = new Object();
+		swipe_det.sX = 0; swipe_det.sY = 0; swipe_det.eX = 0; swipe_det.eY = 0;
+		var min_x = 30;  //min x swipe for horizontal swipe
+		var max_x = 30;  //max x difference for vertical swipe
+		var min_y = 50;  //min y swipe for vertical swipe
+		var max_y = 60;  //max y difference for horizontal swipe
+		var direc = "";
+		ele = document.getElementById(el);
+		ele.addEventListener('touchstart',function(e){
+			var t = e.touches[0];
+			swipe_det.sX = t.screenX; 
+			swipe_det.sY = t.screenY;
+		},false);
+		ele.addEventListener('touchmove',function(e){
+			e.preventDefault();
+			var t = e.touches[0];
+			swipe_det.eX = t.screenX; 
+			swipe_det.eY = t.screenY;    
+		},false);
+		ele.addEventListener('touchend',function(e){
+			//horizontal detection
+			if ((((swipe_det.eX - min_x > swipe_det.sX) || (swipe_det.eX + min_x < swipe_det.sX)) && ((swipe_det.eY < swipe_det.sY + max_y) && (swipe_det.sY > swipe_det.eY - max_y) && (swipe_det.eX > 0)))) {
+			if(swipe_det.eX > swipe_det.sX) direc = "r";
+			else direc = "l";
+			}
+			//vertical detection
+			else if ((((swipe_det.eY - min_y > swipe_det.sY) || (swipe_det.eY + min_y < swipe_det.sY)) && ((swipe_det.eX < swipe_det.sX + max_x) && (swipe_det.sX > swipe_det.eX - max_x) && (swipe_det.eY > 0)))) {
+				if(swipe_det.eY > swipe_det.sY) direc = "d";
+				else direc = "u";
+			}
+
+			if (direc != "") {
+				if(typeof func == 'function') func(el,direc);
+			}
+			direc = "";
+			swipe_det.sX = 0; swipe_det.sY = 0; swipe_det.eX = 0; swipe_det.eY = 0;
+		},false);  
+	}
+
+	function swipe(el,d) {
+		if (d == "r") {
+			location.href = nextLink;
+		} else if (d == "l") {
+			location.href = backLink;
+		}
+		alert("you swiped on element with id '"+el+"' to "+d+" direction");
+	}
+	
+	
 	
 	function socialButtons() {
 		var url, hash, myShareUrl = "";
@@ -155,7 +206,6 @@ $(document).ready(function() {
 		myShareUrl += 't=' + type + '#' + hash.substring(1);
 		
 		myShareText = Options.page_title;
-		console.log(Options.page_title);
 		myShareTextAdd = currentAlbum.physicalPath;
 		if (myShareTextAdd)
 			myShareText += ": " + myShareTextAdd.substring(myShareTextAdd.lastIndexOf('/') + 1);
@@ -855,13 +905,17 @@ $(document).ready(function() {
 		}
 		
 		if (currentAlbum.photos.length == 1) {
+			//nothing to do
 		} else {
 			nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
+			backLink = "#!/" + photoFloat.photoHash(currentAlbum, previousMedia)
 			$("#next").show();
 			$("#back").show();
 			$(".next-media").attr("href", nextLink);
 			$("#next").attr("href", nextLink);
-			$("#back").attr("href", "#!/" + photoFloat.photoHash(currentAlbum, previousMedia));
+			$("#back").attr("href", backLink);
+			$("#photo").load(detectswipe('#photo',swipe));
+			$("#photo").load(detectswipe('#video',swipe));
 		}
 		$(".original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		
@@ -1028,8 +1082,9 @@ $(document).ready(function() {
 		// options function must be called again in order to set elements previously absent
 		setOptions();
 		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length) {
+			// no subalbums, nothing to wait
 			// set social buttons events
-			setTimeout(socialButtons, 1);
+			$("#photo").load(socialButtons);
 		}
 	}
 
