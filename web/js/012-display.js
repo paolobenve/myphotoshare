@@ -1,5 +1,35 @@
 var Options = {};
 
+function getLanguage() {
+	language = "en";
+	if (Options.language && translations[Options.language] !== undefined)
+		language = Options.language;
+	else {
+		var userLang = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage;
+		language = userLang.split('-')[0];
+	}
+	return language;
+}
+
+function translate() {
+	language = getLanguage();
+	var selector;
+	for (var key in translations[language]) {
+		if (key == '#title-string' && document.title.substr(0, 5) != "<?php")
+			// don't set page title, php has already set it
+			continue;
+		selector = $(key);
+		if (selector.length) {
+			selector.html(translations[language][key]);
+		}
+	}
+}
+
+function _t(id) {
+	language = getLanguage();
+	return translations[language][id];
+}
+
 $(document).ready(function() {
 	
 	/* 
@@ -156,35 +186,6 @@ $(document).ready(function() {
 		});
 	}
 	
-	function getLanguage() {
-		language = "en";
-		if (Options.language && translations[Options.language] !== undefined)
-			language = Options.language;
-		else {
-			var userLang = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage;
-			language = userLang.split('-')[0];
-		}
-		return language;
-	}
-	
-	function translate() {
-		language = getLanguage();
-		var selector;
-		for (var key in translations[language]) {
-			if (key == '#title-string' && document.title.substr(0, 5) != "<?php")
-				// don't set page title, php has already set it
-				continue;
-			selector = $(key);
-			if (selector.length) {
-				selector.html(translations[language][key]);
-			}
-		}
-	}
-	
-	function _t(id) {
-		language = getLanguage();
-		return translations[language][id];
-	}
 	
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle;

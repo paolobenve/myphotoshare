@@ -20,6 +20,7 @@ var translations =
 			"#album-sort-reverse": "sort albums reverse (earlier content firt)",
 			"#media-sort-normal": "sort photos and videos normal (older content first)",
 			"#media-sort-reverse": "sort photos and videos reverse (earlier content first)",
+			"whatsapp-mobile-only": "Whatsapp sharing is available on mobile devices only",
 		},
 		'it': {
 			".metadata-show": "metadati",
@@ -41,6 +42,7 @@ var translations =
 			"#album-sort-reverse": "ordina inverso gli album (contenuti più recenti prima)",
 			"#media-sort-normal": "ordina normale foto e video (contenuti più vecchi prima)",
 			"#media-sort-reverse": "ordina inverso foto e video (contenuti più recenti prima)",
+			"whatsapp-mobile-only": "La condivisione su whatsapp è disponibile solo sui dispositivi mobili",
 		},
 		'es': {
 			".metadata-show": "metadatos",
@@ -62,5 +64,6 @@ var translations =
 			"#album-sort-reverse": "ordena inverso los álbum (contenido más reciente primero)",
 			"#media-sort-normal": "ordena normal fotos y videos (contenido más viejo primero)",
 			"#media-sort-reverse": "ordena inverso fotos y videos (contenido más reciente primero)",
+			"whatsapp-mobile-only": "Compartir sobre Whatsapp es posible únicamente su aparatos móbiles",
 		}
 	};

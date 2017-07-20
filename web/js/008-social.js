@@ -215,14 +215,15 @@ var SocialShareKit = (function() {
 					window.location.href = url;
 					win = window.open(url, '', opts);
 				} else {
-					//~ alert(_t("whatsapp-mobile-only"));
+					alert(_t("whatsapp-mobile-only"));
 				}
 			else
 				win = window.open(url, '', opts);
 		} else {
 			win = window.open(url);
 		}
-		win.focus();
+		if (url.indexOf("whatsapp:") !== 0 || isMobile.any() !== null)
+			win.focus();
 		return win;
 	}
 
