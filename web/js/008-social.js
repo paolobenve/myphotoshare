@@ -212,7 +212,7 @@ var SocialShareKit = (function() {
 				',top=' + top + ',left=' + left;
 			if (url.indexOf("whatsapp:") === 0)
 				if (isMobile.any()) {
-					window.location.href = url;
+					//~ window.location.href = url;
 					win = window.open(url, '', opts);
 				} else {
 					alert(_t("whatsapp-mobile-only"));
