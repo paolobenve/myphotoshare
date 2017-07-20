@@ -27,13 +27,12 @@ var isMobile = {
 	}
 };
 var SocialShareKit = (function() {
-	var supportsShare = /(whatsapp|twitter|facebook|google-plus|pinterest|tumblr|vk|linkedin|buffer|email)/,
-				sep = '*|*', wrap, _wrap;
+	var supportsShare = /(whatsapp|twitter|facebook|google-plus|pinterest|tumblr|vk|linkedin|buffer|email)/;
+	var sep = '*|*', wrap, _wrap;
 
 	// Wrapper to support multiple instances per page by selector
 	_wrap = function(opts) {
-		var options = opts || {},
-			selector = options.selector || '.ssk';
+		var options = opts || {}, selector = options.selector || '.ssk';
 		this.nodes = $(selector);
 		this.options = options;
 	};
@@ -210,14 +209,13 @@ var SocialShareKit = (function() {
 			opts = 'status=1,resizable=yes' +
 				',width=' + width + ',height=' + height +
 				',top=' + top + ',left=' + left;
-			if (url.indexOf("whatsapp:") === 0)
+			if (url.indexOf("whatsapp:") === 0) {
 				if (isMobile.any()) {
-					//~ window.location.href = url;
 					win = window.open(url, '', opts);
 				} else {
 					alert(_t("whatsapp-mobile-only"));
 				}
-			else
+			} else
 				win = window.open(url, '', opts);
 		} else {
 			win = window.open(url);
@@ -247,14 +245,14 @@ var SocialShareKit = (function() {
 			};
 		switch (network) {
 			case 'whatsapp':
-				url = 'whatsapp://send?text=' + encodeURIComponent(title + '\n' + shareUrl + '\n\n' + text + '\n');
+				url = 'whatsapp://send?text=' + encodeURIComponent(shareUrl + '\n' + text + '\n');
 				break;
 			case 'facebook':
 				url = 'https://www.facebook.com/share.php?u=' + paramsObj.shareUrlEncoded();
 				break;
 			case 'twitter':
 				url = 'https://twitter.com/intent/tweet?url=' + paramsObj.shareUrlEncoded() +
-					'&text=' + encodeURIComponent(title + (text && title ? ' - ' : '') + text);
+					'&text=' + encodeURIComponent(text);
 				if (via)
 					url += '&via=' + via.replace('@', '');
 				break;
@@ -285,8 +283,9 @@ var SocialShareKit = (function() {
 					'&text=' + encodeURIComponent(text);
 				break;
 			case 'email':
-				url = 'mailto:?subject=' + encodeURIComponent(title) +
-					'&body=' + encodeURIComponent(title + '\n' + shareUrl + '\n\n' + text + '\n');
+				//~ url = 'mailto:?subject=' + encodeURIComponent(text) +
+				url = 'mailto:?' +
+					'body=' + encodeURIComponent(text + '\n\n' + shareUrl + '\n');
 				break;
 		}
 
@@ -305,10 +304,10 @@ var SocialShareKit = (function() {
 	}
 
 	function getTitle(network) {
-		var title;
+		var title ='';
 		if (network == 'twitter')
 			title = getMetaContent('twitter:title');
-		return title || document.title;
+		return title;
 	}
 
 	function getText(network) {
