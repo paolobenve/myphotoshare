@@ -352,7 +352,7 @@ a:hover {
 }
 
 #social, #social:hover {
-	opacity: 0.5;
+	opacity: 0.3;
 	position: absolute;
 	z-index: 1000;
 }
