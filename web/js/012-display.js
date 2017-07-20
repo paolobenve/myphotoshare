@@ -484,8 +484,8 @@ $(document).ready(function() {
 						link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
-						imageString += 			"width: " + Options.album_thumb_size + "px;";
-						imageString += 			" height: " + Options.album_thumb_size + "px;";
+						imageString += 			"width: " + (Options.album_thumb_size + 6) + "px;";
+						imageString += 			" height: " + (Options.album_thumb_size + 6) + "px;";
 						if (! Options.albums_slide_style)
 							imageString +=		" background-color: " + Options.album_button_background_color + ";";
 						imageString += 			"\"";
@@ -923,7 +923,6 @@ $(document).ready(function() {
 		});
 		$("#photo-name").css("color", Options.title_image_name_color);
 		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
-		$(".album-button").css("width", albumThumbnailSize.toString() + "px");
 	}
 	
 	function em2px(selector, em) {
