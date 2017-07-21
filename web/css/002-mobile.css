@@ -12,7 +12,7 @@
 		font-size: .8em;
 		z-index: 1;
 	}
-	#album-sort-arrows, #media-sort-arrows {
+	.arrows{
 		padding: 0 .5em;
 		display: inline !important;
 	}

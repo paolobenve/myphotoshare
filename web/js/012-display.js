@@ -575,8 +575,14 @@ $(document).ready(function() {
 								originalAlbumFoldersArray = originalAlbum.path.split("/");
 								folder = folderArray[originalAlbumFoldersArray.length];
 								
+								// get the value in style sheet (element with that class doesn't exist in DOM
+								var $el = $('<div class="album-caption"></div>');
+								$($el).appendTo('body');
+								var paddingTop = parseInt($($el).css('padding-top'));
+								$($el).remove()
+								
 								captionHeight = em2px("body", 4);
-								ButtonAndCaptionHeight = Options.album_thumb_size + captionHeight;
+								ButtonAndCaptionHeight = Options.album_thumb_size + captionHeight + paddingTop + 3 * 4;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
 									html += " slide";
@@ -595,7 +601,8 @@ $(document).ready(function() {
 								html += ">";
 								theImage.wrap(html);
 								html = "<div class=\"album-caption\"";
-								html += " style=\"width: " + Options.album_thumb_size.toString() + "px; height: " + captionHeight.toString() + "px; ";
+								html += " style=\"width: " + Options.album_thumb_size.toString() + "px;" +
+										"height: " + captionHeight.toString() + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
 								html += ">" + folder + "</div>";

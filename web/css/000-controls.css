@@ -331,8 +331,8 @@ a:hover {
 	text-decoration: none;
 }
 
-.arrows img, .arrows img{
-	padding: 0 2em;
+.arrows img {
+	padding: 0 1em;
 	display: none;
 }
 
