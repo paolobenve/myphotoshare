@@ -114,7 +114,7 @@ a:hover {
 	line-height: 1.1em
 }
 
-#next, #back {
+#next, #prev {
 	position: absolute;
 	width: auto;
 	font-size: 4.5em;
@@ -125,11 +125,14 @@ a:hover {
 	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=35)";
 	filter: alpha(opacity=35);
 }
-#back {
+#prev {
 	left: 0.1em;
 }
 #next {
 	right: 0.1em;
+}
+#next:hover, #prev:hover {
+	cursor: pointer;
 }
 
 #media-box {

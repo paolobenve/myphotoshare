@@ -64,7 +64,6 @@
 				$mapWidth = $sideOffSet + ($tileWidth + $pxBetweenTiles) * $linearNumberOfTiles - $pxBetweenTiles + $sideOffSet;
 				$mapHeight = $sideOffSet + ($tileWidth + $pxBetweenTiles) * $linearNumberOfTiles - $pxBetweenTiles + $sideOffSet;
 				$mapImage = imagecreatetruecolor($mapWidth, $mapHeight);
-				//~ $bgColor = imagecolorallocate($mapImage, 255, 255, 255);
 				$bgColor = imagecolorallocate($mapImage, 50, 40, 0);
 				imagefill($mapImage, 0, 0, $bgColor);
 				 
@@ -184,7 +183,7 @@
 			</div>
 		</div>
 		
-		<a id="back">&lsaquo;</a>
+		<a id="prev">&lsaquo;</a>
 		<a id="next">&rsaquo;</a>
 	</div>
 	<div id="album-view">

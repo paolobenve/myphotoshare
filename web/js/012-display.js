@@ -774,8 +774,8 @@ $(document).ready(function() {
 		
 		if (! fullScreenStatus && currentAlbum.photos.length > 1 && $(".ssk-group").css("display") == "block") {
 			// correct back arrow position when social buttons are on the left
-			$("#back").css("left", "");
-			$("#back").css("left", (parseInt($("#back").css("left")) + $(".ssk").outerWidth()) + "px");
+			$("#prev").css("left", "");
+			$("#prev").css("left", (parseInt($("#prev").css("left")) + $(".ssk").outerWidth()) + "px");
 		}
 		
 		$(window).bind("resize", scaleMedia);
@@ -814,15 +814,15 @@ $(document).ready(function() {
 		$("#media-box").show();
 		if (currentAlbum.photos.length == 1) {
 			$("#next").hide();
-			$("#back").hide();
+			$("#prev").hide();
 			$(".next-media").removeAttr("href");
 			$("#next").removeAttr("href");
-			$("#back").removeAttr("href");
+			$("#prev").removeAttr("href");
 			$("#media-view").addClass("no-bottom-space");
 			$("#album-view").addClass("no-bottom-space");
 		} else {
 			$("#next").show();
-			$("#back").show();
+			$("#prev").show();
 			$("#media-view").removeClass("no-bottom-space");
 			$("#album-view").removeClass("no-bottom-space");
 			$("#media-view").css("bottom", (thumbnailSize + 15).toString() + "px");
@@ -950,13 +950,13 @@ $(document).ready(function() {
 			nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
 			backLink = "#!/" + photoFloat.photoHash(currentAlbum, previousMedia)
 			$("#next").show();
-			$("#back").show();
+			$("#prev").show();
 			$(".next-media").off("click");
 			$('#next').off("click");
-			$('#back').off("click");
+			$('#prev').off("click");
 			$(".next-media").click(function(){ swipeLeft(nextLink); return false; });
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
-			$('#back').click(function(){ swipeRight(backLink); return false; });
+			$('#prev').click(function(){ swipeRight(backLink); return false; });
 			
 			if (currentMedia.mediaType == "video")
 				$("#video").load(detectswipe('media-box-inner',swipe));
@@ -1239,10 +1239,10 @@ $(document).ready(function() {
 	$("#media-view").mouseleave(function() {
 		$(".links").stop().fadeOut("slow");
 	});
-	$("#next, #back").mouseenter(function() {
+	$("#next, #prev").mouseenter(function() {
 		$(this).stop().fadeTo("slow", 1);
 	});
-	$("#next, #back").mouseleave(function() {
+	$("#next, #prev").mouseleave(function() {
 		$(this).stop().fadeTo("slow", 0.35);
 	});
 	if ($.support.fullscreen) {
