@@ -166,41 +166,21 @@
 	</div>
 	<div id="media-view">
 		<div id="media-box">
-			<div id="photo-box">
-				<a class="next-media">
-					<div id="photo-box-inner" ></div>
-				</a>
-				<div id="photo-bar">
-					<div class="links">
-						<a class="metadata-show" href="javascript:void(0)"></a>
-						<a class="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
-						<a class="original-link" target="_blank"></a>
-						<span class="fullscreen-divider"> | </span>
-						<a class="fullscreen" href="javascript:void(0)">
-							<span class="enter-fullscreen"></span>
-							<span class="exit-fullscreen"></span>
-						</a>
-					</div>
-					<div class="metadata"></div>
+			<a class="next-media">
+				<div id="media-box-inner" ></div>
+			</a>
+			<div id="media-bar">
+				<div class="links">
+					<a class="metadata-show" href="javascript:void(0)"></a>
+					<a class="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
+					<a class="original-link" target="_blank"></a>
+					<span class="fullscreen-divider"> | </span>
+					<a class="fullscreen" href="javascript:void(0)">
+						<span class="enter-fullscreen"></span>
+						<span class="exit-fullscreen"></span>
+					</a>
 				</div>
-			</div>
-			<div id="video-box">
-				<a class="next-media">
-					<div id="video-box-inner"></div>
-				</a>
-				<div id="video-bar">
-					<div class="links">
-						<a class="metadata-show" href="javascript:void(0)"></a>
-						<a class="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
-						<a class="original-link" target="_blank"></a>
-						<span class="fullscreen-divider"> | </span>
-						<a class="fullscreen" href="javascript:void(0)">
-							<span class="enter-fullscreen"></span>
-							<span class="exit-fullscreen"></span>
-						</a>
-					</div>
-					<div class="metadata"></div>
-				</div>
+				<div class="metadata"></div>
 			</div>
 		</div>
 		

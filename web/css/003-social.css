@@ -249,7 +249,7 @@
 	-o-transition: padding .1s ease-out;
 	margin: 0;
 }
-@media (min-width:768px) {
+@media (min-width:401px) {
 	.ssk-sticky.ssk-left .ssk, .ssk-sticky.ssk-right .ssk {
 		display: block;
 		clear: both;
@@ -313,7 +313,7 @@
 .ssk-sticky.ssk-round.ssk-lg .ssk:hover {
 	padding: 13px;
 }
-@media (max-width:767px) {
+@media (max-width:400px) {
 	.ssk-sticky {
 		left: 0;
 		right: 0;
@@ -323,6 +323,7 @@
 		display: flex !important;
 		flex-direction: row;
 		flex-wrap: nowrap;
+		text-align: center;
 	}
 	.ssk-sticky.ssk-sticky-hide-xs {
 		display: none !important;
@@ -354,22 +355,22 @@
 	text-align: center;
 	top: -20px;
 }
-@media (min-width:768px) {
+@media (min-width:401px) {
 	.ssk-count.ssk-sticky {
 		padding-top: 0;
 	}
 	.ssk-count.ssk-sticky.ssk-left .ssk-num, .ssk-count.ssk-sticky.ssk-right .ssk-num {
-			top: 20%;
-			background-color: transparent;
+		top: 20%;
+		background-color: transparent;
 	}
 	.ssk-count.ssk-sticky.ssk-left .ssk-num {
-			left: 100%;
-			margin-left: 5px;
+		left: 100%;
+		margin-left: 5px;
 	}
 	.ssk-count.ssk-sticky.ssk-right .ssk-num {
-			right: 115%;
-			margin-left: -100%;
-			text-align: right;
+		right: 115%;
+		margin-left: -100%;
+		text-align: right;
 	}
 }
 .ssk-whatsapp {

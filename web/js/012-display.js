@@ -1,4 +1,5 @@
 var Options = {};
+var nextLink, backLink;
 
 function getLanguage() {
 	language = "en";
@@ -63,7 +64,6 @@ $(document).ready(function() {
 	var language;
 	var byDateRegex;
 	var numSubAlbumsReady = 0;
-	var nextLink, backLink;
 	var isMobile = {
 		Android: function() {
 			return navigator.userAgent.match(/Android/i);
@@ -127,30 +127,35 @@ $(document).ready(function() {
 			swipe_det.sX = 0; swipe_det.sY = 0; swipe_det.eX = 0; swipe_det.eY = 0;
 		},false);  
 	}
-
-	function swipe(el,d) {
-		if (d == "r") {
-			$("#" + el).animate({
-				opacity: 0.5,
-				right: "-=200"
-			}, 500, function() {
-				location.href = nextLink;
-				$("#" + el).css('right', "");
-				$("#" + el).css('opacity', "");
-			});
-		} else if (d == "l") {
-			$("#" + el).animate({
-				opacity: 0.5,
-				left: "-=200",
-			}, 500, function() {
-				location.href = backLink;
-				$("#" + el).css('left', "");
-				$("#" + el).css('opacity', "");
-			});
-		}
+	
+	function swipeRight(dest) {
+		$("#media-box-inner").animate({
+			//~ opacity: 0.5,
+			right: "-=" + window.innerWidth,
+		}, 300, function() {
+			location.href = dest;
+			$("#media-box-inner").css('right', "");
+			//~ $("#media-box-inner").css('opacity', "");
+		});
+	}
+	function swipeLeft(dest) {
+		$("#media-box-inner").animate({
+			//~ opacity: 0.5,
+			left: "-=" + window.innerWidth,
+		}, 300, function() {
+			location.href = dest;
+			$("#media-box-inner").css('left', "");
+			//~ $("#media-box-inner").css('opacity', "");
+		});
 	}
 	
-	
+	function swipe(el,d) {
+		if (d == "r") {
+			swipeRight(backLink);
+		} else if (d == "l") {
+			swipeLeft(nextLink);
+		}
+	}
 	
 	function socialButtons() {
 		var url, hash, myShareUrl = "";
@@ -356,6 +361,7 @@ $(document).ready(function() {
 		
 		document.title = documentTitle;
 		$("#title-string").html(title);
+		
 		if (currentMedia === null) {
 			$("body").on('mouseenter', "#title-container", function() {
 				if (currentAlbum.albums.length > 1) {
@@ -653,10 +659,8 @@ $(document).ready(function() {
 			$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
 			$("#media-view").hide();
-			$("#video-box-inner").empty();
-			$("#video-box").hide();
-			$("#photo-box-inner").empty();
-			$("#photo-box").hide();
+			$("#media-box-inner").empty();
+			$("#media-box").hide();
 			$("#thumbs").show();
 			$("#day-folders-view-container").show();
 			if (currentAlbum.path == Options.folders_string) {
@@ -689,7 +693,7 @@ $(document).ready(function() {
 		return (fraction[0] / fraction[1]).toString();
 	}
 	function scaleMedia() {
-		var media, container, height, albumViewHeight, bottom, width, photoSrc, previousSrc;
+		var media, container, height, containerBottom, bottom, width, photoSrc, previousSrc;
 		$(window).off("resize");
 		if (currentMedia.mediaType == "video") {
 			$('#video').off('loadstart');
@@ -700,10 +704,14 @@ $(document).ready(function() {
 			container = $(window);
 		else {
 			container = $("#media-view");
-			albumViewHeight = 0;
+			containerBottom = 0;
 			if ($("#album-view").is(":visible"))
-				albumViewHeight = $("#album-view").outerHeight();
-			container.css("bottom", albumViewHeight + "px");
+				containerBottom = $("#album-view").outerHeight();
+			else if ($(".ssk-group").css("display") != "block" && parseInt($("#media-bar").css("bottom")) < $(".ssk").outerHeight())
+				// correct container bottom when social buttons are on the bottom
+				containerBottom = $(".ssk").outerHeight();
+
+			container.css("bottom", containerBottom + "px");
 			container.css("top", $("#title-container").outerHeight() + "px");
 		}
 		
@@ -732,10 +740,9 @@ $(document).ready(function() {
 				media.attr("src", photoSrc)
 					.attr("width", width).attr("height", height).attr("ratio", width / height);
 			}
-			
-			bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
 		}
-		if (media.attr("width") > container.width() && media.attr("ratio") > container.width() / container.height()) {
+		
+		if (parseInt(media.attr("width")) > container.width() && media.attr("ratio") > container.width() / container.height()) {
 			height = container.width() / media.attr("ratio");
 			media.css("width", "100%").
 				css("height", "auto").
@@ -743,7 +750,8 @@ $(document).ready(function() {
 					css("height", height).
 					css("margin-top", - height / 2).
 					css("top", "50%");
-		} else if (media.attr("height") > container.height() && media.attr("ratio") < container.width() / container.height()) {
+			bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
+		} else if (parseInt(media.attr("height")) > container.height() && media.attr("ratio") < container.width() / container.height()) {
 			media.css("height", "100%").
 				css("width", "auto").
 				parent().
@@ -752,19 +760,31 @@ $(document).ready(function() {
 					css("top", "0");
 			if (currentMedia.mediaType != "video")
 				bottom = 0;
+			else
+				bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
 		} else {
 			media.css("height", "").css("width", "").
 				parent().
 					css("height", media.attr("height")).
 					css("margin-top", - media.attr("height") / 2).
 					css("top", "50%");
+			bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
 		}
-		if (currentMedia.mediaType == "video" && ! fullScreenStatus) {
-			$("#video-bar").css("bottom", 0);
+		
+		//~ if (currentMedia.mediaType == "video" && ! fullScreenStatus) {
+		if (currentMedia.mediaType == "video") {
+			$("#media-bar").css("bottom", 0);
 		} else {
 			media.css("bottom", bottom);
-			$("#photo-bar").css("bottom", bottom);
+			$("#media-bar").css("bottom", bottom);
 		}
+		
+		if (! fullScreenStatus && currentAlbum.photos.length > 1 && $(".ssk-group").css("display") == "block") {
+			// correct back arrow position when social buttons are on the left
+			$("#back").css("left", "");
+			$("#back").css("left", (parseInt($("#back").css("left")) + $(".ssk").outerWidth()) + "px");
+		}
+		
 		$(window).bind("resize", scaleMedia);
 	}
 	function chooseMediaForScaling(media, container) {
@@ -787,8 +807,9 @@ $(document).ready(function() {
 		}
 		return chosenMedia;
 	}
+	
 	function showMedia(album) {
-		var width, height, previousMedia, nextMedia, text, thumbnailSize, i, changeViewLink;
+		var width, height, previousMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
 		var windowWidth, windowHeight;
 		width = currentMedia.size[0];
 		height = currentMedia.size[1];
@@ -797,6 +818,7 @@ $(document).ready(function() {
 		windowHeight = $(window).height();
 		
 		thumbnailSize = Options.media_thumb_size;
+		$("#media-box").show();
 		if (currentAlbum.photos.length == 1) {
 			$("#next").hide();
 			$("#back").hide();
@@ -820,14 +842,37 @@ $(document).ready(function() {
 		if ($("#album-view").is(":visible"))
 			albumViewHeight = $("#album-view").outerHeight();
 		
+		$('#media-box-inner > img').remove();
+		$('#media-box-inner > video').remove();
+		
 		if (currentMedia.mediaType == "video") {
-			$("#video-box-inner").empty();
 			if (! Modernizr.video) {
-				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p><p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p></div>').appendTo('#video-box-inner');
+				$('<div id="video-unsupported">' +
+						'<p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p>' +
+						'<p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p>' +
+					'</div>').appendTo('#media-box-inner');
+				videoOK = false;
 			}
 			else if (! Modernizr.video.h264) {
-				$('<div id="video-unsupported"><p>Sorry, your browser doesn\'t support the H.264 video format!</p></div>').appendTo('#video-box-inner');
-			} else {
+				$('<div id="video-unsupported">' +
+						'<p>Sorry, your browser doesn\'t support the H.264 video format!</p>' +
+					'</div>').appendTo('#media-box-inner');
+				videoOK = false;
+			}
+		}
+		
+		
+		if (currentMedia.mediaType != "video" || videoOK) {
+			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
+				$("#folders-view").hide();
+				$("#day-view").show();
+			}
+			else {
+				$("#folders-view").show();
+				$("#day-view").hide();
+			}
+			
+			if (currentMedia.mediaType == "video") {
 				if (fullScreenStatus) {
 					////////////////////////////////////////////
 					// the original video doesn't work: WHY????
@@ -837,85 +882,73 @@ $(document).ready(function() {
 				} else {
 					videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
 				}
-				$('<video/>', { id: 'video', controls: true }).appendTo('#video-box-inner')
+				$('<video/>', { id: 'video', controls: true }).appendTo('#media-box-inner')
 					.attr("width", width).attr("height", height).attr("ratio", width / height)
 					.attr("src", videoSrc)
 					.attr("alt", currentMedia.name);
-				$('#video').on('loadstart', scaleMedia());
-			}
-			$("link[rel=image_src]").remove();
-			$('link[rel="video_src"]').remove();
-			$("head").append("<link rel=\"video_src\" href=\"" + videoSrc + "\" />");
-			$("#photo-box-inner").empty();
-			$("#photo-box").hide();
-			$("#video-box").show();
-		} else {
-			$("#photo-box-inner").empty();
-			maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
-			if (width > height) {
-				height = Math.round(height * maxSize / width);
-				width = maxSize;
+				triggerLoad = 'loadstart';
+				$('#media').on(triggerLoad, scaleMedia());
+				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
 			} else {
-				width = Math.round(width * maxSize / height);
-				height = maxSize;
+				maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
+				if (width > height) {
+					height = Math.round(height * maxSize / width);
+					width = maxSize;
+				} else {
+					width = Math.round(width * maxSize / height);
+					height = maxSize;
+				}
+				photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]);
+				$('<img/>', { id: 'photo' }).appendTo('#media-box-inner')
+					.attr("width", width).attr("height", height).attr("ratio", width / height)
+					.attr("src", photoSrc)
+					.attr("alt", currentMedia.name)
+					.attr("title", currentMedia.date);
+				linkTag = "<link rel=\"image_src\" href=\"" + photoSrc + "\" />";
+				triggerLoad = 'load';
 			}
-			photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]);
-			$('<img/>', { id: 'photo' }).appendTo('#photo-box-inner')
-				.attr("width", width).attr("height", height).attr("ratio", width / height)
-				.attr("src", photoSrc)
-				.attr("alt", currentMedia.name)
-				.attr("title", currentMedia.date);
+			
 			$("link[rel=image_src]").remove();
 			$('link[rel="video_src"]').remove();
-			$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-			$("#photo").load(scaleMedia);
-			$("#video-box-inner").empty();
-			$("#video-box").hide();
-			$("#photo-box").show();
+			$("head").append(linkTag);
+			$('#media').on(triggerLoad, scaleMedia());
 			if (! Options.persistent_metadata) {
 				$(".metadata").hide();
 				$(".metadata-show").show();
 				$(".metadata-hide").hide();
 			}
-		}
-		if (currentAlbum.photos.length > 1) {
-			i = currentMediaIndex;
-			// following 2 iteration are needed with date album: the same photo could be present coming from different albums
-			do {
-				if (i == 0)
-					i = currentAlbum.photos.length - 1;
-				else
-					i --;
-				previousMedia = currentAlbum.photos[i];
-			} while (previousMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
 			
-			i = currentMediaIndex;
-			do {
-				if (i == currentAlbum.photos.length - 1)
-					i = 0;
-				else
-					i ++;
-				nextMedia = currentAlbum.photos[i];
-			} while (nextMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
-			
-			if (nextMedia.mediaType == "video") {
-				$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia));
-			} else {
-				$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize));
+			if (currentAlbum.photos.length > 1) {
+				i = currentMediaIndex;
+				// following 2 iteration are needed with date album: the same photo could be present coming from different albums
+				do {
+					if (i == 0)
+						i = currentAlbum.photos.length - 1;
+					else
+						i --;
+					previousMedia = currentAlbum.photos[i];
+				} while (previousMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
+				
+				i = currentMediaIndex;
+				do {
+					if (i == currentAlbum.photos.length - 1)
+						i = 0;
+					else
+						i ++;
+					nextMedia = currentAlbum.photos[i];
+				} while (nextMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
+				
+				if (nextMedia.mediaType == "video") {
+					$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia));
+				} else {
+					$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize));
+				}
+				if (previousMedia.mediaType == "video") {
+					$.preloadImages(photoFloat.videoPath(currentAlbum, previousMedia));
+				} else {
+					$.preloadImages(photoFloat.photoPath(currentAlbum, previousMedia, maxSize));
+				}
 			}
-			if (previousMedia.mediaType == "video") {
-				$.preloadImages(photoFloat.videoPath(currentAlbum, previousMedia));
-			} else {
-				$.preloadImages(photoFloat.photoPath(currentAlbum, previousMedia, maxSize));
-			}
-		}
-		if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
-			$("#folders-view").hide();
-			$("#day-view").show();
-		}
-		else {
-			$("#folders-view").show();
-			$("#day-view").hide();
 		}
 		
 		if (currentAlbum.photos.length == 1) {
@@ -925,14 +958,20 @@ $(document).ready(function() {
 			backLink = "#!/" + photoFloat.photoHash(currentAlbum, previousMedia)
 			$("#next").show();
 			$("#back").show();
-			$(".next-media").attr("href", nextLink);
-			$("#next").attr("href", nextLink);
-			$("#back").attr("href", backLink);
+			$(".next-media").off("click");
+			$('#next').off("click");
+			$('#back').off("click");
+			$(".next-media").click(function(){ swipeLeft(nextLink); return false; });
+			$('#next').click(function(){ swipeLeft(nextLink); return false; });
+			$('#back').click(function(){ swipeRight(backLink); return false; });
+			//~ if ($(".ssk-group").css("display") == "block")
+				//~ // correct back arrow position when social buttons are on the left
+				//~ $("#back").css("left", (parseInt($("#back").css("left")) + $(".ssk").outerWidth()) + "px");
 			
 			if (currentMedia.mediaType == "video")
-				$("#video").load(detectswipe('video-box-inner',swipe));
+				$("#video").load(detectswipe('media-box-inner',swipe));
 			else
-				$("#photo").load(detectswipe('photo-box-inner',swipe));
+				$("#photo").load(detectswipe('media-box-inner',swipe));
 		}
 		$(".original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		
@@ -965,7 +1004,6 @@ $(document).ready(function() {
 		
 		$("#subalbums").hide();
 		$("#media-view").show();
-		//~ socialButtons();
 	}
 	
 	function setOptions() {
@@ -1076,8 +1114,10 @@ $(document).ready(function() {
 		currentMedia = photo;
 		currentMediaIndex = photoIndex;
 		
+		setOptions();
 		if (currentMedia === null || typeof currentMedia === "object")
 			setTitle();
+		
 		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1)
 		{
 			if (currentMedia === null) {
@@ -1177,26 +1217,27 @@ $(document).ready(function() {
 	
 	
 	$(document).keydown(function(e){
-		if (currentMedia === null)
+		console.log(e.keyCode);
+		if (currentMedia === null || nextLink === undefined || backLink === undefined)
 			return true;
-		if (e.keyCode === 39) {
-			window.location.href = $("#next").attr("href");
+		if (e.keyCode === 34 || e.keyCode === 39 || e.keyCode === 40) {
+			swipeLeft(nextLink);
 			return false;
-		} else if (e.keyCode === 37) {
-			window.location.href = $("#back").attr("href");
+		} else if (e.keyCode === 33 || e.keyCode === 37 || e.keyCode === 38) {
+			swipeRight(backLink);
 			return false;
 		}
 		return true;
 	});
 	$(document).mousewheel(function(event, delta) {
 		
-		if (currentMedia === null || $("#next").attr('href') === undefined)
+		if (currentMedia === null || nextLink === undefined || backLink === undefined)
 			return true;
 		if (delta < 0) {
-			window.location.href = $("#next").attr("href");
+			swipeLeft(nextLink);
 			return false;
 		} else if (delta > 0) {
-			window.location.href = $("#back").attr("href");
+			swipeRight(backLink);
 			return false;
 		}
 		return true;

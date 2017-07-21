@@ -144,10 +144,8 @@ a:hover {
 }
 */
 #media-box {
-/*
-	position: absolute;
-*/
 }
+
 #media-view {
 	position: absolute;
 	top: 3em;
@@ -167,10 +165,10 @@ a:hover {
 #media-view.no-bottom-space {
 	bottom: 0 !important;
 }
-#photo-box, #video-box {
+#media-box {
 	display: inline;
 }
-#video-box-inner, #photo-box-inner {
+#media-box-inner {
 	position: absolute;
 	top: 50%;
 	width: 100%;
@@ -223,13 +221,7 @@ a:hover {
 .metadata tr {
 	height: 14px;
 }
-#photo-bar {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	text-align: center;
-}
-#video-bar {
+#media-bar {
 	position: absolute;
 	bottom: 0;
 	width: 100%;
