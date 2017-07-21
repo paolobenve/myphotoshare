@@ -64,67 +64,43 @@ $(document).ready(function() {
 	var language;
 	var byDateRegex;
 	var numSubAlbumsReady = 0;
-	var isMobile = {
-		Android: function() {
-			return navigator.userAgent.match(/Android/i);
-		},
-		BlackBerry: function() {
-			return navigator.userAgent.match(/BlackBerry/i);
-		},
-		iOS: function() {
-			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-		},
-		Opera: function() {
-			return navigator.userAgent.match(/Opera Mini/i);
-		},
-		Windows: function() {
-			return navigator.userAgent.match(/IEMobile/i);
-		},
-		any: function() {
-			return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
-		}
-	};
 	
 	/* Displays */
 	
 	// from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
 	function detectswipe(el,func) {
 		swipe_det = new Object();
-		swipe_det.sX = 0; swipe_det.sY = 0; swipe_det.eX = 0; swipe_det.eY = 0;
+		swipe_det.sX = 0; swipe_det.eX = 0;
 		var min_x = 30;  //min x swipe for horizontal swipe
 		var max_x = 30;  //max x difference for vertical swipe
-		var min_y = 50;  //min y swipe for vertical swipe
-		var max_y = 60;  //max y difference for horizontal swipe
 		var direc = "";
 		ele = document.getElementById(el);
 		ele.addEventListener('touchstart',function(e){
 			var t = e.touches[0];
-			swipe_det.sX = t.screenX; 
-			swipe_det.sY = t.screenY;
+			swipe_det.sX = t.screenX;
 		},false);
 		ele.addEventListener('touchmove',function(e){
 			e.preventDefault();
 			var t = e.touches[0];
-			swipe_det.eX = t.screenX; 
-			swipe_det.eY = t.screenY;    
+			swipe_det.eX = t.screenX;
 		},false);
 		ele.addEventListener('touchend',function(e){
 			//horizontal detection
-			if ((((swipe_det.eX - min_x > swipe_det.sX) || (swipe_det.eX + min_x < swipe_det.sX)) && ((swipe_det.eY < swipe_det.sY + max_y) && (swipe_det.sY > swipe_det.eY - max_y) && (swipe_det.eX > 0)))) {
-			if(swipe_det.eX > swipe_det.sX) direc = "r";
-			else direc = "l";
+			if ((swipe_det.eX - swipe_det.sX > min_x || swipe_det.eX - swipe_det.sX < - min_x) && 
+				swipe_det.eX > 0
+			) {
+				if(swipe_det.eX > swipe_det.sX)
+					direc = "r";
+				else
+					direc = "l";
 			}
-			//vertical detection
-			else if ((((swipe_det.eY - min_y > swipe_det.sY) || (swipe_det.eY + min_y < swipe_det.sY)) && ((swipe_det.eX < swipe_det.sX + max_x) && (swipe_det.sX > swipe_det.eX - max_x) && (swipe_det.eY > 0)))) {
-				if(swipe_det.eY > swipe_det.sY) direc = "d";
-				else direc = "u";
-			}
-
+			
 			if (direc != "") {
-				if(typeof func == 'function') func(el,direc);
+				if(typeof func == 'function')
+					func(el,direc);
 			}
 			direc = "";
-			swipe_det.sX = 0; swipe_det.sY = 0; swipe_det.eX = 0; swipe_det.eY = 0;
+			swipe_det.sX = 0; swipe_det.eX = 0;
 		},false);  
 	}
 	
@@ -206,12 +182,13 @@ $(document).ready(function() {
 						break;
 				}
 			}
-		} else if (currentMedia.mediaType == "video") {
-			mediaArray.push($("#video").attr("src"));
-			type = "v";
 		} else {
-			type = "i";
-			mediaArray.push($("#photo").attr("src"));
+			mediaArray.push($("#media").attr("src"));
+			if (currentMedia.mediaType == "video") {
+				type = "v";
+			} else {
+				type = "p";
+			}
 		}
 		
 		hash = location.hash;
@@ -317,10 +294,10 @@ $(document).ready(function() {
 				title += " &raquo; ";
 		}
 		if (currentMedia !== null)
-			title += "<span id=\"photo-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
+			title += "<span id=\"media-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
 			
 		else if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1)
-			title += " &raquo; <span id=\"photo-name\">" + photoFloat.trimExtension(currentAlbum.photos[0].name) + "</span>";
+			title += " &raquo; <span id=\"media-name\">" + photoFloat.trimExtension(currentAlbum.photos[0].name) + "</span>";
 		else {
 			// the arrows for changing sort
 			if (currentAlbum.albums.length > 1)
@@ -450,7 +427,10 @@ $(document).ready(function() {
 			return;
 		if (currentMedia !== null) {
 			var scroller = $("#album-view");
-			scroller.stop().animate({ scrollLeft: thumb.parent().position().left + scroller.scrollLeft() - scroller.width() / 2 + thumb.width() / 2 }, "slow");
+			scroller.stop().animate(
+				{ scrollLeft: thumb.parent().position().left + scroller.scrollLeft() - scroller.width() / 2 + thumb.width() / 2 },
+				"slow"
+			);
 		} else
 			$("html, body").stop().animate({ scrollTop: thumb.offset().top - $(window).height() / 2 + thumb.height() }, "slow");
 		
@@ -686,14 +666,17 @@ $(document).ready(function() {
 			return fraction[0] + "/" + fraction[1];
 		return (fraction[0] / fraction[1]).toString();
 	}
+	
+	function lateralSocialButtons() {
+		return $(".ssk-group").css("display") == "block";
+	}
+	function bottomSocialButtons() {
+		return ! lateralSocialButtons();
+	}
 	function scaleMedia() {
 		var media, container, height, containerBottom, bottom, width, photoSrc, previousSrc;
 		$(window).off("resize");
-		if (currentMedia.mediaType == "video") {
-			$('#video').off('loadstart');
-		} else {
-			$("#photo").off("load");
-		}
+		
 		if (fullScreenStatus)
 			container = $(window);
 		else {
@@ -701,18 +684,17 @@ $(document).ready(function() {
 			containerBottom = 0;
 			if ($("#album-view").is(":visible"))
 				containerBottom = $("#album-view").outerHeight();
-			else if ($(".ssk-group").css("display") != "block" && parseInt($("#media-bar").css("bottom")) < $(".ssk").outerHeight())
+			else if (bottomSocialButtons())
 				// correct container bottom when social buttons are on the bottom
-				containerBottom = $(".ssk").outerHeight();
+				containerBottom = $(".ssk-group").outerHeight();
 
 			container.css("bottom", containerBottom + "px");
 			container.css("top", $("#title-container").outerHeight() + "px");
 		}
 		
-		if (currentMedia.mediaType == "video") {
-			media = $("#video");
-		} else {
-			media = $("#photo");
+		media = $("#media");
+		media.off('loadstart').off("load");
+		if (currentMedia.mediaType != "video") {
 			photoSrc = chooseMediaForScaling(currentMedia, container);
 			// chooseMediaForScaling() sets maxSize to 0 if it returns the original media
 			previousSrc = media.attr("src");
@@ -772,7 +754,9 @@ $(document).ready(function() {
 			$("#media-bar").css("bottom", bottom);
 		}
 		
-		if (! fullScreenStatus && currentAlbum.photos.length > 1 && $(".ssk-group").css("display") == "block") {
+		media.show();
+		
+		if (! fullScreenStatus && currentAlbum.photos.length > 1 && lateralSocialButtons()) {
 			// correct back arrow position when social buttons are on the left
 			$("#prev").css("left", "");
 			$("#prev").css("left", (parseInt($("#prev").css("left")) + $(".ssk").outerWidth()) + "px");
@@ -875,12 +859,11 @@ $(document).ready(function() {
 				} else {
 					videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
 				}
-				$('<video/>', { id: 'video', controls: true }).appendTo('#media-box-inner')
+				$('<video/>', { id: 'media', controls: true }).appendTo('#media-box-inner')
 					.attr("width", width).attr("height", height).attr("ratio", width / height)
 					.attr("src", videoSrc)
 					.attr("alt", currentMedia.name);
 				triggerLoad = 'loadstart';
-				$('#media').on(triggerLoad, scaleMedia());
 				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
 			} else {
 				maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
@@ -892,7 +875,8 @@ $(document).ready(function() {
 					height = maxSize;
 				}
 				photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]);
-				$('<img/>', { id: 'photo' }).appendTo('#media-box-inner')
+				$('<img/>', { id: 'media' }).appendTo('#media-box-inner')
+					.hide()
 					.attr("width", width).attr("height", height).attr("ratio", width / height)
 					.attr("src", photoSrc)
 					.attr("alt", currentMedia.name)
@@ -958,10 +942,7 @@ $(document).ready(function() {
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
 			$('#prev').click(function(){ swipeRight(backLink); return false; });
 			
-			if (currentMedia.mediaType == "video")
-				$("#video").load(detectswipe('media-box-inner',swipe));
-			else
-				$("#photo").load(detectswipe('media-box-inner',swipe));
+			$("#media").load(detectswipe('media-box-inner',swipe));
 		}
 		$(".original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		
@@ -1020,7 +1001,7 @@ $(document).ready(function() {
 			//mouse out
 			$(this).css("color", Options.title_color);
 		});
-		$("#photo-name").css("color", Options.title_image_name_color);
+		$("#media-name").css("color", Options.title_image_name_color);
 		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
 	}
 	
@@ -1131,7 +1112,7 @@ $(document).ready(function() {
 		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length) {
 			// no subalbums, nothing to wait
 			// set social buttons events
-			$("#photo").load(socialButtons);
+			$("#media").load(socialButtons);
 		}
 	}
 
@@ -1239,43 +1220,33 @@ $(document).ready(function() {
 	$("#media-view").mouseleave(function() {
 		$(".links").stop().fadeOut("slow");
 	});
+	
 	$("#next, #prev").mouseenter(function() {
-		$(this).stop().fadeTo("slow", 1);
+		$(this).stop().fadeTo("fast", 1);
 	});
 	$("#next, #prev").mouseleave(function() {
-		$(this).stop().fadeTo("slow", 0.35);
+		$(this).stop().fadeTo("fast", 0.4);
 	});
 	if ($.support.fullscreen) {
 		$(".fullscreen").show();
 		$(".fullscreen").click(function(e) {
 			e.preventDefault();
-			if (currentMedia.mediaType == "video") {
-				$('#video').off('loadstart');
-				$("#media-box").fullScreen({
-					callback: function(isFullscreen) {
-						fullScreenStatus = isFullscreen;
-						$(".enter-fullscreen").toggle();
-						$(".exit-fullscreen").toggle();
-						showMedia(currentAlbum);
-					}
-				});
-			} else {
-				$("#photo").unbind("load");
-				$("#media-box").fullScreen({
-					callback: function(isFullscreen) {
-						fullScreenStatus = isFullscreen;
-						$(".enter-fullscreen").toggle();
-						$(".exit-fullscreen").toggle();
-						showMedia(currentAlbum);
-					}
-				});
-			}
+			$('#media').off('loadstart').unbind("load");
+			$("#media-box").fullScreen({
+				callback: function(isFullscreen) {
+					fullScreenStatus = isFullscreen;
+					$(".enter-fullscreen").toggle();
+					$(".exit-fullscreen").toggle();
+					showMedia(currentAlbum);
+				}
+			});
 		});
 	}
 	$(".metadata-show").click(function() {
 		$(".metadata-show").hide();
 		$(".metadata-hide").show();
-		$(".metadata").stop()
+		$(".metadata")
+			.stop()
 			.css("height", 0)
 			.css("padding-top", 0)
 			.css("padding-bottom", 0)
@@ -1287,7 +1258,8 @@ $(document).ready(function() {
 	$(".metadata-hide").click(function() {
 		$(".metadata-show").show();
 		$(".metadata-hide").hide();
-		$(".metadata").stop()
+		$(".metadata")
+			.stop()
 			.animate({ height: 0, paddingTop: 0, paddingBottom: 0 }, "slow", function() {
 				$(this).hide();
 			});

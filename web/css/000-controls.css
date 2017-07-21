@@ -290,7 +290,7 @@ a:hover {
 	font-style: italic;
 }
 
-#photo-name {
+#media-name {
 	margin: 0 0 0 0;
 	color: lime;
 	font-weight: bold;
@@ -337,7 +337,7 @@ a:hover {
 }
 
 #social, #social:hover {
-	opacity: 0.3;
+	opacity: 0.45;
 	position: absolute;
 	z-index: 1000;
 }

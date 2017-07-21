@@ -105,7 +105,7 @@
 			if ($pathInfo != '/')
 				$mediaWithPath = $pathInfo .$mediaWithPath;
 			$linkTag = '<link ';
-			if ($_GET['t'] == 'i' || $_GET['t'] == 'a')
+			if ($_GET['t'] == 'p' || $_GET['t'] == 'a')
 				$linkTag .= 'rel="image_src" ';
 			else if ($_GET['t'] == 'v')
 				$linkTag .= 'rel="video_src" ';
