@@ -130,22 +130,18 @@ $(document).ready(function() {
 	
 	function swipeRight(dest) {
 		$("#media-box-inner").animate({
-			//~ opacity: 0.5,
 			right: "-=" + window.innerWidth,
 		}, 300, function() {
 			location.href = dest;
 			$("#media-box-inner").css('right', "");
-			//~ $("#media-box-inner").css('opacity', "");
 		});
 	}
 	function swipeLeft(dest) {
 		$("#media-box-inner").animate({
-			//~ opacity: 0.5,
 			left: "-=" + window.innerWidth,
 		}, 300, function() {
 			location.href = dest;
 			$("#media-box-inner").css('left', "");
-			//~ $("#media-box-inner").css('opacity', "");
 		});
 	}
 	
@@ -582,7 +578,6 @@ $(document).ready(function() {
 									distance = (Options.album_thumb_size - thumbHeight) / 2;
 								}
 								htmlText = "<img " +
-										//~ "title=\"" + randomPhoto.albumName.substr(7) + "\"" +
 										"title=\"" + randomPhoto.albumName + "\"" +
 										" class=\"thumbnail\"" +
 										" src=\"" + photoFloat.photoPath(randomAlbum, randomPhoto, Options.album_thumb_size) + "\"" +
@@ -684,7 +679,6 @@ $(document).ready(function() {
 				$("#thumbs").show();
 			$("#powered-by").hide();
 		}
-		//~ setTimeout(socialButtons, 1);
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
@@ -771,7 +765,6 @@ $(document).ready(function() {
 			bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
 		}
 		
-		//~ if (currentMedia.mediaType == "video" && ! fullScreenStatus) {
 		if (currentMedia.mediaType == "video") {
 			$("#media-bar").css("bottom", 0);
 		} else {
@@ -964,9 +957,6 @@ $(document).ready(function() {
 			$(".next-media").click(function(){ swipeLeft(nextLink); return false; });
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
 			$('#back').click(function(){ swipeRight(backLink); return false; });
-			//~ if ($(".ssk-group").css("display") == "block")
-				//~ // correct back arrow position when social buttons are on the left
-				//~ $("#back").css("left", (parseInt($("#back").css("left")) + $(".ssk").outerWidth()) + "px");
 			
 			if (currentMedia.mediaType == "video")
 				$("#video").load(detectswipe('media-box-inner',swipe));

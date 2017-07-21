@@ -53,11 +53,9 @@ a:hover {
 
 #album-view {
 	position: absolute;
-/*
-	top: 2.5em;
-*/
 	padding: .5em;
 }
+
 #thumbs {
 	clear: both;
 }
@@ -65,10 +63,12 @@ a:hover {
 #thumbs img {
 	border: 0;
 }
+
 #thumbs img.current-thumb {
 	border-top: 6px solid #FFAD27 !important;
 	margin-top: 0;
 }
+
 #subalbums {
 	padding-top: .2em;
 }
@@ -109,12 +109,6 @@ a:hover {
 	text-align: center;
 	font-style: italic;
 	font-size: 90%;
-/*
-	background-position-x: center;
-	background-position-y: 0;
-	background-image: url(../img/image-placeholder.png);
-	background-repeat: no-repeat;
-*/
 	background-color: inherit;
 	margin: 0 auto 3px auto;
 	line-height: 1.1em
@@ -137,13 +131,9 @@ a:hover {
 #next {
 	right: 0.1em;
 }
-/*
-#photo {
-	border: 0;
-	left: 0;
-}
-*/
+
 #media-box {
+	display: inline;
 }
 
 #media-view {
@@ -158,20 +148,41 @@ a:hover {
 	width: 100%;
 }
 
-#album-view.no-bottom-space {
-	height: 0;
-	bottom: 1em;
-}
 #media-view.no-bottom-space {
 	bottom: 0 !important;
 }
-#media-box {
-	display: inline;
-}
+
 #media-box-inner {
 	position: absolute;
 	top: 50%;
 	width: 100%;
+}
+
+#album-view.no-bottom-space {
+	height: 0;
+	bottom: 1em;
+}
+
+#album-view.photo-view-container {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	top: auto !important;
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
+	padding: 0 !important;
+	text-align: center;
+}
+#album-view.photo-view-container.no-bottom-space {
+	height: 0;
+	bottom: 15px;
+}
+#media-bar {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	text-align: center;
 }
 .links {
 	background-color: #000000;
@@ -221,32 +232,11 @@ a:hover {
 .metadata tr {
 	height: 14px;
 }
-#media-bar {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	text-align: center;
-}
 .fullscreen, .exit-fullscreen {
 	display: none;
 }
 .enter-fullscreen, .fullscreen-divider {
 	display: inline;
-}
-#album-view.photo-view-container {
-	position: absolute;
-	width: 100%;
-	bottom: 0;
-	top: auto !important;
-	overflow-x: auto;
-	overflow-y: hidden;
-	white-space: nowrap;
-	padding: 0 !important;
-	text-align: center;
-}
-#album-view.photo-view-container.no-bottom-space {
-	height: 0;
-	bottom: 15px;
 }
 #powered-by {
 	clear: both;
@@ -348,6 +338,7 @@ a:hover {
 	position: absolute;
 	z-index: 1000;
 }
+
 #social:hover {
 	opacity: 1;
 }

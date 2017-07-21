@@ -28,23 +28,11 @@
 			dataType: "json",
 			url: cacheFile,
 			success: function(album) {
-				//~ var i, setTreeMediaCount, thisSelf;
 				var i;
-				//~ thisSelf = self;
-				//begin counting the number of media in its tree
-				//~ setTreeMediaCount = function (thisAlbum) {
-					//~ thisAlbum.numMedia = thisAlbum.photos.length;
-					//~ for (i = 0; i < thisAlbum.albums.length; i ++) {
-						//~ if (typeof thisAlbum.albums[i].numMedia === "undefined")
-							//~ thisSelf.getAlbum(thisAlbum.albums[i], setTreeMediaCount, error);
-					//~ }
-					//~ return thisAlbum.numMedia;
-				//~ };
 				for (i = 0; i < album.albums.length; ++i)
 					album.albums[i].parent = album;
 				for (i = 0; i < album.photos.length; ++i)
 					album.photos[i].parent = album;
-				//~ setTreeMediaCount(album);
 				self.albumCache[cacheKey] = album;
 				
 				callback(album);

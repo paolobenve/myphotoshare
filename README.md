@@ -187,6 +187,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 * swipe gesture on mobile to go to next/previous photo/video
 * media animation when passing to next/previous image
+* simplified html structure
 
 ### version 2.3 (July 20, 2017):
 
