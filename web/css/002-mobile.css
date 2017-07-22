@@ -9,15 +9,7 @@
 		height: 0;
 	}
 	#title {
-		font-size: .8em;
+		font-size: small;
 		z-index: 1;
-	}
-	.arrows{
-		padding: 0 .5em;
-		display: inline !important;
-	}
-	.links {
-		display: inline !important;
-		opacity: 0.5;
 	}
 }

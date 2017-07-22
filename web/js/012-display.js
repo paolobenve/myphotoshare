@@ -336,25 +336,31 @@ $(document).ready(function() {
 		$("#title-string").html(title);
 		
 		if (currentMedia === null) {
-			$("body").on('mouseenter', "#title-container", function() {
-				if (currentAlbum.albums.length > 1) {
-					$("#album-sort-arrows").show();
-					if (getBooleanCookie("albumReverseSortRequested")) {
-						$("#album-sort-reverse").hide();
-						$("#album-sort-normal").show();
-					} else {
-						$("#album-sort-reverse").show();
-						$("#album-sort-normal").hide();
+			if (getBooleanCookie("albumReverseSortRequested")) {
+				$("#album-sort-reverse").hide();
+				$("#album-sort-normal").show();
+			} else {
+				$("#album-sort-reverse").show();
+				$("#album-sort-normal").hide();
+			}
+			if (isMobile.any()) {
+				$(".arrows").css("padding", "0 .5em").css("display", "inline");
+			} else {
+				$("body").off('mouseenter');
+				$("body").off('mouseleave');
+				$("body").on('mouseenter', "#title-container", function() {
+					if (currentAlbum.albums.length > 1) {
+						$("#album-sort-arrows").show();
 					}
-				}
-				if (currentAlbum.photos.length > 1 && ! (currentAlbum.path.match(byDateRegex) && currentAlbum.photos.length >= Options.big_date_folders_threshold)) {
-					$("#media-sort-arrows").show();
-				}
-			});
-			$("body").on('mouseleave', "#title-container", function() {
-				$("#album-sort-arrows").hide();
-				$("#media-sort-arrows").hide();
-			});
+					if (currentAlbum.photos.length > 1 && ! (currentAlbum.path.match(byDateRegex) && currentAlbum.photos.length >= Options.big_date_folders_threshold)) {
+						$("#media-sort-arrows").show();
+					}
+				});
+				$("body").on('mouseleave', "#title-container", function() {
+					$("#album-sort-arrows").hide();
+					$("#media-sort-arrows").hide();
+				});
+			}
 			$("#title").unbind('click');
 			if (currentAlbum.albums.length > 1) {
 				$("#title").on('click', "#album-sort-arrows", function() {
@@ -681,7 +687,7 @@ $(document).ready(function() {
 		return ! lateralSocialButtons();
 	}
 	function scaleMedia() {
-		var media, container, height, containerBottom, bottom, width, photoSrc, previousSrc;
+		var media, container, containerBottom, containerRatio, bottom, width, height, ratio, photoSrc, previousSrc;
 		$(window).off("resize");
 		
 		if (fullScreenStatus)
@@ -698,6 +704,7 @@ $(document).ready(function() {
 			container.css("bottom", containerBottom + "px");
 			container.css("top", $("#title-container").outerHeight() + "px");
 		}
+		containerRatio = container.width() / container.height();
 		
 		media = $("#media");
 		media.off('loadstart').off("load");
@@ -707,6 +714,7 @@ $(document).ready(function() {
 			previousSrc = media.attr("src");
 			width = currentMedia.size[0];
 			height = currentMedia.size[1];
+			ratio = width / height;
 			if (maxSize) {
 				if (width > height) {
 					height = Math.round(height * maxSize / width);
@@ -720,44 +728,54 @@ $(document).ready(function() {
 				$("link[rel=image_src]").remove();
 				$('link[rel="video_src"]').remove();
 				$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
-				media.attr("src", photoSrc)
-					.attr("width", width).attr("height", height).attr("ratio", width / height);
+				media
+					.attr("src", photoSrc)
+					.attr("width", width)
+					.attr("height", height)
+					.attr("ratio", ratio);
 			}
 		}
 		
-		if (parseInt(media.attr("width")) > container.width() && media.attr("ratio") > container.width() / container.height()) {
+		if (parseInt(media.attr("width")) > container.width() && media.attr("ratio") > containerRatio) {
 			height = container.width() / media.attr("ratio");
-			media.css("width", "100%").
-				css("height", "auto").
-				parent().
-					css("height", height).
-					css("margin-top", - height / 2).
-					css("top", "50%");
-			bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
-		} else if (parseInt(media.attr("height")) > container.height() && media.attr("ratio") < container.width() / container.height()) {
-			media.css("height", "100%").
-				css("width", "auto").
-				parent().
-					css("height", "100%").
-					css("margin-top", "0").
-					css("top", "0");
+			media
+				.css("width", "100%")
+				.css("height", "auto")
+				.parent()
+					.css("height", height)
+					.css("margin-top", - height / 2)
+					.css("top", "50%");
+			//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
+			bottom = ((container.height() - container.width() / ratio) / 2) + "px";
+		} else if (parseInt(media.attr("height")) > container.height() && media.attr("ratio") < containerRatio) {
+			media
+				.css("height", "100%")
+				.css("width", "auto")
+				.parent()
+					.css("height", "100%")
+					.css("margin-top", "0")
+					.css("top", "0");
 			if (currentMedia.mediaType != "video")
 				bottom = 0;
 			else
-				bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
+				//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
+				bottom = "0px";
 		} else {
-			media.css("height", "").css("width", "").
-				parent().
-					css("height", media.attr("height")).
-					css("margin-top", - media.attr("height") / 2).
-					css("top", "50%");
-			bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
+			media
+				.css("height", "")
+				.css("width", "")
+				.parent()
+					.css("height", media.attr("height"))
+					.css("margin-top", - media.attr("height") / 2)
+					.css("top", "50%");
+			//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
+			bottom = ((container.height() - height) / 2) + "px";
 		}
 		
 		if (currentMedia.mediaType == "video") {
 			$("#media-bar").css("bottom", 0);
 		} else {
-			media.css("bottom", bottom);
+			//~ media.css("bottom", bottom);
 			$("#media-bar").css("bottom", bottom);
 		}
 		
@@ -866,8 +884,11 @@ $(document).ready(function() {
 				} else {
 					videoSrc = photoFloat.videoPath(currentAlbum, currentMedia);
 				}
-				$('<video/>', { id: 'media', controls: true }).appendTo('#media-box-inner')
-					.attr("width", width).attr("height", height).attr("ratio", width / height)
+				$('<video/>', { id: 'media', controls: true })
+					.appendTo('#media-box-inner')
+					.attr("width", width)
+					.attr("height", height)
+					.attr("ratio", width / height)
 					.attr("src", videoSrc)
 					.attr("alt", currentMedia.name);
 				triggerLoad = 'loadstart';
@@ -882,9 +903,12 @@ $(document).ready(function() {
 					height = maxSize;
 				}
 				photoSrc = photoFloat.photoPath(currentAlbum, currentMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]);
-				$('<img/>', { id: 'media' }).appendTo('#media-box-inner')
+				$('<img/>', { id: 'media' })
+					.appendTo('#media-box-inner')
 					.hide()
-					.attr("width", width).attr("height", height).attr("ratio", width / height)
+					.attr("width", width)
+					.attr("height", height)
+					.attr("ratio", width / height)
 					.attr("src", photoSrc)
 					.attr("alt", currentMedia.name)
 					.attr("title", currentMedia.date);
@@ -1221,12 +1245,18 @@ $(document).ready(function() {
 		return true;
 	});
 	
-	$("#media-view").mouseenter(function() {
-		$(".links").stop().fadeTo("slow", 0.50).css("display", "inline");
-	});
-	$("#media-view").mouseleave(function() {
-		$(".links").stop().fadeOut("slow");
-	});
+	if (isMobile.any()) {
+		$(".links").css("display", "inline").css("opacity", 0.5);
+	} else {
+		$("#media-view").off("mouseenter");
+		$("#media-view").off("mouseleave");
+		$("#media-view").mouseenter(function() {
+			$(".links").stop().fadeTo("slow", 0.50).css("display", "inline");
+		});
+		$("#media-view").mouseleave(function() {
+			$(".links").stop().fadeOut("slow");
+		});
+	}
 	
 	$("#next, #prev").mouseenter(function() {
 		$(this).stop().fadeTo("fast", 1);
