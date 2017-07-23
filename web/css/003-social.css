@@ -343,7 +343,7 @@
 	border-radius: 4px;
 	color: #8f8f8f;
 	background-color: rgba(50, 50, 50, 0.03);
-	display: block;
+	display: none;
 	font-size: 12px;
 	left: 0;
 	line-height: 20px;

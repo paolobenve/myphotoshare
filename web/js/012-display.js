@@ -91,24 +91,17 @@ $(document).ready(function() {
 	/* Displays */
 	
 	// from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
-	function detectswipe(el,func) {
-		var swipe_det, ele, min_x, direc;
-		swipe_det = new Object();
-		swipe_det.sX = 0; swipe_det.eX = 0;
-		min_x = 30;  //min x swipe for horizontal swipe
-		direc = "";
-		ele = document.getElementById(el);
-		ele.addEventListener('touchstart',function(e){
+	function detectSwipe(el,callback) {
+		touchStart = function(e){
 			var t = e.touches[0];
 			swipe_det.sX = t.screenX;
-		},false);
-		ele.addEventListener('touchmove',function(e){
+		} 
+		touchMove = function(e){
 			e.preventDefault();
 			var t = e.touches[0];
 			swipe_det.eX = t.screenX;
-		},false);
-		ele.addEventListener('touchend',function(e){
-			//horizontal detection
+		} 
+		touchEnd = function(e){
 			if ((swipe_det.eX - swipe_det.sX > min_x || swipe_det.eX - swipe_det.sX < - min_x) && 
 				swipe_det.eX > 0
 			) {
@@ -119,16 +112,25 @@ $(document).ready(function() {
 			}
 			
 			if (direc != "") {
-				if(typeof func == 'function')
-					func(el,direc);
+				if(typeof callback == 'function')
+					callback(el,direc);
 			}
 			direc = "";
 			swipe_det.sX = 0; swipe_det.eX = 0;
-		},false);  
+		} 
+		var swipe_det, ele, min_x, direc;
+		swipe_det = new Object();
+		swipe_det.sX = 0; swipe_det.eX = 0;
+		min_x = 30;  //min x swipe for horizontal swipe
+		direc = "";
+		ele = document.getElementById(el);
+		ele.addEventListener('touchstart', touchStart, false);
+		ele.addEventListener('touchmove', touchMove, false);
+		ele.addEventListener('touchend', touchEnd, false);  
 	}
 	
 	function swipeRight(dest) {
-		$("#media-box-inner").animate({
+		$("#media-box-inner").stop().animate({
 			right: "-=" + window.innerWidth,
 		}, 300, function() {
 			location.href = dest;
@@ -136,7 +138,7 @@ $(document).ready(function() {
 		});
 	}
 	function swipeLeft(dest) {
-		$("#media-box-inner").animate({
+		$("#media-box-inner").stop().animate({
 			left: "-=" + window.innerWidth,
 		}, 300, function() {
 			location.href = dest;
@@ -906,8 +908,9 @@ $(document).ready(function() {
 		if ($("#album-view").is(":visible"))
 			albumViewHeight = $("#album-view").outerHeight();
 		
-		$('#media-box-inner > img').remove();
-		$('#media-box-inner > video').remove();
+		$('#media').remove();
+		$("#media").off("load");
+		//~ $('#media-box-inner > video').remove();
 		
 		if (currentMedia.mediaType == "video") {
 			if (! Modernizr.video) {
@@ -1034,8 +1037,6 @@ $(document).ready(function() {
 			$(".next-media").click(function(){ swipeLeft(nextLink); return false; });
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
 			$('#prev').click(function(){ swipeRight(backLink); return false; });
-			
-			$("#media").load(detectswipe('media-box-inner',swipe));
 		}
 		$(".original-link").attr("target", "_blank").attr("href", photoFloat.originalPhotoPath(currentMedia));
 		
@@ -1205,7 +1206,7 @@ $(document).ready(function() {
 		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length) {
 			// no subalbums, nothing to wait
 			// set social buttons events
-			$("#media").load(socialButtons);
+			$("#media").on("load", socialButtons);
 		}
 	}
 
@@ -1305,6 +1306,8 @@ $(document).ready(function() {
 		}
 		return true;
 	});
+	
+	$(document).on("load", detectSwipe('media-box-inner',swipe));
 	
 	if (isMobile.any()) {
 		$(".links").css("display", "inline").css("opacity", 0.5);
