@@ -332,7 +332,7 @@ $(document).ready(function() {
 			for (i = 1; i <= numLinks - linksToLeave; i ++) {
 				title = title.substring(title.indexOf(" <a class=") + 1);
 			}
-			title = "... &raquo;" + title;
+			title = "... &raquo; " + title;
 		}
 
 		if (currentMedia !== null)
