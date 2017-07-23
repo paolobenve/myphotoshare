@@ -1298,10 +1298,10 @@ $(document).ready(function() {
 	$(document).keydown(function(e){
 		if (currentMedia === null || nextLink === undefined || backLink === undefined)
 			return true;
-		if (e.keyCode === 34 || e.keyCode === 39 || e.keyCode === 40) {
+		if (! e.ctrlKey && ! e.shiftKey && (e.keyCode === 34 || e.keyCode === 39 || e.keyCode === 40)) {
 			swipeLeft(nextLink);
 			return false;
-		} else if (e.keyCode === 33 || e.keyCode === 37 || e.keyCode === 38) {
+		} else if (! e.ctrlKey && ! e.shiftKey && (e.keyCode === 33 || e.keyCode === 37 || e.keyCode === 38)) {
 			swipeRight(backLink);
 			return false;
 		}
