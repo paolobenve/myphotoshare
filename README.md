@@ -1,4 +1,4 @@
-# photofloat v. 2.3
+# photofloat v. 2.4
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -21,7 +21,7 @@ The Python script scans a directory tree of images, whereby each directory const
 
 The JavaScript application consists of a single `index.php` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the `options.json` file and the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface.
 
-Photofloat features share buttons, and `php` permits to pass the image/video/album shared to the social media.
+Photofloat features share buttons, and `php` permits to pass the shared image/video/album to social medias.
 
 It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
 
@@ -183,15 +183,11 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-### version 2.4.1 (July 25, 2017):
-
-* 
-
-### version 2.4 (July 20, 2017):
+### version 2.4 (July 24, 2017):
 
 * swipe gesture on mobile to go to next/previous photo/video
 * media animation when passing to next/previous image
-* simplified html structure
+* simplified html structure and json files
 
 ### version 2.3 (July 20, 2017):
 
