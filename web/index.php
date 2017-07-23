@@ -142,7 +142,7 @@
 ";
 	?>
 	<div id="social">
-		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-count">
+		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-sm">
 			<a href="" class="ssk ssk-facebook"></a>
 			<a href="" class="ssk ssk-whatsapp"></a>
 			<a href="" class="ssk ssk-twitter"></a>

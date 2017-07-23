@@ -183,6 +183,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.4.1 (July 25, 2017):
+
+* 
+
 ### version 2.4 (July 20, 2017):
 
 * swipe gesture on mobile to go to next/previous photo/video

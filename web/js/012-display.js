@@ -88,9 +88,12 @@ $(document).ready(function() {
 	var byDateRegex;
 	var numSubAlbumsReady = 0;
 	
+	if (! isMobile.any())
+		$(".ssk-whatsapp").hide();
+	
 	/* Displays */
 	
-	// from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
+	// adapted from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
 	function detectSwipe(el,callback) {
 		touchStart = function(e){
 			var t = e.touches[0];
@@ -255,7 +258,8 @@ $(document).ready(function() {
 	
 	
 	function setTitle() {
-		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle, titleAnchorClasses;
+		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle;
+		var titleAnchorClasses, hiddenTitle = "", beginLink;
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
 		else
@@ -330,11 +334,13 @@ $(document).ready(function() {
 		numLinks = title.split("<a ").length - 1;
 		if (numLinks > linksToLeave) {
 			for (i = 1; i <= numLinks - linksToLeave; i ++) {
-				title = title.substring(title.indexOf(" <a class=") + 1);
+				beginLink = title.indexOf("<a class=", 3);
+				hiddenTitle += title.substring(0, beginLink);
+				title = title.substring(beginLink);
 			}
-			title = "... &raquo; " + title;
+			title = "<a id=\"dots\" href=\"javascript:void(0)\">... &raquo; </a><span id=\"hidden-title\">" + hiddenTitle + "</span> " + title;
 		}
-
+		
 		if (currentMedia !== null)
 			title += "<span id=\"media-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
 			
@@ -354,7 +360,16 @@ $(document).ready(function() {
 					"</a>";
 		}
 		
+		document.title = documentTitle;
+		$("#title-string").html(title);
 		
+		$("#dots").off("click");
+		$("#dots").click(function() {
+			$("#dots").hide();
+			$("#hidden-title").show();
+			return false;
+		});
+
 		// generate the html page title
 		for (i = 0; i < components.length; ++i) {
 			if (i == 0) {
@@ -375,9 +390,6 @@ $(document).ready(function() {
 			documentTitle = photoFloat.trimExtension(currentMedia.name) + documentTitle;
 		else if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.photos.length == 1)
 			documentTitle =  photoFloat.trimExtension(currentAlbum.photos[0].name) + " \u00ab " + documentTitle;
-		
-		document.title = documentTitle;
-		$("#title-string").html(title);
 		
 		if (currentMedia === null) {
 			if (getBooleanCookie("albumReverseSortRequested")) {
@@ -587,10 +599,11 @@ $(document).ready(function() {
 					// resize down the album buttons if they are too wide
 					albumViewWidth = $("body").width() -
 							parseInt($("#album-view").css("padding-left")) -
-							parseInt($("#album-view").css("padding-right")) - 15; // the trailing subtraction is for the scroll slide
-					if (albumButtonWidth(calculatedAlbumThumbSize) > albumViewWidth / 2) {
+							parseInt($("#album-view").css("padding-right")) -
+							15; // the trailing subtraction is for the scroll slide
+					if (albumButtonWidth(calculatedAlbumThumbSize) > albumViewWidth / 3) {
 						calculatedAlbumThumbSize =
-							Math.floor(albumViewWidth / 2 - Options.thumb_spacing - 6);
+							Math.floor(albumViewWidth / 3 - Options.thumb_spacing - 6);
 						if (Options.albums_slide_style)
 							calculatedAlbumThumbSize = Math.floor(calculatedAlbumThumbSize / 1.1);
 					}
@@ -652,7 +665,7 @@ $(document).ready(function() {
 								var paddingTop = parseInt($($el).css('padding-top'));
 								$($el).remove();
 								
-								captionHeight = em2px("body", 4);
+								captionHeight = em2px("body", 3) * calculatedAlbumThumbSize / Options.album_thumb_size;
 								buttonAndCaptionHeight = calculatedAlbumThumbSize + captionHeight + paddingTop + 3 * 4;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
@@ -670,6 +683,7 @@ $(document).ready(function() {
 								theImage.wrap(html);
 								html = "<div class=\"album-caption\"";
 								html += " style=\"width: " + calculatedAlbumThumbSize.toString() + "px;" +
+										"font-size: " + (captionHeight / 2.5).toString() + "px; ";
 										"height: " + captionHeight.toString() + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
