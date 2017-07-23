@@ -33,6 +33,10 @@ a:hover {
 	line-height: 1.3em;
 }
 
+a.title-anchor.mobile {
+	color: orange !important;
+}
+
 #day-folders-view-container {
 	font-variant: small-caps;
 	text-align: center;

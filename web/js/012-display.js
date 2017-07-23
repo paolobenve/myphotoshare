@@ -1,5 +1,26 @@
 var Options = {};
 var nextLink, backLink;
+var language;
+var isMobile = {
+	Android: function() {
+		return navigator.userAgent.match(/Android/i);
+	},
+	BlackBerry: function() {
+		return navigator.userAgent.match(/BlackBerry/i);
+	},
+	iOS: function() {
+		return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+	},
+	Opera: function() {
+		return navigator.userAgent.match(/Opera Mini/i);
+	},
+	Windows: function() {
+		return navigator.userAgent.match(/IEMobile/i);
+	},
+	any: function() {
+		return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+	}
+};
 
 function getLanguage() {
 	language = "en";
@@ -16,12 +37,14 @@ function translate() {
 	language = getLanguage();
 	var selector;
 	for (var key in translations[language]) {
-		if (key == '#title-string' && document.title.substr(0, 5) != "<?php")
-			// don't set page title, php has already set it
-			continue;
-		selector = $(key);
-		if (selector.length) {
-			selector.html(translations[language][key]);
+		if (translations[language].hasOwnProperty(key)) {
+			if (key == '#title-string' && document.title.substr(0, 5) != "<?php")
+				// don't set page title, php has already set it
+				continue;
+			selector = $(key);
+			if (selector.length) {
+				selector.html(translations[language][key]);
+			}
 		}
 	}
 }
@@ -69,11 +92,11 @@ $(document).ready(function() {
 	
 	// from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
 	function detectswipe(el,func) {
+		var swipe_det, ele, min_x, direc;
 		swipe_det = new Object();
 		swipe_det.sX = 0; swipe_det.eX = 0;
-		var min_x = 30;  //min x swipe for horizontal swipe
-		var max_x = 30;  //max x difference for vertical swipe
-		var direc = "";
+		min_x = 30;  //min x swipe for horizontal swipe
+		direc = "";
 		ele = document.getElementById(el);
 		ele.addEventListener('touchstart',function(e){
 			var t = e.touches[0];
@@ -230,7 +253,7 @@ $(document).ready(function() {
 	
 	
 	function setTitle() {
-		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle;
+		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle, titleAnchorClasses;
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
 		else
@@ -269,16 +292,20 @@ $(document).ready(function() {
 			}
 		}
 		// generate the title in the page
+		titleAnchorClasses = 'title-anchor';
+		if (isMobile.any())
+			titleAnchorClasses += ' mobile';
 		for (i = 0; i < components.length; ++i) {
 			if (i)
 				last += "/" + components[i];
 			if (i != 1 || components[i] != Options.folders_string) {
 				if (i < components.length - 1 || currentMedia !== null)
-					if (! (i == 0 && dateTitle))
+					if (i != 0 || ! dateTitle) {
 						if (i == 1 && dateTitle)
-							title = "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">" + title;
+							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + photoFloat.cachePath(last.substring(1)) + "\">" + title;
 						else
-							title += "<a class='title-anchor' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+					}
 				if (i == 1 && dateTitle)
 					title += "(" + _t("#by-date") + ")";
 				else
@@ -293,6 +320,19 @@ $(document).ready(function() {
 				(i == components.length - 1 || components[i + 1] != Options.folders_string))
 				title += " &raquo; ";
 		}
+		
+		// leave only the last link on mobile, the last two otherwise
+		linksToLeave = 2;
+		if (isMobile.any())
+			linksToLeave = 1;
+		numLinks = title.split("<a ").length - 1;
+		if (numLinks > linksToLeave) {
+			for (i = 1; i <= numLinks - linksToLeave; i ++) {
+				title = title.substring(title.indexOf(" <a class=") + 1);
+			}
+			title = "... &raquo;" + title;
+		}
+
 		if (currentMedia !== null)
 			title += "<span id=\"media-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
 			
@@ -311,6 +351,8 @@ $(document).ready(function() {
 						"<img id=\"media-sort-normal\" title=\"" + _t("#media-sort-normal") + "\" height=\"15px\" src=\"img/People_sort_normal.png\">" +
 					"</a>";
 		}
+		
+		
 		// generate the html page title
 		for (i = 0; i < components.length; ++i) {
 			if (i == 0) {
@@ -606,7 +648,7 @@ $(document).ready(function() {
 								var $el = $('<div class="album-caption"></div>');
 								$($el).appendTo('body');
 								var paddingTop = parseInt($($el).css('padding-top'));
-								$($el).remove()
+								$($el).remove();
 								
 								captionHeight = em2px("body", 4);
 								buttonAndCaptionHeight = calculatedAlbumThumbSize + captionHeight + paddingTop + 3 * 4;
@@ -665,6 +707,8 @@ $(document).ready(function() {
 			$("#album-view").removeClass("photo-view-container");
 			$("#subalbums").show();
 			$("#media-view").hide();
+			$("#media-view").removeClass("no-bottom-space");
+			$("#album-view").removeClass("no-bottom-space");
 			$("#media-box-inner").empty();
 			$("#media-box").hide();
 			$("#thumbs").show();
@@ -981,7 +1025,7 @@ $(document).ready(function() {
 			//nothing to do
 		} else {
 			nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
-			backLink = "#!/" + photoFloat.photoHash(currentAlbum, previousMedia)
+			backLink = "#!/" + photoFloat.photoHash(currentAlbum, previousMedia);
 			$("#next").show();
 			$("#prev").show();
 			$(".next-media").off("click");
@@ -1237,7 +1281,6 @@ $(document).ready(function() {
 	
 	
 	$(document).keydown(function(e){
-		console.log(e.keyCode);
 		if (currentMedia === null || nextLink === undefined || backLink === undefined)
 			return true;
 		if (e.keyCode === 34 || e.keyCode === 39 || e.keyCode === 40) {
