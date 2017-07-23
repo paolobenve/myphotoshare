@@ -685,7 +685,7 @@ $(document).ready(function() {
 								theImage.wrap(html);
 								html = "<div class=\"album-caption\"";
 								html += " style=\"width: " + calculatedAlbumThumbSize.toString() + "px;" +
-										"font-size: " + (captionHeight / 2.5).toString() + "px; ";
+										"font-size: " + (captionHeight / 3).toString() + "px; ";
 										"height: " + captionHeight.toString() + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
