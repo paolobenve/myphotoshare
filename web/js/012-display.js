@@ -530,6 +530,8 @@ $(document).ready(function() {
 					thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.photos[i], thumbnailSize);
 					bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 					if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
+						currentAlbum.photos[i].completeName =
+							currentAlbum.photos[i].foldersAlbum + '/' + currentAlbum.photos[i].name;
 						thumbHash =
 							PhotoFloat.cachePath(currentAlbum.photos[i].completeName
 								.substring(0, currentAlbum.photos[i].completeName.length - currentAlbum.photos[i].name.length - 1)) +
@@ -1007,6 +1009,8 @@ $(document).ready(function() {
 			
 			if (currentAlbum.photos.length > 1) {
 				i = currentMediaIndex;
+				currentAlbum.photos[currentMediaIndex].byDateName =
+					currentAlbum.photos[currentMediaIndex].dayAlbum + '/' + currentAlbum.photos[currentMediaIndex].name;
 				// following 2 iteration are needed with date album: the same photo could be present coming from different albums
 				do {
 					if (i == 0)
@@ -1014,6 +1018,7 @@ $(document).ready(function() {
 					else
 						i --;
 					previousMedia = currentAlbum.photos[i];
+					previousMedia.byDateName = previousMedia.dayAlbum + '/' + previousMedia.name;
 				} while (previousMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
 				i = currentMediaIndex;
@@ -1023,6 +1028,7 @@ $(document).ready(function() {
 					else
 						i ++;
 					nextMedia = currentAlbum.photos[i];
+					nextMedia.byDateName = nextMedia.dayAlbum + '/' + nextMedia.name;
 				} while (nextMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
 				if (nextMedia.mediaType == "video") {
