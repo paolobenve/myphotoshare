@@ -4,7 +4,7 @@
 		bottom: 0;
 		margin: 0;
 	}
-	#album-view.photo-view-container {
+	#album-view.media-view-container {
 		display: none;
 		height: 0;
 	}

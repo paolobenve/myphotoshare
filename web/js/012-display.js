@@ -728,7 +728,7 @@ $(document).ready(function() {
 		
 		if (currentMedia === null) {
 			$("#thumbs img").removeClass("current-thumb");
-			$("#album-view").removeClass("photo-view-container");
+			$("#album-view").removeClass("media-view-container");
 			$("#subalbums").show();
 			$("#media-view").hide();
 			$("#media-view").removeClass("no-bottom-space");
@@ -922,8 +922,8 @@ $(document).ready(function() {
 			$("#album-view").removeClass("no-bottom-space");
 			$("#media-view").css("bottom", (thumbnailSize + 15).toString() + "px");
 			$("#album-view").css("height", (thumbnailSize + 20).toString() + "px");
-			$("#album-view").addClass("photo-view-container");
-			$("#album-view.photo-view-container").css("height", (thumbnailSize + 22).toString() + "px");
+			$("#album-view").addClass("media-view-container");
+			$("#album-view.media-view-container").css("height", (thumbnailSize + 22).toString() + "px");
 		}
 
 		var albumViewHeight = 0;

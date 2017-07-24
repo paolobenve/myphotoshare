@@ -170,7 +170,7 @@ a.title-anchor.mobile {
 	bottom: 1em;
 }
 
-#album-view.photo-view-container {
+#album-view.media-view-container {
 	position: absolute;
 	width: 100%;
 	bottom: 0;
@@ -181,7 +181,7 @@ a.title-anchor.mobile {
 	padding: 0 !important;
 	text-align: center;
 }
-#album-view.photo-view-container.no-bottom-space {
+#album-view.media-view-container.no-bottom-space {
 	height: 0;
 	bottom: 15px;
 }
