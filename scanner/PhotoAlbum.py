@@ -535,16 +535,16 @@ class Media(object):
 		else:
 			if start_image_width > start_image_height:
 				thumbnail_width = thumb_size
-				thumbnail_height = round(thumb_size * start_image_height / float(start_image_width))
+				thumbnail_height = int(round(thumb_size * start_image_height / float(start_image_width)))
 			else:
-				thumbnail_width = round(thumb_size * start_image_width / float(start_image_height))
+				thumbnail_width = int(round(thumb_size * start_image_width / float(start_image_height)))
 				thumbnail_height = thumb_size
 		if (
 			original_thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height" and
 			start_image_width > start_image_height
 		):
-			thumb_size = round(original_thumb_size * start_image_width / float(start_image_height))
-			thumbnail_width = round(thumb_size * start_image_width / float(start_image_height))
+			thumb_size = int(round(original_thumb_size * start_image_width / float(start_image_height)))
+			thumbnail_width = int(round(thumb_size * start_image_width / float(start_image_height)))
 			thumbnail_height = thumb_size
 		if (start_image_width >= thumbnail_width and start_image_height > thumbnail_height):
 			# both width and height of thumbnail are less then width and height of start_image, no blurring can happen
