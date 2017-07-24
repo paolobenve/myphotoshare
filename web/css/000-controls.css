@@ -45,7 +45,7 @@ a.title-anchor.mobile {
 	opacity: 0.5;
 }
 
-#day-view, #folders-view {
+#date-view, #folders-view {
 	color: inherit;
 	display: none;
 }

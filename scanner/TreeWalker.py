@@ -230,13 +230,14 @@ class TreeWalker:
 		next_level()
 		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):
-				next_level()
-				self.remove_stale(cache, all_cache_entries)
-				if not os.listdir(os.path.join(self.cache_path, cache)) and not cache == "album":
-					message("empty subdir, deleting", "xxxx")
-					file_to_delete = os.path.join(self.cache_path, cache)
-					os.rmdir(os.path.join(self.cache_path, file_to_delete))
-				back_level()
+				if not cache == "album":
+					next_level()
+					self.remove_stale(cache, all_cache_entries)
+					if not os.listdir(os.path.join(self.cache_path, cache)):
+						message("empty subdir, deleting", "xxxx")
+						file_to_delete = os.path.join(self.cache_path, cache)
+						os.rmdir(os.path.join(self.cache_path, file_to_delete))
+					back_level()
 			else:
 				cache_with_subdir = os.path.join(subdir, cache)
 				# only delete json's, transcoded videos, reduced images and thumbnails

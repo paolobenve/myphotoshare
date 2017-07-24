@@ -154,7 +154,7 @@
 		<div id="buttons-container">
 			<a id="day-folders-view-link" href="javascript:void(0)">
 				<div id="day-folders-view-container">
-					<span id="day-view"></span>
+					<span id="date-view"></span>
 					<span id="folders-view"></span>
 				</div>
 			</a>

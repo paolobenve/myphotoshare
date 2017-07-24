@@ -739,16 +739,16 @@ $(document).ready(function() {
 			$("#day-folders-view-container").show();
 			if (currentAlbum.path == Options.folders_string) {
 				$("#folders-view").hide();
-				$("#day-view").show();
+				$("#date-view").show();
 				$("#day-folders-view-link").attr("href", "#!/" + Options.by_date_string);
 			}
 			else if (currentAlbum.path == Options.by_date_string) {
 				$("#folders-view").show();
-				$("#day-view").hide();
+				$("#date-view").hide();
 				$("#day-folders-view-link").attr("href", "#!/" + Options.folders_string);
 			} else {
 				$("#folders-view").hide();
-				$("#day-view").hide();
+				$("#date-view").hide();
 			}
 			$("#powered-by").show();
 		} else {
@@ -954,11 +954,11 @@ $(document).ready(function() {
 		if (currentMedia.metadata.mediaType == "photo" || currentMedia.metadata.mediaType == "video" && videoOK) {
 			if (currentAlbum.path == currentMedia.foldersAlbum) {
 				$("#folders-view").hide();
-				$("#day-view").show();
+				$("#date-view").show();
 			}
 			else {
 				$("#folders-view").show();
-				$("#day-view").hide();
+				$("#date-view").hide();
 			}
 			
 			if (currentMedia.metadata.mediaType == "video") {
