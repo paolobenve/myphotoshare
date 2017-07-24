@@ -826,7 +826,7 @@ class Media(object):
 				"cacheSubdir": cache_subdir(self.media_file_name),
 				"cacheBase": cache_base(self.name)
 			}
-		photo.update(self.attributes)
+		photo.update({"metadata": self.attributes})
 		return photo
 
 class PhotoAlbumEncoder(json.JSONEncoder):

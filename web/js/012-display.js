@@ -212,7 +212,7 @@ $(document).ready(function() {
 			}
 		} else {
 			mediaArray.push($("#media").attr("src"));
-			if (currentMedia.mediaType == "video") {
+			if (currentMedia.metadata.mediaType == "video") {
 				type = "v";
 			} else {
 				type = "p";
@@ -539,8 +539,8 @@ $(document).ready(function() {
 							PhotoFloat.cachePath(currentAlbum.photos[i].name);
 					}
 					link = $("<a href=\"#!/" + hash + "\"></a>");
-					width = currentAlbum.photos[i].size[0];
-					height = currentAlbum.photos[i].size[1];
+					width = currentAlbum.photos[i].metadata.size[0];
+					height = currentAlbum.photos[i].metadata.size[1];
 					imageString = "<div class=\"thumb-container\" ";
 					imageString += "style=\"width: ";
 					if (Options.media_thumb_type == "fixed_height") {
@@ -632,8 +632,8 @@ $(document).ready(function() {
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, buttonAndCaptionHeight, html;
 								
 								if (Options.album_thumb_type == "fit") {
-									photoWidth = randomPhoto.size[0];
-									photoHeight = randomPhoto.size[1];
+									photoWidth = randomPhoto.metadata.size[0];
+									photoHeight = randomPhoto.metadata.size[1];
 									if (photoWidth > photoHeight) {
 										thumbWidth = calculatedAlbumThumbSize;
 										thumbHeight = calculatedAlbumThumbSize * photoHeight / photoWidth;
@@ -788,12 +788,12 @@ $(document).ready(function() {
 		
 		media = $("#media");
 		media.off('loadstart').off("load");
-		if (currentMedia.mediaType != "video") {
+		if (currentMedia.metadata.mediaType != "video") {
 			photoSrc = chooseMediaForScaling(currentMedia, container);
 			// chooseMediaForScaling() sets maxSize to 0 if it returns the original media
 			previousSrc = media.attr("src");
-			width = currentMedia.size[0];
-			height = currentMedia.size[1];
+			width = currentMedia.metadata.size[0];
+			height = currentMedia.metadata.size[1];
 			ratio = width / height;
 			if (maxSize) {
 				if (width > height) {
@@ -835,7 +835,7 @@ $(document).ready(function() {
 					.css("height", "100%")
 					.css("margin-top", "0")
 					.css("top", "0");
-			if (currentMedia.mediaType != "video")
+			if (currentMedia.metadata.mediaType != "video")
 				bottom = 0;
 			else
 				//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
@@ -852,7 +852,7 @@ $(document).ready(function() {
 			bottom = ((container.height() - height) / 2) + "px";
 		}
 		
-		if (currentMedia.mediaType == "video") {
+		if (currentMedia.metadata.mediaType == "video") {
 			$("#media-bar").css("bottom", 0);
 		} else {
 			//~ media.css("bottom", bottom);
@@ -874,12 +874,12 @@ $(document).ready(function() {
 		chosenMedia = PhotoFloat.originalPhotoPath(currentMedia);
 		maxSize = 0;
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
-			if (media.size[0] > media.size[1]) {
+			if (media.metadata.size[0] > media.metadata.size[1]) {
 				reducedWidth = Options.reduced_sizes[i];
-				reducedHeight = Options.reduced_sizes[i] * media.size[1] / media.size[0];
+				reducedHeight = Options.reduced_sizes[i] * media.metadata.size[1] / media.metadata.size[0];
 			} else {
 				reducedHeight = Options.reduced_sizes[i];
-				reducedWidth = Options.reduced_sizes[i] * media.size[0] / media.size[1];
+				reducedWidth = Options.reduced_sizes[i] * media.metadata.size[0] / media.metadata.size[1];
 			}
 			
 			if (reducedWidth < container.width() && reducedHeight < container.height())
@@ -893,8 +893,8 @@ $(document).ready(function() {
 	function showMedia(album) {
 		var width, height, previousMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
 		var windowWidth, windowHeight;
-		width = currentMedia.size[0];
-		height = currentMedia.size[1];
+		width = currentMedia.metadata.size[0];
+		height = currentMedia.metadata.size[1];
 
 		windowWidth = $(window).width();
 		windowHeight = $(window).height();
@@ -928,7 +928,7 @@ $(document).ready(function() {
 		$("#media").off("load");
 		//~ $('#media-box-inner > video').remove();
 		
-		if (currentMedia.mediaType == "video") {
+		if (currentMedia.metadata.mediaType == "video") {
 			if (! Modernizr.video) {
 				$('<div id="video-unsupported">' +
 						'<p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p>' +
@@ -945,7 +945,7 @@ $(document).ready(function() {
 		}
 		
 		
-		if (currentMedia.mediaType != "video" || videoOK) {
+		if (currentMedia.metadata.mediaType != "video" || videoOK) {
 			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
 				$("#folders-view").hide();
 				$("#day-view").show();
@@ -955,7 +955,7 @@ $(document).ready(function() {
 				$("#day-view").hide();
 			}
 			
-			if (currentMedia.mediaType == "video") {
+			if (currentMedia.metadata.mediaType == "video") {
 				if (fullScreenStatus) {
 					////////////////////////////////////////////
 					// the original video doesn't work: WHY????
@@ -1031,12 +1031,12 @@ $(document).ready(function() {
 					nextMedia.byDateName = nextMedia.dayAlbum + '/' + nextMedia.name;
 				} while (nextMedia.byDateName == currentAlbum.photos[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
-				if (nextMedia.mediaType == "video") {
+				if (nextMedia.metadata.mediaType == "video") {
 					$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia));
 				} else {
 					$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize));
 				}
-				if (previousMedia.mediaType == "video") {
+				if (previousMedia.metadata.mediaType == "video") {
 					$.preloadImages(photoFloat.videoPath(currentAlbum, previousMedia));
 				} else {
 					$.preloadImages(photoFloat.photoPath(currentAlbum, previousMedia, maxSize));
@@ -1067,23 +1067,23 @@ $(document).ready(function() {
 		$("#day-folders-view-link").attr("href", changeViewLink);
 		
 		text = "<table>";
-		if (typeof currentMedia.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentMedia.make + "</td></tr>";
-		if (typeof currentMedia.model !== "undefined") text += "<tr><td>Camera Model</td><td>" + currentMedia.model + "</td></tr>";
-		if (typeof currentMedia.date !== "undefined") text += "<tr><td>Time Taken</td><td>" + currentMedia.date + "</td></tr>";
-		if (typeof currentMedia.size !== "undefined") text += "<tr><td>Resolution</td><td>" + currentMedia.size[0] + " x " + currentMedia.size[1] + "</td></tr>";
-		if (typeof currentMedia.aperture !== "undefined") text += "<tr><td>Aperture</td><td> f/" + getDecimal(currentMedia.aperture) + "</td></tr>";
-		if (typeof currentMedia.focalLength !== "undefined") text += "<tr><td>Focal Length</td><td>" + getDecimal(currentMedia.focalLength) + " mm</td></tr>";
-		if (typeof currentMedia.subjectDistanceRange !== "undefined") text += "<tr><td>Subject Distance Range</td><td>" + currentMedia.subjectDistanceRange + "</td></tr>";
-		if (typeof currentMedia.iso !== "undefined") text += "<tr><td>ISO</td><td>" + currentMedia.iso + "</td></tr>";
-		if (typeof currentMedia.sceneCaptureType !== "undefined") text += "<tr><td>Scene Capture Type</td><td>" + currentMedia.sceneCaptureType + "</td></tr>";
-		if (typeof currentMedia.exposureTime !== "undefined") text += "<tr><td>Exposure Time</td><td>" + getDecimal(currentMedia.exposureTime) + " sec</td></tr>";
-		if (typeof currentMedia.exposureProgram !== "undefined") text += "<tr><td>Exposure Program</td><td>" + currentMedia.exposureProgram + "</td></tr>";
-		if (typeof currentMedia.exposureCompensation !== "undefined") text += "<tr><td>Exposure Compensation</td><td>" + getDecimal(currentMedia.exposureCompensation) + "</td></tr>";
-		if (typeof currentMedia.spectralSensitivity !== "undefined") text += "<tr><td>Spectral Sensitivity</td><td>" + currentMedia.spectralSensitivity + "</td></tr>";
-		if (typeof currentMedia.sensingMethod !== "undefined") text += "<tr><td>Sensing Method</td><td>" + currentMedia.sensingMethod + "</td></tr>";
-		if (typeof currentMedia.lightSource !== "undefined") text += "<tr><td>Light Source</td><td>" + currentMedia.lightSource + "</td></tr>";
-		if (typeof currentMedia.flash !== "undefined") text += "<tr><td>Flash</td><td>" + currentMedia.flash + "</td></tr>";
-		if (typeof currentMedia.orientation !== "undefined") text += "<tr><td>Orientation</td><td>" + currentMedia.orientation + "</td></tr>";
+		if (typeof currentMedia.metadata.make !== "undefined") text += "<tr><td>Camera Maker</td><td>" + currentMedia.metadata.make + "</td></tr>";
+		if (typeof currentMedia.metadata.model !== "undefined") text += "<tr><td>Camera Model</td><td>" + currentMedia.metadata.model + "</td></tr>";
+		if (typeof currentMedia.metadata.date !== "undefined") text += "<tr><td>Time Taken</td><td>" + currentMedia.metadata.date + "</td></tr>";
+		if (typeof currentMedia.metadata.size !== "undefined") text += "<tr><td>Resolution</td><td>" + currentMedia.metadata.size[0] + " x " + currentMedia.metadata.size[1] + "</td></tr>";
+		if (typeof currentMedia.metadata.aperture !== "undefined") text += "<tr><td>Aperture</td><td> f/" + getDecimal(currentMedia.metadata.aperture) + "</td></tr>";
+		if (typeof currentMedia.metadata.focalLength !== "undefined") text += "<tr><td>Focal Length</td><td>" + getDecimal(currentMedia.metadata.focalLength) + " mm</td></tr>";
+		if (typeof currentMedia.metadata.subjectDistanceRange !== "undefined") text += "<tr><td>Subject Distance Range</td><td>" + currentMedia.metadata.subjectDistanceRange + "</td></tr>";
+		if (typeof currentMedia.metadata.iso !== "undefined") text += "<tr><td>ISO</td><td>" + currentMedia.metadata.iso + "</td></tr>";
+		if (typeof currentMedia.metadata.sceneCaptureType !== "undefined") text += "<tr><td>Scene Capture Type</td><td>" + currentMedia.metadata.sceneCaptureType + "</td></tr>";
+		if (typeof currentMedia.metadata.exposureTime !== "undefined") text += "<tr><td>Exposure Time</td><td>" + getDecimal(currentMedia.metadata.exposureTime) + " sec</td></tr>";
+		if (typeof currentMedia.metadata.exposureProgram !== "undefined") text += "<tr><td>Exposure Program</td><td>" + currentMedia.metadata.exposureProgram + "</td></tr>";
+		if (typeof currentMedia.metadata.exposureCompensation !== "undefined") text += "<tr><td>Exposure Compensation</td><td>" + getDecimal(currentMedia.metadata.exposureCompensation) + "</td></tr>";
+		if (typeof currentMedia.metadata.spectralSensitivity !== "undefined") text += "<tr><td>Spectral Sensitivity</td><td>" + currentMedia.metadata.spectralSensitivity + "</td></tr>";
+		if (typeof currentMedia.metadata.sensingMethod !== "undefined") text += "<tr><td>Sensing Method</td><td>" + currentMedia.metadata.sensingMethod + "</td></tr>";
+		if (typeof currentMedia.metadata.lightSource !== "undefined") text += "<tr><td>Light Source</td><td>" + currentMedia.metadata.lightSource + "</td></tr>";
+		if (typeof currentMedia.metadata.flash !== "undefined") text += "<tr><td>Flash</td><td>" + currentMedia.metadata.flash + "</td></tr>";
+		if (typeof currentMedia.metadata.orientation !== "undefined") text += "<tr><td>Orientation</td><td>" + currentMedia.metadata.orientation + "</td></tr>";
 		text += "</table>";
 		$(".metadata").html(text);
 		
