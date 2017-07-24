@@ -44,7 +44,8 @@ def main():
 				'media_thumb_size',
 				'big_date_folders_threshold',
 				'respected_processors',
-				'max_album_share_thumbnails_number'
+				'max_album_share_thumbnails_number',
+				'min_album_thumbnail'
 		):
 			Options.config[option] = usr_config.getint('options', option)
 		elif option in ('different_album_thumbnails',

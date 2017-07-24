@@ -146,12 +146,12 @@
 			path = path.replace(/__/g, "_");
 		return path;
 	};
-	PhotoFloat.photoHash = function(album, media) {
+	PhotoFloat.mediaHash = function(album, media) {
 		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(media.name);
 	};
-	PhotoFloat.photoHashFolder = function(album, media) {
+	PhotoFloat.mediaHashFolder = function(album, media) {
 		var hash;
-		hash = PhotoFloat.photoHash(album, media);
+		hash = PhotoFloat.mediaHash(album, media);
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 			media.completeName = media.foldersAlbum + '/' + media.name;
@@ -167,7 +167,7 @@
 		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
 	};
 	PhotoFloat.videoPath = function(album, video) {
-		var hashFolder = PhotoFloat.photoHashFolder(album, video) + "_transcoded.mp4";
+		var hashFolder = PhotoFloat.mediaHashFolder(album, video) + "_transcoded.mp4";
 		var hash = PhotoFloat.cachePath(hashFolder);
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)
@@ -210,7 +210,7 @@
 		}
 		else
 			suffix = thumb_size.toString();
-		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
+		hash = PhotoFloat.cachePath(PhotoFloat.mediaHashFolder(album, photo) + "_" + suffix + ".jpg");
 		var rootString = "root-";
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
@@ -231,18 +231,6 @@
 	};
 	PhotoFloat.originalPhotoPath = function(photo) {
 		return photo.albumName;
-	};
-	PhotoFloat.photoFoldersAlbum = function(photo) {
-		return photo.foldersAlbum;
-	};
-	PhotoFloat.photoDayAlbum = function(photo) {
-		return photo.dayAlbum;
-	};
-	PhotoFloat.photoMonthAlbum = function(photo) {
-		return photo.monthAlbum;
-	};
-	PhotoFloat.photoYearAlbum = function(photo) {
-		return photo.yearAlbum;
 	};
 	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
@@ -270,17 +258,13 @@
 	
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
-	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
-	PhotoFloat.prototype.photoHashFolder = PhotoFloat.photoHashFolder;
+	PhotoFloat.prototype.mediaHash = PhotoFloat.mediaHash;
+	PhotoFloat.prototype.mediaHashFolder = PhotoFloat.mediaHashFolder;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
 	PhotoFloat.prototype.thumbPath = PhotoFloat.thumbPath;
 	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
 	PhotoFloat.prototype.videoPath = PhotoFloat.videoPath;
 	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;
-	PhotoFloat.prototype.photoFoldersAlbum = PhotoFloat.photoFoldersAlbum;
-	PhotoFloat.prototype.photoDayAlbum = PhotoFloat.photoDayAlbum;
-	PhotoFloat.prototype.photoMonthAlbum = PhotoFloat.photoMonthAlbum;
-	PhotoFloat.prototype.photoYearAlbum = PhotoFloat.photoYearAlbum;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
 	/* expose class globally */

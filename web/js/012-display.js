@@ -471,16 +471,16 @@ $(document).ready(function() {
 	}
 
 	function scrollToThumb() {
-		var photo, thumb;
+		var media, thumb;
 
-		photo = currentMedia;
-		if (photo === null) {
-			photo = previousMedia;
-			if (photo === null)
+		media = currentMedia;
+		if (media === null) {
+			media = previousMedia;
+			if (media === null)
 				return;
 		}
 		$("#thumbs img").each(function() {
-			if (this.title === photo.name) {
+			if (this.title === media.name) {
 				thumb = $(this);
 				return false;
 			}
@@ -510,7 +510,7 @@ $(document).ready(function() {
 	}
 	
 	function showAlbum(populate) {
-		var i, link, image, photos, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
+		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, populateMedia;
 		var albumViewWidth, calculatedAlbumThumbSize = Options.album_thumb_size;
 		var photoWidth, photoHeight;
@@ -524,9 +524,9 @@ $(document).ready(function() {
 				populateMedia = populateMedia && (currentAlbum.media.length < Options.big_date_folders_threshold);
 			
 			if (populateMedia === true || populateMedia && needMediaHtmlReverse()) {
-				photos = [];
+				media = [];
 				for (i = 0; i < currentAlbum.media.length; ++i) {
-					hash = photoFloat.photoHash(currentAlbum, currentAlbum.media[i]);
+					hash = photoFloat.mediaHash(currentAlbum, currentAlbum.media[i]);
 					thumbHash = photoFloat.thumbPath(currentAlbum, currentAlbum.media[i], thumbnailSize);
 					bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 					if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
@@ -573,10 +573,10 @@ $(document).ready(function() {
 					
 					image.get(0).media = currentAlbum.media[i];
 					link.append(image);
-					photos.push(link);
+					media.push(link);
 					(function(theLink, theImage, theAlbum) {
 						theImage.error(function() {
-							photos.splice(photos.indexOf(theLink), 1);
+							media.splice(media.indexOf(theLink), 1);
 							theLink.remove();
 							theAlbum.media.splice(theAlbum.media.indexOf(theImage.get(0).media), 1);
 						});
@@ -585,7 +585,7 @@ $(document).ready(function() {
 				
 				thumbsElement = $("#thumbs");
 				thumbsElement.empty();
-				thumbsElement.append.apply(thumbsElement, photos);
+				thumbsElement.append.apply(thumbsElement, media);
 				
 				if (needMediaHtmlReverse())
 					currentAlbum.mediaReverseSort = ! currentAlbum.mediaReverseSort;
@@ -603,9 +603,9 @@ $(document).ready(function() {
 							parseInt($("#album-view").css("padding-left")) -
 							parseInt($("#album-view").css("padding-right")) -
 							15; // the trailing subtraction is for the scroll slide
-					if (albumButtonWidth(calculatedAlbumThumbSize) > albumViewWidth / 3) {
+					if (albumButtonWidth(calculatedAlbumThumbSize) > albumViewWidth / Options.min_album_thumbnail) {
 						calculatedAlbumThumbSize =
-							Math.floor(albumViewWidth / 3 - Options.thumb_spacing - 6);
+							Math.floor(albumViewWidth / Options.min_album_thumbnail - Options.thumb_spacing - 6);
 						if (Options.albums_slide_style)
 							calculatedAlbumThumbSize = Math.floor(calculatedAlbumThumbSize / 1.1);
 					}
@@ -946,7 +946,7 @@ $(document).ready(function() {
 		
 		
 		if (currentMedia.metadata.mediaType == "photo" || currentMedia.metadata.mediaType == "video" && videoOK) {
-			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
+			if (currentAlbum.path == currentMedia.foldersAlbum) {
 				$("#folders-view").hide();
 				$("#day-view").show();
 			}
@@ -1047,8 +1047,8 @@ $(document).ready(function() {
 		if (currentAlbum.media.length == 1) {
 			//nothing to do
 		} else {
-			nextLink = "#!/" + photoFloat.photoHash(currentAlbum, nextMedia);
-			backLink = "#!/" + photoFloat.photoHash(currentAlbum, previousMedia);
+			nextLink = "#!/" + photoFloat.mediaHash(currentAlbum, nextMedia);
+			backLink = "#!/" + photoFloat.mediaHash(currentAlbum, previousMedia);
 			$("#next").show();
 			$("#prev").show();
 			$(".next-media").off("click");
