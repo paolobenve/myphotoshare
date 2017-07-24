@@ -13,11 +13,10 @@
 	<title><?php if ($options['page_title']) echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
-<!--
 	<link href="css/styles.min.css" rel="stylesheet" type="text/css" /> 
 	<script type="text/javascript" src="js/scripts.min.js"></script> 
--->
 
+<!--
 	<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 	<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 	<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
@@ -32,6 +31,7 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
+-->
 	<?php
 		function join_paths() {
 			return preg_replace('~[/\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
@@ -154,7 +154,7 @@
 		<div id="buttons-container">
 			<a id="day-folders-view-link" href="javascript:void(0)">
 				<div id="day-folders-view-container">
-					<span id="day-view"></span>
+					<span id="date-view"></span>
 					<span id="folders-view"></span>
 				</div>
 			</a>
@@ -169,17 +169,17 @@
 				<div id="media-box-inner" ></div>
 			</a>
 			<div id="media-bar">
-				<div class="links">
-					<a class="metadata-show" href="javascript:void(0)"></a>
-					<a class="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
-					<a class="original-link" target="_blank"></a>
-					<span class="fullscreen-divider"> | </span>
-					<a class="fullscreen" href="javascript:void(0)">
-						<span class="enter-fullscreen"></span>
-						<span class="exit-fullscreen"></span>
+				<div id="links">
+					<a id="metadata-show" href="javascript:void(0)"></a>
+					<a id="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
+					<a id="original-link" target="_blank"></a>
+					<span id="fullscreen-divider"> | </span>
+					<a id="fullscreen" href="javascript:void(0)">
+						<span id="enter-fullscreen"></span>
+						<span id="exit-fullscreen"></span>
 					</a>
 				</div>
-				<div class="metadata"></div>
+				<div id="metadata"></div>
 			</div>
 		</div>
 		

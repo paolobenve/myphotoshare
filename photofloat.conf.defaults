@@ -147,7 +147,7 @@ switch_button_color_hover = black
 # shoud metadata be shown persistently until they are closed?
 persistent_metadata = false
 
-# should default sorting be reverse (more recent photos top)?
+# should default sorting be reverse (more recent photos/videos top)?
 default_album_reverse_sort = false
 default_media_reverse_sort = true
 
@@ -157,3 +157,8 @@ big_date_folders_threshold = 9999
 # How many thumbnails should we put at most in the image that php generates for sharing albums?
 # it must be an integer, and a square: 4, 9, 16,..
 max_album_share_thumbnails_number = 16
+
+# How many album thumbnails will fit at least on screen width?
+# Album button sizes will be reduced in order that the given number of buttons fit in it
+# if set to 1, no correction is made
+min_album_thumbnail = 3

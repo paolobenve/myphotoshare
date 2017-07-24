@@ -208,10 +208,10 @@ var SocialShareKit = (function() {
 	function getUrl(options, network, el) {
 		var url, dataOpts = getDataOpts(options, network, el),
 			shareUrl = getShareUrl(options, network, el, dataOpts),
-			title = typeof dataOpts['title'] !== 'undefined' ? dataOpts['title'] : getTitle(network),
-			text = typeof dataOpts['text'] !== 'undefined' ? dataOpts['text'] : getText(network),
-			image = dataOpts['image'] ? dataOpts['image'] : getMetaContent('og:image'),
-			via = typeof dataOpts['via'] !== 'undefined' ? dataOpts['via'] : getMetaContent('twitter:site'),
+			title = typeof dataOpts.title !== 'undefined' ? dataOpts.title : getTitle(network),
+			text = typeof dataOpts.text !== 'undefined' ? dataOpts.text : getText(network),
+			image = dataOpts.image ? dataOpts.image : getMetaContent('og:image'),
+			via = typeof dataOpts.via !== 'undefined' ? dataOpts.via : getMetaContent('twitter:site'),
 			paramsObj = {
 				shareUrl: shareUrl,
 				title: title,
@@ -271,7 +271,7 @@ var SocialShareKit = (function() {
 		paramsObj.networkUrl = url;
 
 		if (options.onBeforeOpen) {
-			options.onBeforeOpen(el, network, paramsObj)
+			options.onBeforeOpen(el, network, paramsObj);
 		}
 
 		return paramsObj.networkUrl;
@@ -279,7 +279,7 @@ var SocialShareKit = (function() {
 
 	function getShareUrl(options, network, el, dataOpts) {
 		dataOpts = dataOpts || getDataOpts(options, network, el);
-		return dataOpts['url'] || window.location.href;
+		return dataOpts.url || window.location.href;
 	}
 
 	function getTitle(network) {
@@ -302,7 +302,7 @@ var SocialShareKit = (function() {
 		if (tag.length) {
 			text = tag[0].getAttribute('content') || '';
 		}
-		return text || ''
+		return text || '';
 	}
 
 	function getDataOpts(options, network, el) {
@@ -416,7 +416,7 @@ var SocialShareKit = (function() {
 			callback(data);
 		};
 		if (network == 'vk') {
-			window['VK'] = {
+			window.VK = {
 				Share: {
 					count: function(a, b) {
 						window[callbackName](b);
@@ -424,7 +424,7 @@ var SocialShareKit = (function() {
 				}
 			};
 		} else if (network == 'google-plus') {
-			window['services'] = {
+			window.services = {
 				gplus: {
 					cb: window[callbackName]
 				}

@@ -45,7 +45,7 @@ a.title-anchor.mobile {
 	opacity: 0.5;
 }
 
-#day-view, #folders-view {
+#date-view, #folders-view {
 	color: inherit;
 	display: none;
 }
@@ -170,7 +170,7 @@ a.title-anchor.mobile {
 	bottom: 1em;
 }
 
-#album-view.photo-view-container {
+#album-view.media-view-container {
 	position: absolute;
 	width: 100%;
 	bottom: 0;
@@ -181,7 +181,7 @@ a.title-anchor.mobile {
 	padding: 0 !important;
 	text-align: center;
 }
-#album-view.photo-view-container.no-bottom-space {
+#album-view.media-view-container.no-bottom-space {
 	height: 0;
 	bottom: 15px;
 }
@@ -191,7 +191,7 @@ a.title-anchor.mobile {
 	width: 100%;
 	text-align: center;
 }
-.links {
+#links {
 	background-color: #000000;
 	font-weight: bold;
 	height: 10px;
@@ -209,7 +209,7 @@ a.title-anchor.mobile {
 	-webkit-border-top-right-radius: 5px;
 	-webkit-border-top-left-radius: 5px;
 }
-.metadata {
+#metadata {
 	background-color: #000000;
 	width: 340px;
 	font-size: 75%;
@@ -232,17 +232,17 @@ a.title-anchor.mobile {
 	filter: alpha(opacity=50);
 	overflow: auto;
 }
-.metadata table {
+#metadata table {
 	margin: auto auto;
 	text-align: left;
 }
-.metadata tr {
+#metadata tr {
 	height: 14px;
 }
-.fullscreen, .exit-fullscreen {
+#fullscreen, #exit-fullscreen {
 	display: none;
 }
-.enter-fullscreen, .fullscreen-divider {
+#enter-fullscreen, #fullscreen-divider {
 	display: inline;
 }
 #powered-by {

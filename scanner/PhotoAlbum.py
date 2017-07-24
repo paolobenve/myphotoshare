@@ -27,13 +27,13 @@ def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb
 class Album(object):
 	def __init__(self, path):
 		self._path = trim_base(path)
-		self._photos = list()
+		self._media = list()
 		self._albums = list()
-		self._photos_sorted = True
+		self._media_sorted = True
 		self._albums_sorted = True
 	@property
-	def photos(self):
-		return self._photos
+	def media(self):
+		return self._media
 	@property
 	def albums(self):
 		return self._albums
@@ -48,34 +48,34 @@ class Album(object):
 	@property
 	def date(self):
 		self._sort()
-		if len(self._photos) == 0 and len(self._albums) == 0:
+		if len(self._media) == 0 and len(self._albums) == 0:
 			return datetime(1900, 1, 1)
-		elif len(self._photos) == 0:
+		elif len(self._media) == 0:
 			return self._albums[-1].date
 		elif len(self._albums) == 0:
-			return self._photos[-1].date
-		return max(self._photos[-1].date, self._albums[-1].date)
+			return self._media[-1].date
+		return max(self._media[-1].date, self._albums[-1].date)
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
 		except TypeError:
 			return 1
-	def add_photo(self, photo):
-		self._photos.append(photo)
-		self._photos_sorted = False
+	def add_media(self, media):
+		self._media.append(media)
+		self._media_sorted = False
 	def add_album(self, album):
 		self._albums.append(album)
 		self._albums_sorted = False
 	def _sort(self):
-		if not self._photos_sorted:
-			self._photos.sort()
-			self._photos_sorted = True
+		if not self._media_sorted:
+			self._media.sort()
+			self._media_sorted = True
 		if not self._albums_sorted:
 			self._albums.sort()
 			self._albums_sorted = True
 	@property
 	def empty(self):
-		if len(self._photos) != 0:
+		if len(self._media) != 0:
 			return False
 		if len(self._albums) == 0:
 			return True
@@ -98,8 +98,8 @@ class Album(object):
 	@staticmethod
 	def from_dict(dictionary, cripple=True):
 		album = Album(dictionary["path"])
-		for photo in dictionary["photos"]:
-			album.add_photo(Media.from_dict(photo, untrim_base(album.path)))
+		for media in dictionary["media"]:
+			album.add_media(Media.from_dict(media, untrim_base(album.path)))
 		if not cripple:
 			for subalbum in dictionary["albums"]:
 				album.add_album(Album.from_dict(subalbum), cripple)
@@ -129,7 +129,7 @@ class Album(object):
 				"path": self.path,
 				"date": self.date,
 				"albums": subalbums,
-				"photos": self._photos,
+				"media": self._media,
 				"cacheBase": cache_base(self.path)
 				}
 		else:
@@ -138,15 +138,15 @@ class Album(object):
 				"physicalPath": path_without_marker,
 				"date": self.date,
 				"albums": subalbums,
-				"photos": self._photos,
+				"media": self._media,
 				"cacheBase": cache_base(self.path)
 				}
 		
 		return dictionary
-	def photo_from_path(self, path):
-		for photo in self._photos:
-			if trim_base(path) == photo._path:
-				return photo
+	def media_from_path(self, path):
+		for media in self._media:
+			if trim_base(path) == media._path:
+				return media
 		return None
 
 class Media(object):
@@ -312,7 +312,7 @@ class Media(object):
 				self._attributes["mediaType"] = "video"
 				self._attributes["size"] = (int(s["width"]), int(s["height"]))
 				if "duration" in s:
-					self._attributes["duration"] = s["duration"]
+					self._attributes["duration"] = float(int(float(s["duration"]) * 10)) / 10
 				if "tags" in s and "rotate" in s["tags"]:
 					self._attributes["rotate"] = s["tags"]["rotate"]
 				if original:
@@ -815,7 +815,7 @@ class Media(object):
 		foldersAlbum = Options.config['folders_string']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
-		photo = {
+		media = {
 				"name": self.name,
 				"albumName": self.album_path,
 				"yearAlbum": self.year_album_path,
@@ -826,8 +826,8 @@ class Media(object):
 				"cacheSubdir": cache_subdir(self.media_file_name),
 				"cacheBase": cache_base(self.name)
 			}
-		photo.update(self.attributes)
-		return photo
+		media.update({"metadata": self.attributes})
+		return media
 
 class PhotoAlbumEncoder(json.JSONEncoder):
 	def default(self, obj):

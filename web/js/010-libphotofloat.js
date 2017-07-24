@@ -9,7 +9,7 @@
 	PhotoFloat.prototype.getAlbum = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
 		
-		if (typeof subalbum.photos !== "undefined" && subalbum.photos !== null) {
+		if (typeof subalbum.media !== "undefined" && subalbum.media !== null) {
 			callback(subalbum);
 			return;
 		}
@@ -31,8 +31,8 @@
 				var i;
 				for (i = 0; i < album.albums.length; ++i)
 					album.albums[i].parent = album;
-				for (i = 0; i < album.photos.length; ++i)
-					album.photos[i].parent = album;
+				for (i = 0; i < album.media.length; ++i)
+					album.media[i].parent = album;
 				self.albumCache[cacheKey] = album;
 				
 				callback(album);
@@ -56,43 +56,43 @@
 		var nextAlbum, self;
 		self = this;
 		nextAlbum = function(album) {
-			var index = Math.floor(Math.random() * (album.photos.length + album.albums.length));
-			if (index >= album.photos.length) {
-				index -= album.photos.length;
+			var index = Math.floor(Math.random() * (album.media.length + album.albums.length));
+			if (index >= album.media.length) {
+				index -= album.media.length;
 				self.getAlbum(album.albums[index], nextAlbum, error);
 			} else
-				callback(album, album.photos[index], container);
+				callback(album, album.media[index], container);
 		};
-		if (typeof subalbum.photos !== "undefined" && subalbum.photos !== null)
+		if (typeof subalbum.media !== "undefined" && subalbum.media !== null)
 			nextAlbum(subalbum);
 		else
 			this.getAlbum(subalbum, nextAlbum, error);
 	};
 	
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
-		var index, album, photo;
+		var index, album, media;
 		hash = PhotoFloat.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (! hash.length) {
 			album = PhotoFloat.cachePath(Options.folders_string);
-			photo = null;
+			media = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
-			photo = hash.substring(index + 1);
+			media = hash.substring(index + 1);
 			album = hash.substring(0, index);
 		} else {
 			album = hash;
-			photo = null;
+			media = null;
 		}
 		this.getAlbum(album, function(theAlbum) {
 			var i = -1;
-			if (photo !== null) {
-				for (i = 0; i < theAlbum.photos.length; ++i) {
-					if (PhotoFloat.cachePath(theAlbum.photos[i].name) === photo) {
-						photo = theAlbum.photos[i];
+			if (media !== null) {
+				for (i = 0; i < theAlbum.media.length; ++i) {
+					if (PhotoFloat.cachePath(theAlbum.media[i].name) === media) {
+						media = theAlbum.media[i];
 						break;
 					}
 				}
-				if (i >= theAlbum.photos.length) {
+				if (i >= theAlbum.media.length) {
 					$("#album-view").fadeOut(200);
 					$("#media-view").fadeOut(200);
 					$("#album-view").fadeIn(3500);
@@ -102,7 +102,7 @@
 					i = -1;
 				}
 			}
-			callback(theAlbum, photo, i);
+			callback(theAlbum, media, i);
 		}, error);
 	};
 	PhotoFloat.prototype.authenticate = function(password, result) {
@@ -146,12 +146,12 @@
 			path = path.replace(/__/g, "_");
 		return path;
 	};
-	PhotoFloat.photoHash = function(album, media) {
+	PhotoFloat.mediaHash = function(album, media) {
 		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(media.name);
 	};
-	PhotoFloat.photoHashFolder = function(album, media) {
+	PhotoFloat.mediaHashFolder = function(album, media) {
 		var hash;
-		hash = PhotoFloat.photoHash(album, media);
+		hash = PhotoFloat.mediaHash(album, media);
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 			media.completeName = media.foldersAlbum + '/' + media.name;
@@ -162,84 +162,55 @@
 		return hash;
 	};
 	PhotoFloat.albumHash = function(album) {
-		if (typeof album.photos !== "undefined" && album.photos !== null)
+		if (typeof album.media !== "undefined" && album.media !== null)
 			return PhotoFloat.cachePath(album.path);
 		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
 	};
-	PhotoFloat.videoPath = function(album, video) {
-		var hashFolder = PhotoFloat.photoHashFolder(album, video) + "_transcoded.mp4";
-		var hash = PhotoFloat.cachePath(hashFolder);
-		var rootString = "root-";
+	PhotoFloat.mediaPath = function(album, media, size) {
+		var suffix, hash, rootString = "root-";
+		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
+		var foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
+		if (
+			media.metadata.mediaType == "photo" ||
+			media.metadata.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1
+		) {
+			suffix = size.toString();
+			if (size == Options.album_thumb_size) {
+				suffix += "a";
+				if (Options.album_thumb_type == "square")
+					suffix += "s";
+				else if (Options.album_thumb_type == "fit")
+					suffix += "f";
+			}
+			else if (size == Options.media_thumb_size) {
+				suffix += "t";
+				if (Options.media_thumb_type == "square")
+					suffix += "s";
+				else if (Options.media_thumb_type == "fixed_height")
+					suffix += "f";
+			}
+			suffix += ".jpg";
+		} else if (media.metadata.mediaType == "video") {
+			suffix = "transcoded.mp4";
+		}
+		hash = PhotoFloat.cachePath(PhotoFloat.mediaHashFolder(album, media) + "_" + suffix);
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
-			var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
-			var foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
 			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
 				hash = hash.substring(foldersStringWithTrailingSeparator.length);
 			else {
-				bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 				if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
 				hash = hash.substring(bydateStringWithTrailingSeparator.length);
 			}
 		}
-		if (video.cacheSubdir)
-			return Options.server_cache_path + video.cacheSubdir + "/" + hash;
+		if (media.cacheSubdir)
+			return Options.server_cache_path + media.cacheSubdir + "/" + hash;
 		else
 			return Options.server_cache_path + hash;
 	};
-	PhotoFloat.photoPath = function(album, photo, thumb_size) {
-		var suffix, hash;
-		suffix = thumb_size.toString();
-		if (thumb_size == Options.album_thumb_size) {
-			suffix += "a";
-			if (Options.album_thumb_type == "square")
-				suffix += "s";
-			else if (Options.album_thumb_type == "fit")
-				suffix += "f";
-		}
-		else if (thumb_size == Options.media_thumb_size) {
-			suffix += "t";
-			if (Options.media_thumb_type == "square")
-				suffix += "s";
-			else if (Options.media_thumb_type == "fixed_height")
-				suffix += "f";
-		}
-		else
-			suffix = thumb_size.toString();
-		hash = PhotoFloat.cachePath(PhotoFloat.photoHashFolder(album, photo) + "_" + suffix + ".jpg");
-		var rootString = "root-";
-		if (hash.indexOf(rootString) === 0)
-			hash = hash.substring(rootString.length);
-		else {
-			var foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
-			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
-				hash = hash.substring(foldersStringWithTrailingSeparator.length);
-			else {
-				var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
-				if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
-				hash = hash.substring(bydateStringWithTrailingSeparator.length);
-			}
-		}
-		if (photo.cacheSubdir)
-			return Options.server_cache_path + photo.cacheSubdir + "/" + hash;
-		else
-			return Options.server_cache_path + hash;
-	};
-	PhotoFloat.originalPhotoPath = function(photo) {
-		return photo.albumName;
-	};
-	PhotoFloat.photoFoldersAlbum = function(photo) {
-		return photo.foldersAlbum;
-	};
-	PhotoFloat.photoDayAlbum = function(photo) {
-		return photo.dayAlbum;
-	};
-	PhotoFloat.photoMonthAlbum = function(photo) {
-		return photo.monthAlbum;
-	};
-	PhotoFloat.photoYearAlbum = function(photo) {
-		return photo.yearAlbum;
+	PhotoFloat.originalMediaPath = function(media) {
+		return media.albumName;
 	};
 	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
@@ -267,16 +238,11 @@
 	
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
-	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
-	PhotoFloat.prototype.photoHashFolder = PhotoFloat.photoHashFolder;
+	PhotoFloat.prototype.mediaHash = PhotoFloat.mediaHash;
+	PhotoFloat.prototype.mediaHashFolder = PhotoFloat.mediaHashFolder;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
-	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
-	PhotoFloat.prototype.videoPath = PhotoFloat.videoPath;
-	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;
-	PhotoFloat.prototype.photoFoldersAlbum = PhotoFloat.photoFoldersAlbum;
-	PhotoFloat.prototype.photoDayAlbum = PhotoFloat.photoDayAlbum;
-	PhotoFloat.prototype.photoMonthAlbum = PhotoFloat.photoMonthAlbum;
-	PhotoFloat.prototype.photoYearAlbum = PhotoFloat.photoYearAlbum;
+	PhotoFloat.prototype.mediaPath = PhotoFloat.mediaPath;
+	PhotoFloat.prototype.originalMediaPath = PhotoFloat.originalMediaPath;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
 	/* expose class globally */
