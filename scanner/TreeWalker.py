@@ -23,7 +23,7 @@ class TreeWalker:
 		set_cache_path_base(self.album_path)
 		self.all_albums = list()
 		self.tree_by_date = {}
-		self.all_photos = list()
+		self.all_media = list()
 		self.save_json_options()
 		folders_album = self.walk(self.album_path)
 		self.big_lists()
@@ -38,7 +38,7 @@ class TreeWalker:
 		self.remove_stale()
 		message("complete", "")
 	def generate_date_album(self):
-		# convert the temporary structure where photos are organazide by year, month, date to a set of albums
+		# convert the temporary structure where media are organized by year, month, date to a set of albums
 		by_date_path = os.path.join(self.album_path, Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
@@ -49,14 +49,14 @@ class TreeWalker:
 				month_path = os.path.join(year_path, str(month))
 				month_album = Album(month_path)
 				year_album.add_album(month_album)
-				for day, photos in self.tree_by_date[year][month].iteritems():
+				for day, media in self.tree_by_date[year][month].iteritems():
 					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
 					month_album.add_album(day_album)
-					for photo in photos:
-						day_album.add_photo(photo)
-						month_album.add_photo(photo)
-						year_album.add_photo(photo)
+					for single_media in media:
+						day_album.add_media(single_media)
+						month_album.add_media(single_media)
+						year_album.add_media(single_media)
 					self.all_albums.append(day_album)
 					#day_cache = os.path.join(self.cache_path, json_name_by_date(day_path))
 					if not day_album.empty:
@@ -74,15 +74,15 @@ class TreeWalker:
 		if not by_date_album.empty:
 			by_date_album.cache(self.cache_path)
 		return by_date_album
-	def add_photo_to_tree_by_date(self, photo):
-		# add the given photo to a temporary structure where photos are organazide by year, month, date
-		if not photo.year in self.tree_by_date.keys():
-			self.tree_by_date[photo.year] = {}
-		if not photo.month in self.tree_by_date[photo.year].keys():
-			self.tree_by_date[photo.year][photo.month] = {}
-		if not photo.day in self.tree_by_date[photo.year][photo.month].keys():
-			self.tree_by_date[photo.year][photo.month][photo.day] = list()
-		self.tree_by_date[photo.year][photo.month][photo.day].append(photo)
+	def add_media_to_tree_by_date(self, media):
+		# add the given media to a temporary structure where media are organazide by year, month, date
+		if not media.year in self.tree_by_date.keys():
+			self.tree_by_date[media.year] = {}
+		if not media.month in self.tree_by_date[media.year].keys():
+			self.tree_by_date[media.year][media.month] = {}
+		if not media.day in self.tree_by_date[media.year][media.month].keys():
+			self.tree_by_date[media.year][media.month][media.day] = list()
+		self.tree_by_date[media.year][media.month][media.day].append(media)
 	def walk(self, path):
 		trimmed_path = trim_base_custom(path, self.album_path)
 		path_with_marker = os.path.join(self.album_path, Options.config['folders_string'])
@@ -104,9 +104,9 @@ class TreeWalker:
 					message("full cache", os.path.basename(path))
 					cached = True
 					album = cached_album
-					for photo in album.photos:
-						self.all_photos.append(photo)
-						self.add_photo_to_tree_by_date(photo)
+					for media in album.media:
+						self.all_media.append(media)
+						self.add_media_to_tree_by_date(media)
 				else:
 					message("partial cache", os.path.basename(path))
 			except KeyboardInterrupt:
@@ -137,13 +137,13 @@ class TreeWalker:
 				next_level()
 				cache_hit = False
 				if cached_album:
-					cached_photo = cached_album.photo_from_path(entry)
+					cached_media = cached_album.media_from_path(entry)
 					if (
-						cached_photo and
-						file_mtime(entry) <= cached_photo.attributes["dateTimeFile"]
+						cached_media and
+						file_mtime(entry) <= cached_media.attributes["dateTimeFile"]
 					):
 						cache_files = list()
-						if "mediaType" in cached_photo.attributes and cached_photo.attributes["mediaType"] == "video":
+						if "mediaType" in cached_media.attributes and cached_media.attributes["mediaType"] == "video":
 							# video
 							cache_files.append(os.path.join(self.cache_path, video_cache_with_subdir(entry)))
 						else:
@@ -161,14 +161,14 @@ class TreeWalker:
 								break
 						if cache_hit:
 							message("cache hit", os.path.basename(entry))
-							photo = cached_photo
+							media = cached_media
 				if not cache_hit:
 					message(" processing image/video", os.path.basename(entry))
-					photo = Media(entry, self.cache_path)
-				if photo.is_valid:
-					self.all_photos.append(photo)
-					album.add_photo(photo)
-					self.add_photo_to_tree_by_date(photo)
+					media = Media(entry, self.cache_path)
+				if media.is_valid:
+					self.all_media.append(media)
+					album.add_media(media)
+					self.add_media_to_tree_by_date(media)
 				else:
 					next_level()
 					message("unreadable", ":-(")
@@ -185,13 +185,13 @@ class TreeWalker:
 		back_level()
 		return album
 	def big_lists(self):
-		photo_list = []
-		self.all_photos.sort()
-		for photo in self.all_photos:
-			photo_list.append(photo.path)
-		message("caching", "all photos path list")
-		fp = open(os.path.join(self.cache_path, "all_photos.json"), 'w')
-		json.dump(photo_list, fp, cls=PhotoAlbumEncoder)
+		media_list = []
+		self.all_media.sort()
+		for media in self.all_media:
+			media_list.append(media.path)
+		message("caching", "all media path list")
+		fp = open(os.path.join(self.cache_path, "all_media.json"), 'w')
+		json.dump(media_list, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	def save_json_options(self):
 		next_level()
@@ -210,11 +210,11 @@ class TreeWalker:
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
 			message("cleanup", "building stale list")
-			all_cache_entries = { "all_photos.json": True, "latest_photos.json": True, "options.json": True }
+			all_cache_entries = { "all_media.json": True, "latest_media.json": True, "options.json": True }
 			for album in self.all_albums:
 				all_cache_entries[album.json_file] = True
-			for photo in self.all_photos:
-				for entry in photo.image_caches:
+			for media in self.all_media:
+				for entry in media.image_caches:
 					all_cache_entries[entry] = True
 			next_level()
 		else:
