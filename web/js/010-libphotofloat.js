@@ -170,7 +170,10 @@
 		var suffix, hash, rootString = "root-";
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		var foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
-		if (media.metadata.mediaType == "photo" || media.metadata.mediaType == "video" && size != "") {
+		if (
+			media.metadata.mediaType == "photo" ||
+			media.metadata.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1
+		) {
 			suffix = size.toString()
 			if (size == Options.album_thumb_size) {
 				suffix += "a";

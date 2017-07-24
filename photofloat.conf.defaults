@@ -159,4 +159,6 @@ big_date_folders_threshold = 9999
 max_album_share_thumbnails_number = 16
 
 # How many album thumbnails will fit at least on screen width?
+# Album button sizes will be reduced in order that the given number of buttons fit in it
+# if set to 1, no correction is made
 min_album_thumbnail = 3

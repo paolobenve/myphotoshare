@@ -1,5 +1,5 @@
 var Options = {};
-var nextLink, backLink;
+var nextLink = "", prevLink = "";
 var language;
 var isMobile = {
 	Android: function() {
@@ -132,28 +132,32 @@ $(document).ready(function() {
 		ele.addEventListener('touchend', touchEnd, false);  
 	}
 	
-	function swipeRight(dest) {
-		$("#media-box-inner").stop().animate({
-			right: "-=" + window.innerWidth,
-		}, 300, function() {
-			location.href = dest;
-			$("#media-box-inner").css('right', "");
-		});
-	}
-	function swipeLeft(dest) {
-		$("#media-box-inner").stop().animate({
-			left: "-=" + window.innerWidth,
-		}, 300, function() {
-			location.href = dest;
-			$("#media-box-inner").css('left', "");
-		});
-	}
-	
 	function swipe(el,d) {
 		if (d == "r") {
-			swipeRight(backLink);
+			swipeRight(prevLink);
 		} else if (d == "l") {
 			swipeLeft(nextLink);
+		}
+	}
+	
+	function swipeRight(dest) {
+		if (dest) {
+			$("#media-box-inner").stop().animate({
+				right: "-=" + window.innerWidth,
+			}, 300, function() {
+				location.href = dest;
+				$("#media-box-inner").css('right', "");
+			});
+		}
+	}
+	function swipeLeft(dest) {
+		if (dest) {
+			$("#media-box-inner").stop().animate({
+				left: "-=" + window.innerWidth,
+			}, 300, function() {
+				location.href = dest;
+				$("#media-box-inner").css('left', "");
+			});
 		}
 	}
 	
@@ -513,7 +517,7 @@ $(document).ready(function() {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, populateMedia;
 		var albumViewWidth, calculatedAlbumThumbSize = Options.album_thumb_size;
-		var photoWidth, photoHeight;
+		var mediaWidth, mediaHeight;
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
@@ -632,13 +636,13 @@ $(document).ready(function() {
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, buttonAndCaptionHeight, html;
 								
 								if (Options.album_thumb_type == "fit") {
-									photoWidth = randomPhoto.metadata.size[0];
-									photoHeight = randomPhoto.metadata.size[1];
-									if (photoWidth > photoHeight) {
+									mediaWidth = randomPhoto.metadata.size[0];
+									mediaHeight = randomPhoto.metadata.size[1];
+									if (mediaWidth > mediaHeight) {
 										thumbWidth = calculatedAlbumThumbSize;
-										thumbHeight = calculatedAlbumThumbSize * photoHeight / photoWidth;
+										thumbHeight = calculatedAlbumThumbSize * mediaHeight / mediaWidth;
 									} else {
-										thumbWidth = calculatedAlbumThumbSize * photoWidth / photoHeight;
+										thumbWidth = calculatedAlbumThumbSize * mediaWidth / mediaHeight;
 										thumbHeight = calculatedAlbumThumbSize;
 									}
 									distance = (calculatedAlbumThumbSize - thumbHeight) / 2;
@@ -956,7 +960,6 @@ $(document).ready(function() {
 			}
 			
 			if (currentMedia.metadata.mediaType == "video") {
-				maxSize = "";
 				if (fullScreenStatus) {
 					////////////////////////////////////////////
 					// the original video doesn't work: WHY????
@@ -1037,19 +1040,20 @@ $(document).ready(function() {
 			}
 		}
 		
+		$(".next-media").off("click");
+		$('#next').off("click");
+		$('#prev').off("click");
 		if (currentAlbum.media.length == 1) {
-			//nothing to do
+			nextLink = "";
+			prevLink = "";
 		} else {
 			nextLink = "#!/" + photoFloat.mediaHash(currentAlbum, nextMedia);
-			backLink = "#!/" + photoFloat.mediaHash(currentAlbum, previousMedia);
+			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, previousMedia);
 			$("#next").show();
 			$("#prev").show();
-			$(".next-media").off("click");
-			$('#next').off("click");
-			$('#prev').off("click");
 			$(".next-media").click(function(){ swipeLeft(nextLink); return false; });
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
-			$('#prev').click(function(){ swipeRight(backLink); return false; });
+			$('#prev').click(function(){ swipeRight(prevLink); return false; });
 		}
 		$(".original-link").attr("target", "_blank").attr("href", photoFloat.originalMediaPath(currentMedia));
 		
@@ -1172,25 +1176,25 @@ $(document).ready(function() {
 	
 	/* Entry point for most events */
 	
-	function hashParsed(album, photo, photoIndex) {
+	function hashParsed(album, media, mediaIndex) {
 		var populateAlbum;
 		undie();
 		$("#loading").hide();
-		if (album === currentAlbum && photo === currentMedia)
+		if (album === currentAlbum && media === currentMedia)
 			return;
 		if (album != currentAlbum)
 			currentAlbum = null;
 		
 		previousAlbum = currentAlbum;
-		if (currentAlbum && currentAlbum.path.indexOf(Options.by_date_string) === 0 && photo !== null) {
-			previousMedia = photo;
+		if (currentAlbum && currentAlbum.path.indexOf(Options.by_date_string) === 0 && media !== null) {
+			previousMedia = media;
 		}
 		else {
 			previousMedia = currentMedia;
 		}
 		currentAlbum = album;
-		currentMedia = photo;
-		currentMediaIndex = photoIndex;
+		currentMedia = media;
+		currentMediaIndex = mediaIndex;
 		
 		setOptions();
 		if (currentMedia === null || typeof currentMedia === "object")
@@ -1203,6 +1207,8 @@ $(document).ready(function() {
 				currentMediaIndex = 1;
 			}
 			$("#day-folders-view-container").show();
+			nextMedia = null;
+			previousMedia = null;
 			showMedia(currentAlbum);
 		}
 		else {
@@ -1295,26 +1301,26 @@ $(document).ready(function() {
 	
 	
 	$(document).keydown(function(e){
-		if (currentMedia === null || nextLink === undefined || backLink === undefined)
+		if (currentMedia === null)
 			return true;
 		if (! e.ctrlKey && ! e.shiftKey && (e.keyCode === 34 || e.keyCode === 39 || e.keyCode === 40)) {
 			swipeLeft(nextLink);
 			return false;
 		} else if (! e.ctrlKey && ! e.shiftKey && (e.keyCode === 33 || e.keyCode === 37 || e.keyCode === 38)) {
-			swipeRight(backLink);
+			swipeRight(prevLink);
 			return false;
 		}
 		return true;
 	});
 	$(document).mousewheel(function(event, delta) {
 		
-		if (currentMedia === null || nextLink === undefined || backLink === undefined)
+		if (currentMedia === null)
 			return true;
 		if (delta < 0) {
 			swipeLeft(nextLink);
 			return false;
 		} else if (delta > 0) {
-			swipeRight(backLink);
+			swipeRight(prevLink);
 			return false;
 		}
 		return true;
@@ -1365,6 +1371,7 @@ $(document).ready(function() {
 			.css("padding-top", 0)
 			.css("padding-bottom", 0)
 			.show()
+			.stop()
 			.animate({ height: $(".metadata > table").height(), paddingTop: 3, paddingBottom: 3 }, "slow", function() {
 				$(this).css("height", "auto");
 			});
