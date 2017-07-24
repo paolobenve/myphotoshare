@@ -188,6 +188,9 @@
 		else
 			return Options.server_cache_path + hash;
 	};
+	PhotoFloat.thumbPath = function(album, photo, thumb_size) {
+		return PhotoFloat.photoPath(album, photo, thumb_size);
+	}
 	PhotoFloat.photoPath = function(album, photo, thumb_size) {
 		var suffix, hash;
 		suffix = thumb_size.toString();
@@ -270,6 +273,7 @@
 	PhotoFloat.prototype.photoHash = PhotoFloat.photoHash;
 	PhotoFloat.prototype.photoHashFolder = PhotoFloat.photoHashFolder;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
+	PhotoFloat.prototype.thumbPath = PhotoFloat.thumbPath;
 	PhotoFloat.prototype.photoPath = PhotoFloat.photoPath;
 	PhotoFloat.prototype.videoPath = PhotoFloat.videoPath;
 	PhotoFloat.prototype.originalPhotoPath = PhotoFloat.originalPhotoPath;

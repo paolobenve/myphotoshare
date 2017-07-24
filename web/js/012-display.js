@@ -214,7 +214,7 @@ $(document).ready(function() {
 			mediaArray.push($("#media").attr("src"));
 			if (currentMedia.metadata.mediaType == "video") {
 				type = "v";
-			} else {
+			} else if (currentMedia.metadata.mediaType == "photo") {
 				type = "p";
 			}
 		}
@@ -527,7 +527,7 @@ $(document).ready(function() {
 				photos = [];
 				for (i = 0; i < currentAlbum.media.length; ++i) {
 					hash = photoFloat.photoHash(currentAlbum, currentAlbum.media[i]);
-					thumbHash = photoFloat.photoPath(currentAlbum, currentAlbum.media[i], thumbnailSize);
+					thumbHash = photoFloat.thumbPath(currentAlbum, currentAlbum.media[i], thumbnailSize);
 					bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 					if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 						currentAlbum.media[i].completeName =
@@ -646,7 +646,7 @@ $(document).ready(function() {
 								htmlText = "<img " +
 										"title=\"" + randomPhoto.albumName + "\"" +
 										" class=\"thumbnail\"" +
-										" src=\"" + photoFloat.photoPath(randomAlbum, randomPhoto, Options.album_thumb_size) + "\"" +
+										" src=\"" + photoFloat.thumbPath(randomAlbum, randomPhoto, Options.album_thumb_size) + "\"" +
 										" style=\"width:" + thumbWidth + "px;" +
 											" height:" + thumbHeight + "px;" +
 											" margin-top: " + distance + "px" +
@@ -788,7 +788,7 @@ $(document).ready(function() {
 		
 		media = $("#media");
 		media.off('loadstart').off("load");
-		if (currentMedia.metadata.mediaType != "video") {
+		if (currentMedia.metadata.mediaType == "photo") {
 			photoSrc = chooseMediaForScaling(currentMedia, container);
 			// chooseMediaForScaling() sets maxSize to 0 if it returns the original media
 			previousSrc = media.attr("src");
@@ -835,9 +835,9 @@ $(document).ready(function() {
 					.css("height", "100%")
 					.css("margin-top", "0")
 					.css("top", "0");
-			if (currentMedia.metadata.mediaType != "video")
+			if (currentMedia.metadata.mediaType == "photo") 
 				bottom = 0;
-			else
+			else if (currentMedia.metadata.mediaType == "video")
 				//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
 				bottom = "0px";
 		} else {
@@ -854,7 +854,7 @@ $(document).ready(function() {
 		
 		if (currentMedia.metadata.mediaType == "video") {
 			$("#media-bar").css("bottom", 0);
-		} else {
+		} else if (currentMedia.metadata.mediaType == "photo") {
 			//~ media.css("bottom", bottom);
 			$("#media-bar").css("bottom", bottom);
 		}
@@ -945,7 +945,7 @@ $(document).ready(function() {
 		}
 		
 		
-		if (currentMedia.metadata.mediaType != "video" || videoOK) {
+		if (currentMedia.metadata.mediaType == "photo" || currentMedia.metadata.mediaType == "video" && videoOK) {
 			if (currentAlbum.path == photoFloat.photoFoldersAlbum(currentMedia)) {
 				$("#folders-view").hide();
 				$("#day-view").show();
@@ -974,7 +974,7 @@ $(document).ready(function() {
 					.attr("alt", currentMedia.name);
 				triggerLoad = 'loadstart';
 				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
-			} else {
+			} else if (currentMedia.metadata.mediaType == "photo") {
 				maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
 				if (width > height) {
 					height = Math.round(height * maxSize / width);
@@ -1033,12 +1033,12 @@ $(document).ready(function() {
 				
 				if (nextMedia.metadata.mediaType == "video") {
 					$.preloadImages(photoFloat.videoPath(currentAlbum, nextMedia));
-				} else {
+				} else if (nextMedia.metadata.mediaType == "photo") {
 					$.preloadImages(photoFloat.photoPath(currentAlbum, nextMedia, maxSize));
 				}
 				if (previousMedia.metadata.mediaType == "video") {
 					$.preloadImages(photoFloat.videoPath(currentAlbum, previousMedia));
-				} else {
+				} else if (previousMedia.metadata.mediaType == "photo") {
 					$.preloadImages(photoFloat.photoPath(currentAlbum, previousMedia, maxSize));
 				}
 			}
