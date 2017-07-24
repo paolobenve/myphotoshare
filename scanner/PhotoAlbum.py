@@ -312,7 +312,7 @@ class Media(object):
 				self._attributes["mediaType"] = "video"
 				self._attributes["size"] = (int(s["width"]), int(s["height"]))
 				if "duration" in s:
-					self._attributes["duration"] = s["duration"]
+					self._attributes["duration"] = float(int(float(s["duration"]) * 10)) / 10
 				if "tags" in s and "rotate" in s["tags"]:
 					self._attributes["rotate"] = s["tags"]["rotate"]
 				if original:

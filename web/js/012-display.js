@@ -80,6 +80,7 @@ $(document).ready(function() {
 	var currentMediaIndex = -1;
 	var previousAlbum = null;
 	var previousMedia = null;
+	var nextMedia = null;
 	var photoFloat = new PhotoFloat();
 	var maxSize;
 	var fullScreenStatus = false;
@@ -95,15 +96,17 @@ $(document).ready(function() {
 	
 	// adapted from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
 	function detectSwipe(el,callback) {
+		var swipe_det, ele, min_x, direc;
+		var touchStart, touchMove, touchEnd;
 		touchStart = function(e){
 			var t = e.touches[0];
 			swipe_det.sX = t.screenX;
-		} 
+		};
 		touchMove = function(e){
 			e.preventDefault();
 			var t = e.touches[0];
 			swipe_det.eX = t.screenX;
-		} 
+		};
 		touchEnd = function(e){
 			if ((swipe_det.eX - swipe_det.sX > min_x || swipe_det.eX - swipe_det.sX < - min_x) && 
 				swipe_det.eX > 0
@@ -120,8 +123,7 @@ $(document).ready(function() {
 			}
 			direc = "";
 			swipe_det.sX = 0; swipe_det.eX = 0;
-		} 
-		var swipe_det, ele, min_x, direc;
+		};
 		swipe_det = new Object();
 		swipe_det.sX = 0; swipe_det.eX = 0;
 		min_x = 30;  //min x swipe for horizontal swipe
@@ -263,7 +265,7 @@ $(document).ready(function() {
 	
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle;
-		var titleAnchorClasses, hiddenTitle = "", beginLink;
+		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks;
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
 		else
@@ -688,8 +690,8 @@ $(document).ready(function() {
 								html += ">";
 								theImage.wrap(html);
 								html = "<div class=\"album-caption\"";
-								html += " style=\"width: " + calculatedAlbumThumbSize.toString() + "px;" +
-										"font-size: " + (captionHeight / 3).toString() + "px; ";
+								html += " style=\"width: " + calculatedAlbumThumbSize.toString() + "px; " +
+										"font-size: " + (captionHeight / 3).toString() + "px; " +
 										"height: " + captionHeight.toString() + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
@@ -965,9 +967,9 @@ $(document).ready(function() {
 					// the original video doesn't work: WHY????
 					// videoSrc = currentMedia.albumName;
 					////////////////////////////////////////////
-					videoSrc = photoFloat.mediaPath(currentAlbum, currentMedia);
+					videoSrc = photoFloat.mediaPath(currentAlbum, currentMedia, "");
 				} else {
-					videoSrc = photoFloat.mediaPath(currentAlbum, currentMedia);
+					videoSrc = photoFloat.mediaPath(currentAlbum, currentMedia, "");
 				}
 				$('<video/>', { id: 'media', controls: true })
 					.appendTo('#media-box-inner')
@@ -1006,9 +1008,9 @@ $(document).ready(function() {
 			$("head").append(linkTag);
 			$('#media').on(triggerLoad, scaleMedia());
 			if (! Options.persistent_metadata) {
-				$(".metadata").hide();
-				$(".metadata-show").show();
-				$(".metadata-hide").hide();
+				$("#metadata").hide();
+				$("#metadata-show").show();
+				$("#metadata-hide").hide();
 			}
 			
 			if (currentAlbum.media.length > 1) {
@@ -1055,7 +1057,7 @@ $(document).ready(function() {
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
 			$('#prev').click(function(){ swipeRight(prevLink); return false; });
 		}
-		$(".original-link").attr("target", "_blank").attr("href", photoFloat.originalMediaPath(currentMedia));
+		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalMediaPath(currentMedia));
 		
 		if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
 			changeViewLink = "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name);
@@ -1081,8 +1083,9 @@ $(document).ready(function() {
 		if (typeof currentMedia.metadata.lightSource !== "undefined") text += "<tr><td>Light Source</td><td>" + currentMedia.metadata.lightSource + "</td></tr>";
 		if (typeof currentMedia.metadata.flash !== "undefined") text += "<tr><td>Flash</td><td>" + currentMedia.metadata.flash + "</td></tr>";
 		if (typeof currentMedia.metadata.orientation !== "undefined") text += "<tr><td>Orientation</td><td>" + currentMedia.metadata.orientation + "</td></tr>";
+		if (typeof currentMedia.metadata.duration !== "undefined") text += "<tr><td>Duration</td><td>" + currentMedia.metadata.duration + " sec</td></tr>";
 		text += "</table>";
-		$(".metadata").html(text);
+		$("#metadata").html(text);
 		
 		$("#subalbums").hide();
 		$("#media-view").show();
@@ -1329,15 +1332,15 @@ $(document).ready(function() {
 	$(document).on("load", detectSwipe('media-box-inner',swipe));
 	
 	if (isMobile.any()) {
-		$(".links").css("display", "inline").css("opacity", 0.5);
+		$("#links").css("display", "inline").css("opacity", 0.5);
 	} else {
 		$("#media-view").off("mouseenter");
 		$("#media-view").off("mouseleave");
 		$("#media-view").mouseenter(function() {
-			$(".links").stop().fadeTo("slow", 0.50).css("display", "inline");
+			$("#links").stop().fadeTo("slow", 0.50).css("display", "inline");
 		});
 		$("#media-view").mouseleave(function() {
-			$(".links").stop().fadeOut("slow");
+			$("#links").stop().fadeOut("slow");
 		});
 	}
 	
@@ -1348,38 +1351,38 @@ $(document).ready(function() {
 		$(this).stop().fadeTo("fast", 0.4);
 	});
 	if ($.support.fullscreen) {
-		$(".fullscreen").show();
-		$(".fullscreen").click(function(e) {
+		$("#fullscreen").show();
+		$("#fullscreen").click(function(e) {
 			e.preventDefault();
 			$('#media').off('loadstart').unbind("load");
 			$("#media-box").fullScreen({
 				callback: function(isFullscreen) {
 					fullScreenStatus = isFullscreen;
-					$(".enter-fullscreen").toggle();
-					$(".exit-fullscreen").toggle();
+					$("#enter-fullscreen").toggle();
+					$("#exit-fullscreen").toggle();
 					showMedia(currentAlbum);
 				}
 			});
 		});
 	}
-	$(".metadata-show").click(function() {
-		$(".metadata-show").hide();
-		$(".metadata-hide").show();
-		$(".metadata")
+	$("#metadata-show").click(function() {
+		$("#metadata-show").hide();
+		$("#metadata-hide").show();
+		$("#metadata")
 			.stop()
 			.css("height", 0)
 			.css("padding-top", 0)
 			.css("padding-bottom", 0)
 			.show()
 			.stop()
-			.animate({ height: $(".metadata > table").height(), paddingTop: 3, paddingBottom: 3 }, "slow", function() {
+			.animate({ height: $("#metadata > table").height(), paddingTop: 3, paddingBottom: 3 }, "slow", function() {
 				$(this).css("height", "auto");
 			});
 	});
-	$(".metadata-hide").click(function() {
-		$(".metadata-show").show();
-		$(".metadata-hide").hide();
-		$(".metadata")
+	$("#metadata-hide").click(function() {
+		$("#metadata-show").show();
+		$("#metadata-hide").hide();
+		$("#metadata")
 			.stop()
 			.animate({ height: 0, paddingTop: 0, paddingBottom: 0 }, "slow", function() {
 				$(this).hide();

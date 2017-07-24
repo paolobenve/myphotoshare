@@ -166,7 +166,7 @@
 			return PhotoFloat.cachePath(album.path);
 		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
 	};
-	PhotoFloat.mediaPath = function(album, media, size = "") {
+	PhotoFloat.mediaPath = function(album, media, size) {
 		var suffix, hash, rootString = "root-";
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		var foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
@@ -174,7 +174,7 @@
 			media.metadata.mediaType == "photo" ||
 			media.metadata.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1
 		) {
-			suffix = size.toString()
+			suffix = size.toString();
 			if (size == Options.album_thumb_size) {
 				suffix += "a";
 				if (Options.album_thumb_type == "square")
