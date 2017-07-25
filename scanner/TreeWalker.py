@@ -94,20 +94,18 @@ class TreeWalker:
 			back_level()
 			return None
 		message("Next level folder:", os.path.basename(path))
-		#~ cache = os.path.join(self.cache_path, json_name(path))
-		this_json_name = json_name(path_with_marker)
-		cache_json_file = os.path.join(self.cache_path, this_json_name)
-		cached = False
+		cache = os.path.join(self.cache_path, json_name(path))
+		json_cache_file = json_name(path_with_marker)
+		json_cache_file = os.path.join(self.cache_path, json_cache_file)
+		path_is_cached = False
 		cached_album = None
-		#~ if os.path.exists(cache):
-		if os.path.exists(cache_json_file):
+		if os.path.exists(json_cache_file):
 			try:
-				#~ cached_album = Album.from_cache(cache)
-				cached_album = Album.from_cache(cache_json_file)
+				#~ cached_album = Album.from_cache(json_cache_file)
 				#~ if False and file_mtime(path) <= file_mtime(cache):
-				if false and self.max_mtime_in_tree(path) <= file_mtime(cache_json_file):
+				if False and self.max_mtime_in_tree(path) <= file_mtime(json_cache_file):
 					message("full cache", os.path.basename(path))
-					cached = True
+					path_is_cached = True
 					album = cached_album
 					for media in album.media:
 						self.all_media.append(media)
@@ -116,10 +114,10 @@ class TreeWalker:
 					message("partial cache", os.path.basename(path))
 			except KeyboardInterrupt:
 				raise
-			except (ValueError, AttributeError) as e:
-				message("corrupt cache", os.path.basename(path))
-				cached_album = None
-		if not cached:
+			#~ except (ValueError, AttributeError) as e:
+				#~ message("corrupt cache", os.path.basename(path))
+				#~ cached_album = None
+		if not path_is_cached:
 			album = Album(path_with_marker)
 		for entry in sorted(os.listdir(path)):
 			if entry[0] == '.':
@@ -138,7 +136,7 @@ class TreeWalker:
 				next_walked_album = self.walk(entry)
 				if next_walked_album is not None:
 					album.add_album(next_walked_album)
-			elif not cached and os.path.isfile(entry):
+			elif not path_is_cached and os.path.isfile(entry):
 				next_level()
 				cache_hit = False
 				if cached_album:

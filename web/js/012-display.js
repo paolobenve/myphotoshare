@@ -218,9 +218,9 @@ $(document).ready(function() {
 			}
 		} else {
 			mediaArray.push($("#media").attr("src"));
-			if (currentMedia.metadata.mediaType == "video") {
+			if (currentMedia.mediaType == "video") {
 				type = "v";
-			} else if (currentMedia.metadata.mediaType == "photo") {
+			} else if (currentMedia.mediaType == "photo") {
 				type = "p";
 			}
 		}
@@ -794,7 +794,7 @@ $(document).ready(function() {
 		
 		media = $("#media");
 		media.off('loadstart').off("load");
-		if (currentMedia.metadata.mediaType == "photo") {
+		if (currentMedia.mediaType == "photo") {
 			photoSrc = chooseReducedPhotoForScaling(container);
 			// chooseReducedPhotoForScaling() sets maxSize to 0 if it returns the original media
 			previousSrc = media.attr("src");
@@ -841,9 +841,9 @@ $(document).ready(function() {
 					.css("height", "100%")
 					.css("margin-top", "0")
 					.css("top", "0");
-			if (currentMedia.metadata.mediaType == "photo") 
+			if (currentMedia.mediaType == "photo") 
 				bottom = 0;
-			else if (currentMedia.metadata.mediaType == "video")
+			else if (currentMedia.mediaType == "video")
 				//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
 				bottom = "0px";
 		} else {
@@ -858,9 +858,9 @@ $(document).ready(function() {
 			bottom = ((container.height() - height) / 2) + "px";
 		}
 		
-		if (currentMedia.metadata.mediaType == "video") {
+		if (currentMedia.mediaType == "video") {
 			$("#media-bar").css("bottom", 0);
-		} else if (currentMedia.metadata.mediaType == "photo") {
+		} else if (currentMedia.mediaType == "photo") {
 			//~ media.css("bottom", bottom);
 			$("#media-bar").css("bottom", bottom);
 		}
@@ -934,7 +934,7 @@ $(document).ready(function() {
 		$("#media").off("load");
 		//~ $('#media-box-inner > video').remove();
 		
-		if (currentMedia.metadata.mediaType == "video") {
+		if (currentMedia.mediaType == "video") {
 			if (! Modernizr.video) {
 				$('<div id="video-unsupported">' +
 						'<p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p>' +
@@ -951,7 +951,7 @@ $(document).ready(function() {
 		}
 		
 		
-		if (currentMedia.metadata.mediaType == "photo" || currentMedia.metadata.mediaType == "video" && videoOK) {
+		if (currentMedia.mediaType == "photo" || currentMedia.mediaType == "video" && videoOK) {
 			if (currentAlbum.path == currentMedia.foldersAlbum) {
 				$("#folders-view").hide();
 				$("#date-view").show();
@@ -961,7 +961,7 @@ $(document).ready(function() {
 				$("#date-view").hide();
 			}
 			
-			if (currentMedia.metadata.mediaType == "video") {
+			if (currentMedia.mediaType == "video") {
 				if (fullScreenStatus) {
 					////////////////////////////////////////////
 					// the original video doesn't work: WHY????
@@ -980,7 +980,7 @@ $(document).ready(function() {
 					.attr("alt", currentMedia.name);
 				triggerLoad = 'loadstart';
 				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
-			} else if (currentMedia.metadata.mediaType == "photo") {
+			} else if (currentMedia.mediaType == "photo") {
 				maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
 				if (width > height) {
 					height = Math.round(height * maxSize / width);
