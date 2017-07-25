@@ -773,34 +773,37 @@ $(document).ready(function() {
 		return ! lateralSocialButtons();
 	}
 	function scaleMedia() {
-		var media, container, containerBottom, containerRatio, bottom, width, height, ratio, photoSrc, previousSrc;
+		var media, container, containerBottom = 0, containerTop = 0, containerRatio, width, height, ratio, photoSrc, previousSrc;
+		var containerHeight = $(window).innerHeight(), containerWidth = $(window).innerWidth(), mediaBarBottom = 0;
+		
 		$(window).off("resize");
 		
 		if (fullScreenStatus)
 			container = $(window);
 		else {
 			container = $("#media-view");
-			containerBottom = 0;
-			if ($("#album-view").is(":visible"))
+			if ($("#thumbs").is(":visible"))
 				containerBottom = $("#album-view").outerHeight();
-			else if (bottomSocialButtons())
+			else if (bottomSocialButtons() && containerBottom < $(".ssk").outerHeight())
 				// correct container bottom when social buttons are on the bottom
-				containerBottom = $(".ssk-group").outerHeight();
-
+				containerBottom = $(".ssk").outerHeight();
+			containerTop = $("#title-container").outerHeight();
+			containerHeight -= containerBottom + $("#title-container").outerHeight();
+			container.css("top", containerTop + "px");
 			container.css("bottom", containerBottom + "px");
-			container.css("top", $("#title-container").outerHeight() + "px");
 		}
-		containerRatio = container.width() / container.height();
+		
+		containerRatio = containerWidth / containerHeight;
 		
 		media = $("#media");
 		media.off('loadstart').off("load");
+		width = currentMedia.metadata.size[0];
+		height = currentMedia.metadata.size[1];
+		ratio = width / height;
 		if (currentMedia.mediaType == "photo") {
 			photoSrc = chooseReducedPhotoForScaling(container);
 			// chooseReducedPhotoForScaling() sets maxSize to 0 if it returns the original media
 			previousSrc = media.attr("src");
-			width = currentMedia.metadata.size[0];
-			height = currentMedia.metadata.size[1];
-			ratio = width / height;
 			if (maxSize) {
 				if (width > height) {
 					height = Math.round(height * maxSize / width);
@@ -822,30 +825,33 @@ $(document).ready(function() {
 			}
 		}
 		
-		if (parseInt(media.attr("width")) > container.width() && media.attr("ratio") > containerRatio) {
+		if (parseInt(media.attr("width")) > containerWidth && media.attr("ratio") > containerRatio) {
 			height = container.width() / media.attr("ratio");
 			media
-				.css("width", "100%")
-				.css("height", "auto")
+				.css("width", containerWidth + "px")
+				.css("height", (containerWidth / ratio) + "px")
 				.parent()
 					.css("height", height)
 					.css("margin-top", - height / 2)
 					.css("top", "50%");
-			//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
-			bottom = ((container.height() - container.width() / ratio) / 2) + "px";
-		} else if (parseInt(media.attr("height")) > container.height() && media.attr("ratio") < containerRatio) {
+			if (currentMedia.mediaType == "video")
+				mediaBarBottom = 0;
+			else if (currentMedia.mediaType == "photo")
+				mediaBarBottom = (containerHeight - containerWidth / ratio) / 2;
+		} else if (parseInt(media.attr("height")) > containerHeight && media.attr("ratio") < containerRatio) {
 			media
-				.css("height", "100%")
-				.css("width", "auto")
+				.css("height", containerHeight + "px")
+				.css("width", (containerHeight * ratio) + "px")
 				.parent()
 					.css("height", "100%")
 					.css("margin-top", "0")
 					.css("top", "0");
-			if (currentMedia.mediaType == "photo") 
-				bottom = 0;
-			else if (currentMedia.mediaType == "video")
-				//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
-				bottom = "0px";
+			if (currentMedia.mediaType == "video") {
+				media.css("height", parseInt(media.css("height")) - $("#links").outerHeight());
+				mediaBarBottom = 0;
+			} else if (currentMedia.mediaType == "photo")
+				// put media bar slightly below so that video buttons are not covered
+				mediaBarBottom = 0;
 		} else {
 			media
 				.css("height", "")
@@ -854,16 +860,15 @@ $(document).ready(function() {
 					.css("height", media.attr("height"))
 					.css("margin-top", - media.attr("height") / 2)
 					.css("top", "50%");
-			//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
-			bottom = ((container.height() - height) / 2) + "px";
+			mediaBarBottom = (container.height() - media.attr("height")) / 2;
+			if (fullScreenStatus) {
+				if (currentMedia.mediaType == "video") {
+					mediaBarBottom = 0;
+				}
+			}
 		}
 		
-		if (currentMedia.mediaType == "video") {
-			$("#media-bar").css("bottom", 0);
-		} else if (currentMedia.mediaType == "photo") {
-			//~ media.css("bottom", bottom);
-			$("#media-bar").css("bottom", bottom);
-		}
+		$("#media-bar").css("bottom", mediaBarBottom + "px");
 		
 		media.show();
 		
@@ -915,6 +920,7 @@ $(document).ready(function() {
 			$("#prev").removeAttr("href");
 			$("#media-view").addClass("no-bottom-space");
 			$("#album-view").addClass("no-bottom-space");
+			$("#thumbs").hide();
 		} else {
 			$("#next").show();
 			$("#prev").show();
@@ -924,6 +930,7 @@ $(document).ready(function() {
 			$("#album-view").css("height", (thumbnailSize + 20).toString() + "px");
 			$("#album-view").addClass("media-view-container");
 			$("#album-view.media-view-container").css("height", (thumbnailSize + 22).toString() + "px");
+			$("#thumbs").show();
 		}
 
 		var albumViewHeight = 0;
@@ -932,7 +939,6 @@ $(document).ready(function() {
 		
 		$('#media').remove();
 		$("#media").off("load");
-		//~ $('#media-box-inner > video').remove();
 		
 		if (currentMedia.mediaType == "video") {
 			if (! Modernizr.video) {
@@ -949,7 +955,6 @@ $(document).ready(function() {
 				videoOK = false;
 			}
 		}
-		
 		
 		if (currentMedia.mediaType == "photo" || currentMedia.mediaType == "video" && videoOK) {
 			if (currentAlbum.path == currentMedia.foldersAlbum) {

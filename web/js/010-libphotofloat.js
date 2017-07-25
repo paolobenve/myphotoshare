@@ -155,9 +155,7 @@
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 			media.completeName = media.foldersAlbum + '/' + media.name;
-			hash = PhotoFloat.cachePath(media.foldersAlbum) + "/" +
-			//~ hash = PhotoFloat.cachePath(media.completeName.substring(0, media.completeName.length - media.name.length - 1)) + "/" +
-				PhotoFloat.cachePath(media.name);
+			hash = PhotoFloat.cachePath(media.foldersAlbum) + "/" + PhotoFloat.cachePath(media.name);
 		}
 		return hash;
 	};

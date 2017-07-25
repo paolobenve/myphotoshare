@@ -156,7 +156,10 @@ a.title-anchor.mobile {
 }
 
 #media-view.no-bottom-space {
+/*
 	bottom: 0 !important;
+*/
+	bottom: 0;
 }
 
 #media-box-inner {
