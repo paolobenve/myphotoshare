@@ -903,17 +903,18 @@ $(document).ready(function() {
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
 			if (Options.reduced_sizes[i] > mediaSize)
 				continue;
-			
-			if (mediaWidth > mediaHeight) {
-				reducedWidth = Options.reduced_sizes[i];
-				reducedHeight = Options.reduced_sizes[i] * mediaHeight / mediaWidth;
-			} else {
-				reducedHeight = Options.reduced_sizes[i];
-				reducedWidth = Options.reduced_sizes[i] * mediaWidth / mediaHeight;
+			if (container !== null) {
+				if (mediaWidth > mediaHeight) {
+					reducedWidth = Options.reduced_sizes[i];
+					reducedHeight = Options.reduced_sizes[i] * mediaHeight / mediaWidth;
+				} else {
+					reducedHeight = Options.reduced_sizes[i];
+					reducedWidth = Options.reduced_sizes[i] * mediaWidth / mediaHeight;
+				}
+				
+				if (reducedWidth < container.width() && reducedHeight < container.height())
+					break;
 			}
-			
-			if (reducedWidth < container.width() && reducedHeight < container.height())
-				break;
 			chosenMedia = photoFloat.mediaPath(currentAlbum, currentMedia, Options.reduced_sizes[i]);
 			maxSize = Options.reduced_sizes[i];
 			if (container === null)
