@@ -94,13 +94,18 @@ class TreeWalker:
 			back_level()
 			return None
 		message("Next level folder:", os.path.basename(path))
-		cache = os.path.join(self.cache_path, json_name(path))
+		#~ cache = os.path.join(self.cache_path, json_name(path))
+		this_json_name = json_name(path_with_marker)
+		cache_json_file = os.path.join(self.cache_path, this_json_name)
 		cached = False
 		cached_album = None
-		if os.path.exists(cache):
+		#~ if os.path.exists(cache):
+		if os.path.exists(cache_json_file):
 			try:
-				cached_album = Album.from_cache(cache)
-				if False and file_mtime(path) <= file_mtime(cache):
+				#~ cached_album = Album.from_cache(cache)
+				cached_album = Album.from_cache(cache_json_file)
+				#~ if False and file_mtime(path) <= file_mtime(cache):
+				if false and self.max_mtime_in_tree(path) <= file_mtime(cache_json_file):
 					message("full cache", os.path.basename(path))
 					cached = True
 					album = cached_album
@@ -184,6 +189,11 @@ class TreeWalker:
 			message("empty", os.path.basename(path))
 		back_level()
 		return album
+	
+	def max_mtime_in_tree(self, path):
+		max_time = max(file_mtime(root) for root,_,_ in os.walk(path))
+		return max_time
+	
 	def big_lists(self):
 		media_list = []
 		self.all_media.sort()

@@ -27,16 +27,16 @@ def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb
 class Album(object):
 	def __init__(self, path):
 		self._path = trim_base(path)
-		self._media = list()
-		self._albums = list()
-		self._media_sorted = True
-		self._albums_sorted = True
+		self.media_list = list()
+		self.albums_list = list()
+		self.media_list_is_sorted = True
+		self.albums_list_is_sorted = True
 	@property
 	def media(self):
-		return self._media
+		return self.media_list
 	@property
 	def albums(self):
-		return self._albums
+		return self.albums_list
 	@property
 	def path(self):
 		return self._path
@@ -48,38 +48,38 @@ class Album(object):
 	@property
 	def date(self):
 		self._sort()
-		if len(self._media) == 0 and len(self._albums) == 0:
+		if len(self.media_list) == 0 and len(self.albums_list) == 0:
 			return datetime(1900, 1, 1)
-		elif len(self._media) == 0:
-			return self._albums[-1].date
-		elif len(self._albums) == 0:
-			return self._media[-1].date
-		return max(self._media[-1].date, self._albums[-1].date)
+		elif len(self.media_list) == 0:
+			return self.albums_list[-1].date
+		elif len(self.albums_list) == 0:
+			return self.media_list[-1].date
+		return max(self.media_list[-1].date, self.albums_list[-1].date)
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
 		except TypeError:
 			return 1
 	def add_media(self, media):
-		self._media.append(media)
-		self._media_sorted = False
+		self.media_list.append(media)
+		self.media_list_is_sorted = False
 	def add_album(self, album):
-		self._albums.append(album)
-		self._albums_sorted = False
+		self.albums_list.append(album)
+		self.albums_list_is_sorted = False
 	def _sort(self):
-		if not self._media_sorted:
-			self._media.sort()
-			self._media_sorted = True
-		if not self._albums_sorted:
-			self._albums.sort()
-			self._albums_sorted = True
+		if not self.media_list_is_sorted:
+			self.media_list.sort()
+			self.media_list_is_sorted = True
+		if not self.albums_list_is_sorted:
+			self.albums_list.sort()
+			self.albums_list_is_sorted = True
 	@property
 	def empty(self):
-		if len(self._media) != 0:
+		if len(self.media_list) != 0:
 			return False
-		if len(self._albums) == 0:
+		if len(self.albums_list) == 0:
 			return True
-		for album in self._albums:
+		for album in self.albums_list:
 			if not album.empty:
 				return False
 		return True
@@ -116,11 +116,11 @@ class Album(object):
 		self._sort()
 		subalbums = []
 		if cripple:
-			for sub in self._albums:
+			for sub in self.albums_list:
 				if not sub.empty:
 					subalbums.append({ "path": trim_base_custom(sub.path, self._path), "date": sub.date })
 		else:
-			for sub in self._albums:
+			for sub in self.albums_list:
 				if not sub.empty:
 					subalbums.append(sub)
 		path_without_marker = self.remove_marker(self.path)
@@ -129,7 +129,7 @@ class Album(object):
 				"path": self.path,
 				"date": self.date,
 				"albums": subalbums,
-				"media": self._media,
+				"media": self.media_list,
 				"cacheBase": cache_base(self.path)
 				}
 		else:
@@ -138,13 +138,13 @@ class Album(object):
 				"physicalPath": path_without_marker,
 				"date": self.date,
 				"albums": subalbums,
-				"media": self._media,
+				"media": self.media_list,
 				"cacheBase": cache_base(self.path)
 				}
 		
 		return dictionary
 	def media_from_path(self, path):
-		for media in self._media:
+		for media in self.media_list:
 			if trim_base(path) == media._path:
 				return media
 		return None
@@ -326,10 +326,10 @@ class Media(object):
 		else:
 			if (old_width > old_height):
 				canvas_width = canvas_max_size
-				canvas_height = int(float(canvas_width) / float(old_width) * float(old_height))
+				canvas_height = int(float(canvas_width) * float(old_height) / float(old_width))
 			else:
 				canvas_height = canvas_max_size
-				canvas_width = int(float(canvas_height) / float(old_height) * float(old_width))
+				canvas_width = int(float(canvas_height) * float(old_width) / float(old_height))
 		
 		# Center the image
 		x1 = int(math.floor((canvas_width - old_width) / 2))
@@ -556,13 +556,13 @@ class Media(object):
 			# don't start from a canvas for next thumbnail
 			self.last_thumbnail_was_canvas = True
 		try:
-			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reducing size", info_string)
 			elif original_thumb_size == Options.config['album_thumb_size']:
 				message("thumbing for albums", info_string)
 			else:
 				message("thumbing for media", info_string)
+			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			back_level()
 			return start_image_copy
 		except KeyboardInterrupt:
