@@ -784,9 +784,10 @@ $(document).ready(function() {
 		return ! lateralSocialButtons();
 	}
 	function scaleMedia() {
-		var media, container, containerBottom = 0, containerTop = 0, containerRatio, ratio, photoSrc, previousSrc;
+		var media, container, containerBottom = 0, containerTop = 0, containerRatio, photoSrc, previousSrc;
 		var containerHeight = $(window).innerHeight(), containerWidth = $(window).innerWidth(), mediaBarBottom = 0;
-		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1],ratio = width / height;
+		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1], ratio = width / height;
+		var isOriginal;
 		
 		$(window).off("resize");
 		
@@ -811,20 +812,19 @@ $(document).ready(function() {
 		media.off('loadstart').off("load");
 		
 		if (currentMedia.mediaType == "photo") {
-			photoSrc = chooseReducedPhoto(container);
+			[photoSrc, isOriginal] = chooseReducedPhoto(container);
 			previousSrc = media.attr("src");
-			if (! imageExists(photoSrc)) {
-				photoSrc = photoFloat.originalMediaPath(currentMedia);
-			} else {
+			//~ if (! imageExists(photoSrc)) {
+				//~ photoSrc = photoFloat.originalMediaPath(currentMedia);
+			//~ } else 
+			if (! isOriginal) {
 				// chooseReducedPhoto() sets maxSize to 0 if it returns the original media
-				if (maxSize) {
-					if (width > height) {
-						height = Math.round(height * maxSize / width);
-						width = maxSize;
-					} else {
-						width = Math.round(width * maxSize / height);
-						height = maxSize;
-					}
+				if (width > height) {
+					height = Math.round(height * maxSize / width);
+					width = maxSize;
+				} else {
+					width = Math.round(width * maxSize / height);
+					height = maxSize;
 				}
 			}
 			if (photoSrc != previousSrc || media.attr("width") != width || media.attr("height") != height) {
@@ -898,6 +898,8 @@ $(document).ready(function() {
 		var chosenMedia, reducedWidth, reducedHeight;
 		var mediaWidth = currentMedia.metadata.size[0], mediaHeight = currentMedia.metadata.size[1];
 		var mediaSize = Math.max(mediaWidth, mediaHeight);
+		var isOriginal = true;
+		
 		chosenMedia = PhotoFloat.originalMediaPath(currentMedia);
 		maxSize = 0;
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
@@ -917,10 +919,11 @@ $(document).ready(function() {
 			}
 			chosenMedia = photoFloat.mediaPath(currentAlbum, currentMedia, Options.reduced_sizes[i]);
 			maxSize = Options.reduced_sizes[i];
+			isOriginal = false;
 			if (container === null)
 				break;
 		}
-		return chosenMedia;
+		return [chosenMedia, isOriginal];
 	}
 	function chooseThumbnail(album, media, thumbnailSize, calculatedThumbnailSize) {
 		var chosenMedia = PhotoFloat.originalMediaPath(media);
@@ -941,17 +944,18 @@ $(document).ready(function() {
 		return [chosenMedia, isOriginal];
 	}
 	
-	function imageExists(imageUrl){
-		var http = new XMLHttpRequest();
-		http.open('HEAD', imageUrl, false);
-		http.send();
-		return http.status != 404;
-	}
+	//~ function imageExists(imageUrl){
+		//~ var http = new XMLHttpRequest();
+		//~ http.open('HEAD', imageUrl, false);
+		//~ http.send();
+		//~ return http.status != 404;
+	//~ }
 	
 	function showMedia(album) {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
 		var previousMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
-		var windowWidth = $(window).width(), windowHeight = $(window).height();
+		//~ var windowWidth = $(window).width(), windowHeight = $(window).height();
+		var isOriginal;
 		
 		thumbnailSize = Options.media_thumb_size;
 		$("#media-box").show();
@@ -1029,8 +1033,9 @@ $(document).ready(function() {
 				triggerLoad = 'loadstart';
 				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
 			} else if (currentMedia.mediaType == "photo") {
-				photoSrc = chooseReducedPhoto(null);
-				if (maxSize && imageExists(photoSrc)) {
+				[photoSrc, isOriginal] = chooseReducedPhoto(null);
+				//~ if (maxSize && imageExists(photoSrc)) {
+				if (! isOriginal) {
 					if (width > height) {
 						height = Math.round(height * maxSize / width);
 						width = maxSize;
@@ -1038,8 +1043,8 @@ $(document).ready(function() {
 						width = Math.round(width * maxSize / height);
 						height = maxSize;
 					}
-				} else {
-					photoSrc = photoFloat.originalMediaPath(currentMedia);
+				//~ } else {
+					//~ photoSrc = photoFloat.originalMediaPath(currentMedia);
 				}
 				$('<img/>', { id: 'media' })
 					.appendTo('#media-box-inner')
