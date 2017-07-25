@@ -486,7 +486,6 @@ class Media(object):
 		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumb_size, thumb_type))
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
-		next_level()
 		if thumb_type == "square": 
 			info_string += ", square"
 		if thumb_size == Options.config['album_thumb_size'] and thumb_type == "fit":
@@ -494,31 +493,7 @@ class Media(object):
 		elif thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height":
 			info_string += ", fixed height"
 		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
-		if (
-			os.path.exists(thumb_path) and
-			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
-				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
-				is_thumbnail and not Options.config['recreate_thumbnails']
-			)
-		):
-			if original_thumb_size == Options.config['album_thumb_size']:
-				message("existing album thumbnail", info_string)
-			elif original_thumb_size == Options.config['media_thumb_size']:
-				message("existing thumbnail", info_string)
-			else:
-				message("existing reduced size", info_string)
-			back_level()
-			return start_image
-		gc.collect()
-		try:
-			start_image_copy = start_image.copy()
-		except KeyboardInterrupt:
-			raise
-		except:
-			try:
-				start_image_copy = start_image.copy() # we try again to work around PIL bug
-			except KeyboardInterrupt:
-				raise
+		
 		start_image_width = start_image.size[0]
 		start_image_height = start_image.size[1]
 		if thumb_type == "square":
@@ -532,66 +507,114 @@ class Media(object):
 				top = (start_image_height - start_image_width) / 2
 				right = start_image_width
 				bottom = start_image_height - top
-			start_image_copy = start_image_copy.crop((left, top, right, bottom))
-			gc.collect()
+			must_crop = True
 			thumbnail_width = thumb_size
 			thumbnail_height = thumb_size
 		else:
+			must_crop = False
 			if start_image_width > start_image_height:
 				thumbnail_width = thumb_size
-				thumbnail_height = round(thumb_size * start_image_height / float(start_image_width))
+				thumbnail_height = int(round(thumb_size * start_image_height / float(start_image_width)))
 			else:
-				thumbnail_width = round(thumb_size * start_image_width / float(start_image_height))
+				thumbnail_width = int(round(thumb_size * start_image_width / float(start_image_height)))
 				thumbnail_height = thumb_size
 		if (
 			original_thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height" and
 			start_image_width > start_image_height
 		):
-			thumb_size = round(original_thumb_size * start_image_width / float(start_image_height))
-			thumbnail_width = round(thumb_size * start_image_width / float(start_image_height))
+			thumb_size = int(round(original_thumb_size * start_image_width / float(start_image_height)))
+			thumbnail_width = int(round(thumb_size * start_image_width / float(start_image_height)))
 			thumbnail_height = thumb_size
-		if (start_image_width >= thumbnail_width and start_image_height > thumbnail_height):
-			# both width and height of thumbnail are less then width and height of start_image, no blurring can happen
-			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
-			self.last_thumbnail_was_canvas = False
-		elif not is_thumbnail:
-			# we arrive here when at least one size the start image is less than the corresponding thumbnail size => make the canvas
-			start_image_copy = self.resize_canvas(start_image_copy, thumb_size, Options.config['background_color'], False)
-			# don't start from a canvas for next thumbnail
-			self.last_thumbnail_was_canvas = True
-		try:
-			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reducing size", info_string)
-			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums", info_string)
-			else:
-				message("thumbing for media", info_string)
-			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			back_level()
-			return start_image_copy
-		except KeyboardInterrupt:
-			try:
-				os.unlink(thumb_path)
-			except:
-				pass
-			raise
-		except IOError:
-			start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			next_level(1)
-			message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 1)
-			back_level(1)
-			back_level()
-			return start_image_copy
-		except:
+		
+		if (start_image_width <= thumbnail_width and start_image_height <= thumbnail_height):
+			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
+			# do not to produce canvas; anyway they render very badly with gif's,
+			# simply don't make the thumbnail, and delete it if it exists
+			# js will see that the thumbnail doesn't exist and use the original image
 			next_level()
-			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns start image")
-			back_level()
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("no reduced size, image is smaller", info_string)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("no thumbnail for albums, image is smaller", info_string)
+			else:
+				message("no thumbnail for media, image is smaller", info_string)
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
 			back_level()
 			return start_image
+		else:
+			if (
+				os.path.exists(thumb_path) and
+				file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
+					not is_thumbnail and not Options.config['recreate_reduced_photos'] or
+					is_thumbnail and not Options.config['recreate_thumbnails']
+				)
+			):
+				next_level()
+				if original_thumb_size == Options.config['album_thumb_size']:
+					message("existing album thumbnail", info_string)
+				elif original_thumb_size == Options.config['media_thumb_size']:
+					message("existing thumbnail", info_string)
+				else:
+					message("existing reduced size", info_string)
+				back_level()
+				return start_image
+			gc.collect()
+			try:
+				start_image_copy = start_image.copy()
+			except KeyboardInterrupt:
+				raise
+			except:
+				try:
+					start_image_copy = start_image.copy() # we try again to work around PIL bug
+				except KeyboardInterrupt:
+					raise
+			
+			# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
+			# we can resize, but first crop to square if needed
+			if must_crop:
+				start_image_copy = start_image_copy.crop((left, top, right, bottom))
+			gc.collect()
+			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+			#~ self.last_thumbnail_was_canvas = False
+			
+			try:
+				next_level()
+				if original_thumb_size > Options.config['album_thumb_size']:
+					message("reducing size", info_string)
+				elif original_thumb_size == Options.config['album_thumb_size']:
+					message("thumbing for albums", info_string)
+				else:
+					message("thumbing for media", info_string)
+				start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				back_level()
+				return start_image_copy
+			except KeyboardInterrupt:
+				try:
+					os.unlink(thumb_path)
+				except:
+					pass
+				raise
+			except IOError:
+				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				next_level()
+				message(str(thumb_size) + " thumbnail", "OK (bug workaround)", )
+				back_level()
+				back_level()
+				return start_image_copy
+			except:
+				next_level()
+				message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns start image")
+				back_level()
+				try:
+					os.unlink(thumb_path)
+				except:
+					pass
+				back_level()
+				return start_image
+	
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(

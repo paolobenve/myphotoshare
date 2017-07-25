@@ -802,15 +802,19 @@ $(document).ready(function() {
 		ratio = width / height;
 		if (currentMedia.mediaType == "photo") {
 			photoSrc = chooseReducedPhotoForScaling(container);
-			// chooseReducedPhotoForScaling() sets maxSize to 0 if it returns the original media
 			previousSrc = media.attr("src");
-			if (maxSize) {
-				if (width > height) {
-					height = Math.round(height * maxSize / width);
-					width = maxSize;
-				} else {
-					width = Math.round(width * maxSize / height);
-					height = maxSize;
+			if (! imageExists(photoSrc)) {
+				photoSrc = photoFloat.originalMediaPath(currentMedia);
+			} else {
+				// chooseReducedPhotoForScaling() sets maxSize to 0 if it returns the original media
+				if (maxSize) {
+					if (width > height) {
+						height = Math.round(height * maxSize / width);
+						width = maxSize;
+					} else {
+						width = Math.round(width * maxSize / height);
+						height = maxSize;
+					}
 				}
 			}
 			if (photoSrc != previousSrc) {
@@ -882,10 +886,14 @@ $(document).ready(function() {
 	}
 	function chooseReducedPhotoForScaling(container) {
 		var chosenMedia, reducedWidth, reducedHeight;
+		var mediaWidth = currentMedia.metadata.size[0], mediaHeight = currentMedia.metadata.size[1];
+		var mediaSize = Math.max(mediaWidth, mediaHeight);
 		chosenMedia = PhotoFloat.originalMediaPath(currentMedia);
 		maxSize = 0;
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
-			if (currentMedia.metadata.size[0] > currentMedia.metadata.size[1]) {
+			if (Options.reduced_sizes[i] > mediaSize)
+				continue;
+			if (mediaWidth > mediaHeight) {
 				reducedWidth = Options.reduced_sizes[i];
 				reducedHeight = Options.reduced_sizes[i] * currentMedia.metadata.size[1] / currentMedia.metadata.size[0];
 			} else {
@@ -899,6 +907,13 @@ $(document).ready(function() {
 			maxSize = Options.reduced_sizes[i];
 		}
 		return chosenMedia;
+	}
+	
+	function imageExists(imageUrl){
+		var http = new XMLHttpRequest();
+		http.open('HEAD', imageUrl, false);
+		http.send();
+		return http.status != 404;
 	}
 	
 	function showMedia(album) {
@@ -986,15 +1001,25 @@ $(document).ready(function() {
 				triggerLoad = 'loadstart';
 				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
 			} else if (currentMedia.mediaType == "photo") {
-				maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
-				if (width > height) {
-					height = Math.round(height * maxSize / width);
-					width = maxSize;
+				photoSrc = photoFloat.mediaPath(
+						currentAlbum,
+						currentMedia,
+						Options.reduced_sizes[Options.reduced_sizes.length - 1]
+				);
+				if (imageExists(photoSrc)) {
+					maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
+					if (width > height) {
+						height = Math.round(height * maxSize / width);
+						width = maxSize;
+					} else {
+						width = Math.round(width * maxSize / height);
+						height = maxSize;
+					}
 				} else {
-					width = Math.round(width * maxSize / height);
-					height = maxSize;
+					photoSrc = photoFloat.originalMediaPath(currentMedia);
+					width = currentMedia.metadata.size[0];
+					height = currentMedia.metadata.size[1];
 				}
-				photoSrc = photoFloat.mediaPath(currentAlbum, currentMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]);
 				$('<img/>', { id: 'media' })
 					.appendTo('#media-box-inner')
 					.hide()
