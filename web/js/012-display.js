@@ -503,8 +503,8 @@ $(document).ready(function() {
 			$("html, body").stop().animate({ scrollTop: thumb.offset().top - $(window).height() / 2 + thumb.height() }, "slow");
 		
 		if (currentMedia !== null) {
-			$("#thumbs img").removeClass("current-thumb");
-			thumb.addClass("current-thumb");
+			$(".thumb-container").removeClass("current-thumb");
+			thumb.parent().addClass("current-thumb");
 		}
 	}
 	
@@ -519,7 +519,7 @@ $(document).ready(function() {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, bydateStringWithTrailingSeparator, populateMedia;
 		var albumViewWidth, calculatedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, isOriginal;
+		var mediaWidth, mediaHeight, choosen, isOriginal;
 		
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
@@ -535,7 +535,9 @@ $(document).ready(function() {
 				for (i = 0; i < currentAlbum.media.length; ++i) {
 					width = currentAlbum.media[i].metadata.size[0];
 					height = currentAlbum.media[i].metadata.size[1];
-					[thumbHash, isOriginal] = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize, thumbnailSize);
+					choosen = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize, thumbnailSize);
+					thumbHash = choosen[0];
+					isOriginal = choosen[1];
 					bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 					if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 						currentAlbum.media[i].completeName =
@@ -557,11 +559,11 @@ $(document).ready(function() {
 						} else {
 							thumbHeight = thumbnailSize;
 							thumbWidth = thumbnailSize;
-							calculatedWidth = Options.media_thumb_size.toString().toString();
+							calculatedWidth = Options.media_thumb_size;
 						}
 					}
 					imageString = "<div class=\"thumb-container\" ";
-					imageString += "style=\"width: " + calculatedWidth + "px;\">";
+					imageString += "style=\"width: " + calculatedWidth + "px; height: " + Options.media_thumb_size + "px;\">";
 					imageString += 		"<span class=\"helper\"></span>";
 					imageString += 		"<img title=\"" + currentAlbum.media[i].name +
 								"\" alt=\"" + photoFloat.trimExtension(currentAlbum.media[i].name) +
@@ -637,10 +639,12 @@ $(document).ready(function() {
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum) {
 								var distance = 0;
-								var htmlText, isOriginal;
+								var htmlText, isOriginal, mediaSrc;
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, buttonAndCaptionHeight, html;
 								
-								[mediaSrc, isOriginal] = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, calculatedAlbumThumbSize);
+								choosen = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, calculatedAlbumThumbSize);
+								mediaSrc = choosen[0];
+								isOriginal = choosen[1];
 								if (isOriginal) {
 									thumbWidth = randomMedia.metadata.size[0];
 									thumbHeight = randomMedia.metadata.size[1];
@@ -658,7 +662,6 @@ $(document).ready(function() {
 										distance = (calculatedAlbumThumbSize - thumbHeight) / 2;
 									}
 								}
-								//~ mediaSrc = photoFloat.mediaPath(randomAlbum, randomMedia, Options.album_thumb_size);
 								htmlText = "<span class=\"helper\"></span>" +
 										"<img " +
 											"title=\"" + randomMedia.albumName + "\"" +
@@ -738,7 +741,7 @@ $(document).ready(function() {
 		}
 		
 		if (currentMedia === null) {
-			$("#thumbs img").removeClass("current-thumb");
+			$(".thumb-container").removeClass("current-thumb");
 			$("#album-view").removeClass("media-view-container");
 			$("#subalbums").show();
 			$("#media-view").hide();
@@ -787,7 +790,7 @@ $(document).ready(function() {
 		var media, container, containerBottom = 0, containerTop = 0, containerRatio, photoSrc, previousSrc;
 		var containerHeight = $(window).innerHeight(), containerWidth = $(window).innerWidth(), mediaBarBottom = 0;
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1], ratio = width / height;
-		var isOriginal;
+		var choosen, isOriginal;
 		
 		$(window).off("resize");
 		
@@ -812,7 +815,9 @@ $(document).ready(function() {
 		media.off('loadstart').off("load");
 		
 		if (currentMedia.mediaType == "photo") {
-			[photoSrc, isOriginal] = chooseReducedPhoto(container);
+			choosen = chooseReducedPhoto(currentMedia, container);
+			photoSrc = choosen[0];
+			isOriginal = choosen[1];
 			previousSrc = media.attr("src");
 			//~ if (! imageExists(photoSrc)) {
 				//~ photoSrc = photoFloat.originalMediaPath(currentMedia);
@@ -882,7 +887,8 @@ $(document).ready(function() {
 			}
 		}
 		
-		$("#media-bar").css("bottom", mediaBarBottom + "px");
+		//~ $("#media-bar").css("bottom", mediaBarBottom + "px");
+		$("#media-bar").css("bottom", 0);
 		
 		media.show();
 		
@@ -894,14 +900,24 @@ $(document).ready(function() {
 		
 		$(window).bind("resize", scaleMedia);
 	}
-	function chooseReducedPhoto(container) {
+	function chooseReducedPhoto(media, container) {
 		var chosenMedia, reducedWidth, reducedHeight;
-		var mediaWidth = currentMedia.metadata.size[0], mediaHeight = currentMedia.metadata.size[1];
+		var mediaWidth = media.metadata.size[0], mediaHeight = media.metadata.size[1];
 		var mediaSize = Math.max(mediaWidth, mediaHeight);
 		var isOriginal = true;
 		
-		chosenMedia = PhotoFloat.originalMediaPath(currentMedia);
+		chosenMedia = PhotoFloat.originalMediaPath(media);
 		maxSize = 0;
+		
+		if (container == null) {
+			// try with what is more probable to be the container
+			if (fullScreenStatus)
+				container = $(window);
+			else {
+				container = $("#media-view");
+			}
+		}
+		
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
 			if (Options.reduced_sizes[i] > mediaSize)
 				continue;
@@ -917,7 +933,7 @@ $(document).ready(function() {
 				if (reducedWidth < container.width() && reducedHeight < container.height())
 					break;
 			}
-			chosenMedia = photoFloat.mediaPath(currentAlbum, currentMedia, Options.reduced_sizes[i]);
+			chosenMedia = photoFloat.mediaPath(currentAlbum, media, Options.reduced_sizes[i]);
 			maxSize = Options.reduced_sizes[i];
 			isOriginal = false;
 			if (container === null)
@@ -925,6 +941,7 @@ $(document).ready(function() {
 		}
 		return [chosenMedia, isOriginal];
 	}
+	
 	function chooseThumbnail(album, media, thumbnailSize, calculatedThumbnailSize) {
 		var chosenMedia = PhotoFloat.originalMediaPath(media);
 		var mediaWidth = media.metadata.size[0], mediaHeight = media.metadata.size[1];
@@ -953,16 +970,16 @@ $(document).ready(function() {
 	
 	function showMedia(album) {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
-		var previousMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
+		var prevMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
 		//~ var windowWidth = $(window).width(), windowHeight = $(window).height();
-		var isOriginal;
+		var choosen, isOriginal, nextReducedPhoto, prevReducedPhoto;
 		
 		thumbnailSize = Options.media_thumb_size;
 		$("#media-box").show();
 		if (currentAlbum.media.length == 1) {
 			$("#next").hide();
 			$("#prev").hide();
-			$(".next-media").removeAttr("href");
+			$("#next-media").removeAttr("href");
 			$("#next").removeAttr("href");
 			$("#prev").removeAttr("href");
 			$("#media-view").addClass("no-bottom-space");
@@ -1033,7 +1050,9 @@ $(document).ready(function() {
 				triggerLoad = 'loadstart';
 				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
 			} else if (currentMedia.mediaType == "photo") {
-				[photoSrc, isOriginal] = chooseReducedPhoto(null);
+				choosen = chooseReducedPhoto(currentMedia, null);
+				photoSrc = choosen[0];
+				isOriginal = choosen[1];
 				//~ if (maxSize && imageExists(photoSrc)) {
 				if (! isOriginal) {
 					if (width > height) {
@@ -1079,9 +1098,9 @@ $(document).ready(function() {
 						i = currentAlbum.media.length - 1;
 					else
 						i --;
-					previousMedia = currentAlbum.media[i];
-					previousMedia.byDateName = previousMedia.dayAlbum + '/' + previousMedia.name;
-				} while (previousMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
+					prevMedia = currentAlbum.media[i];
+					prevMedia.byDateName = prevMedia.dayAlbum + '/' + prevMedia.name;
+				} while (prevMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
 				i = currentMediaIndex;
 				do {
@@ -1093,12 +1112,20 @@ $(document).ready(function() {
 					nextMedia.byDateName = nextMedia.dayAlbum + '/' + nextMedia.name;
 				} while (nextMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
-				$.preloadImages(photoFloat.mediaPath(currentAlbum, nextMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]));
-				$.preloadImages(photoFloat.mediaPath(currentAlbum, previousMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]));
+				if (nextMedia.mediaType == "photo") {
+					choosen = chooseReducedPhoto(nextMedia, null);
+					nextReducedPhoto = choosen[0];
+					$.preloadImages(nextReducedPhoto);
+				}
+				if (prevMedia.mediaType == "photo") {
+					choosen = chooseReducedPhoto(prevMedia, null);
+					prevReducedPhoto = choosen[0];
+					$.preloadImages(prevReducedPhoto);
+				}
 			}
 		}
 		
-		$(".next-media").off("click");
+		$("#next-media").off("click");
 		$('#next').off("click");
 		$('#prev').off("click");
 		if (currentAlbum.media.length == 1) {
@@ -1106,10 +1133,10 @@ $(document).ready(function() {
 			prevLink = "";
 		} else {
 			nextLink = "#!/" + photoFloat.mediaHash(currentAlbum, nextMedia);
-			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, previousMedia);
+			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, prevMedia);
 			$("#next").show();
 			$("#prev").show();
-			$(".next-media").click(function(){ swipeLeft(nextLink); return false; });
+			$("#next-media").click(function(){ swipeLeft(nextLink); return false; });
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
 			$('#prev').click(function(){ swipeRight(prevLink); return false; });
 		}

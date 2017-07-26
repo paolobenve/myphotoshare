@@ -68,7 +68,7 @@ a.title-anchor.mobile {
 	border: 0;
 }
 
-#thumbs img.current-thumb {
+.thumb-container.current-thumb {
 	border-top: 6px solid #FFAD27 !important;
 	margin-top: 0;
 }

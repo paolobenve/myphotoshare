@@ -165,7 +165,7 @@
 	</div>
 	<div id="media-view">
 		<div id="media-box">
-			<a class="next-media">
+			<a id="next-media">
 				<div id="media-box-inner" ></div>
 			</a>
 			<div id="media-bar">
