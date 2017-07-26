@@ -521,6 +521,7 @@ $(document).ready(function() {
 		var albumViewWidth, calculatedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, choosen, isOriginal;
 		
+		
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
@@ -791,8 +792,6 @@ $(document).ready(function() {
 		var containerHeight = $(window).innerHeight(), containerWidth = $(window).innerWidth(), mediaBarBottom = 0;
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1], ratio = width / height;
 		var choosen, isOriginal;
-		
-		$(window).off("resize");
 		
 		if (fullScreenStatus)
 			container = $(window);
@@ -1266,6 +1265,9 @@ $(document).ready(function() {
 		var populateAlbum;
 		undie();
 		$("#loading").hide();
+		
+		$(window).off("resize");
+		
 		if (album === currentAlbum && media === currentMedia)
 			return;
 		if (album != currentAlbum)
