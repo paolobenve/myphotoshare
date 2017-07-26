@@ -26,20 +26,20 @@ def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb
 
 class Album(object):
 	def __init__(self, path):
-		self._path = trim_base(path)
-		self._media = list()
-		self._albums = list()
-		self._media_sorted = True
-		self._albums_sorted = True
+		self.baseless_path = trim_base(path)
+		self.media_list = list()
+		self.albums_list = list()
+		self.media_list_is_sorted = True
+		self.albums_list_is_sorted = True
 	@property
 	def media(self):
-		return self._media
+		return self.media_list
 	@property
 	def albums(self):
-		return self._albums
+		return self.albums_list
 	@property
 	def path(self):
-		return self._path
+		return self.baseless_path
 	def __str__(self):
 		return self.path
 	@property
@@ -48,38 +48,38 @@ class Album(object):
 	@property
 	def date(self):
 		self._sort()
-		if len(self._media) == 0 and len(self._albums) == 0:
+		if len(self.media_list) == 0 and len(self.albums_list) == 0:
 			return datetime(1900, 1, 1)
-		elif len(self._media) == 0:
-			return self._albums[-1].date
-		elif len(self._albums) == 0:
-			return self._media[-1].date
-		return max(self._media[-1].date, self._albums[-1].date)
+		elif len(self.media_list) == 0:
+			return self.albums_list[-1].date
+		elif len(self.albums_list) == 0:
+			return self.media_list[-1].date
+		return max(self.media_list[-1].date, self.albums_list[-1].date)
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
 		except TypeError:
 			return 1
 	def add_media(self, media):
-		self._media.append(media)
-		self._media_sorted = False
+		self.media_list.append(media)
+		self.media_list_is_sorted = False
 	def add_album(self, album):
-		self._albums.append(album)
-		self._albums_sorted = False
+		self.albums_list.append(album)
+		self.albums_list_is_sorted = False
 	def _sort(self):
-		if not self._media_sorted:
-			self._media.sort()
-			self._media_sorted = True
-		if not self._albums_sorted:
-			self._albums.sort()
-			self._albums_sorted = True
+		if not self.media_list_is_sorted:
+			self.media_list.sort()
+			self.media_list_is_sorted = True
+		if not self.albums_list_is_sorted:
+			self.albums_list.sort()
+			self.albums_list_is_sorted = True
 	@property
 	def empty(self):
-		if len(self._media) != 0:
+		if len(self.media_list) != 0:
 			return False
-		if len(self._albums) == 0:
+		if len(self.albums_list) == 0:
 			return True
-		for album in self._albums:
+		for album in self.albums_list:
 			if not album.empty:
 				return False
 		return True
@@ -97,7 +97,10 @@ class Album(object):
 		return Album.from_dict(dictionary)
 	@staticmethod
 	def from_dict(dictionary, cripple=True):
-		album = Album(dictionary["path"])
+		if "physicalPath" in dictionary:
+			album = Album(dictionary["physicalPath"])
+		else:
+			album = Album(dictionary["path"])
 		for media in dictionary["media"]:
 			album.add_media(Media.from_dict(media, untrim_base(album.path)))
 		if not cripple:
@@ -116,11 +119,11 @@ class Album(object):
 		self._sort()
 		subalbums = []
 		if cripple:
-			for sub in self._albums:
+			for sub in self.albums_list:
 				if not sub.empty:
-					subalbums.append({ "path": trim_base_custom(sub.path, self._path), "date": sub.date })
+					subalbums.append({ "path": trim_base_custom(sub.path, self.baseless_path), "date": sub.date })
 		else:
-			for sub in self._albums:
+			for sub in self.albums_list:
 				if not sub.empty:
 					subalbums.append(sub)
 		path_without_marker = self.remove_marker(self.path)
@@ -129,7 +132,7 @@ class Album(object):
 				"path": self.path,
 				"date": self.date,
 				"albums": subalbums,
-				"media": self._media,
+				"media": self.media_list,
 				"cacheBase": cache_base(self.path)
 				}
 		else:
@@ -138,14 +141,14 @@ class Album(object):
 				"physicalPath": path_without_marker,
 				"date": self.date,
 				"albums": subalbums,
-				"media": self._media,
+				"media": self.media_list,
 				"cacheBase": cache_base(self.path)
 				}
 		
 		return dictionary
 	def media_from_path(self, path):
-		for media in self._media:
-			if trim_base(path) == media._path:
+		for media in self.media_list:
+			if trim_base(path) == media.media_file_name:
 				return media
 		return None
 
@@ -168,6 +171,7 @@ class Media(object):
 			self._attributes = attributes
 			return
 		self._attributes = {}
+		self._attributes["metadata"] = {}
 		self._attributes["dateTimeFile"] = mtime
 		self._attributes["mediaType"] = "photo"
 		
@@ -192,7 +196,7 @@ class Media(object):
 			return
 		
 	def _photo_metadata(self, image):
-		self._attributes["size"] = image.size
+		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
 		try:
 			info = image._getexif()
@@ -222,71 +226,71 @@ class Media(object):
 		if "Orientation" in exif:
 			self._orientation = exif["Orientation"];
 			if self._orientation in range(5, 9):
-				self._attributes["size"] = (self._attributes["size"][1], self._attributes["size"][0])
+				self._attributes["metadata"]["size"] = (self._attributes["metadata"]["size"][1], self._attributes["metadata"]["size"][0])
 			if self._orientation - 1 < len(self._photo_metadata.orientation_list):
-				self._attributes["orientation"] = self._photo_metadata.orientation_list[self._orientation - 1]
+				self._attributes["metadata"]["orientation"] = self._photo_metadata.orientation_list[self._orientation - 1]
 		if "Make" in exif:
-			self._attributes["make"] = exif["Make"]
+			self._attributes["metadata"]["make"] = exif["Make"]
 		if "Model" in exif:
-			self._attributes["model"] = exif["Model"]
+			self._attributes["metadata"]["model"] = exif["Model"]
 		if "ApertureValue" in exif:
-			self._attributes["aperture"] = exif["ApertureValue"]
+			self._attributes["metadata"]["aperture"] = exif["ApertureValue"]
 		elif "FNumber" in exif:
-			self._attributes["aperture"] = exif["FNumber"]
+			self._attributes["metadata"]["aperture"] = exif["FNumber"]
 		if "FocalLength" in exif:
-			self._attributes["focalLength"] = exif["FocalLength"]
+			self._attributes["metadata"]["focalLength"] = exif["FocalLength"]
 		if "ISOSpeedRatings" in exif:
-			self._attributes["iso"] = exif["ISOSpeedRatings"]
+			self._attributes["metadata"]["iso"] = exif["ISOSpeedRatings"]
 		if "ISO" in exif:
-			self._attributes["iso"] = exif["ISO"]
+			self._attributes["metadata"]["iso"] = exif["ISO"]
 		if "PhotographicSensitivity" in exif:
-			self._attributes["iso"] = exif["PhotographicSensitivity"]
+			self._attributes["metadata"]["iso"] = exif["PhotographicSensitivity"]
 		if "ExposureTime" in exif:
-			self._attributes["exposureTime"] = exif["ExposureTime"]
+			self._attributes["metadata"]["exposureTime"] = exif["ExposureTime"]
 		if "Flash" in exif and exif["Flash"] in self._photo_metadata.flash_dictionary:
 			try:
-				self._attributes["flash"] = self._photo_metadata.flash_dictionary[exif["Flash"]]
+				self._attributes["metadata"]["flash"] = self._photo_metadata.flash_dictionary[exif["Flash"]]
 			except KeyboardInterrupt:
 				raise
 			except:
 				pass
 		if "LightSource" in exif and exif["LightSource"] in self._photo_metadata.light_source_dictionary:
 			try:
-				self._attributes["lightSource"] = self._photo_metadata.light_source_dictionary[exif["LightSource"]]
+				self._attributes["metadata"]["lightSource"] = self._photo_metadata.light_source_dictionary[exif["LightSource"]]
 			except KeyboardInterrupt:
 				raise
 			except:
 				pass
 		if "ExposureProgram" in exif and exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
-			self._attributes["exposureProgram"] = self._photo_metadata.exposure_list[exif["ExposureProgram"]]
+			self._attributes["metadata"]["exposureProgram"] = self._photo_metadata.exposure_list[exif["ExposureProgram"]]
 		if "SpectralSensitivity" in exif:
-			self._attributes["spectralSensitivity"] = exif["SpectralSensitivity"]
+			self._attributes["metadata"]["spectralSensitivity"] = exif["SpectralSensitivity"]
 		if "MeteringMode" in exif and exif["MeteringMode"] < len(self._photo_metadata.metering_list):
-			self._attributes["meteringMode"] = self._photo_metadata.metering_list[exif["MeteringMode"]]
+			self._attributes["metadata"]["meteringMode"] = self._photo_metadata.metering_list[exif["MeteringMode"]]
 		if "SensingMethod" in exif and exif["SensingMethod"] < len(self._photo_metadata.sensing_method_list):
-			self._attributes["sensingMethod"] = self._photo_metadata.sensing_method_list[exif["SensingMethod"]]
+			self._attributes["metadata"]["sensingMethod"] = self._photo_metadata.sensing_method_list[exif["SensingMethod"]]
 		if "SceneCaptureType" in exif and exif["SceneCaptureType"] < len(self._photo_metadata.scene_capture_type_list):
-			self._attributes["sceneCaptureType"] = self._photo_metadata.scene_capture_type_list[exif["SceneCaptureType"]]
+			self._attributes["metadata"]["sceneCaptureType"] = self._photo_metadata.scene_capture_type_list[exif["SceneCaptureType"]]
 		if "SubjectDistanceRange" in exif and exif["SubjectDistanceRange"] < len(self._photo_metadata.subject_distance_range_list):
-			self._attributes["subjectDistanceRange"] = self._photo_metadata.subject_distance_range_list[exif["SubjectDistanceRange"]]
+			self._attributes["metadata"]["subjectDistanceRange"] = self._photo_metadata.subject_distance_range_list[exif["SubjectDistanceRange"]]
 		if "ExposureCompensation" in exif:
-			self._attributes["exposureCompensation"] = exif["ExposureCompensation"]
+			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureCompensation"]
 		if "ExposureBiasValue" in exif:
-			self._attributes["exposureCompensation"] = exif["ExposureBiasValue"]
+			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureBiasValue"]
 		if "DateTimeOriginal" in exif:
 			try:
-				self._attributes["dateTimeOriginal"] = datetime.strptime(exif["DateTimeOriginal"], '%Y:%m:%d %H:%M:%S')
+				self._attributes["metadata"]["dateTimeOriginal"] = datetime.strptime(exif["DateTimeOriginal"], '%Y:%m:%d %H:%M:%S')
 			except KeyboardInterrupt:
 				raise
 			except TypeError:
-				self._attributes["dateTimeOriginal"] = exif["DateTimeOriginal"]
+				self._attributes["metadata"]["dateTimeOriginal"] = exif["DateTimeOriginal"]
 		if "DateTime" in exif:
 			try:
-				self._attributes["dateTime"] = datetime.strptime(exif["DateTime"], '%Y:%m:%d %H:%M:%S')
+				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], '%Y:%m:%d %H:%M:%S')
 			except KeyboardInterrupt:
 				raise
 			except TypeError:
-				self._attributes["dateTime"] = exif["DateTime"]
+				self._attributes["metadata"]["dateTime"] = exif["DateTime"]
 
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
 	_photo_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
@@ -310,13 +314,13 @@ class Media(object):
 				message("debug: s[codec_type]", s['codec_type'], 1)
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
-				self._attributes["size"] = (int(s["width"]), int(s["height"]))
+				self._attributes["metadata"]["size"] = (int(s["width"]), int(s["height"]))
 				if "duration" in s:
-					self._attributes["duration"] = float(int(float(s["duration"]) * 10)) / 10
+					self._attributes["metadata"]["duration"] = float(int(float(s["duration"]) * 10)) / 10
 				if "tags" in s and "rotate" in s["tags"]:
-					self._attributes["rotate"] = s["tags"]["rotate"]
+					self._attributes["metadata"]["rotate"] = s["tags"]["rotate"]
 				if original:
-					self._attributes["originalSize"] = (int(s["width"]), int(s["height"]))
+					self._attributes["metadata"]["originalSize"] = (int(s["width"]), int(s["height"]))
 				break
 	def resize_canvas(self, image, canvas_max_size, background_color, square_thumbnail = True):
 		old_width, old_height = image.size
@@ -326,10 +330,10 @@ class Media(object):
 		else:
 			if (old_width > old_height):
 				canvas_width = canvas_max_size
-				canvas_height = int(float(canvas_width) / float(old_width) * float(old_height))
+				canvas_height = int(float(canvas_width) * float(old_height) / float(old_width))
 			else:
 				canvas_height = canvas_max_size
-				canvas_width = int(float(canvas_height) / float(old_height) * float(old_width))
+				canvas_width = int(float(canvas_height) * float(old_width) / float(old_height))
 		
 		# Center the image
 		x1 = int(math.floor((canvas_width - old_width) / 2))
@@ -482,7 +486,6 @@ class Media(object):
 		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumb_size, thumb_type))
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
-		next_level()
 		if thumb_type == "square": 
 			info_string += ", square"
 		if thumb_size == Options.config['album_thumb_size'] and thumb_type == "fit":
@@ -490,31 +493,7 @@ class Media(object):
 		elif thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height":
 			info_string += ", fixed height"
 		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
-		if (
-			os.path.exists(thumb_path) and
-			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
-				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
-				is_thumbnail and not Options.config['recreate_thumbnails']
-			)
-		):
-			if original_thumb_size == Options.config['album_thumb_size']:
-				message("existing album thumbnail", info_string)
-			elif original_thumb_size == Options.config['media_thumb_size']:
-				message("existing thumbnail", info_string)
-			else:
-				message("existing reduced size", info_string)
-			back_level()
-			return start_image
-		gc.collect()
-		try:
-			start_image_copy = start_image.copy()
-		except KeyboardInterrupt:
-			raise
-		except:
-			try:
-				start_image_copy = start_image.copy() # we try again to work around PIL bug
-			except KeyboardInterrupt:
-				raise
+		
 		start_image_width = start_image.size[0]
 		start_image_height = start_image.size[1]
 		if thumb_type == "square":
@@ -528,11 +507,11 @@ class Media(object):
 				top = (start_image_height - start_image_width) / 2
 				right = start_image_width
 				bottom = start_image_height - top
-			start_image_copy = start_image_copy.crop((left, top, right, bottom))
-			gc.collect()
+			must_crop = True
 			thumbnail_width = thumb_size
 			thumbnail_height = thumb_size
 		else:
+			must_crop = False
 			if start_image_width > start_image_height:
 				thumbnail_width = thumb_size
 				thumbnail_height = int(round(thumb_size * start_image_height / float(start_image_width)))
@@ -546,48 +525,96 @@ class Media(object):
 			thumb_size = int(round(original_thumb_size * start_image_width / float(start_image_height)))
 			thumbnail_width = int(round(thumb_size * start_image_width / float(start_image_height)))
 			thumbnail_height = thumb_size
-		if (start_image_width >= thumbnail_width and start_image_height > thumbnail_height):
-			# both width and height of thumbnail are less then width and height of start_image, no blurring can happen
-			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
-			self.last_thumbnail_was_canvas = False
-		elif not is_thumbnail:
-			# we arrive here when at least one size the start image is less than the corresponding thumbnail size => make the canvas
-			start_image_copy = self.resize_canvas(start_image_copy, thumb_size, Options.config['background_color'], False)
-			# don't start from a canvas for next thumbnail
-			self.last_thumbnail_was_canvas = True
-		try:
-			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reducing size", info_string)
-			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums", info_string)
-			else:
-				message("thumbing for media", info_string)
-			back_level()
-			return start_image_copy
-		except KeyboardInterrupt:
-			try:
-				os.unlink(thumb_path)
-			except:
-				pass
-			raise
-		except IOError:
-			start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			next_level(1)
-			message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 1)
-			back_level(1)
-			back_level()
-			return start_image_copy
-		except:
+		
+		if (start_image_width <= thumbnail_width and start_image_height <= thumbnail_height):
+			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
+			# do not to produce canvas; anyway they render very badly with gif's,
+			# simply don't make the thumbnail, and delete it if it exists
+			# js will see that the thumbnail doesn't exist and use the original image
 			next_level()
-			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns start image")
-			back_level()
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("no reduced size, image is smaller", info_string)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("no thumbnail for albums, image is smaller", info_string)
+			else:
+				message("no thumbnail for media, image is smaller", info_string)
 			try:
 				os.unlink(thumb_path)
 			except:
 				pass
 			back_level()
 			return start_image
+		else:
+			if (
+				os.path.exists(thumb_path) and
+				file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
+					not is_thumbnail and not Options.config['recreate_reduced_photos'] or
+					is_thumbnail and not Options.config['recreate_thumbnails']
+				)
+			):
+				next_level()
+				if original_thumb_size == Options.config['album_thumb_size']:
+					message("existing album thumbnail", info_string)
+				elif original_thumb_size == Options.config['media_thumb_size']:
+					message("existing thumbnail", info_string)
+				else:
+					message("existing reduced size", info_string)
+				back_level()
+				return start_image
+			gc.collect()
+			try:
+				start_image_copy = start_image.copy()
+			except KeyboardInterrupt:
+				raise
+			except:
+				try:
+					start_image_copy = start_image.copy() # we try again to work around PIL bug
+				except KeyboardInterrupt:
+					raise
+			
+			# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
+			# we can resize, but first crop to square if needed
+			if must_crop:
+				start_image_copy = start_image_copy.crop((left, top, right, bottom))
+			gc.collect()
+			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+			#~ self.last_thumbnail_was_canvas = False
+			
+			try:
+				next_level()
+				if original_thumb_size > Options.config['album_thumb_size']:
+					message("reducing size", info_string)
+				elif original_thumb_size == Options.config['album_thumb_size']:
+					message("thumbing for albums", info_string)
+				else:
+					message("thumbing for media", info_string)
+				start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				back_level()
+				return start_image_copy
+			except KeyboardInterrupt:
+				try:
+					os.unlink(thumb_path)
+				except:
+					pass
+				raise
+			except IOError:
+				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				next_level()
+				message(str(thumb_size) + " thumbnail", "OK (bug workaround)", )
+				back_level()
+				back_level()
+				return start_image_copy
+			except:
+				next_level()
+				message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns start image")
+				back_level()
+				try:
+					os.unlink(thumb_path)
+				except:
+					pass
+				back_level()
+				return start_image
+	
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(
@@ -630,11 +657,11 @@ class Media(object):
 			return
 		mirror = image
 		if "rotate" in self._attributes:
-			if self._attributes["rotate"] == "90":
+			if self._attributes["metadata"]["rotate"] == "90":
 				mirror = image.transpose(Image.ROTATE_270)
-			elif self._attributes["rotate"] == "180":
+			elif self._attributes["metadata"]["rotate"] == "180":
 				mirror = image.transpose(Image.ROTATE_180)
-			elif self._attributes["rotate"] == "270":
+			elif self._attributes["metadata"]["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
 		self._thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
@@ -688,15 +715,15 @@ class Media(object):
 		next_level()
 		message("transcoding", info_string)
 		back_level()
-		if "originalSize" in self._attributes and self._attributes["originalSize"][1] > 720:
+		if "originalSize" in self._attributes["metadata"] and self._attributes["metadata"]["originalSize"][1] > 720:
 			transcode_cmd.append('-s')
 			transcode_cmd.append('hd720')
-		if "rotate" in self._attributes:
-			if self._attributes["rotate"] == "90":
+		if "rotate" in self._attributes["metadata"]:
+			if self._attributes["metadata"]["rotate"] == "90":
 				filters.append('transpose=1')
-			elif self._attributes["rotate"] == "180":
+			elif self._attributes["metadata"]["rotate"] == "180":
 				filters.append('vflip,hflip')
-			elif self._attributes["rotate"] == "270":
+			elif self._attributes["metadata"]["rotate"] == "270":
 				filters.append('transpose=2')
 		if len(filters):
 			transcode_cmd.append('-vf')
@@ -755,10 +782,10 @@ class Media(object):
 		correct_date = None;
 		if not self.is_valid:
 			correct_date = datetime(1900, 1, 1)
-		if "dateTimeOriginal" in self._attributes:
-			correct_date = self._attributes["dateTimeOriginal"]
+		if "dateTimeOriginal" in self._attributes["metadata"]:
+			correct_date = self._attributes["metadata"]["dateTimeOriginal"]
 		elif "dateTime" in self._attributes:
-			correct_date = self._attributes["dateTime"]
+			correct_date = self._attributes["metadata"]["dateTime"]
 		else:
 			correct_date = self._attributes["dateTimeFile"]
 		return correct_date
@@ -805,11 +832,11 @@ class Media(object):
 		for key, value in dictionary.items():
 			if key.startswith("dateTime"):
 				try:
-					dictionary[key] = datetime.strptime(dictionary[key], "%c")
+					dictionary[key] = datetime.strptime(dictionary[key], "%Y-%m-%d %H:%M:%S")
 				except KeyboardInterrupt:
 					raise
-				except:
-					pass
+				#~ except:
+					#~ pass
 		return Media(path, None, dictionary)
 	def to_dict(self):
 		foldersAlbum = Options.config['folders_string']
@@ -824,15 +851,20 @@ class Media(object):
 				"foldersAlbum": foldersAlbum,
 				"date": self.date,
 				"cacheSubdir": cache_subdir(self.media_file_name),
-				"cacheBase": cache_base(self.name)
+				"cacheBase": cache_base(self.name),
+				"mediaType": self._attributes["mediaType"]
 			}
-		media.update({"metadata": self.attributes})
+		media.update({"metadata": self.attributes["metadata"]})
+		#~ media.update(self.attributes)
 		return media
 
 class PhotoAlbumEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, datetime):
-			return obj.strftime("%c")
+			# following is Jason's line
+			#return obj.strftime("%a %b %d %H:%M:%S %Y")
+			return obj.strftime("%Y-%m-%d %H:%M:%S")
+			#~ return obj.strftime("%c")
 		if isinstance(obj, Album) or isinstance(obj, Media):
 			return obj.to_dict()
 		return json.JSONEncoder.default(self, obj)

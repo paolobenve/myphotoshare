@@ -174,13 +174,13 @@ $(document).ready(function() {
 		if (currentMedia === null) {
 			// album: prepare the thumbnail names, they will be passed to php code for generating a n-thumbnail image
 			type = "a";
-			re = new  RegExp("_(" + Options.album_thumb_size.toString() + "a(s|f)\\.jpg|" +
-				Options.media_thumb_size.toString() + "t(s|f)\\.jpg)$");
+			re = new  RegExp("_(" + Options.album_thumb_size + "a(s|f)\\.jpg|" +
+				Options.media_thumb_size + "t(s|f)\\.jpg)$");
 			// recollect all the thumbnails showed in page
 			$(".thumbnail").each(function() {
 				src = $(this).attr("src");
 				position = src.search(re);
-				src = src.substring(0, position + 1) + Options.album_thumb_size.toString() + "as.jpg";
+				src = src.substring(0, position + 1) + Options.album_thumb_size + "as.jpg";
 				src = src.substring(Options.server_cache_path.length);
 				if (allThumbnails.indexOf(src) == -1)
 					allThumbnails.push(src);
@@ -218,9 +218,9 @@ $(document).ready(function() {
 			}
 		} else {
 			mediaArray.push($("#media").attr("src"));
-			if (currentMedia.metadata.mediaType == "video") {
+			if (currentMedia.mediaType == "video") {
 				type = "v";
-			} else if (currentMedia.metadata.mediaType == "photo") {
+			} else if (currentMedia.mediaType == "photo") {
 				type = "p";
 			}
 		}
@@ -456,7 +456,7 @@ $(document).ready(function() {
 						$("#media-sort-normal").show();
 					}
 					showAlbum("conditional");
-					});
+				});
 			}
 			setOptions();
 		}
@@ -503,8 +503,8 @@ $(document).ready(function() {
 			$("html, body").stop().animate({ scrollTop: thumb.offset().top - $(window).height() / 2 + thumb.height() }, "slow");
 		
 		if (currentMedia !== null) {
-			$("#thumbs img").removeClass("current-thumb");
-			thumb.addClass("current-thumb");
+			$(".thumb-container").removeClass("current-thumb");
+			thumb.parent().addClass("current-thumb");
 		}
 	}
 	
@@ -517,9 +517,11 @@ $(document).ready(function() {
 	
 	function showAlbum(populate) {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
-		var width, height, thumbWidth, thumbHeight, imageString, bydateStringWithTrailingSeparator, populateMedia;
+		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, bydateStringWithTrailingSeparator, populateMedia;
 		var albumViewWidth, calculatedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight;
+		var mediaWidth, mediaHeight, choosen, isOriginal;
+		
+		
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
 		if (populate) {
@@ -532,8 +534,11 @@ $(document).ready(function() {
 			if (populateMedia === true || populateMedia && needMediaHtmlReverse()) {
 				media = [];
 				for (i = 0; i < currentAlbum.media.length; ++i) {
-					hash = photoFloat.mediaHash(currentAlbum, currentAlbum.media[i]);
-					thumbHash = photoFloat.mediaPath(currentAlbum, currentAlbum.media[i], thumbnailSize);
+					width = currentAlbum.media[i].metadata.size[0];
+					height = currentAlbum.media[i].metadata.size[1];
+					choosen = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize, thumbnailSize);
+					thumbHash = choosen[0];
+					isOriginal = choosen[1];
 					bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 					if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 						currentAlbum.media[i].completeName =
@@ -544,40 +549,45 @@ $(document).ready(function() {
 							"/" +
 							PhotoFloat.cachePath(currentAlbum.media[i].name);
 					}
-					link = $("<a href=\"#!/" + hash + "\"></a>");
-					width = currentAlbum.media[i].metadata.size[0];
-					height = currentAlbum.media[i].metadata.size[1];
-					imageString = "<div class=\"thumb-container\" ";
-					imageString += "style=\"width: ";
-					if (Options.media_thumb_type == "fixed_height") {
-						thumbHeight = Options.media_thumb_size;
-						thumbWidth = thumbHeight * width / height;
-						imageString += thumbWidth.toString();
+					if (isOriginal) {
+						thumbHeight = width;
+						thumbWidth = height;
 					} else {
-						imageString += Options.media_thumb_size.toString().toString();
+						if (Options.media_thumb_type == "fixed_height") {
+							thumbHeight = Options.media_thumb_size;
+							thumbWidth = thumbHeight * width / height;
+							calculatedWidth = thumbWidth;
+						} else {
+							thumbHeight = thumbnailSize;
+							thumbWidth = thumbnailSize;
+							calculatedWidth = Options.media_thumb_size;
+						}
 					}
-					imageString += 			"px;\">";
-					imageString += 		"<img title=\"" + currentAlbum.media[i].name +
-								"\" alt=\"" + photoFloat.trimExtension(currentAlbum.media[i].name) +
-								"\" src=\"" +  thumbHash +
-								"\" class=\"thumbnail";
-					if (Options.media_thumb_type == "fixed_height") {
-						imageString += 	"\" height=\"" + thumbHeight +
-								"\" width=\"" + thumbWidth;
-					} else {
-						imageString += 	"\" height=\"" + thumbnailSize +
-								"\" width=\"" + thumbnailSize;
-					}
-					imageString += 		"\" />" +
+					imageString =	"<div class=\"thumb-and-caption-container\" style=\"" +
+										"width: " + calculatedWidth + "px;\"" + 
+									">" +
+								"<div class=\"thumb-container\" " + "style=\"" +
+										"width: " + calculatedWidth + "px; " +
+										"height: " + Options.media_thumb_size + "px;" +
+									"\">" +
+									"<span class=\"helper\"></span>" +
+									"<img title=\"" + currentAlbum.media[i].name + "\"" +
+										"alt=\"" + photoFloat.trimExtension(currentAlbum.media[i].name) + "\"" +
+										"src=\"" +  thumbHash + "\"" +
+										"class=\"thumbnail" + "\"" +
+										"height=\"" + thumbHeight + "\"" +
+										"width=\"" + thumbWidth + "\"" +
+									"/>" +
+								"</div>" +
 								"<div class=\"media-caption\">" +
 								currentAlbum.media[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
 								"</div>" +
-								"</div>";
+							"</div>";
 					image = $(imageString);
 					
-					
-					
 					image.get(0).media = currentAlbum.media[i];
+					hash = photoFloat.mediaHash(currentAlbum, currentAlbum.media[i]);
+					link = $("<a href=\"#!/" + hash + "\"></a>");
 					link.append(image);
 					media.push(link);
 					(function(theLink, theImage, theAlbum) {
@@ -621,49 +631,58 @@ $(document).ready(function() {
 						link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
-						imageString += 			"width: " + (calculatedAlbumThumbSize + 6) + "px;";
-						imageString += 			" height: " + (calculatedAlbumThumbSize + 6) + "px;";
+						imageString += 			"width: " + (calculatedAlbumThumbSize + 2) + "px;";
+						imageString += 			" height: " + (calculatedAlbumThumbSize + 2) + "px;";
 						if (! Options.albums_slide_style)
 							imageString +=		" background-color: " + Options.album_button_background_color + ";";
 						imageString += 			"\"";
-						imageString += ">";
+						imageString += 		">";
 						imageString += "</div>";
 						image = $(imageString);
 						link.append(image);
 						subalbums.push(link);
 						(function(theContainer, theAlbum, theImage, theLink) {
-							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomPhoto, originalAlbum) {
+							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum) {
 								var distance = 0;
-								var htmlText;
+								var htmlText, isOriginal, mediaSrc;
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, buttonAndCaptionHeight, html;
 								
-								if (Options.album_thumb_type == "fit") {
-									mediaWidth = randomPhoto.metadata.size[0];
-									mediaHeight = randomPhoto.metadata.size[1];
-									if (mediaWidth > mediaHeight) {
-										thumbWidth = calculatedAlbumThumbSize;
-										thumbHeight = calculatedAlbumThumbSize * mediaHeight / mediaWidth;
-									} else {
-										thumbWidth = calculatedAlbumThumbSize * mediaWidth / mediaHeight;
-										thumbHeight = calculatedAlbumThumbSize;
+								choosen = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, calculatedAlbumThumbSize);
+								mediaSrc = choosen[0];
+								isOriginal = choosen[1];
+								if (isOriginal) {
+									thumbWidth = randomMedia.metadata.size[0];
+									thumbHeight = randomMedia.metadata.size[1];
+								} else {
+									if (Options.album_thumb_type == "fit") {
+										mediaWidth = randomMedia.metadata.size[0];
+										mediaHeight = randomMedia.metadata.size[1];
+										if (mediaWidth > mediaHeight) {
+											thumbWidth = calculatedAlbumThumbSize;
+											thumbHeight = calculatedAlbumThumbSize * mediaHeight / mediaWidth;
+										} else {
+											thumbWidth = calculatedAlbumThumbSize * mediaWidth / mediaHeight;
+											thumbHeight = calculatedAlbumThumbSize;
+										}
+										distance = (calculatedAlbumThumbSize - thumbHeight) / 2;
 									}
-									distance = (calculatedAlbumThumbSize - thumbHeight) / 2;
 								}
-								htmlText = "<img " +
-										"title=\"" + randomPhoto.albumName + "\"" +
-										" class=\"thumbnail\"" +
-										" src=\"" + photoFloat.mediaPath(randomAlbum, randomPhoto, Options.album_thumb_size) + "\"" +
-										" style=\"width:" + thumbWidth + "px;" +
-											" height:" + thumbHeight + "px;" +
-											" margin-top: " + distance + "px" +
-											"\"" +
+								htmlText = "<span class=\"helper\"></span>" +
+										"<img " +
+											"title=\"" + randomMedia.albumName + "\"" +
+											" class=\"thumbnail\"" +
+											" src=\"" + mediaSrc + "\"" +
+											" style=\"width:" + thumbWidth + "px;" +
+												" height:" + thumbHeight + "px;" +
+												" margin-top: " + distance + "px" +
+												"\"" +
 										">";
 								theImage.html(htmlText);
 								
 								if (originalAlbum.path.indexOf(Options.by_date_string) === 0)
-									folderArray = randomPhoto.dayAlbum.split("/");
+									folderArray = randomMedia.dayAlbum.split("/");
 								else
-									folderArray = randomPhoto.albumName.split("/");
+									folderArray = randomMedia.albumName.split("/");
 								originalAlbumFoldersArray = originalAlbum.path.split("/");
 								folder = folderArray[originalAlbumFoldersArray.length];
 								
@@ -680,19 +699,19 @@ $(document).ready(function() {
 									html += " slide";
 								html += "\"";
 								html += "style=\"";
-								html += 	"height: " + buttonAndCaptionHeight.toString() + "px; " +
+								html += 	"height: " + buttonAndCaptionHeight + "px; " +
 										"margin-right: " + Options.thumb_spacing + "px; ";
-								html += "width: " + albumButtonWidth(calculatedAlbumThumbSize).toString() + "px; ";
-								html += "padding-top: " + Math.round(calculatedAlbumThumbSize * 0.05).toString() + "px; ";
+								html += "width: " + albumButtonWidth(calculatedAlbumThumbSize) + "px; ";
+								html += "padding-top: " + Math.round(calculatedAlbumThumbSize * 0.05) + "px; ";
 								if (Options.albums_slide_style)
 									html += "background-color: " + Options.album_button_background_color + "; ";
 								html += "\"";
 								html += ">";
 								theImage.wrap(html);
 								html = "<div class=\"album-caption\"";
-								html += " style=\"width: " + calculatedAlbumThumbSize.toString() + "px; " +
-										"font-size: " + (captionHeight / 3).toString() + "px; " +
-										"height: " + captionHeight.toString() + "px; ";
+								html += " style=\"width: " + calculatedAlbumThumbSize + "px; " +
+										"font-size: " + (captionHeight / 3) + "px; " +
+										"height: " + captionHeight + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
 								html += ">" + folder + "</div>";
@@ -727,7 +746,7 @@ $(document).ready(function() {
 		}
 		
 		if (currentMedia === null) {
-			$("#thumbs img").removeClass("current-thumb");
+			$(".thumb-container").removeClass("current-thumb");
 			$("#album-view").removeClass("media-view-container");
 			$("#subalbums").show();
 			$("#media-view").hide();
@@ -758,6 +777,9 @@ $(document).ready(function() {
 				$("#thumbs").show();
 			$("#powered-by").hide();
 		}
+		
+		setOptions();
+		
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
@@ -773,35 +795,41 @@ $(document).ready(function() {
 		return ! lateralSocialButtons();
 	}
 	function scaleMedia() {
-		var media, container, containerBottom, containerRatio, bottom, width, height, ratio, photoSrc, previousSrc;
-		$(window).off("resize");
+		var media, container, containerBottom = 0, containerTop = 0, containerRatio, photoSrc, previousSrc;
+		var containerHeight = $(window).innerHeight(), containerWidth = $(window).innerWidth(), mediaBarBottom = 0;
+		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1], ratio = width / height;
+		var choosen, isOriginal;
 		
 		if (fullScreenStatus)
 			container = $(window);
 		else {
 			container = $("#media-view");
-			containerBottom = 0;
-			if ($("#album-view").is(":visible"))
+			if ($("#thumbs").is(":visible"))
 				containerBottom = $("#album-view").outerHeight();
-			else if (bottomSocialButtons())
+			else if (bottomSocialButtons() && containerBottom < $(".ssk").outerHeight())
 				// correct container bottom when social buttons are on the bottom
-				containerBottom = $(".ssk-group").outerHeight();
-
+				containerBottom = $(".ssk").outerHeight();
+			containerTop = $("#title-container").outerHeight();
+			containerHeight -= containerBottom + $("#title-container").outerHeight();
+			container.css("top", containerTop + "px");
 			container.css("bottom", containerBottom + "px");
-			container.css("top", $("#title-container").outerHeight() + "px");
 		}
-		containerRatio = container.width() / container.height();
+		
+		containerRatio = containerWidth / containerHeight;
 		
 		media = $("#media");
 		media.off('loadstart').off("load");
-		if (currentMedia.metadata.mediaType == "photo") {
-			photoSrc = chooseReducedPhotoForScaling(container);
-			// chooseReducedPhotoForScaling() sets maxSize to 0 if it returns the original media
+		
+		if (currentMedia.mediaType == "photo") {
+			choosen = chooseReducedPhoto(currentMedia, container);
+			photoSrc = choosen[0];
+			isOriginal = choosen[1];
 			previousSrc = media.attr("src");
-			width = currentMedia.metadata.size[0];
-			height = currentMedia.metadata.size[1];
-			ratio = width / height;
-			if (maxSize) {
+			//~ if (! imageExists(photoSrc)) {
+				//~ photoSrc = photoFloat.originalMediaPath(currentMedia);
+			//~ } else 
+			if (! isOriginal) {
+				// chooseReducedPhoto() sets maxSize to 0 if it returns the original media
 				if (width > height) {
 					height = Math.round(height * maxSize / width);
 					width = maxSize;
@@ -810,7 +838,7 @@ $(document).ready(function() {
 					height = maxSize;
 				}
 			}
-			if (photoSrc != previousSrc) {
+			if (photoSrc != previousSrc || media.attr("width") != width || media.attr("height") != height) {
 				$("link[rel=image_src]").remove();
 				$('link[rel="video_src"]').remove();
 				$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
@@ -822,30 +850,33 @@ $(document).ready(function() {
 			}
 		}
 		
-		if (parseInt(media.attr("width")) > container.width() && media.attr("ratio") > containerRatio) {
+		if (parseInt(media.attr("width")) > containerWidth && media.attr("ratio") > containerRatio) {
 			height = container.width() / media.attr("ratio");
 			media
-				.css("width", "100%")
-				.css("height", "auto")
+				.css("width", containerWidth + "px")
+				.css("height", (containerWidth / ratio) + "px")
 				.parent()
 					.css("height", height)
 					.css("margin-top", - height / 2)
 					.css("top", "50%");
-			//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
-			bottom = ((container.height() - container.width() / ratio) / 2) + "px";
-		} else if (parseInt(media.attr("height")) > container.height() && media.attr("ratio") < containerRatio) {
+			if (currentMedia.mediaType == "video")
+				mediaBarBottom = 0;
+			else if (currentMedia.mediaType == "photo")
+				mediaBarBottom = (containerHeight - containerWidth / ratio) / 2;
+		} else if (parseInt(media.attr("height")) > containerHeight && media.attr("ratio") < containerRatio) {
 			media
-				.css("height", "100%")
-				.css("width", "auto")
+				.css("height", containerHeight + "px")
+				.css("width", (containerHeight * ratio) + "px")
 				.parent()
 					.css("height", "100%")
 					.css("margin-top", "0")
 					.css("top", "0");
-			if (currentMedia.metadata.mediaType == "photo") 
-				bottom = 0;
-			else if (currentMedia.metadata.mediaType == "video")
-				//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
-				bottom = "0px";
+			if (currentMedia.mediaType == "video") {
+				media.css("height", parseInt(media.css("height")) - $("#links").outerHeight());
+				mediaBarBottom = 0;
+			} else if (currentMedia.mediaType == "photo")
+				// put media bar slightly below so that video buttons are not covered
+				mediaBarBottom = 0;
 		} else {
 			media
 				.css("height", "")
@@ -854,16 +885,16 @@ $(document).ready(function() {
 					.css("height", media.attr("height"))
 					.css("margin-top", - media.attr("height") / 2)
 					.css("top", "50%");
-			//~ bottom = ((container.height() - parseInt(media.css("height"))) / 2) + "px";
-			bottom = ((container.height() - height) / 2) + "px";
+			mediaBarBottom = (container.height() - media.attr("height")) / 2;
+			if (fullScreenStatus) {
+				if (currentMedia.mediaType == "video") {
+					mediaBarBottom = 0;
+				}
+			}
 		}
 		
-		if (currentMedia.metadata.mediaType == "video") {
-			$("#media-bar").css("bottom", 0);
-		} else if (currentMedia.metadata.mediaType == "photo") {
-			//~ media.css("bottom", bottom);
-			$("#media-bar").css("bottom", bottom);
-		}
+		//~ $("#media-bar").css("bottom", mediaBarBottom + "px");
+		$("#media-bar").css("bottom", 0);
 		
 		media.show();
 		
@@ -875,46 +906,91 @@ $(document).ready(function() {
 		
 		$(window).bind("resize", scaleMedia);
 	}
-	function chooseReducedPhotoForScaling(container) {
+	function chooseReducedPhoto(media, container) {
 		var chosenMedia, reducedWidth, reducedHeight;
-		chosenMedia = PhotoFloat.originalMediaPath(currentMedia);
+		var mediaWidth = media.metadata.size[0], mediaHeight = media.metadata.size[1];
+		var mediaSize = Math.max(mediaWidth, mediaHeight);
+		var isOriginal = true;
+		
+		chosenMedia = PhotoFloat.originalMediaPath(media);
 		maxSize = 0;
-		for (var i = 0; i < Options.reduced_sizes.length; i++) {
-			if (currentMedia.metadata.size[0] > currentMedia.metadata.size[1]) {
-				reducedWidth = Options.reduced_sizes[i];
-				reducedHeight = Options.reduced_sizes[i] * currentMedia.metadata.size[1] / currentMedia.metadata.size[0];
-			} else {
-				reducedHeight = Options.reduced_sizes[i];
-				reducedWidth = Options.reduced_sizes[i] * currentMedia.metadata.size[0] / currentMedia.metadata.size[1];
+		
+		if (container == null) {
+			// try with what is more probable to be the container
+			if (fullScreenStatus)
+				container = $(window);
+			else {
+				container = $("#media-view");
 			}
-			
-			if (reducedWidth < container.width() && reducedHeight < container.height())
-				break;
-			chosenMedia = photoFloat.mediaPath(currentAlbum, currentMedia, Options.reduced_sizes[i]);
-			maxSize = Options.reduced_sizes[i];
 		}
-		return chosenMedia;
+		
+		for (var i = 0; i < Options.reduced_sizes.length; i++) {
+			if (Options.reduced_sizes[i] > mediaSize)
+				continue;
+			if (container !== null) {
+				if (mediaWidth > mediaHeight) {
+					reducedWidth = Options.reduced_sizes[i];
+					reducedHeight = Options.reduced_sizes[i] * mediaHeight / mediaWidth;
+				} else {
+					reducedHeight = Options.reduced_sizes[i];
+					reducedWidth = Options.reduced_sizes[i] * mediaWidth / mediaHeight;
+				}
+				
+				if (reducedWidth < container.width() && reducedHeight < container.height())
+					break;
+			}
+			chosenMedia = photoFloat.mediaPath(currentAlbum, media, Options.reduced_sizes[i]);
+			maxSize = Options.reduced_sizes[i];
+			isOriginal = false;
+			if (container === null)
+				break;
+		}
+		return [chosenMedia, isOriginal];
 	}
 	
+	function chooseThumbnail(album, media, thumbnailSize, calculatedThumbnailSize) {
+		var chosenMedia = PhotoFloat.originalMediaPath(media);
+		var mediaWidth = media.metadata.size[0], mediaHeight = media.metadata.size[1];
+		var mediaMaxSize = Math.max(mediaWidth, mediaHeight);
+		var mediaMinSize = Math.min(mediaWidth, mediaHeight);
+		var isOriginal = true;
+		
+		if (
+			Options.album_thumb_type == "square" && mediaMinSize > calculatedThumbnailSize ||
+			Options.album_thumb_type == "fit" && mediaMaxSize > calculatedThumbnailSize ||
+			Options.album_thumb_type == "fixed_height" && mediaHeight > calculatedThumbnailSize
+		) {
+			chosenMedia = photoFloat.mediaPath(album, media, thumbnailSize);
+			isOriginal = false;
+		}
+		
+		return [chosenMedia, isOriginal];
+	}
+	
+	//~ function imageExists(imageUrl){
+		//~ var http = new XMLHttpRequest();
+		//~ http.open('HEAD', imageUrl, false);
+		//~ http.send();
+		//~ return http.status != 404;
+	//~ }
+	
 	function showMedia(album) {
-		var width, height, previousMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
-		var windowWidth, windowHeight;
-		width = currentMedia.metadata.size[0];
-		height = currentMedia.metadata.size[1];
-
-		windowWidth = $(window).width();
-		windowHeight = $(window).height();
+		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
+		var prevMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
+		//~ var windowWidth = $(window).width(), windowHeight = $(window).height();
+		var choosen, isOriginal, nextReducedPhoto, prevReducedPhoto;
 		
 		thumbnailSize = Options.media_thumb_size;
 		$("#media-box").show();
 		if (currentAlbum.media.length == 1) {
 			$("#next").hide();
 			$("#prev").hide();
-			$(".next-media").removeAttr("href");
+			$("#next-media").removeAttr("href");
 			$("#next").removeAttr("href");
 			$("#prev").removeAttr("href");
 			$("#media-view").addClass("no-bottom-space");
 			$("#album-view").addClass("no-bottom-space");
+			$("#thumbs").hide();
 		} else {
 			$("#next").show();
 			$("#prev").show();
@@ -924,6 +1000,7 @@ $(document).ready(function() {
 			$("#album-view").css("height", (thumbnailSize + 20).toString() + "px");
 			$("#album-view").addClass("media-view-container");
 			$("#album-view.media-view-container").css("height", (thumbnailSize + 22).toString() + "px");
+			$("#thumbs").show();
 		}
 
 		var albumViewHeight = 0;
@@ -932,9 +1009,8 @@ $(document).ready(function() {
 		
 		$('#media').remove();
 		$("#media").off("load");
-		//~ $('#media-box-inner > video').remove();
 		
-		if (currentMedia.metadata.mediaType == "video") {
+		if (currentMedia.mediaType == "video") {
 			if (! Modernizr.video) {
 				$('<div id="video-unsupported">' +
 						'<p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p>' +
@@ -950,8 +1026,7 @@ $(document).ready(function() {
 			}
 		}
 		
-		
-		if (currentMedia.metadata.mediaType == "photo" || currentMedia.metadata.mediaType == "video" && videoOK) {
+		if (currentMedia.mediaType == "photo" || currentMedia.mediaType == "video" && videoOK) {
 			if (currentAlbum.path == currentMedia.foldersAlbum) {
 				$("#folders-view").hide();
 				$("#date-view").show();
@@ -961,7 +1036,7 @@ $(document).ready(function() {
 				$("#date-view").hide();
 			}
 			
-			if (currentMedia.metadata.mediaType == "video") {
+			if (currentMedia.mediaType == "video") {
 				if (fullScreenStatus) {
 					////////////////////////////////////////////
 					// the original video doesn't work: WHY????
@@ -980,16 +1055,22 @@ $(document).ready(function() {
 					.attr("alt", currentMedia.name);
 				triggerLoad = 'loadstart';
 				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
-			} else if (currentMedia.metadata.mediaType == "photo") {
-				maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
-				if (width > height) {
-					height = Math.round(height * maxSize / width);
-					width = maxSize;
-				} else {
-					width = Math.round(width * maxSize / height);
-					height = maxSize;
+			} else if (currentMedia.mediaType == "photo") {
+				choosen = chooseReducedPhoto(currentMedia, null);
+				photoSrc = choosen[0];
+				isOriginal = choosen[1];
+				//~ if (maxSize && imageExists(photoSrc)) {
+				if (! isOriginal) {
+					if (width > height) {
+						height = Math.round(height * maxSize / width);
+						width = maxSize;
+					} else {
+						width = Math.round(width * maxSize / height);
+						height = maxSize;
+					}
+				//~ } else {
+					//~ photoSrc = photoFloat.originalMediaPath(currentMedia);
 				}
-				photoSrc = photoFloat.mediaPath(currentAlbum, currentMedia, Options.reduced_sizes[Options.reduced_sizes.length - 1]);
 				$('<img/>', { id: 'media' })
 					.appendTo('#media-box-inner')
 					.hide()
@@ -1023,9 +1104,9 @@ $(document).ready(function() {
 						i = currentAlbum.media.length - 1;
 					else
 						i --;
-					previousMedia = currentAlbum.media[i];
-					previousMedia.byDateName = previousMedia.dayAlbum + '/' + previousMedia.name;
-				} while (previousMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
+					prevMedia = currentAlbum.media[i];
+					prevMedia.byDateName = prevMedia.dayAlbum + '/' + prevMedia.name;
+				} while (prevMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
 				i = currentMediaIndex;
 				do {
@@ -1037,12 +1118,20 @@ $(document).ready(function() {
 					nextMedia.byDateName = nextMedia.dayAlbum + '/' + nextMedia.name;
 				} while (nextMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
-				$.preloadImages(photoFloat.mediaPath(currentAlbum, nextMedia, maxSize));
-				$.preloadImages(photoFloat.mediaPath(currentAlbum, previousMedia, maxSize));
+				if (nextMedia.mediaType == "photo") {
+					choosen = chooseReducedPhoto(nextMedia, null);
+					nextReducedPhoto = choosen[0];
+					$.preloadImages(nextReducedPhoto);
+				}
+				if (prevMedia.mediaType == "photo") {
+					choosen = chooseReducedPhoto(prevMedia, null);
+					prevReducedPhoto = choosen[0];
+					$.preloadImages(prevReducedPhoto);
+				}
 			}
 		}
 		
-		$(".next-media").off("click");
+		$("#next-media").off("click");
 		$('#next').off("click");
 		$('#prev').off("click");
 		if (currentAlbum.media.length == 1) {
@@ -1050,10 +1139,10 @@ $(document).ready(function() {
 			prevLink = "";
 		} else {
 			nextLink = "#!/" + photoFloat.mediaHash(currentAlbum, nextMedia);
-			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, previousMedia);
+			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, prevMedia);
 			$("#next").show();
 			$("#prev").show();
-			$(".next-media").click(function(){ swipeLeft(nextLink); return false; });
+			$("#next-media").click(function(){ swipeLeft(nextLink); return false; });
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
 			$('#prev').click(function(){ swipeRight(prevLink); return false; });
 		}
@@ -1116,7 +1205,7 @@ $(document).ready(function() {
 			$(this).css("color", Options.title_color);
 		});
 		$("#media-name").css("color", Options.title_image_name_color);
-		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
+		$(".thumb-and-caption-container").css("margin-right", Options.thumb_spacing.toString() + "px");
 	}
 	
 	function em2px(selector, em) {
@@ -1183,6 +1272,9 @@ $(document).ready(function() {
 		var populateAlbum;
 		undie();
 		$("#loading").hide();
+		
+		$(window).off("resize");
+		
 		if (album === currentAlbum && media === currentMedia)
 			return;
 		if (album != currentAlbum)
@@ -1305,11 +1397,10 @@ $(document).ready(function() {
 	
 	$(document).keydown(function(e){
 		if (currentMedia === null)
-			return true;
-		if (! e.ctrlKey && ! e.shiftKey && (e.keyCode === 34 || e.keyCode === 39 || e.keyCode === 40)) {
+		if (! e.ctrlKey && ! e.shiftKey && e.altKey && (e.keyCode === 34 || e.keyCode === 39 || e.keyCode === 40)) {
 			swipeLeft(nextLink);
 			return false;
-		} else if (! e.ctrlKey && ! e.shiftKey && (e.keyCode === 33 || e.keyCode === 37 || e.keyCode === 38)) {
+		} else if (! e.ctrlKey && ! e.shiftKey && e.altKey  && (e.keyCode === 33 || e.keyCode === 37 || e.keyCode === 38)) {
 			swipeRight(prevLink);
 			return false;
 		}

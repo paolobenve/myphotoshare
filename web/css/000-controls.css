@@ -68,7 +68,7 @@ a.title-anchor.mobile {
 	border: 0;
 }
 
-#thumbs img.current-thumb {
+.thumb-container.current-thumb {
 	border-top: 6px solid #FFAD27 !important;
 	margin-top: 0;
 }
@@ -97,13 +97,22 @@ a.title-anchor.mobile {
 	margin: 0 auto;
 	height: 3em;
 }
-.album-button-and-caption.slide img {
-	border: 3px solid gray;
+
+/* this class is needed in order to get the thumbnails vertically centered,
+ * see https://stackoverflow.com/questions/7273338/how-to-vertically-align-an-image-inside-a-div#7310398*/
+.helper {
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+}
+.album-button {
+	border: 1px solid lightgray;
 	border-right-color: whitesmoke;
 	border-bottom-color: whitesmoke;
+	white-space: nowrap;
+	text-align: center;
 }
-.album-button-and-caption.slide:hover  img {
-	border: 3px solid gray;
+.album-button-and-caption.slide:hover .album-button {
 	border-left-color: whitesmoke;
 	border-top-color: whitesmoke;
 }
@@ -116,6 +125,10 @@ a.title-anchor.mobile {
 	background-color: inherit;
 	margin: 0 auto;
 	line-height: 1.1em
+}
+
+.album-button img, .thumb-container img {
+	vertical-align: middle;
 }
 
 #next, #prev {
@@ -156,7 +169,10 @@ a.title-anchor.mobile {
 }
 
 #media-view.no-bottom-space {
+/*
 	bottom: 0 !important;
+*/
+	bottom: 0;
 }
 
 #media-box-inner {
@@ -302,11 +318,15 @@ a.title-anchor.mobile {
 	font-style: italic;
 }
 
+.thumb-and-caption-container {
+	margin-bottom: 1em;
+	display: block;
+}
 .thumb-container {
-	display: inline;
 	position: relative;
 	top: 0;
-	margin-bottom: 1em;
+	white-space: nowrap;
+	text-align: center;
 }
 .media-caption, .album-caption {
 	display: block;
@@ -322,6 +342,7 @@ a.title-anchor.mobile {
 .media-caption {
 	font-size: 75%;
 	color: chartreuse;
+	white-space: normal;
 }
 
 .album-caption {

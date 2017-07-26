@@ -183,6 +183,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.4.1 (July 26, 2017):
+
+* do not produce canvas for small images: they are shown in their original size
+
 ### version 2.4 (July 24, 2017):
 
 * swipe gesture on mobile to go to next/previous photo/video

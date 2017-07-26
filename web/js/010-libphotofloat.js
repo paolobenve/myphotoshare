@@ -155,9 +155,7 @@
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 			media.completeName = media.foldersAlbum + '/' + media.name;
-			hash = PhotoFloat.cachePath(media.foldersAlbum) + "/" +
-			//~ hash = PhotoFloat.cachePath(media.completeName.substring(0, media.completeName.length - media.name.length - 1)) + "/" +
-				PhotoFloat.cachePath(media.name);
+			hash = PhotoFloat.cachePath(media.foldersAlbum) + "/" + PhotoFloat.cachePath(media.name);
 		}
 		return hash;
 	};
@@ -171,8 +169,8 @@
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		var foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
 		if (
-			media.metadata.mediaType == "photo" ||
-			media.metadata.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1
+			media.mediaType == "photo" ||
+			media.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1
 		) {
 			suffix = size.toString();
 			if (size == Options.album_thumb_size) {
@@ -190,7 +188,7 @@
 					suffix += "f";
 			}
 			suffix += ".jpg";
-		} else if (media.metadata.mediaType == "video") {
+		} else if (media.mediaType == "video") {
 			suffix = "transcoded.mp4";
 		}
 		hash = PhotoFloat.cachePath(PhotoFloat.mediaHashFolder(album, media) + "_" + suffix);

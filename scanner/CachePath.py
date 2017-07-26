@@ -39,14 +39,16 @@ def trim_base_custom(path, base):
 def trim_base(path):
 	return trim_base_custom(path, trim_base.base)
 def cache_base(path, filepath=False):
-	if len(path) == 0:
-		path = "root"
-	else:
-		path = trim_base(path).replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
+	if not filepath:
+		path = trim_base(path)
+	if path:
+		path = path.replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 		while path.find("--") != -1:
 			path = path.replace("--", "-")
 		while path.find("__") != -1:
 			path = path.replace("__", "_")
+	else:
+		path = "root"
 	return path
 def json_name(path):
 	return cache_base(path) + ".json"
