@@ -116,7 +116,7 @@ Go to the folder you cloned the repository in and execute:
     $ git pull https://github.com/paolobenve/photofloat.git
     $ ./js-css-minify.sh
 
-Obviously the scanner should be launche too.
+Obviously the scanner should be launched too.
 
 ### Generate the albums:
 
