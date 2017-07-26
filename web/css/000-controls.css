@@ -106,14 +106,13 @@ a.title-anchor.mobile {
 	vertical-align: middle;
 }
 .album-button {
-	border: 3px solid gray;
+	border: 1px solid lightgray;
 	border-right-color: whitesmoke;
 	border-bottom-color: whitesmoke;
 	white-space: nowrap;
 	text-align: center;
 }
-.album-button:hover {
-	border: 3px solid gray;
+.album-button-and-caption.slide:hover .album-button {
 	border-left-color: whitesmoke;
 	border-top-color: whitesmoke;
 }
