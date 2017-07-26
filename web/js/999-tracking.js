@@ -18,22 +18,22 @@ if (Options.google_analytics_id) {
 }
 
 // piwik
-if (Options.piwik_site && Options.piwik_id) {
+if (Options.piwik_server && Options.piwik_id) {
 	$(window).load(function () {
-	var _paq = _paq || [];
-	_paq.push(['trackPageView']);
-	_paq.push(['enableLinkTracking']);
+	window._paq = window._paq || [];
+	window._paq.push(['trackPageView']);
+	window._paq.push(['enableLinkTracking']);
 	(function() {
-		var u="//" + Options.piwik_site;
-		_paq.push(['setTrackerUrl', u+'piwik.php']);
-		_paq.push(['setSiteId', Options.piwik_id.toString()]);
+		var u="//" + Options.piwik_server;
+		window._paq.push(['setTrackerUrl', u+'piwik.php']);
+		window._paq.push(['setSiteId', Options.piwik_id.toString()]);
 		var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
 		g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
 	})();
 	});
 	$(window).hashchange(function() {
-		_paq.push(['setCustomUrl', '/' + window.location.hash.substr(1)]);
-		_paq.push(['setDocumentTitle', PhotoFloat.cleanHash(location.hash)]);
-		_paq.push(['trackPageView']);
+		window._paq.push(['setCustomUrl', '/' + window.location.hash.substr(1)]);
+		window._paq.push(['setDocumentTitle', PhotoFloat.cleanHash(location.hash)]);
+		window._paq.push(['trackPageView']);
 	});
 }
