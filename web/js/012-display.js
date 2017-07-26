@@ -174,13 +174,13 @@ $(document).ready(function() {
 		if (currentMedia === null) {
 			// album: prepare the thumbnail names, they will be passed to php code for generating a n-thumbnail image
 			type = "a";
-			re = new  RegExp("_(" + Options.album_thumb_size.toString() + "a(s|f)\\.jpg|" +
-				Options.media_thumb_size.toString() + "t(s|f)\\.jpg)$");
+			re = new  RegExp("_(" + Options.album_thumb_size + "a(s|f)\\.jpg|" +
+				Options.media_thumb_size + "t(s|f)\\.jpg)$");
 			// recollect all the thumbnails showed in page
 			$(".thumbnail").each(function() {
 				src = $(this).attr("src");
 				position = src.search(re);
-				src = src.substring(0, position + 1) + Options.album_thumb_size.toString() + "as.jpg";
+				src = src.substring(0, position + 1) + Options.album_thumb_size + "as.jpg";
 				src = src.substring(Options.server_cache_path.length);
 				if (allThumbnails.indexOf(src) == -1)
 					allThumbnails.push(src);
@@ -556,7 +556,7 @@ $(document).ready(function() {
 						if (Options.media_thumb_type == "fixed_height") {
 							thumbHeight = Options.media_thumb_size;
 							thumbWidth = thumbHeight * width / height;
-							calculatedWidth = thumbWidth.toString();
+							calculatedWidth = thumbWidth;
 						} else {
 							thumbHeight = thumbnailSize;
 							thumbWidth = thumbnailSize;
@@ -695,19 +695,19 @@ $(document).ready(function() {
 									html += " slide";
 								html += "\"";
 								html += "style=\"";
-								html += 	"height: " + buttonAndCaptionHeight.toString() + "px; " +
+								html += 	"height: " + buttonAndCaptionHeight + "px; " +
 										"margin-right: " + Options.thumb_spacing + "px; ";
-								html += "width: " + albumButtonWidth(calculatedAlbumThumbSize).toString() + "px; ";
-								html += "padding-top: " + Math.round(calculatedAlbumThumbSize * 0.05).toString() + "px; ";
+								html += "width: " + albumButtonWidth(calculatedAlbumThumbSize) + "px; ";
+								html += "padding-top: " + Math.round(calculatedAlbumThumbSize * 0.05) + "px; ";
 								if (Options.albums_slide_style)
 									html += "background-color: " + Options.album_button_background_color + "; ";
 								html += "\"";
 								html += ">";
 								theImage.wrap(html);
 								html = "<div class=\"album-caption\"";
-								html += " style=\"width: " + calculatedAlbumThumbSize.toString() + "px; " +
-										"font-size: " + (captionHeight / 3).toString() + "px; " +
-										"height: " + captionHeight.toString() + "px; ";
+								html += " style=\"width: " + calculatedAlbumThumbSize + "px; " +
+										"font-size: " + (captionHeight / 3) + "px; " +
+										"height: " + captionHeight + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
 								html += ">" + folder + "</div>";
