@@ -116,6 +116,8 @@ Go to the folder you cloned the repository in and execute:
     $ git pull https://github.com/paolobenve/photofloat.git
     $ ./js-css-minify.sh
 
+Obviously the scanner should be launche too.
+
 ### Generate the albums:
 
 When you're done run the static generator (you need Python≥2.6 and the Python Imaging Library; for video something like libav-conv is requiered too):
