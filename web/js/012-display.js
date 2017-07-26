@@ -456,7 +456,7 @@ $(document).ready(function() {
 						$("#media-sort-normal").show();
 					}
 					showAlbum("conditional");
-					});
+				});
 			}
 			setOptions();
 		}
@@ -773,6 +773,9 @@ $(document).ready(function() {
 				$("#thumbs").show();
 			$("#powered-by").hide();
 		}
+		
+		setOptions();
+		
 		setTimeout(scrollToThumb, 1);
 	}
 	function getDecimal(fraction) {
