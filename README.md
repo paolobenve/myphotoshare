@@ -2,16 +2,50 @@
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
-![Screenshot](screnshot-panorama-2.2.png)
-![Screenshot](screnshot-classic-square-2.2.png)
-![Screenshot](screnshot-no-slide-mode-fit-2.2.png)
-![Screenshot](screnshot-slide-mode-2.2.png)
+## Description
 
-It's an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
+`photofloat` is an open source web photo gallery aimed at sleekness and speed. It keeps with an old hat mentality, preferring to work over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
 This is a Jason A. Donenfeld's Photofloat fork, enriched by following contributors: Jerome Charaoui's patches about showing videos, and Paolo Benvenuto's following development.
 
 [Check out a demo!](http://palmaro.qumran2.net/#!/_folders-giovani-biscotti_natale_2016/giovani_preparazione_biscotti_2016-12-16-17.17.27.jpg)
+
+## Features
+
+* Manages images and videos
+* Animations to make the interface feel nice
+* Fullscreen mode
+* Swipe gestures for mobile
+* Separate album view and photo view
+* Album metadata pre-fetching
+* Photo pre-loading
+* Recursive async randomized tree walking album thumbnail algorithm
+* Smooth up and down scaling
+* Mouse-wheel support
+* Metadata display
+* Consistent hash url format
+* Linkable states via ajax urls
+* Link to original images
+* Optional Google Analytics integration
+* Optional server-side authentication support
+* Media can be browsed by folder or by date
+* Many customization through config file
+* Cache folder can be managed with subdirs (useful for large repositories)
+* Albums and cache server folders can be anywhere, even on another server
+* Images and folders can be sorted ascending/descending (via a cookie)
+* User interface translated via separate translation file
+* Thumbnails can be square (cropped) or full-content
+* Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+` a preview of the image/album is shared
+* Single `index.php` file: `php` applies basic option to home page (crawlers and social media do not execute javascript)
+* Media animation when passing to next/previous image
+* Folders (or trees) are not scanned if a marker in put inside them
+
+## Screenshots
+
+![Screenshot](screnshot-panorama-2.2.png)
+![Screenshot](screnshot-classic-square-2.2.png)
+![Screenshot](screnshot-no-slide-mode-fit-2.2.png)
+![Screenshot](screnshot-slide-mode-2.2.png)
 
 ## How It Works
 
@@ -186,6 +220,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 ### version 2.4.1 (July 26, 2017):
 
 * do not produce canvas for small images: they are shown in their original size
+* two new options: `exclude_files_marker` and `exclude_tree_marker`: when the markers are found in a folder, the media in the folder itself or the whole tree isn't scanned
 
 ### version 2.4 (July 24, 2017):
 

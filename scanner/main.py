@@ -154,7 +154,6 @@ def main():
 	
 	try:
 		os.umask(002)
-		message("Browsing", "start!")
 		TreeWalker(Options.config['album_path'], Options.config['cache_path'])
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")

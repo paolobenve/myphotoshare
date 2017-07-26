@@ -52,6 +52,9 @@ video_transcode_bitrate = 4M
 # an integer number 1 -100
 jpeg_quality = 95
 
+# markers that permit not to scan files in folder or whole trees
+exclude_files_marker = .photofloat.exclude.files
+exclude_tree_marker = .photofloat.exclude.tree
 
 ###########################################################
 # scanner and ui options
