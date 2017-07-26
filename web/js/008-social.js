@@ -189,13 +189,6 @@ var SocialShareKit = (function() {
 			opts = 'status=1,resizable=yes' +
 				',width=' + width + ',height=' + height +
 				',top=' + top + ',left=' + left;
-			if (url.indexOf("whatsapp:") === 0) {
-				if (isMobile.any()) {
-					win = window.open(url, '', opts);
-				} else {
-					alert(_t("whatsapp-mobile-only"));
-				}
-			} else
 				win = window.open(url, '', opts);
 		} else {
 			win = window.open(url);

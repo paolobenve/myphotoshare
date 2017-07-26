@@ -271,7 +271,7 @@ a.title-anchor.mobile {
 	color: #FFAD27;
 	margin-top: 20px;
 }
-#error-overlay, #error-text-folder, #error-text-image, #error-options-file, #auth-text {
+#error-overlay, #error-text-folder, #error-root-folder, #error-text-image, #error-options-file, #auth-text {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -282,12 +282,12 @@ a.title-anchor.mobile {
 #error-overlay {
 	background-color: #000000;
 }
-#error-text-folder, #error-text-image, #error-options-file, #auth-text {
+#error-text-folder, #error-root-folder, #error-text-image, #error-options-file, #auth-text {
 	position: fixed;
 	padding-top: 20%;
 	text-align: center;
 }
-#error-text-folder, #error-text-image, #error-options-file {
+#error-text-folder, #error-root-folder, #error-text-image, #error-options-file {
 	font-size: 4em;
 	font-weight: bold;
 	font-style: italic;
