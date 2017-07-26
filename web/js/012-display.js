@@ -563,20 +563,26 @@ $(document).ready(function() {
 							calculatedWidth = Options.media_thumb_size;
 						}
 					}
-					imageString = "<div class=\"thumb-container\" ";
-					imageString += "style=\"width: " + calculatedWidth + "px; height: " + Options.media_thumb_size + "px;\">";
-					imageString += 		"<span class=\"helper\"></span>";
-					imageString += 		"<img title=\"" + currentAlbum.media[i].name +
-								"\" alt=\"" + photoFloat.trimExtension(currentAlbum.media[i].name) +
-								"\" src=\"" +  thumbHash +
-								"\" class=\"thumbnail" +
-								"\" height=\"" + thumbHeight +
-								"\" width=\"" + thumbWidth +
-								"\" />" +
+					imageString =	"<div class=\"thumb-and-caption-container\" style=\"" +
+										"width: " + calculatedWidth + "px;\"" + 
+									">" +
+								"<div class=\"thumb-container\" " + "style=\"" +
+										"width: " + calculatedWidth + "px; " +
+										"height: " + Options.media_thumb_size + "px;" +
+									"\">" +
+									"<span class=\"helper\"></span>" +
+									"<img title=\"" + currentAlbum.media[i].name + "\"" +
+										"alt=\"" + photoFloat.trimExtension(currentAlbum.media[i].name) + "\"" +
+										"src=\"" +  thumbHash + "\"" +
+										"class=\"thumbnail" + "\"" +
+										"height=\"" + thumbHeight + "\"" +
+										"width=\"" + thumbWidth + "\"" +
+									"/>" +
+								"</div>" +
 								"<div class=\"media-caption\">" +
 								currentAlbum.media[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
 								"</div>" +
-								"</div>";
+							"</div>";
 					image = $(imageString);
 					
 					image.get(0).media = currentAlbum.media[i];
@@ -625,14 +631,12 @@ $(document).ready(function() {
 						link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
-						//~ imageString += 			"width: " + (calculatedAlbumThumbSize + 6) + "px;";
-						//~ imageString += 			" height: " + (calculatedAlbumThumbSize + 6) + "px;";
 						imageString += 			"width: " + (calculatedAlbumThumbSize + 2) + "px;";
 						imageString += 			" height: " + (calculatedAlbumThumbSize + 2) + "px;";
 						if (! Options.albums_slide_style)
 							imageString +=		" background-color: " + Options.album_button_background_color + ";";
 						imageString += 			"\"";
-						imageString += ">";
+						imageString += 		">";
 						imageString += "</div>";
 						image = $(imageString);
 						link.append(image);
@@ -1201,7 +1205,7 @@ $(document).ready(function() {
 			$(this).css("color", Options.title_color);
 		});
 		$("#media-name").css("color", Options.title_image_name_color);
-		$(".thumb-container").css("margin-right", Options.thumb_spacing.toString() + "px");
+		$(".thumb-and-caption-container").css("margin-right", Options.thumb_spacing.toString() + "px");
 	}
 	
 	function em2px(selector, em) {
