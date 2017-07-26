@@ -32,7 +32,6 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
-	<script type="text/javascript" src="js/999-tracking.js"></script>
 	<?php
 		function join_paths() {
 			return preg_replace('~[/\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
@@ -128,6 +127,53 @@
 			}
 		}
 	?>
+	<?php if ($options['piwik_server'] && $options['piwik_id']) { ?>
+		<!-- Piwik -->
+		<script type="text/javascript">
+			var _paq = _paq || [];
+			_paq.push(['trackPageView']);
+			_paq.push(['enableLinkTracking']);
+			(function() {
+				var u="//<?php echo $options['piwik_server']; ?>";
+				_paq.push(['setTrackerUrl', u+'piwik.php']);
+				_paq.push(['setSiteId', '<?php echo $options['piwik_id']; ?>']);
+				var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+				g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+			})();
+			// from https://piwik.org/blog/2017/02/how-to-track-single-page-websites-using-piwik-analytics/
+			$(document).ready(function() {
+				$(window).hashchange(function() {
+					_paq.push(['setCustomUrl', '/' + window.location.hash.substr(1)]);
+					_paq.push(['setDocumentTitle', PhotoFloat.cleanHash(location.hash)]);
+					_paq.push(['trackPageView']);
+				});
+			});
+		</script>
+		<noscript><p><img src="//cathopedia.org:8080/piwik/piwik.php?idsite=15" style="border:0;" alt="" /></p></noscript>
+		<!-- End Piwik Code -->
+	<?php } ?>  
+	<?php if ($options['google_analitics_id']) { ?>
+		<!-- google analytics -->
+		<script type="text/javascript">
+			// from https://git.zx2c4.com/PhotoFloat/tree/web/js/999-googletracker.js
+			window._gaq = window._gaq || [];
+			window._gaq.push(['_setAccount', '<?php echo $options['google_analytics_id']; ?>']);
+			var ga = document.createElement('script');
+			ga.type = 'text/javascript';
+			ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0];
+			s.parentNode.insertBefore(ga, s);
+			$(document).ready(function() {
+				$(window).hashchange(function() {
+					window._gaq = window._gaq || [];
+					window._gaq.push(['_trackPageview']);
+					window._gaq.push(['_trackPageview', PhotoFloat.cleanHash(location.hash)]);
+				});
+			});
+		</script>
+		<!-- End google analitics code -->
+	<?php } ?>  
 </head>
 <body>
 	<?php
