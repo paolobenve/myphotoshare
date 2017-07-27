@@ -173,4 +173,5 @@ google_analytics_id =
 # piwik analytics server...
 piwik_server = 
 # ... and site id (an integer)
-piwik_id = 
+# this parameter must come after piwik_server
+piwik_id =

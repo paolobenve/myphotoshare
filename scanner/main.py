@@ -45,8 +45,7 @@ def main():
 				'big_date_folders_threshold',
 				'respected_processors',
 				'max_album_share_thumbnails_number',
-				'min_album_thumbnail',
-				'piwik_id'
+				'min_album_thumbnail'
 		):
 			Options.config[option] = usr_config.getint('options', option)
 		elif option in ('different_album_thumbnails',
@@ -61,6 +60,9 @@ def main():
 			Options.config[option] = eval(usr_config.get('options', option))
 		else:
 			Options.config[option] = usr_config.get('options', option)
+			if option == 'piwik_id' and Options.config['piwik_server']:
+				# piwik_id must be evaluated here because otherwise an error is produced if it's not set
+				Options.config[option] = usr_config.getint('options', option)
 		option_value = str(Options.config[option])
 		option_length = len(option_value)
 		max_length = 40

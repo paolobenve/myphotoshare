@@ -219,6 +219,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.4.2 (July 29, 2017):
+
+* right click on image moves back in album (opposite of left click)
+
 ### version 2.4.1 (July 26, 2017):
 
 * do not produce canvas for small images: they are shown in their original size

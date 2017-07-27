@@ -13,6 +13,7 @@ import tempfile
 from VideoToolWrapper import *
 import math
 import Options
+import hashlib
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -31,6 +32,19 @@ class Album(object):
 		self.albums_list = list()
 		self.media_list_is_sorted = True
 		self.albums_list_is_sorted = True
+		
+		if Options.config['subdir_method'] == "md5":
+			_subdir = hashlib.md5(path).hexdigest()[:2]
+		elif Options.config['subdir_method'] == "folder":
+			if path.find("/") == -1:
+				_subdir = "__"
+			else:
+				_subdir = path[path.rfind("/") + 1:][:2].replace(" ", "_")
+				if len(_subdir) == 1:
+					_subdir += "_"
+		else:
+			_subdir = ""
+		print _subdir,path
 	@property
 	def media(self):
 		return self.media_list
@@ -45,6 +59,9 @@ class Album(object):
 	@property
 	def json_file(self):
 		return json_name(self.path)
+	@property
+	def subdir(self):
+		return self._subdir
 	@property
 	def date(self):
 		self._sort()
