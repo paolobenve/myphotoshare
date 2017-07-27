@@ -542,12 +542,12 @@ $(document).ready(function() {
 					bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 					if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 						currentAlbum.media[i].completeName =
-							currentAlbum.media[i].foldersAlbum + '/' + currentAlbum.media[i].name;
+							PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
 						thumbHash =
-							PhotoFloat.cachePath(currentAlbum.media[i].completeName
-								.substring(0, currentAlbum.media[i].completeName.length - currentAlbum.media[i].name.length - 1)) +
-							"/" +
-							PhotoFloat.cachePath(currentAlbum.media[i].name);
+							PhotoFloat.pathJoin([
+								PhotoFloat.cachePath(currentAlbum.media[i].completeName
+									.substring(0, currentAlbum.media[i].completeName.length - currentAlbum.media[i].name.length - 1)),
+								PhotoFloat.cachePath(currentAlbum.media[i].name)]);
 					}
 					if (isOriginal) {
 						thumbHeight = width;
@@ -1093,7 +1093,7 @@ $(document).ready(function() {
 			if (currentAlbum.media.length > 1) {
 				i = currentMediaIndex;
 				currentAlbum.media[currentMediaIndex].byDateName =
-					currentAlbum.media[currentMediaIndex].dayAlbum + '/' + currentAlbum.media[currentMediaIndex].name;
+					PhotoFloat.pathJoin([currentAlbum.media[currentMediaIndex].dayAlbum, currentAlbum.media[currentMediaIndex].name]);
 				// following 2 iteration are needed with date album: the same photo could be present coming from different albums
 				do {
 					if (i == 0)
@@ -1101,7 +1101,7 @@ $(document).ready(function() {
 					else
 						i --;
 					prevMedia = currentAlbum.media[i];
-					prevMedia.byDateName = prevMedia.dayAlbum + '/' + prevMedia.name;
+					prevMedia.byDateName = PhotoFloat.pathJoin([prevMedia.dayAlbum, prevMedia.name]);
 				} while (prevMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
 				i = currentMediaIndex;
@@ -1111,7 +1111,7 @@ $(document).ready(function() {
 					else
 						i ++;
 					nextMedia = currentAlbum.media[i];
-					nextMedia.byDateName = nextMedia.dayAlbum + '/' + nextMedia.name;
+					nextMedia.byDateName = PhotoFloat.pathJoin([nextMedia.dayAlbum, nextMedia.name]);
 				} while (nextMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
 				if (nextMedia.mediaType == "photo") {
@@ -1152,9 +1152,9 @@ $(document).ready(function() {
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalMediaPath(currentMedia));
 		
 		if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
-			changeViewLink = "#!/" + PhotoFloat.cachePath(currentMedia.foldersAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name);
+			changeViewLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.cachePath(currentMedia.foldersAlbum), PhotoFloat.cachePath(currentMedia.name)]);
 		else
-			changeViewLink = "#!/" + PhotoFloat.cachePath(currentMedia.dayAlbum) + "/" + PhotoFloat.cachePath(currentMedia.name);
+			changeViewLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.cachePath(currentMedia.dayAlbum), PhotoFloat.cachePath(currentMedia.name)]);
 		$("#day-folders-view-link").attr("href", changeViewLink);
 		
 		text = "<table>";
@@ -1331,9 +1331,10 @@ $(document).ready(function() {
 		if (Object.keys(Options).length > 0)
 			callback(location.hash, hashParsed, die);
 		else {
-			if (cacheSubDir && cacheSubDir.substr(-1) != "/")
-				cacheSubDir += "/";
-			var optionsFile = cacheSubDir + "options.json";
+			
+			//~ if (cacheSubDir && cacheSubDir.substr(-1) != "/")
+				//~ cacheSubDir += "/";
+			var optionsFile = PhotoFloat.pathJoin([cacheSubDir, "options.json"]);
 			var ajaxOptions = {
 				type: "GET",
 				dataType: "json",
@@ -1342,10 +1343,6 @@ $(document).ready(function() {
 					for (var key in data)
 						if (data.hasOwnProperty(key))
 							Options[key] = data[key];
-					if (Options.server_cache_path && Options.server_cache_path.substr(-1) != "/")
-						Options.server_cache_path += "/";
-					if (Options.server_album_path && Options.server_album_path.substr(-1) != "/")
-						Options.server_album_path += "/";
 					translate();
 					
 					if (getBooleanCookie("albumReverseSortRequested") === null)

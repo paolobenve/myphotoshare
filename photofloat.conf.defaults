@@ -45,8 +45,8 @@ respected_processors = 1
 #    (none)	: no subfolders
 subdir_method = md5
 
-# The transcode bitrate used for videos: an integer, the bitrate in bits/s
-video_transcode_bitrate = 1000000
+# The transcode bitrate used for videos: an integer, the bitrate in bits/s, even in notation nnk, nnM
+video_transcode_bitrate = 1M
 
 # The jpg quality parameter for generating the reduced size images and the tumbnails
 # an integer number 1 -100

@@ -39,16 +39,26 @@ def main():
 	for option in default_config.options('options'):
 		if option in ('max_verbose',
 				'jpeg_quality',
-				'video_transcode_bitrate',
 				'thumb_spacing',
 				'album_thumb_size',
 				'media_thumb_size',
 				'big_date_folders_threshold',
 				'respected_processors',
 				'max_album_share_thumbnails_number',
-				'min_album_thumbnail'
+				'min_album_thumbnail',
+				'piwik_id'
 		):
-			Options.config[option] = usr_config.getint('options', option)
+			try:
+				if option != 'piwik_id' or Options.config['piwik_server']:
+					# piwik_id must be evaluated here because otherwise an error is produced if it's not set
+					Options.config[option] = usr_config.getint('options', option)
+				else:
+					Options.config[option] = ""
+			except:
+				next_level()
+				message("WARNING: option " + option + " in user config file", "is not integer, using default value")
+				back_level()
+				Options.config[option] = default_config.getint('options', option)
 		elif option in ('different_album_thumbnails',
 				'albums_slide_style',
 				'show_media_names_below_thumbs_in_albums',
@@ -56,14 +66,18 @@ def main():
 				'default_album_reverse_sort',
 				'default_media_reverse_sort'
 		):
-			Options.config[option] = usr_config.getboolean('options', option)
+			try:
+				Options.config[option] = usr_config.getboolean('options', option)
+			except:
+				next_level()
+				message("WARNING: option " + option + " in user config file", "is not boolean, using default value")
+				back_level()
+				Options.config[option] = default_config.getboolean('options', option)
 		elif option in ('reduced_sizes'):
 			Options.config[option] = eval(usr_config.get('options', option))
 		else:
 			Options.config[option] = usr_config.get('options', option)
-			if option == 'piwik_id' and Options.config['piwik_server']:
-				# piwik_id must be evaluated here because otherwise an error is produced if it's not set
-				Options.config[option] = usr_config.getint('options', option)
+			
 		option_value = str(Options.config[option])
 		option_length = len(option_value)
 		max_length = 40
@@ -156,9 +170,12 @@ def main():
 	os.chmod(albumCacheDir, 0777)
 	
 	
+	Options.config['album_path'] = os.path.abspath(Options.config['album_path']).decode(sys.getfilesystemencoding())
+	Options.config['cache_path'] = os.path.abspath(Options.config['cache_path']).decode(sys.getfilesystemencoding())
+	
 	try:
 		os.umask(002)
-		TreeWalker(Options.config['album_path'], Options.config['cache_path'])
+		TreeWalker()
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)

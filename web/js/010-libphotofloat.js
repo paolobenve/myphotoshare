@@ -16,12 +16,12 @@
 		if (Object.prototype.toString.call(subalbum).slice(8, -1) === "String")
 			cacheKey = subalbum;
 		else
-			cacheKey = PhotoFloat.cachePath(subalbum.parent.path + "/" + subalbum.path);
+			cacheKey = PhotoFloat.cachePath(PhotoFloat.pathJoin([subalbum.parent.path, subalbum.path]));
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
 			return;
 		}
-		var cacheFile = Options.server_cache_path + cacheKey + ".json";
+		var cacheFile = PhotoFloat.pathJoin([Options.server_cache_path, cacheKey + ".json"]);
 		self = this;
 		ajaxOptions = {
 			type: "GET",
@@ -157,22 +157,33 @@
 		return path;
 	};
 	PhotoFloat.mediaHash = function(album, media) {
-		return PhotoFloat.albumHash(album) + "/" + PhotoFloat.cachePath(media.name);
+		return PhotoFloat.pathJoin([PhotoFloat.albumHash(album), PhotoFloat.cachePath(media.name)]);
 	};
 	PhotoFloat.mediaHashFolder = function(album, media) {
 		var hash;
 		hash = PhotoFloat.mediaHash(album, media);
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
-			media.completeName = media.foldersAlbum + '/' + media.name;
-			hash = PhotoFloat.cachePath(media.foldersAlbum) + "/" + PhotoFloat.cachePath(media.name);
+			media.completeName = PhotoFloat.pathJoin([media.foldersAlbum, media.name]);
+			hash = PhotoFloat.pathJoin([PhotoFloat.cachePath(media.foldersAlbum), PhotoFloat.cachePath(media.name)]);
 		}
 		return hash;
 	};
+	PhotoFloat.pathJoin = function(pathArr) {
+		var result = '';
+		for (var i = 0; i < pathArr.length; ++i) {
+			if (i < pathArr.length - 1 &&  pathArr[i] && pathArr[i][pathArr[i].length - 1] != "/")
+				pathArr[i] += '/';
+			if (i && pathArr[i] && pathArr[i][0] == "/")
+				pathArr[i] = pathArr[i].slice(1);
+			result += pathArr[i]
+		}
+		return result;
+	}
 	PhotoFloat.albumHash = function(album) {
 		if (typeof album.media !== "undefined" && album.media !== null)
 			return PhotoFloat.cachePath(album.path);
-		return PhotoFloat.cachePath(album.parent.path + "/" + album.path);
+		return PhotoFloat.cachePath(PhotoFloat.pathJoin([album.parent.path, album.path]));
 	};
 	PhotoFloat.mediaPath = function(album, media, size) {
 		var suffix = "_", hash, rootString = "root-";
@@ -213,9 +224,9 @@
 			}
 		}
 		if (media.cacheSubdir)
-			return Options.server_cache_path + media.cacheSubdir + "/" + hash;
+			return PhotoFloat.pathJoin([Options.server_cache_path, media.cacheSubdir, hash]);
 		else
-			return Options.server_cache_path + hash;
+			return PhotoFloat.pathJoin([Options.server_cache_path, hash]);
 	};
 	PhotoFloat.originalMediaPath = function(media) {
 		return media.albumName;
@@ -248,6 +259,7 @@
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
 	PhotoFloat.prototype.mediaHash = PhotoFloat.mediaHash;
 	PhotoFloat.prototype.mediaHashFolder = PhotoFloat.mediaHashFolder;
+	PhotoFloat.prototype.pathJoin = PhotoFloat.pathJoin;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
 	PhotoFloat.prototype.mediaPath = PhotoFloat.mediaPath;
 	PhotoFloat.prototype.originalMediaPath = PhotoFloat.originalMediaPath;

@@ -26,21 +26,17 @@ def next_level(verbose = 0):
 def back_level(verbose = 0):
 	if (verbose <= max_verbose):
 		message.level -= 1
-def set_cache_path_base(base):
-	trim_base.base = base
-def untrim_base(path):
-	return os.path.join(trim_base.base, path)
 def trim_base_custom(path, base):
 	if path.startswith(base):
 		path = path[len(base):]
 	if path.startswith('/'):
 		path = path[1:]
 	return path
-def trim_base(path):
-	return trim_base_custom(path, trim_base.base)
+def remove_album_path(path):
+	return trim_base_custom(path, Options.config['album_path'])
 def cache_base(path, filepath=False):
 	if not filepath:
-		path = trim_base(path)
+		path = remove_album_path(path)
 	if path:
 		path = path.replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 		while path.find("--") != -1:
@@ -71,6 +67,6 @@ def photo_cache_name(path, size, thumb_type = ""):
 	result = cache_base(path, True) + suffix
 	return result
 def video_cache_name(path):
-	return cache_base(path, True) + "_transcoded_" + str(Options.config['video_transcode_bitrate']) + ".mp4"
+	return cache_base(path, True) + "_transcoded_" + Options.config['video_transcode_bitrate'] + ".mp4"
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))

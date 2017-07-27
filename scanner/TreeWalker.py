@@ -9,7 +9,7 @@ import Options
 import re
 
 class TreeWalker:
-	def __init__(self, album_path, cache_path):
+	def __init__(self):
 		self.save_json_options()
 		self.all_cache_entries= ["options.json"]
 		if (Options.config['thumbnail_generation_mode'] == "parallel"):
@@ -21,13 +21,10 @@ class TreeWalker:
 			# be sure reduced_sizes array is correctly sorted 
 			Options.config['reduced_sizes'].sort(reverse = True)
 		message("Browsing", "start!")
-		self.album_path = os.path.abspath(album_path).decode(sys.getfilesystemencoding())
-		self.cache_path = os.path.abspath(cache_path).decode(sys.getfilesystemencoding())
-		set_cache_path_base(self.album_path)
 		self.all_albums = list()
 		self.tree_by_date = {}
 		self.all_media = list()
-		folders_album = self.walk(self.album_path)
+		folders_album = self.walk(Options.config['album_path'])
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE")
 		else:
@@ -35,19 +32,19 @@ class TreeWalker:
 			self.all_cache_entries.append(Options.config['folders_string'] + ".json")
 			self.save_all_media_json()
 			by_date_album = self.generate_date_album()
-			origin_album = Album(self.album_path)
+			origin_album = Album(Options.config['album_path'])
 			origin_album.add_album(folders_album)
 			self.all_albums.append(origin_album)
 			if by_date_album is not None and not by_date_album.empty:
 				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
 				origin_album.add_album(by_date_album)
 			if not origin_album.empty:
-				origin_album.cache(self.cache_path)
+				origin_album.cache(Options.config['cache_path'])
 		self.remove_stale()
 		message("complete", "")
 	def generate_date_album(self):
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
-		by_date_path = os.path.join(self.album_path, Options.config['by_date_string'])
+		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
 			year_path = os.path.join(by_date_path, str(year))
@@ -66,21 +63,21 @@ class TreeWalker:
 						month_album.add_media(single_media)
 						year_album.add_media(single_media)
 					self.all_albums.append(day_album)
-					#day_cache = os.path.join(self.cache_path, json_name_by_date(day_path))
+					#day_cache = os.path.join(Options.config['cache_path'], json_name_by_date(day_path))
 					if not day_album.empty:
-						day_album.cache(self.cache_path)
+						day_album.cache(Options.config['cache_path'])
 				self.all_albums.append(month_album)
-				#month_cache = os.path.join(self.cache_path, json_name_by_date(month_path))
+				#month_cache = os.path.join(Options.config['cache_path'], json_name_by_date(month_path))
 				if not month_album.empty:
-					month_album.cache(self.cache_path)
+					month_album.cache(Options.config['cache_path'])
 			self.all_albums.append(year_album)
-			#year_cache = os.path.join(self.cache_path, json_name_by_date(year_path))
+			#year_cache = os.path.join(Options.config['cache_path'], json_name_by_date(year_path))
 			if not year_album.empty:
-				year_album.cache(self.cache_path)
+				year_album.cache(Options.config['cache_path'])
 		self.all_albums.append(by_date_album)
-		root_cache = os.path.join(self.cache_path, json_name(self.album_path))
+		root_cache = os.path.join(Options.config['cache_path'], json_name(Options.config['album_path']))
 		if not by_date_album.empty:
-			by_date_album.cache(self.cache_path)
+			by_date_album.cache(Options.config['cache_path'])
 		return by_date_album
 	def add_media_to_tree_by_date(self, media):
 		# add the given media to a temporary structure where media are organazide by year, month, date
@@ -92,8 +89,8 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month][media.day] = list()
 		self.tree_by_date[media.year][media.month][media.day].append(media)
 	def walk(self, path):
-		trimmed_path = trim_base_custom(path, self.album_path)
-		path_with_marker = os.path.join(self.album_path, Options.config['folders_string'])
+		trimmed_path = trim_base_custom(path, Options.config['album_path'])
+		path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
 		if trimmed_path:
 			path_with_marker = os.path.join(path_with_marker, trimmed_path)
 		next_level()
@@ -112,16 +109,16 @@ class TreeWalker:
 			next_level()
 			message("files excluded by marker file", Options.config['exclude_files_marker'])
 			back_level()
-		cache = os.path.join(self.cache_path, json_name(path))
+		cache = os.path.join(Options.config['cache_path'], json_name(path))
 		json_cache_file = json_name(path_with_marker)
-		json_cache_file = os.path.join(self.cache_path, json_cache_file)
+		json_cache_file = os.path.join(Options.config['cache_path'], json_cache_file)
 		path_is_cached = False
 		cached_album = None
 		if os.path.exists(json_cache_file):
 			try:
-				#~ cached_album = Album.from_cache(json_cache_file)
+				cached_album = Album.from_cache(json_cache_file)
 				#~ if False and file_mtime(path) <= file_mtime(cache):
-				if False and self.max_mtime_in_tree(path) <= file_mtime(json_cache_file):
+				if self.max_mtime_in_tree(path) <= file_mtime(json_cache_file):
 					message("full cache", os.path.basename(path))
 					path_is_cached = True
 					album = cached_album
@@ -135,8 +132,10 @@ class TreeWalker:
 			#~ except (ValueError, AttributeError) as e:
 				#~ message("corrupt cache", os.path.basename(path))
 				#~ cached_album = None
+		
 		if not path_is_cached:
 			album = Album(path_with_marker)
+		
 		for entry in sorted(os.listdir(path)):
 			if entry[0] == '.':
 				continue
@@ -167,35 +166,7 @@ class TreeWalker:
 						cached_media and
 						file_mtime(entry_with_path) <= cached_media.attributes["dateTimeFile"]
 					):
-						cache_files = cached_media.image_caches()
-						#~ cache_files = list()
-						#~ if "mediaType" in cached_media.attributes and cached_media.attributes["mediaType"] == "video":
-							#~ # video
-							#~ cache_files.append(
-								#~ os.path.join(
-									#~ self.cache_path,
-									#~ album.subdir,
-									#~ entry_with_path
-								#~ )
-							#~ )
-						#~ else:
-							#~ # image
-							#~ for thumb_size in Options.config['reduced_sizes']:
-								#~ cache_files.append(
-									#~ os.path.join(
-										#~ self.cache_path,
-										#~ album.subdir,
-										#~ photo_cache(entry_with_path, thumb_size)
-									#~ )
-								#~ )
-							#~ for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
-								#~ cache_files.append(
-									#~ os.path.join(
-										#~ self.cache_path,
-										#~ album.subdir,
-										#~ photo_cache(entry_with_path, thumb_size)
-									#~ )
-								#~ )
+						cache_files = cached_media.image_caches
 						# at this point we have full path to cache image/video
 						# check if it actually exists
 						cache_hit = True
@@ -208,7 +179,7 @@ class TreeWalker:
 							media = cached_media
 				if not cache_hit:
 					message(" processing image/video", os.path.basename(entry_with_path))
-					media = Media(album, entry_with_path, self.cache_path)
+					media = Media(album, entry_with_path, Options.config['cache_path'])
 				if media.is_valid:
 					self.all_media.append(media)
 					album.add_media(media)
@@ -222,7 +193,7 @@ class TreeWalker:
 			next_level()
 			message("caching folder:", os.path.basename(path))
 			back_level()
-			album.cache(self.cache_path)
+			album.cache(Options.config['cache_path'])
 			self.all_albums.append(album)
 		else:
 			next_level()
@@ -241,7 +212,7 @@ class TreeWalker:
 		for media in self.all_media:
 			media_list.append(media.path)
 		message("caching", "all media path list")
-		fp = open(os.path.join(self.cache_path, "all_media.json"), 'w')
+		fp = open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w')
 		json.dump(media_list, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	def save_json_options(self):
@@ -251,7 +222,7 @@ class TreeWalker:
 			message("saving json options file", json_options_file)
 		except IOError:
 			json_options_file_old = json_options_file
-			json_options_file = os.path.join(self.cache_path, 'options.json')
+			json_options_file = os.path.join(Options.config['cache_path'], 'options.json')
 			message("saving json options file", json_options_file + " (couldn not save " + json_options_file_old + ")")
 			fp = open(json_options_file, 'w')
 		json.dump(Options.config, fp)
@@ -276,32 +247,33 @@ class TreeWalker:
 		# reduced sizes, thumbnails, old style thumbnails
 		deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(s|[at][sf])?\.jpg$"
 		next_level()
-		for cache in sorted(os.listdir(os.path.join(self.cache_path, subdir))):
-			if os.path.isdir(os.path.join(Options.config['cache_path'], cache)):
-				if not cache == "album":
+		
+		for cache_file in sorted(os.listdir(os.path.join(Options.config['cache_path'], subdir))):
+			if os.path.isdir(os.path.join(Options.config['cache_path'], cache_file)):
+				if not cache_file == "album":
 					next_level()
-					self.remove_stale(cache, self.all_cache_entries)
-					if not os.listdir(os.path.join(self.cache_path, cache)):
+					self.remove_stale(cache_file, self.all_cache_entries)
+					if not os.listdir(os.path.join(Options.config['cache_path'], cache_file)):
 						message("empty subdir, deleting", "xxxx")
-						file_to_delete = os.path.join(self.cache_path, cache)
-						os.rmdir(os.path.join(self.cache_path, file_to_delete))
+						file_to_delete = os.path.join(Options.config['cache_path'], cache_file)
+						os.rmdir(os.path.join(Options.config['cache_path'], file_to_delete))
 					back_level()
 			else:
-				cache_with_subdir = os.path.join(subdir, cache)
+				cache_with_subdir = os.path.join(subdir, cache_file)
 				# only delete json's, transcoded videos, reduced images and thumbnails
 				found = False
-				match = re.search(deletable_files_suffixes_re, cache)
+				match = re.search(deletable_files_suffixes_re, cache_file)
 				if match:
 					try:
-						cache = cache.decode(sys.getfilesystemencoding())
+						cache_file = cache_file.decode(sys.getfilesystemencoding())
 					except KeyboardInterrupt:
 						raise
 					except:
 						pass
 					if cache_with_subdir not in self.all_cache_entries:
 						message("cleanup", cache_with_subdir)
-						file_to_delete = os.path.join(self.cache_path, cache_with_subdir)
-						os.unlink(os.path.join(self.cache_path, file_to_delete))
+						file_to_delete = os.path.join(Options.config['cache_path'], cache_with_subdir)
+						os.unlink(os.path.join(Options.config['cache_path'], file_to_delete))
 				else:
 					message("not deleting", cache_with_subdir)
 					continue

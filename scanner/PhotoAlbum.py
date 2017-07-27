@@ -27,13 +27,14 @@ def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb
 
 class Album(object):
 	def __init__(self, path):
-		self.baseless_path = trim_base(path)
+		self.baseless_path = remove_album_path(path)
 		self.media_list = list()
 		self.albums_list = list()
 		self.media_list_is_sorted = True
 		self.albums_list_is_sorted = True
 		self._subdir = ""
-		if Options.config['subdir_method'] in ("md5", "folder"):
+		
+		if self.baseless_path.find(Options.config['by_date_string']) != 0 and  Options.config['subdir_method'] in ("md5", "folder"):
 			if Options.config['subdir_method'] == "md5":
 				self._subdir = hashlib.md5(path).hexdigest()[:2]
 			elif Options.config['subdir_method'] == "folder":
@@ -46,7 +47,7 @@ class Album(object):
 			self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
 			if not os.path.exists(self.cache_path_with_subdir):
 				os.makedirs(self.cache_path_with_subdir)
-	
+		
 	@property
 	def media(self):
 		return self.media_list
@@ -66,7 +67,7 @@ class Album(object):
 		return self._subdir
 	@property
 	def date(self):
-		self._sort()
+		self.sort_subalbums_and_media()
 		if len(self.media_list) == 0 and len(self.albums_list) == 0:
 			return datetime(1900, 1, 1)
 		elif len(self.media_list) == 0:
@@ -85,7 +86,7 @@ class Album(object):
 	def add_album(self, album):
 		self.albums_list.append(album)
 		self.albums_list_is_sorted = False
-	def _sort(self):
+	def sort_subalbums_and_media(self):
 		if not self.media_list_is_sorted:
 			self.media_list.sort()
 			self.media_list_is_sorted = True
@@ -104,7 +105,7 @@ class Album(object):
 		return True
 		
 	def cache(self, base_dir):
-		self._sort()
+		self.sort_subalbums_and_media()
 		fp = open(os.path.join(base_dir, self.json_file), 'w')
 		json.dump(self, fp, cls=PhotoAlbumEncoder)
 		fp.close()
@@ -115,29 +116,34 @@ class Album(object):
 		fp.close()
 		return Album.from_dict(dictionary)
 	@staticmethod
-	def from_dict(dictionary, cripple=True):
-		if "physicalPath" in dictionary:
-			album = Album(dictionary["physicalPath"])
-		else:
-			album = Album(dictionary["path"])
+	def from_dict(dictionary, path_is_cripple=True):
+		#~ if "physicalPath" in dictionary:
+			#~ path = dictionary["physicalPath"]
+		#~ else:
+			#~ path = dictionary["path"]
+		path = dictionary["path"]
+		album = Album(os.path.join(Options.config['album_path'], path))
 		for media in dictionary["media"]:
-			album.add_media(Media.from_dict(media, untrim_base(album.path)))
-		if not cripple:
+			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], album.remove_folders_marker(album.baseless_path)))
+			album.add_media(new_media)
+		if not path_is_cripple:
 			for subalbum in dictionary["albums"]:
-				album.add_album(Album.from_dict(subalbum), cripple)
-		album._sort()
+				album.add_album(Album.from_dict(subalbum, path_is_cripple))
+		
+		album.sort_subalbums_and_media()
+		
 		return album
-	def remove_marker(self, path):
+	def remove_folders_marker(self, path):
 		marker_position = path.find(Options.config['folders_string'])
 		if marker_position == 0:
 			path = path[len(Options.config['folders_string']):]
 			if len(path) > 0:
 				path = path[1:]
 		return path
-	def to_dict(self, cripple=True):
-		self._sort()
+	def to_dict(self, path_is_cripple=True):
+		self.sort_subalbums_and_media()
 		subalbums = []
-		if cripple:
+		if path_is_cripple:
 			for sub in self.albums_list:
 				if not sub.empty:
 					subalbums.append({ "path": trim_base_custom(sub.path, self.baseless_path), "date": sub.date })
@@ -145,37 +151,28 @@ class Album(object):
 			for sub in self.albums_list:
 				if not sub.empty:
 					subalbums.append(sub)
-		path_without_marker = self.remove_marker(self.path)
-		if path_without_marker == self.path:
-			dictionary = {
-				"path": self.path,
-				"date": self.date,
-				"albums": subalbums,
-				"media": self.media_list,
-				"cacheBase": cache_base(self.path)
-				}
-		else:
-			dictionary = {
-				"path": self.path,
-				"physicalPath": path_without_marker,
-				"date": self.date,
-				"albums": subalbums,
-				"media": self.media_list,
-				"cacheBase": cache_base(self.path)
-				}
+		path_without_folders_marker = self.remove_folders_marker(self.path)
+		dictionary = {
+			"path": self.path,
+			"date": self.date,
+			"albums": subalbums,
+			"media": self.media_list,
+			"cacheBase": cache_base(self.path),
+			"physicalPath": path_without_folders_marker
+			}
 		
 		return dictionary
 	def media_from_path(self, path):
 		for media in self.media_list:
-			if trim_base(path) == media.media_file_name:
+			if remove_album_path(path) == media.media_file_name:
 				return media
 		return None
 
 class Media(object):
 	def __init__(self, album, media_path, thumbs_path=None, attributes=None):
 		self.album = album
-		self.media_file_name = trim_base(media_path)
-		self.folders = trim_base(os.path.dirname(self.media_file_name))
+		self.media_file_name = remove_album_path(media_path)
+		self.folders = remove_album_path(os.path.dirname(self.media_file_name))
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
 		self.is_valid = True
 		image = None
@@ -187,6 +184,7 @@ class Media(object):
 			self.is_valid = False
 			return
 		if attributes is not None and attributes["dateTimeFile"] >= mtime:
+		#~ if attributes is not None and attributes["date"] >= mtime:
 			self._attributes = attributes
 			return
 		self._attributes = {}
@@ -204,7 +202,7 @@ class Media(object):
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
 			try:
-				self._photo_thumbnails(image, media_path, thumbs_path)
+				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
 			except KeyboardInterrupt:
 				raise
 		elif self._attributes["mediaType"] == "video":
@@ -705,7 +703,7 @@ class Media(object):
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
 			'-crf', '20',						# set quality
-			'-b:v', str(Options.config['video_transcode_bitrate']),	# set videobitrate
+			'-b:v', Options.config['video_transcode_bitrate'],	# set videobitrate
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec
 			'-ac', '2',						# force two audiochannels
@@ -841,7 +839,7 @@ class Media(object):
 			correct_date = datetime(1900, 1, 1)
 		if "dateTimeOriginal" in self._attributes["metadata"]:
 			correct_date = self._attributes["metadata"]["dateTimeOriginal"]
-		elif "dateTime" in self._attributes:
+		elif "dateTime" in self._attributes["metadata"]:
 			correct_date = self._attributes["metadata"]["dateTime"]
 		else:
 			correct_date = self._attributes["dateTimeFile"]
@@ -882,19 +880,30 @@ class Media(object):
 	def attributes(self):
 		return self._attributes
 	@staticmethod
-	def from_dict(dictionary, basepath):
+	def from_dict(album, dictionary, basepath):
 		del dictionary["date"]
-		path = os.path.join(basepath, dictionary["name"])
+		media_path = os.path.join(basepath, dictionary["name"])
+		
 		del dictionary["name"]
 		for key, value in dictionary.items():
 			if key.startswith("dateTime"):
 				try:
-					dictionary[key] = datetime.strptime(dictionary[key], "%Y-%m-%d %H:%M:%S")
+					dictionary[key] = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
 				except KeyboardInterrupt:
 					raise
 				#~ except:
 					#~ pass
-		return Media(album, path, None, dictionary)
+			if key == "metadata":
+				for key1, value1 in value.items():
+					if key1.startswith("dateTime"):
+						try:
+							dictionary[key][key1] = datetime.strptime(value1, "%Y-%m-%d %H:%M:%S")
+						except KeyboardInterrupt:
+							raise
+						#~ except:
+							#~ pass
+					
+		return Media(album, media_path, None, dictionary)
 	def to_dict(self):
 		foldersAlbum = Options.config['folders_string']
 		if (self.folders):
@@ -909,19 +918,15 @@ class Media(object):
 				"date": self.date,
 				"cacheSubdir": self.album.subdir,
 				"cacheBase": cache_base(self.name),
-				"mediaType": self._attributes["mediaType"]
 			}
-		media.update({"metadata": self.attributes["metadata"]})
-		#~ media.update(self.attributes)
+		media.update(self.attributes)
+		
 		return media
 
 class PhotoAlbumEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, datetime):
-			# following is Jason's line
-			#return obj.strftime("%a %b %d %H:%M:%S %Y")
 			return obj.strftime("%Y-%m-%d %H:%M:%S")
-			#~ return obj.strftime("%c")
 		if isinstance(obj, Album) or isinstance(obj, Media):
 			return obj.to_dict()
 		return json.JSONEncoder.default(self, obj)
