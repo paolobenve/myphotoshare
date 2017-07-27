@@ -1131,7 +1131,7 @@ $(document).ready(function() {
 			}
 		}
 		
-		$("#next-media").off("click");
+		$("#next-media").off("mousedown");
 		$('#next').off("click");
 		$('#prev').off("click");
 		if (currentAlbum.media.length == 1) {
@@ -1142,7 +1142,14 @@ $(document).ready(function() {
 			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, prevMedia);
 			$("#next").show();
 			$("#prev").show();
-			$("#next-media").click(function(){ swipeLeft(nextLink); return false; });
+			$("#next-media").attr("oncontextmenu", "return false;");
+			$("#next-media").mousedown(function(ev){
+				if(ev.which == 1)
+					swipeLeft(nextLink);
+				else if(ev.which == 3)
+					swipeRight(prevLink);
+				return false; 
+			});
 			$('#next').click(function(){ swipeLeft(nextLink); return false; });
 			$('#prev').click(function(){ swipeRight(prevLink); return false; });
 		}
