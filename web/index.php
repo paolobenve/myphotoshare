@@ -143,7 +143,7 @@
 			// from https://piwik.org/blog/2017/02/how-to-track-single-page-websites-using-piwik-analytics/
 			$(document).ready(function() {
 				$(window).hashchange(function() {
-					_paq.push(['setCustomUrl', '/' + window.location.hash.substr(1)]);
+					_paq.push(['setCustomUrl', '/' + window.location.hash]);
 					_paq.push(['setDocumentTitle', PhotoFloat.cleanHash(location.hash)]);
 					_paq.push(['trackPageView']);
 				});
