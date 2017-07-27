@@ -52,7 +52,8 @@ def cache_base(path, filepath=False):
 	return path
 def json_name(path):
 	return cache_base(path) + ".json"
-def image_cache(path, size, thumb_type = ""):
+def photo_cache_name(path, size, thumb_type = ""):
+	# this function is used for video thumbnails too
 	suffix = "_" + str(size)
 	if size == Options.config['album_thumb_size']:
 		suffix += "a"
@@ -69,38 +70,7 @@ def image_cache(path, size, thumb_type = ""):
 	suffix += ".jpg"
 	result = cache_base(path, True) + suffix
 	return result
-def cache_subdir(path):
-	if Options.config['subdir_method'] == "md5":
-		subdir = hashlib.md5(path).hexdigest()[:2]
-	elif Options.config['subdir_method'] == "folder":
-		if path.find("/") == -1:
-			subdir = "__"
-		else:
-			subdir = path[:path.find("/")][:2]
-	else:
-		subdir = ""
-	return subdir
-def path_with_subdir(path, size, thumb_type = ""):
-	subdir = cache_subdir(path)
-	if subdir:
-		cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
-		if not os.path.exists(cache_path_with_subdir):
-			os.makedirs(cache_path_with_subdir)
-		image_cache_with_subdir = os.path.join(subdir, image_cache(path, size, thumb_type))
-	else:
-		image_cache_with_subdir = image_cache(path, size, thumb_type)
-	return image_cache_with_subdir
-def video_cache_with_subdir(path):
-	subdir = cache_subdir(path)
-	if subdir:
-		cache_path_with_subdir = os.path.join(Options.config['cache_path'], subdir)
-		if not os.path.exists(cache_path_with_subdir):
-			os.makedirs(cache_path_with_subdir)
-		video_cache_with_subdir = os.path.join(subdir, video_cache(path))
-	else:
-		video_cache_with_subdir = video_cache(path)
-	return video_cache_with_subdir
-def video_cache(path):
-	return cache_base(path, True) + "_transcoded.mp4"
+def video_cache_name(path):
+	return cache_base(path, True) + "_transcoded_" + str(Options.config['video_transcode_bitrate']) + ".mp4"
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))

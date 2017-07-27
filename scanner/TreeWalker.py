@@ -167,16 +167,35 @@ class TreeWalker:
 						cached_media and
 						file_mtime(entry_with_path) <= cached_media.attributes["dateTimeFile"]
 					):
-						cache_files = list()
-						if "mediaType" in cached_media.attributes and cached_media.attributes["mediaType"] == "video":
-							# video
-							cache_files.append(os.path.join(self.cache_path, video_cache_with_subdir(entry_with_path)))
-						else:
-							# image
-							for thumb_size in Options.config['reduced_sizes']:
-								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry_with_path, thumb_size)))
-							for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
-								cache_files.append(os.path.join(self.cache_path, path_with_subdir(entry_with_path, thumb_size)))
+						cache_files = cached_media.image_caches()
+						#~ cache_files = list()
+						#~ if "mediaType" in cached_media.attributes and cached_media.attributes["mediaType"] == "video":
+							#~ # video
+							#~ cache_files.append(
+								#~ os.path.join(
+									#~ self.cache_path,
+									#~ album.subdir,
+									#~ entry_with_path
+								#~ )
+							#~ )
+						#~ else:
+							#~ # image
+							#~ for thumb_size in Options.config['reduced_sizes']:
+								#~ cache_files.append(
+									#~ os.path.join(
+										#~ self.cache_path,
+										#~ album.subdir,
+										#~ photo_cache(entry_with_path, thumb_size)
+									#~ )
+								#~ )
+							#~ for thumb_size in (Options.config['album_thumb_size'], Options.config['media_thumb_size']):
+								#~ cache_files.append(
+									#~ os.path.join(
+										#~ self.cache_path,
+										#~ album.subdir,
+										#~ photo_cache(entry_with_path, thumb_size)
+									#~ )
+								#~ )
 						# at this point we have full path to cache image/video
 						# check if it actually exists
 						cache_hit = True
@@ -189,7 +208,7 @@ class TreeWalker:
 							media = cached_media
 				if not cache_hit:
 					message(" processing image/video", os.path.basename(entry_with_path))
-					media = Media(entry_with_path, self.cache_path)
+					media = Media(album, entry_with_path, self.cache_path)
 				if media.is_valid:
 					self.all_media.append(media)
 					album.add_media(media)
@@ -240,7 +259,6 @@ class TreeWalker:
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
 			message("cleanup", "building stale list")
-			#~ all_cache_entries = { "all_media.json": True, Options.config['folders_string'] + ".json": True, Options.config['by_date_string'] + ".json": True, "options.json": True }
 			for album in self.all_albums:
 				self.all_cache_entries.append(album.json_file)
 			for media in self.all_media:
@@ -254,7 +272,7 @@ class TreeWalker:
 			info = "in subdir " + subdir
 		message("searching", info)
 		deletable_files_suffixes_re ="\.json$"
-		deletable_files_suffixes_re += "|_transcoded\.mp4$"
+		deletable_files_suffixes_re += "|_transcoded(_[1-9][0-9]{1,10})?\.mp4$"
 		# reduced sizes, thumbnails, old style thumbnails
 		deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(s|[at][sf])?\.jpg$"
 		next_level()

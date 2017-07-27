@@ -32,19 +32,21 @@ class Album(object):
 		self.albums_list = list()
 		self.media_list_is_sorted = True
 		self.albums_list_is_sorted = True
-		
-		if Options.config['subdir_method'] == "md5":
-			_subdir = hashlib.md5(path).hexdigest()[:2]
-		elif Options.config['subdir_method'] == "folder":
-			if path.find("/") == -1:
-				_subdir = "__"
-			else:
-				_subdir = path[path.rfind("/") + 1:][:2].replace(" ", "_")
-				if len(_subdir) == 1:
-					_subdir += "_"
-		else:
-			_subdir = ""
-		print _subdir,path
+		self._subdir = ""
+		if Options.config['subdir_method'] in ("md5", "folder"):
+			if Options.config['subdir_method'] == "md5":
+				self._subdir = hashlib.md5(path).hexdigest()[:2]
+			elif Options.config['subdir_method'] == "folder":
+				if path.find("/") == -1:
+					self._subdir = "__"
+				else:
+					self._subdir = path[path.rfind("/") + 1:][:2].replace(" ", "_")
+					if len(self._subdir) == 1:
+						self._subdir += "_"
+			self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
+			if not os.path.exists(self.cache_path_with_subdir):
+				os.makedirs(self.cache_path_with_subdir)
+	
 	@property
 	def media(self):
 		return self.media_list
@@ -170,13 +172,13 @@ class Album(object):
 		return None
 
 class Media(object):
-	def __init__(self, media_path, thumbs_path=None, attributes=None):
+	def __init__(self, album, media_path, thumbs_path=None, attributes=None):
+		self.album = album
 		self.media_file_name = trim_base(media_path)
 		self.folders = trim_base(os.path.dirname(self.media_file_name))
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
 		self.is_valid = True
 		image = None
-		self.last_thumbnail_was_canvas = False
 		try:
 			mtime = file_mtime(media_path)
 		except KeyboardInterrupt:
@@ -463,14 +465,13 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
-		self.last_thumbnail_was_canvas = False
 		thumb = image
 		image_width = image.size[0]
 		image_height = image.size[1]
 		try:
 			for thumb_size in Options.config['reduced_sizes']:
 				try:
-					if (min(image_width, image_height) < thumb_size or self.last_thumbnail_was_canvas):
+					if (min(image_width, image_height) < thumb_size):
 						image_to_start_from = image
 					else:
 						image_to_start_from = thumb
@@ -500,7 +501,7 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 	def _thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
-		thumb_path = os.path.join(thumbs_path, path_with_subdir(self.media_file_name, thumb_size, thumb_type))
+		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self.media_file_name, thumb_size, thumb_type))
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
 		if thumb_type == "square": 
@@ -595,7 +596,6 @@ class Media(object):
 				start_image_copy = start_image_copy.crop((left, top, right, bottom))
 			gc.collect()
 			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
-			#~ self.last_thumbnail_was_canvas = False
 			
 			try:
 				next_level()
@@ -695,7 +695,7 @@ class Media(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, video_cache_with_subdir(self.media_file_name))
+		transcode_path = os.path.join(transcode_path, self.album.subdir, video_cache_name(self.media_file_name))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -705,7 +705,7 @@ class Media(object):
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
 			'-crf', '20',						# set quality
-			'-b:v', Options.config['video_transcode_bitrate'],	# set videobitrate
+			'-b:v', str(Options.config['video_transcode_bitrate']),	# set videobitrate
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec
 			'-ac', '2',						# force two audiochannels
@@ -785,14 +785,54 @@ class Media(object):
 	def image_caches(self):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
-			caches.append(video_cache_with_subdir(self.media_file_name))
+			# transcoded video path
+			caches.append(os.path.join(self.album.subdir, video_cache_name(self.media_file_name)))
 		else:
+			# reduced sizes paths
 			for thumb_size in Options.config['reduced_sizes']:
-				caches.append(path_with_subdir(self.media_file_name, thumb_size))
-		caches.append(path_with_subdir(self.media_file_name, Options.config['album_thumb_size'], Options.config['album_thumb_type']))
+				caches.append(
+					os.path.join(
+						self.album.subdir,
+						photo_cache_name(
+							self.media_file_name,
+							thumb_size
+						)
+					)
+				)
+		# album thumbnail path
+		caches.append(
+			os.path.join(
+				self.album.subdir,
+				photo_cache_name(
+					self.media_file_name,
+					Options.config['album_thumb_size'],
+					Options.config['album_thumb_type']
+				)
+			)
+		)
 		if Options.config['album_thumb_type'] == "fit":
-			caches.append(path_with_subdir(self.media_file_name, Options.config['album_thumb_size'], "square"))
-		caches.append(path_with_subdir(self.media_file_name, Options.config['media_thumb_size'], Options.config['media_thumb_type']))
+			# album square thumbnail path (it's generated always)
+			caches.append(
+				os.path.join(
+					self.album.subdir,
+					photo_cache_name(
+						self.media_file_name,
+						Options.config['album_thumb_size'],
+						"square"
+					)
+				)
+			)
+		# media thumbnail path
+		caches.append(
+			os.path.join(
+				self.album.subdir,
+				photo_cache_name(
+					self.media_file_name,
+					Options.config['media_thumb_size'],
+					Options.config['media_thumb_type']
+				)
+			)
+		)
 		return caches
 	@property
 	def date(self):
@@ -854,7 +894,7 @@ class Media(object):
 					raise
 				#~ except:
 					#~ pass
-		return Media(path, None, dictionary)
+		return Media(album, path, None, dictionary)
 	def to_dict(self):
 		foldersAlbum = Options.config['folders_string']
 		if (self.folders):
@@ -867,7 +907,7 @@ class Media(object):
 				"dayAlbum": self.day_album_path,
 				"foldersAlbum": foldersAlbum,
 				"date": self.date,
-				"cacheSubdir": cache_subdir(self.media_file_name),
+				"cacheSubdir": self.album.subdir,
 				"cacheBase": cache_base(self.name),
 				"mediaType": self._attributes["mediaType"]
 			}

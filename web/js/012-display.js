@@ -1038,11 +1038,7 @@ $(document).ready(function() {
 			
 			if (currentMedia.mediaType == "video") {
 				if (fullScreenStatus) {
-					////////////////////////////////////////////
-					// the original video doesn't work: WHY????
-					// videoSrc = currentMedia.albumName;
-					////////////////////////////////////////////
-					videoSrc = photoFloat.mediaPath(currentAlbum, currentMedia, "");
+					videoSrc = currentMedia.albumName;
 				} else {
 					videoSrc = photoFloat.mediaPath(currentAlbum, currentMedia, "");
 				}

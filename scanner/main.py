@@ -39,6 +39,7 @@ def main():
 	for option in default_config.options('options'):
 		if option in ('max_verbose',
 				'jpeg_quality',
+				'video_transcode_bitrate',
 				'thumb_spacing',
 				'album_thumb_size',
 				'media_thumb_size',

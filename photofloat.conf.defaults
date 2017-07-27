@@ -45,8 +45,8 @@ respected_processors = 1
 #    (none)	: no subfolders
 subdir_method = md5
 
-# The transcode bitrate used for videos
-video_transcode_bitrate = 4M
+# The transcode bitrate used for videos: an integer, the bitrate in bits/s
+video_transcode_bitrate = 1000000
 
 # The jpg quality parameter for generating the reduced size images and the tumbnails
 # an integer number 1 -100
@@ -61,6 +61,7 @@ exclude_tree_marker = .photofloat.exclude.tree
 ###########################################################
 
 # The sizes for the reduced images
+# they must be reverse ordered, i.e. from biggest to smallest
 reduced_sizes = [1600, 1200, 800]
 
 # The sizes for the thumbnails to use for albums
