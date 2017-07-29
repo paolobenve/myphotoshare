@@ -129,9 +129,9 @@ class TreeWalker:
 					message("partial cache", os.path.basename(path))
 			except KeyboardInterrupt:
 				raise
-			#~ except (ValueError, AttributeError) as e:
-				#~ message("corrupt cache", os.path.basename(path))
-				#~ cached_album = None
+			except (ValueError, AttributeError, KeyError) as e:
+				message("corrupt cache", os.path.basename(path))
+				cached_album = None
 		
 		if not path_is_cached:
 			album = Album(path_with_marker)

@@ -908,18 +908,19 @@ class Media(object):
 		foldersAlbum = Options.config['folders_string']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
-		media = {
-				"name": self.name,
-				"albumName": self.album_path,
-				"yearAlbum": self.year_album_path,
-				"monthAlbum": self.month_album_path,
-				"dayAlbum": self.day_album_path,
-				"foldersAlbum": foldersAlbum,
-				"date": self.date,
-				"cacheSubdir": self.album.subdir,
-				"cacheBase": cache_base(self.name),
-			}
-		media.update(self.attributes)
+		
+		media = self.attributes
+		media["name"]		= self.name
+		media["cacheBase"]	= cache_base(self.name)
+		media["date"]		= self.date
+		media["yearAlbum"]	= self.year_album_path
+		media["monthAlbum"]	= self.month_album_path
+		media["dayAlbum"]	= self.day_album_path
+		
+		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
+		media["albumName"]	= self.album_path
+		media["foldersAlbum"]	= foldersAlbum
+		media["cacheSubdir"]	= self.album.subdir
 		
 		return media
 
