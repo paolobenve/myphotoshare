@@ -112,7 +112,7 @@ class TreeWalker:
 		cache = os.path.join(Options.config['cache_path'], json_name(path))
 		json_cache_file = json_name(path_with_marker)
 		json_cache_file = os.path.join(Options.config['cache_path'], json_cache_file)
-		path_is_cached = False
+		album_is_cached = False
 		cached_album = None
 		if os.path.exists(json_cache_file):
 			try:
@@ -120,7 +120,7 @@ class TreeWalker:
 				#~ if False and file_mtime(path) <= file_mtime(cache):
 				if self.max_mtime_in_tree(path) <= file_mtime(json_cache_file):
 					message("full cache", os.path.basename(path))
-					path_is_cached = True
+					album_is_cached = True
 					album = cached_album
 					for media in album.media:
 						self.all_media.append(media)
@@ -133,7 +133,7 @@ class TreeWalker:
 				message("corrupt cache", os.path.basename(path))
 				cached_album = None
 		
-		if not path_is_cached:
+		if not album_is_cached:
 			album = Album(path_with_marker)
 		
 		for entry in sorted(os.listdir(path)):
@@ -155,7 +155,7 @@ class TreeWalker:
 				next_walked_album = self.walk(entry_with_path)
 				if next_walked_album is not None:
 					album.add_album(next_walked_album)
-			elif not path_is_cached and os.path.isfile(entry_with_path):
+			elif not album_is_cached and os.path.isfile(entry_with_path):
 				if Options.config['exclude_files_marker'] in os.listdir(path):
 					continue
 				next_level()
