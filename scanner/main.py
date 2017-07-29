@@ -101,23 +101,88 @@ def main():
 		message(option, option_value)
 	# values that have type != string
 	back_level()
-
+	
+	if Options.config['index_html_path']:
+		Options.config['index_html_path'] = os.path.abspath(Options.config['index_html_path']).decode(sys.getfilesystemencoding())
+	if Options.config['album_path']:
+		Options.config['album_path'] = os.path.abspath(Options.config['album_path']).decode(sys.getfilesystemencoding())
+	if Options.config['cache_path']:
+		Options.config['cache_path'] = os.path.abspath(Options.config['cache_path']).decode(sys.getfilesystemencoding())
+	
+	# try to guess value not given
+	guessed_index_dir = False
+	guessed_album_dir = False
+	guessed_cache_dir = False
 	if not Options.config['index_html_path'] and not Options.config['album_path'] and not Options.config['cache_path']:
-		message("options", "at least index_html_path or both album_path and cache_path must be given, quitting")
-		sys.exit(-97)
+		message("options", "neither index_html_path nor album_path or cache_path have been defined, assuming default positions")
+		# default position for index_html_path is script_path/../web
+		# default position for album path is script_path/../web/albums
+		# default position for cache path is script_path/../web/cache
+		script_path = os.path.dirname(os.path.realpath(sys.argv[0]))
+		Options.config['index_html_path'] = os.path.abspath(os.path.join(script_path, "..", "web"))
+		Options.config['album_path'] = os.path.abspath(os.path.join(Options.config['index_html_path'], "albums"))
+		Options.config['cache_path'] = os.path.abspath(os.path.join(Options.config['index_html_path'], "cache"))
+		guessed_index_dir = True
+		guessed_album_dir = True
+		guessed_cache_dir = True
 	elif Options.config['index_html_path'] and not Options.config['album_path'] and not Options.config['cache_path']:
-		message("options", "on index_html_path is given, using its subfolder 'albums' for album_path and 'cache' for cache_path")
+		message("options", "only index_html_path is given, using its subfolder 'albums' for album_path and 'cache' for cache_path")
 		Options.config['album_path'] = os.path.join(Options.config['index_html_path'], "albums")
 		Options.config['cache_path'] = os.path.join(Options.config['index_html_path'], "cache")
+		guessed_album_dir = True
+		guessed_cache_dir = True
 	elif (not Options.config['index_html_path'] and
 			Options.config['album_path'] and
 			Options.config['cache_path'] and
 			Options.config['album_path'][:Options.config['album_path']
-				.rfind("/")] == Options.config['cache_path'][:Options.config['album_path'].rfind("/")]):
-		album_path = Options.config['album_path']
-		album_base = album_path[:album_path.rfind("/")]
-		Options.config['index_html_path'] = album_base
-
+				.rfind("/")] == Options.config['cache_path'][:Options.config['cache_path'].rfind("/")]):
+		guessed_index_dir = True
+		message("options", "only album_path or cache_path has been given, using their common parent folder for index_html_path")
+		Options.config['index_html_path'] = Options.config['album_path'][:Options.config['album_path'].rfind("/")]
+	else:
+		message("options", "you must define at least some of index_html_path, album_path and cache_path, and correctly; quitting")
+		sys.exit(-97)
+	
+	if guessed_index_dir or guessed_album_dir or guessed_cache_dir:
+		message("options", "guessed value(s):")
+		next_level()
+		if guessed_index_dir:
+			message('index_html_path', Options.config['index_html_path'])
+		if guessed_album_dir:
+			message('album_path', Options.config['album_path'])
+		if guessed_cache_dir:
+			message('cache_path', Options.config['cache_path'])
+		back_level()
+	
+	# the album directory must exist and be readable
+	try:
+		os.stat(albumCacheDir)
+	except:
+		message("FATAL ERROR", Options.config['album_path'] + " doesn't exist or unreadable, quitting")
+		sys.exit(-97)
+	# the cache directory must exist, or we'll try to create it
+	try:
+		os.stat(Options.config['cache_path'])
+	except:
+		try:
+			os.mkdir(Options.config['cache_path'])
+			guessed_index_dir
+			os.chmod(Options.config['cache_path'], 0777)
+			message("permissions changed", Options.config['cache_path'])
+		except:
+			message("FATAL ERROR", Options.config['cache_path'] + " inexistent and couldn't be created, quitting")
+			sys.exit(-97)
+	
+	# create the directory where php will put album composite images
+	albumCacheDir = os.path.join(Options.config['cache_path'], 'album')
+	try:
+		os.stat(albumCacheDir)
+	except:
+		message("creating album cache directory for php", albumCacheDir)
+		os.mkdir(albumCacheDir)
+	message("changing permissions", albumCacheDir)
+	os.chmod(albumCacheDir, 0777)
+	
 	json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
 	try:
 		with open(json_options_file) as old_options_file:
@@ -149,29 +214,6 @@ def main():
 			Options.config['recreate_thumbnails'] = True
 	except KeyError:
 		Options.config['recreate_thumbnails'] = True
-	Options.config['retranscode_videos'] = False
-	try:
-		if str(old_options['video_transcode_bitrate']) != str(Options.config['video_transcode_bitrate']):
-			Options.config['retranscode_videos'] = True
-	except KeyError:
-		Options.config['retranscode_videos'] = False
-
-	# create the directory where php will put album composite images
-	albumCacheDir = Options.config['cache_path']
-	if albumCacheDir[-1] != '/':
-		albumCacheDir += '/'
-	albumCacheDir += 'album'
-	try:
-		os.stat(albumCacheDir)
-	except:
-		message("creating album cache directory for php", albumCacheDir)
-		os.mkdir(albumCacheDir)
-	message("changing permissions", albumCacheDir)
-	os.chmod(albumCacheDir, 0777)
-	
-	
-	Options.config['album_path'] = os.path.abspath(Options.config['album_path']).decode(sys.getfilesystemencoding())
-	Options.config['cache_path'] = os.path.abspath(Options.config['cache_path']).decode(sys.getfilesystemencoding())
 	
 	try:
 		os.umask(002)

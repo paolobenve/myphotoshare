@@ -719,8 +719,7 @@ class Media(object):
 		info_string = "mp4, h264"
 		if (
 			os.path.exists(transcode_path) and
-			file_mtime(transcode_path) >= self._attributes["dateTimeFile"] and
-			not Options.config['retranscode_videos']
+			file_mtime(transcode_path) >= self._attributes["dateTimeFile"]
 		):
 			next_level()
 			message("existent transcoded video", info_string)
