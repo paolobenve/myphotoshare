@@ -204,7 +204,7 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 		except IOError:
-			message("unreadable " + media_path, "check permissions!")
+			message("unreadable, check permissions", media_path)
 		except:
 			self._video_metadata(media_path)
 		if isinstance(image, Image.Image):
