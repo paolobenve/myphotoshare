@@ -54,8 +54,7 @@ class Album(object):
 			self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
 			if not os.path.exists(self.cache_path_with_subdir):
 				os.makedirs(self.cache_path_with_subdir)
-				print path,self.baseless_path,self.cache_path_with_subdir
-		
+	
 	@property
 	def media(self):
 		return self.media_list

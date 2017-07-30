@@ -113,7 +113,11 @@ def main():
 	guessed_index_dir = False
 	guessed_album_dir = False
 	guessed_cache_dir = False
-	if not Options.config['index_html_path'] and not Options.config['album_path'] and not Options.config['cache_path']:
+	if (
+		not Options.config['index_html_path'] and
+		not Options.config['album_path'] and
+		not Options.config['cache_path']
+	):
 		message("options", "neither index_html_path nor album_path or cache_path have been defined, assuming default positions")
 		# default position for index_html_path is script_path/../web
 		# default position for album path is script_path/../web/albums
@@ -125,21 +129,31 @@ def main():
 		guessed_index_dir = True
 		guessed_album_dir = True
 		guessed_cache_dir = True
-	elif Options.config['index_html_path'] and not Options.config['album_path'] and not Options.config['cache_path']:
+	elif (
+		Options.config['index_html_path'] and
+		not Options.config['album_path'] and
+		not Options.config['cache_path']
+	):
 		message("options", "only index_html_path is given, using its subfolder 'albums' for album_path and 'cache' for cache_path")
 		Options.config['album_path'] = os.path.join(Options.config['index_html_path'], "albums")
 		Options.config['cache_path'] = os.path.join(Options.config['index_html_path'], "cache")
 		guessed_album_dir = True
 		guessed_cache_dir = True
-	elif (not Options.config['index_html_path'] and
-			Options.config['album_path'] and
-			Options.config['cache_path'] and
-			Options.config['album_path'][:Options.config['album_path']
-				.rfind("/")] == Options.config['cache_path'][:Options.config['cache_path'].rfind("/")]):
+	elif (
+		not Options.config['index_html_path'] and
+		Options.config['album_path'] and
+		Options.config['cache_path'] and
+		Options.config['album_path'][:Options.config['album_path']
+			.rfind("/")] == Options.config['cache_path'][:Options.config['cache_path'].rfind("/")]
+	):
 		guessed_index_dir = True
 		message("options", "only album_path or cache_path has been given, using their common parent folder for index_html_path")
 		Options.config['index_html_path'] = Options.config['album_path'][:Options.config['album_path'].rfind("/")]
-	else:
+	elif not (
+		Options.config['index_html_path'] and
+		Options.config['album_path'] and
+		Options.config['cache_path']
+	):
 		message("options", "you must define at least some of index_html_path, album_path and cache_path, and correctly; quitting")
 		sys.exit(-97)
 	
