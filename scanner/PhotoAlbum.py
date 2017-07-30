@@ -33,6 +33,8 @@ class Album(object):
 		self.media_list_is_sorted = True
 		self.albums_list_is_sorted = True
 		self._subdir = ""
+		self.num_media_in_sub_tree = 0
+		self.num_media_in_album = 0
 		
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
@@ -153,7 +155,11 @@ class Album(object):
 		if path_is_cripple:
 			for sub in self.albums_list:
 				if not sub.empty:
-					subalbums.append({ "path": trim_base_custom(sub.path, self.baseless_path), "date": sub.date })
+					subalbums.append({
+						"path": trim_base_custom(sub.path, self.baseless_path),
+						"date": sub.date,
+						"numMediaInSubTree": sub.num_media_in_sub_tree
+					})
 		else:
 			for sub in self.albums_list:
 				if not sub.empty:
@@ -165,7 +171,9 @@ class Album(object):
 			"albums": subalbums,
 			"media": self.media_list,
 			"cacheBase": cache_base(self.path),
-			"physicalPath": path_without_folders_marker
+			"physicalPath": path_without_folders_marker,
+			"numMediaInSubTree": self.num_media_in_sub_tree,
+			"numMediaInAlbum": self.num_media_in_album
 			}
 		
 		return dictionary

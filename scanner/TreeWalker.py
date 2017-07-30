@@ -24,7 +24,8 @@ class TreeWalker:
 		self.all_albums = list()
 		self.tree_by_date = {}
 		self.all_media = list()
-		folders_album = self.walk(Options.config['album_path'])
+		[folders_album, num] = self.walk(Options.config['album_path'])
+		folders_album.num_media_in_sub_tree = num
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE")
 		else:
@@ -60,8 +61,13 @@ class TreeWalker:
 					month_album.add_album(day_album)
 					for single_media in media:
 						day_album.add_media(single_media)
+						day_album.num_media_in_sub_tree += 1
+						day_album.num_media_in_album += 1
 						month_album.add_media(single_media)
+						month_album.num_media_in_sub_tree += 1
 						year_album.add_media(single_media)
+						year_album.num_media_in_sub_tree += 1
+						by_date_album.num_media_in_sub_tree += 1
 					self.all_albums.append(day_album)
 					#day_cache = os.path.join(Options.config['cache_path'], json_name_by_date(day_path))
 					if not day_album.empty:
@@ -97,14 +103,14 @@ class TreeWalker:
 		if not os.access(absolute_path, os.R_OK | os.X_OK):
 			message("access denied", os.path.basename(absolute_path))
 			back_level()
-			return None
+			return [None, 0]
 		message("Next level folder:", os.path.basename(absolute_path))
 		if Options.config['exclude_tree_marker'] in os.listdir(absolute_path):
 			next_level()
 			message("excluded with subfolders by marker file", Options.config['exclude_tree_marker'])
 			back_level()
 			back_level()
-			return None
+			return [None, 0]
 		if Options.config['exclude_files_marker'] in os.listdir(absolute_path):
 			next_level()
 			message("files excluded by marker file", Options.config['exclude_files_marker'])
@@ -153,7 +159,8 @@ class TreeWalker:
 			
 			entry_with_path = os.path.join(absolute_path, entry)
 			if os.path.isdir(entry_with_path):
-				next_walked_album = self.walk(entry_with_path)
+				[next_walked_album, num] = self.walk(entry_with_path)
+				album.num_media_in_sub_tree += num
 				if next_walked_album is not None:
 					album.add_album(next_walked_album)
 			elif os.path.isfile(entry_with_path):
@@ -182,10 +189,13 @@ class TreeWalker:
 					message(" processing image/video", os.path.basename(entry_with_path))
 					media = Media(album, entry_with_path, Options.config['cache_path'])
 				
-				if media.is_valid and not json_cache_OK:
-					self.all_media.append(media)
-					album.add_media(media)
-					self.add_media_to_tree_by_date(media)
+				if media.is_valid:
+					album.num_media_in_sub_tree += 1
+					album.num_media_in_album += 1
+					if not json_cache_OK:
+						self.all_media.append(media)
+						album.add_media(media)
+						self.add_media_to_tree_by_date(media)
 				elif not media.is_valid:
 					next_level()
 					message("unreadable", ":-(")
@@ -202,7 +212,9 @@ class TreeWalker:
 			message("empty", os.path.basename(absolute_path))
 			back_level()
 		back_level()
-		return album
+		
+		
+		return [album, album.num_media_in_sub_tree]
 	
 	def max_mtime_in_tree(self, path):
 		max_time = max(file_mtime(root) for root,_,_ in os.walk(path))
