@@ -18,10 +18,10 @@ import hashlib
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
-	# self._thumbnail is not defined at the top level, it's not pickable.
+	# self.reduce_or_make_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self._thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_or_make_thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
 	except KeyboardInterrupt:
 		raise
 
@@ -201,10 +201,7 @@ class Media(object):
 		
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
-			try:
-				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
-			except KeyboardInterrupt:
-				raise
+			self._photo_thumbnails(image, media_path, Options.config['cache_path'])
 		elif self._attributes["mediaType"] == "video":
 			self._video_transcode(thumbs_path, media_path)
 			self._video_thumbnails(thumbs_path, media_path)
@@ -391,114 +388,101 @@ class Media(object):
 			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
 		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
 			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
+	def thumbnail_size_is_smaller_then_size_of_(self, image, thumb_size, thumb_type = ""):
+		image_width = image.size[0]
+		image_height = image.size[1]
+		max_image_size = max(image_width, image_height)
+		if (
+			thumb_size == Options.config['media_thumb_size'] and
+			Options.config['media_thumb_type'] == "fixed_height" and
+			image_width > image_height
+		):
+			veredict = thumb_size * image_width / image_height < image_width
+		elif Options.config['media_thumb_type'] == "square":
+			min_image_size = min(image_width, image_height)
+			veredict = thumb_size < min_image_size
+		else:
+			veredict = thumb_size < max_image_size
+		return veredict
+			
 	def _photo_thumbnails_parallel(self, start_image, photo_path, thumbs_path):
+		# get number of cores on the system, and use all minus one
+		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
+		pool = Pool(processes=num_of_cores)
 		try:
-			# get number of cores on the system, and use all minus one
-			num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
-			pool = Pool(processes=num_of_cores)
-			try:
-				# reduced sizes media
-				for thumb_size in Options.config['reduced_sizes']:
-					if (
-						Options.config['thumbnail_generation_mode'] == "mixed" and
-						thumb_size == Options.config['reduced_sizes'][0]
-					):
-						continue
-					try:
-						pool.apply_async(
-							make_photo_thumbs,
-							args = (self, start_image, photo_path, thumbs_path, thumb_size)
-						)
-					except KeyboardInterrupt:
-						raise
-				# album thumbnails
-				(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-				try:
-					pool.apply_async(
-						make_photo_thumbs,
-						args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
-					)
-				except KeyboardInterrupt:
-					raise
-				if thumb_type == "fit":
-					# square album thumbnail is needed too
-					thumb_type = "square"
-					try:
-						pool.apply_async(
-							make_photo_thumbs,
-							args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
-						)
-					except KeyboardInterrupt:
-						raise
-				# media thumbnails
-				(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-				try:
-					pool.apply_async(
-						make_photo_thumbs,
-						args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
-					)
-				except KeyboardInterrupt:
-					raise
-			except KeyboardInterrupt:
-				raise
-			except:
-				pool.terminate()
-			pool.close()
-			pool.join()
+			# reduced sizes media
+			for thumb_size in Options.config['reduced_sizes']:
+				if (
+					Options.config['thumbnail_generation_mode'] == "mixed" and
+					thumb_size == Options.config['reduced_sizes'][0]
+				):
+					continue
+				pool.apply_async(
+					make_photo_thumbs,
+					args = (self, start_image, photo_path, thumbs_path, thumb_size)
+				)
+			# album thumbnails
+			(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
+			pool.apply_async(
+				make_photo_thumbs,
+				args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
+			)
+			if thumb_type == "fit":
+				# square album thumbnail is needed too
+				thumb_type = "square"
+				pool.apply_async(
+					make_photo_thumbs,
+					args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
+				)
+			# media thumbnails
+			(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
+			pool.apply_async(
+				make_photo_thumbs,
+				args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
+			)
 		except KeyboardInterrupt:
 			raise
+		except:
+			pool.terminate()
+		pool.close()
+		pool.join()
+	
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
-		thumb = image
-		try:
-			thumb_size = Options.config['reduced_sizes'][0]
-			try:
-				if (max(image.size[0], image.size[1]) < thumb_size):
-					image_to_start_from = image
-				else:
-					image_to_start_from = thumb
-				thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size)
-				self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
-			except KeyboardInterrupt:
-				raise
-		except KeyboardInterrupt:
-			raise
+		thumb_size = Options.config['reduced_sizes'][0]
+		thumb = self.reduce_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size)
+		self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
+		# this function calls self.reduce_or_make_thumbnail() with the proper image self.reduce_or_make_thumbnail() needs
+		# so that the thumbnail doesn't get blurred
 		thumb = image
 		image_width = image.size[0]
 		image_height = image.size[1]
-		try:
-			for thumb_size in Options.config['reduced_sizes']:
-				try:
-					if (min(image_width, image_height) < thumb_size):
-						image_to_start_from = image
-					else:
-						image_to_start_from = thumb
-					thumb = self._thumbnail(image_to_start_from, photo_path, thumbs_path, thumb_size)
-				except KeyboardInterrupt:
-					raise
-			smallest_reduced_size_image = thumb
-			# album size: square thumbnail are generated anyway, because they are needed by the php code that permits sharing albums
-			(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-			for i in range(2):
-				try:
-					thumb = self._thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
-				except KeyboardInterrupt:
-					raise
-				if i == 0:
-					if thumb_type == "square":
-						# no need for a second iteration
-						break
-					else:
-						thumb_type = "square"
-			# media size
-			(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-			try:
-				thumb = self._thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
-			except KeyboardInterrupt:
-				raise
-		except KeyboardInterrupt:
-			raise
-	def _thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
+		for thumb_size in Options.config['reduced_sizes']:
+			thumb = self.reduce_or_make_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
+		smallest_reduced_size_image = thumb
+		
+		# album size: square thumbnail are generated anyway, because they are needed by the php code that permits sharing albums
+		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
+		for i in range(2):
+			if thumb_type == "fit" or self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
+				thumb = self.reduce_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
+			else:
+				thumb = self.reduce_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
+			if i == 0:
+				if thumb_type == "square":
+					# no need for a second iteration
+					break
+				else:
+					thumb_type = "square"
+		# media size
+		# at this point thumb is always square
+		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
+		if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
+			thumb = self.reduce_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
+		else:
+			thumb = self.reduce_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
+	
+	def reduce_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self.media_file_name, thumb_size, thumb_type))
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
@@ -513,36 +497,66 @@ class Media(object):
 		start_image_width = start_image.size[0]
 		start_image_height = start_image.size[1]
 		if thumb_type == "square":
-			if start_image_width > start_image_height:
-				left = (start_image_width - start_image_height) / 2
-				top = 0
-				right = start_image_width - left
-				bottom = start_image_height
+			# image is to be cropped
+			if min(start_image_width, start_image_height) >= thumb_size:
+				# image is bigger than the square which will result from cropping
+				if start_image_width > start_image_height:
+					left = (start_image_width - start_image_height) / 2
+					top = 0
+					right = start_image_width - left
+					bottom = start_image_height
+				else:
+					left = 0
+					top = (start_image_height - start_image_width) / 2
+					right = start_image_width
+					bottom = start_image_height - top
+				thumbnail_width = thumb_size
+				thumbnail_height = thumb_size
+				must_crop = True
+			elif max(start_image_width, start_image_height) >= thumb_size:
+				# image smallest size is smaller than the square which would result from cropping
+				# cropped image will not be square
+				if start_image_width > start_image_height:
+					left = (start_image_width - thumb_size) / 2
+					top = 0
+					right = start_image_width - left
+					bottom = start_image_height
+					thumbnail_width = thumb_size
+					thumbnail_height = start_image_height
+				else:
+					left = 0
+					top = (start_image_height - thumb_size) / 2
+					right = start_image_width
+					bottom = start_image_height - top
+					thumbnail_width = start_image_width
+					thumbnail_height = thumb_size
+				must_crop = True
 			else:
-				left = 0
-				top = (start_image_height - start_image_width) / 2
-				right = start_image_width
-				bottom = start_image_height - top
-			must_crop = True
-			thumbnail_width = thumb_size
-			thumbnail_height = thumb_size
+				# image is smaller than the square thumbnail, don't crop it
+				thumbnail_width = start_image_width
+				thumbnail_height = start_image_height
+				must_crop = False
 		else:
 			must_crop = False
-			if start_image_width > start_image_height:
+			if (
+				original_thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height" and
+				start_image_width > start_image_height
+			):
+				# the thumbnail size will not be thumb_size, the image will be greater
+				thumbnail_height = original_thumb_size
+				thumbnail_width = int(round(original_thumb_size * start_image_width / float(start_image_height)))
+				thumb_size = thumbnail_width
+			elif start_image_width > start_image_height:
 				thumbnail_width = thumb_size
 				thumbnail_height = int(round(thumb_size * start_image_height / float(start_image_width)))
 			else:
 				thumbnail_width = int(round(thumb_size * start_image_width / float(start_image_height)))
 				thumbnail_height = thumb_size
-		if (
-			original_thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height" and
-			start_image_width > start_image_height
-		):
-			thumb_size = int(round(original_thumb_size * start_image_width / float(start_image_height)))
-			thumbnail_width = int(round(thumb_size * start_image_width / float(start_image_height)))
-			thumbnail_height = thumb_size
 		
-		if (start_image_width <= thumbnail_width and start_image_height <= thumbnail_height):
+		# now thumbnail_width and thumbnail_height are the values the thumbnail will get,
+		# and if the thumbnail isn't a square one, their ratio is the same of the original image
+		
+		if max(start_image_width, start_image_height) <= thumb_size:
 			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
 			# do not to produce canvas; anyway they render very badly with gif's,
 			# simply don't make the thumbnail, and delete it if it exists
@@ -583,11 +597,8 @@ class Media(object):
 			except KeyboardInterrupt:
 				raise
 			except:
-				try:
-					start_image_copy = start_image.copy() # we try again to work around PIL bug
-				except KeyboardInterrupt:
-					raise
-			
+				start_image_copy = start_image.copy() # we try again to work around PIL bug
+				
 			# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
 			# we can resize, but first crop to square if needed
 			if must_crop:
@@ -595,14 +606,14 @@ class Media(object):
 			gc.collect()
 			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
 			
+			next_level()
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("reducing size", info_string)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("thumbing for albums", info_string)
+			else:
+				message("thumbing for media", info_string)
 			try:
-				next_level()
-				if original_thumb_size > Options.config['album_thumb_size']:
-					message("reducing size", info_string)
-				elif original_thumb_size == Options.config['album_thumb_size']:
-					message("thumbing for albums", info_string)
-				else:
-					message("thumbing for media", info_string)
 				start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 				back_level()
 				return start_image_copy
@@ -610,10 +621,15 @@ class Media(object):
 				try:
 					os.unlink(thumb_path)
 				except:
-					pass
-				raise
+					raise
 			except IOError:
-				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				try:
+					start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				except KeyboardInterrupt:
+					try:
+						os.unlink(thumb_path)
+					except:
+						raise
 				next_level()
 				message(str(thumb_size) + " thumbnail", "OK (bug workaround)", )
 				back_level()
@@ -621,7 +637,7 @@ class Media(object):
 				return start_image_copy
 			except:
 				next_level()
-				message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path) + ", _thumbnail() returns start image")
+				message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path))
 				back_level()
 				try:
 					os.unlink(thumb_path)
@@ -679,13 +695,13 @@ class Media(object):
 			elif self._attributes["metadata"]["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-		self._thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		if thumb_type == "fit":
 			# square thumbnail is needed too
 			thumb_type = "square"
-			self._thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+			self.reduce_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-		self._thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		
 		try:
 			os.unlink(tfn)
@@ -716,7 +732,7 @@ class Media(object):
 			'-y' 							# don't prompt for overwrite
 		]
 		filters = []
-		info_string = "mp4, h264"
+		info_string = "mp4, h264, " + Options.config['video_transcode_bitrate'] + " bit/sec"
 		if (
 			os.path.exists(transcode_path) and
 			file_mtime(transcode_path) >= self._attributes["dateTimeFile"]

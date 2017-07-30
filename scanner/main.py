@@ -156,10 +156,11 @@ def main():
 	
 	# the album directory must exist and be readable
 	try:
-		os.stat(albumCacheDir)
+		os.stat(Options.config['album_path'])
 	except:
 		message("FATAL ERROR", Options.config['album_path'] + " doesn't exist or unreadable, quitting")
 		sys.exit(-97)
+		
 	# the cache directory must exist, or we'll try to create it
 	try:
 		os.stat(Options.config['cache_path'])
@@ -180,7 +181,6 @@ def main():
 	except:
 		message("creating album cache directory for php", albumCacheDir)
 		os.mkdir(albumCacheDir)
-	message("changing permissions", albumCacheDir)
 	os.chmod(albumCacheDir, 0777)
 	
 	json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')

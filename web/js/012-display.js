@@ -550,8 +550,9 @@ $(document).ready(function() {
 								PhotoFloat.cachePath(currentAlbum.media[i].name)]);
 					}
 					if (isOriginal) {
-						thumbHeight = width;
-						thumbWidth = height;
+						thumbHeight = height;
+						thumbWidth = width;
+						calculatedWidth = thumbWidth;
 					} else {
 						if (Options.media_thumb_type == "fixed_height") {
 							thumbHeight = Options.media_thumb_size;
@@ -956,9 +957,14 @@ $(document).ready(function() {
 		var isOriginal = true;
 		
 		if (
-			Options.album_thumb_type == "square" && mediaMinSize > calculatedThumbnailSize ||
-			Options.album_thumb_type == "fit" && mediaMaxSize > calculatedThumbnailSize ||
-			Options.album_thumb_type == "fixed_height" && mediaHeight > calculatedThumbnailSize
+			thumbnailSize == Options.album_thumb_size && (
+				Options.album_thumb_type == "square" && mediaMinSize > calculatedThumbnailSize ||
+				Options.album_thumb_type == "fit" && mediaMaxSize > calculatedThumbnailSize
+			) || thumbnailSize == Options.media_thumb_size && (
+				Options.media_thumb_type == "square" && mediaMinSize > thumbnailSize ||
+				Options.media_thumb_type == "fixed_height" && mediaHeight > thumbnailSize
+				
+			)
 		) {
 			chosenMedia = photoFloat.mediaPath(album, media, thumbnailSize);
 			isOriginal = false;
