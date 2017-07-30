@@ -675,7 +675,7 @@ $(document).ready(function() {
 											" src=\"" + mediaSrc + "\"" +
 											" style=\"width:" + thumbWidth + "px;" +
 												" height:" + thumbHeight + "px;" +
-												" margin-top: " + distance + "px" +
+												//~ " margin-top: " + distance + "px" +
 												"\"" +
 										">";
 								theImage.html(htmlText);
