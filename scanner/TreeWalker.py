@@ -119,7 +119,7 @@ class TreeWalker:
 				cached_album = Album.from_cache(json_cache_file)
 				if file_mtime(absolute_path) <= file_mtime(json_cache_file):
 				#~ if self.max_mtime_in_tree(absolute_path) <= file_mtime(json_cache_file):
-					message("  json cache file OK", json_message)
+					message("  json cache file OK", "  " + json_message)
 					json_cache_OK = True
 					album = cached_album
 					for media in album.media:
@@ -135,7 +135,7 @@ class TreeWalker:
 		
 		if not json_cache_OK:
 			album = Album(absolute_path_with_marker)
-		message("  subdir", album.subdir)
+		message("  subdir", "  " + album.subdir)
 		
 		for entry in sorted(os.listdir(absolute_path)):
 			if entry[0] == '.':

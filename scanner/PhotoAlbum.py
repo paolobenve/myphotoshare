@@ -34,7 +34,14 @@ class Album(object):
 		self.albums_list_is_sorted = True
 		self._subdir = ""
 		
-		if self.baseless_path.find(Options.config['by_date_string']) != 0 and  Options.config['subdir_method'] in ("md5", "folder"):
+		if (
+			Options.config['subdir_method'] in ("md5", "folder") and
+			(
+				self.baseless_path.find(Options.config['by_date_string']) != 0 and
+				self.baseless_path != ""
+			)
+			
+		):
 			if Options.config['subdir_method'] == "md5":
 				self._subdir = hashlib.md5(path).hexdigest()[:2]
 			elif Options.config['subdir_method'] == "folder":
@@ -47,6 +54,7 @@ class Album(object):
 			self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
 			if not os.path.exists(self.cache_path_with_subdir):
 				os.makedirs(self.cache_path_with_subdir)
+				print path,self.baseless_path,self.cache_path_with_subdir
 		
 	@property
 	def media(self):
