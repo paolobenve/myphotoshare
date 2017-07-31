@@ -508,19 +508,21 @@ $(document).ready(function() {
 		}
 	}
 	
-	function albumButtonWidth(thumbnailWidth) {
+	function albumButtonWidth(thumbnailWidth, buttonBorder) {
 		if (Options.albums_slide_style)
-			return Math.round(thumbnailWidth * 1.1);
+			return Math.round((thumbnailWidth + 2 * buttonBorder) * 1.1);
 		else
-			return thumbnailWidth;
+			return thumbnailWidth + 2 * buttonBorder;
 	}
 	
 	function showAlbum(populate) {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, bydateStringWithTrailingSeparator, populateMedia;
-		var albumViewWidth, calculatedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, choosen, isOriginal;
+		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
+		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 15, buttonBorder = 1;
 		
+		if (Options.albums_slide_style)
+			slideBorder = 3;
 		
 		if (currentMedia === null && previousMedia === null)
 			$("html, body").stop().animate({ scrollTop: 0 }, "slow");
@@ -619,12 +621,14 @@ $(document).ready(function() {
 					albumViewWidth = $("body").width() -
 							parseInt($("#album-view").css("padding-left")) -
 							parseInt($("#album-view").css("padding-right")) -
-							15; // the trailing subtraction is for the scroll slide
-					if (albumButtonWidth(calculatedAlbumThumbSize) > albumViewWidth / Options.min_album_thumbnail) {
-						calculatedAlbumThumbSize =
-							Math.floor(albumViewWidth / Options.min_album_thumbnail - Options.thumb_spacing - 6);
+							scrollBarWidth;
+					if ((albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + Options.thumb_spacing) * Options.min_album_thumbnail > albumViewWidth) {
 						if (Options.albums_slide_style)
-							calculatedAlbumThumbSize = Math.floor(calculatedAlbumThumbSize / 1.1);
+							correctedAlbumThumbSize =
+								Math.floor((albumViewWidth / Options.min_album_thumbnail - Options.thumb_spacing - 2 * slideBorder) / 1.1 - 2 * buttonBorder);
+						else
+							correctedAlbumThumbSize =
+								Math.floor(albumViewWidth / Options.min_album_thumbnail - Options.thumb_spacing - 2 * buttonBorder);
 					}
 					
 					
@@ -632,8 +636,10 @@ $(document).ready(function() {
 						link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
-						imageString += 			"width: " + (calculatedAlbumThumbSize + 2) + "px;";
-						imageString += 			" height: " + (calculatedAlbumThumbSize + 2) + "px;";
+						//~ imageString += 			"width: " + (correctedAlbumThumbSize + 2 * buttonBorder) + "px;";
+						//~ imageString += 			" height: " + (correctedAlbumThumbSize + 2 * buttonBorder) + "px;";
+						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
+						imageString += 			" height: " + correctedAlbumThumbSize + "px;";
 						if (! Options.albums_slide_style)
 							imageString +=		" background-color: " + Options.album_button_background_color + ";";
 						imageString += 			"\"";
@@ -648,7 +654,7 @@ $(document).ready(function() {
 								var htmlText, isOriginal, mediaSrc;
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, buttonAndCaptionHeight, html;
 								
-								choosen = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, calculatedAlbumThumbSize);
+								choosen = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								mediaSrc = choosen[0];
 								isOriginal = choosen[1];
 								if (isOriginal) {
@@ -659,13 +665,13 @@ $(document).ready(function() {
 										mediaWidth = randomMedia.metadata.size[0];
 										mediaHeight = randomMedia.metadata.size[1];
 										if (mediaWidth > mediaHeight) {
-											thumbWidth = calculatedAlbumThumbSize;
-											thumbHeight = calculatedAlbumThumbSize * mediaHeight / mediaWidth;
+											thumbWidth = correctedAlbumThumbSize;
+											thumbHeight = correctedAlbumThumbSize * mediaHeight / mediaWidth;
 										} else {
-											thumbWidth = calculatedAlbumThumbSize * mediaWidth / mediaHeight;
-											thumbHeight = calculatedAlbumThumbSize;
+											thumbWidth = correctedAlbumThumbSize * mediaWidth / mediaHeight;
+											thumbHeight = correctedAlbumThumbSize;
 										}
-										distance = (calculatedAlbumThumbSize - thumbHeight) / 2;
+										distance = (correctedAlbumThumbSize - thumbHeight) / 2;
 									}
 								}
 								htmlText = "<span class=\"helper\"></span>" +
@@ -675,7 +681,6 @@ $(document).ready(function() {
 											" src=\"" + mediaSrc + "\"" +
 											" style=\"width:" + thumbWidth + "px;" +
 												" height:" + thumbHeight + "px;" +
-												//~ " margin-top: " + distance + "px" +
 												"\"" +
 										">";
 								theImage.html(htmlText);
@@ -693,8 +698,8 @@ $(document).ready(function() {
 								var paddingTop = parseInt($($el).css('padding-top'));
 								$($el).remove();
 								
-								captionHeight = em2px("body", 3) * calculatedAlbumThumbSize / Options.album_thumb_size;
-								buttonAndCaptionHeight = calculatedAlbumThumbSize + captionHeight + paddingTop + 3 * 4;
+								captionHeight = em2px("body", 3) * correctedAlbumThumbSize / Options.album_thumb_size;
+								buttonAndCaptionHeight = correctedAlbumThumbSize + captionHeight + paddingTop + 3 * 4;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
 									html += " slide";
@@ -702,15 +707,15 @@ $(document).ready(function() {
 								html += "style=\"";
 								html += 	"height: " + buttonAndCaptionHeight + "px; " +
 										"margin-right: " + Options.thumb_spacing + "px; ";
-								html += "width: " + albumButtonWidth(calculatedAlbumThumbSize) + "px; ";
-								html += "padding-top: " + Math.round(calculatedAlbumThumbSize * 0.05) + "px; ";
+								html +=		"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
+								html += 	"padding-top: " + Math.round(correctedAlbumThumbSize * 0.05) + "px; ";
 								if (Options.albums_slide_style)
 									html += "background-color: " + Options.album_button_background_color + "; ";
-								html += "\"";
+								html += 	"\"";
 								html += ">";
 								theImage.wrap(html);
 								html = "<div class=\"album-caption\"";
-								html += " style=\"width: " + calculatedAlbumThumbSize + "px; " +
+								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
 										"font-size: " + (captionHeight / 3) + "px; " +
 										"height: " + captionHeight + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
