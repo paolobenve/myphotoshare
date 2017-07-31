@@ -519,7 +519,7 @@ $(document).ready(function() {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, bydateStringWithTrailingSeparator, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 15, buttonBorder = 1;
+		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1;
 		
 		if (Options.albums_slide_style)
 			slideBorder = 3;
@@ -660,21 +660,30 @@ $(document).ready(function() {
 								if (isOriginal) {
 									thumbWidth = randomMedia.metadata.size[0];
 									thumbHeight = randomMedia.metadata.size[1];
+									if (thumbWidth > correctedAlbumThumbSize || thumbHeight > correctedAlbumThumbSize) {
+										if (thumbWidth > thumbHeight) {
+											thumbHeight = Math.floor(correctedAlbumThumbSize * thumbHeight / thumbWidth);
+											thumbWidth = correctedAlbumThumbSize;
+										} else {
+											thumbWidth = Math.floor(correctedAlbumThumbSize * thumbWidth / thumbHeight);
+											thumbHeight = correctedAlbumThumbSize;
+										}
+									}
 								} else {
 									if (Options.album_thumb_type == "fit") {
 										mediaWidth = randomMedia.metadata.size[0];
 										mediaHeight = randomMedia.metadata.size[1];
 										if (mediaWidth > mediaHeight) {
 											thumbWidth = correctedAlbumThumbSize;
-											thumbHeight = correctedAlbumThumbSize * mediaHeight / mediaWidth;
+											thumbHeight = Math.floor(correctedAlbumThumbSize * mediaHeight / mediaWidth);
 										} else {
-											thumbWidth = correctedAlbumThumbSize * mediaWidth / mediaHeight;
+											thumbWidth = Math.floor(correctedAlbumThumbSize * mediaWidth / mediaHeight);
 											thumbHeight = correctedAlbumThumbSize;
 										}
 										distance = (correctedAlbumThumbSize - thumbHeight) / 2;
 									}
 								}
-								htmlText = "<span class=\"helper\"></span>" +
+								htmlText =	"<span class=\"helper\"></span>" +
 										"<img " +
 											"title=\"" + randomMedia.albumName + "\"" +
 											" class=\"thumbnail\"" +
@@ -698,7 +707,7 @@ $(document).ready(function() {
 								var paddingTop = parseInt($($el).css('padding-top'));
 								$($el).remove();
 								
-								captionHeight = em2px("body", 3) * correctedAlbumThumbSize / Options.album_thumb_size;
+								captionHeight = Math.round(em2px("body", 3) * correctedAlbumThumbSize / Options.album_thumb_size);
 								buttonAndCaptionHeight = correctedAlbumThumbSize + captionHeight + paddingTop + 3 * 4;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
@@ -716,7 +725,7 @@ $(document).ready(function() {
 								theImage.wrap(html);
 								html = "<div class=\"album-caption\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
-										"font-size: " + (captionHeight / 3) + "px; " +
+										"font-size: " + Math.round((captionHeight / 3)) + "px; " +
 										"height: " + captionHeight + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
@@ -963,8 +972,10 @@ $(document).ready(function() {
 		
 		if (
 			thumbnailSize == Options.album_thumb_size && (
-				Options.album_thumb_type == "square" && mediaMinSize > calculatedThumbnailSize ||
-				Options.album_thumb_type == "fit" && mediaMaxSize > calculatedThumbnailSize
+				//~ Options.album_thumb_type == "square" && mediaMinSize > calculatedThumbnailSize ||
+				//~ Options.album_thumb_type == "fit" && mediaMaxSize > calculatedThumbnailSize
+				Options.album_thumb_type == "square" && mediaMinSize > thumbnailSize ||
+				Options.album_thumb_type == "fit" && mediaMaxSize > thumbnailSize
 			) || thumbnailSize == Options.media_thumb_size && (
 				Options.media_thumb_type == "square" && mediaMinSize > thumbnailSize ||
 				Options.media_thumb_type == "fixed_height" && mediaHeight > thumbnailSize
