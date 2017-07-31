@@ -1,5 +1,5 @@
 var Options = {};
-var nextLink = "", prevLink = "";
+var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
 var language;
 var isMobile = {
 	Android: function() {
@@ -159,6 +159,27 @@ $(document).ready(function() {
 			}, 300, function() {
 				location.href = dest;
 				$("#media-box-inner").css('left', "");
+			});
+		}
+	}
+	
+	function swipeUp(dest) {
+		if (dest) {
+			$("#media-box-inner").stop().animate({
+				top: "-=" + window.innerHeight,
+			}, 300, function() {
+				location.href = dest;
+				$("#media-box-inner").css('top', "");
+			});
+		}
+	}
+	function swipeDown(dest) {
+		if (dest) {
+			$("#media-box-inner").stop().animate({
+				top: "+=" + window.innerHeight,
+			}, 300, function() {
+				location.href = dest;
+				$("#media-box-inner").css('top', "");
 			});
 		}
 	}
@@ -613,6 +634,7 @@ $(document).ready(function() {
 			}
 			
 			if (currentMedia === null) {
+				mediaLink = "#!/" + photoFloat.mediaHash(currentAlbum, currentAlbum.media[0]);
 				if (populate === true || populate && needAlbumHtmlReverse()) {
 					subalbums = [];
 					
@@ -1149,6 +1171,7 @@ $(document).ready(function() {
 		$("#next-media").off("mousedown");
 		$('#next').off("click");
 		$('#prev').off("click");
+		albumLink = "#!/" + photoFloat.albumHash(currentAlbum);
 		if (currentAlbum.media.length == 1) {
 			nextLink = "";
 			prevLink = "";
@@ -1157,16 +1180,31 @@ $(document).ready(function() {
 			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, prevMedia);
 			$("#next").show();
 			$("#prev").show();
-			$("#next-media").attr("oncontextmenu", "return false;");
+			//~ $("#next-media").attr("oncontextmenu", "return false;");
 			$("#next-media").mousedown(function(ev){
 				if(ev.which == 1)
 					swipeLeft(nextLink);
-				else if(ev.which == 3)
-					swipeRight(prevLink);
+				else if(ev.which == 3) {
+					if (ev.shiftKey) {
+					}
+					else {
+						ev.preventDefault();
+						ev.stopPropagation();
+						$("#next-media").attr("oncontextmenu", "return false;");
+						swipeRight(prevLink);
+						$("#next-media").attr("oncontextmenu", "");
+					}
+				}
 				return false; 
 			});
-			$('#next').click(function(){ swipeLeft(nextLink); return false; });
-			$('#prev').click(function(){ swipeRight(prevLink); return false; });
+			$('#next').click(function(){
+				swipeLeft(nextLink);
+				return false;
+			});
+			$('#prev').click(function(e){
+				swipeRight(prevLink);
+				return false;
+			});
 		}
 		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalMediaPath(currentMedia));
 		
@@ -1415,14 +1453,27 @@ $(document).ready(function() {
 	
 	
 	$(document).keydown(function(e){
-		if (currentMedia === null)
-		if (! e.ctrlKey && ! e.shiftKey && e.altKey && (e.keyCode === 34 || e.keyCode === 39 || e.keyCode === 40)) {
+		if (! e.ctrlKey && ! e.shiftKey && ! e.altKey && (e.keyCode === 39)) {
+			// arrow right
 			swipeLeft(nextLink);
 			return false;
-		} else if (! e.ctrlKey && ! e.shiftKey && e.altKey  && (e.keyCode === 33 || e.keyCode === 37 || e.keyCode === 38)) {
+		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 37)) {
+			// arrow left
 			swipeRight(prevLink);
 			return false;
-		}
+		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
+			// esc, arrow up, page up
+			if (currentMedia === null && ! e.keyCode === 27 )
+				swipeUp(mediaLink);
+			else if (currentMedia !== null)
+				swipeDown(albumLink);
+		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && e.keyCode === 40 || e.keyCode === 34) {
+			// arrow down, page down
+			if (currentMedia === null)
+				swipeUp(mediaLink);
+			else
+				swipeUp(albumLink);
+		} 
 		return true;
 	});
 	$(document).mousewheel(function(event, delta) {
