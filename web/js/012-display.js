@@ -262,7 +262,6 @@ $(document).ready(function() {
 		});
 	}
 	
-	
 	function setTitle() {
 		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks;
@@ -940,7 +939,7 @@ $(document).ready(function() {
 		}
 		
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
-			if (Options.reduced_sizes[i] > mediaSize)
+			if (Options.reduced_sizes[i] >= mediaSize)
 				continue;
 			if (container !== null) {
 				if (mediaWidth > mediaHeight) {
@@ -972,8 +971,6 @@ $(document).ready(function() {
 		
 		if (
 			thumbnailSize == Options.album_thumb_size && (
-				//~ Options.album_thumb_type == "square" && mediaMinSize > calculatedThumbnailSize ||
-				//~ Options.album_thumb_type == "fit" && mediaMaxSize > calculatedThumbnailSize
 				Options.album_thumb_type == "square" && mediaMinSize > thumbnailSize ||
 				Options.album_thumb_type == "fit" && mediaMaxSize > thumbnailSize
 			) || thumbnailSize == Options.media_thumb_size && (

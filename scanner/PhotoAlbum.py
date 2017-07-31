@@ -18,10 +18,10 @@ import hashlib
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
-	# self.reduce_or_make_thumbnail is not defined at the top level, it's not pickable.
+	# self.reduce_image_size_or_make_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self.reduce_or_make_thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_image_size_or_make_thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
 	except KeyboardInterrupt:
 		raise
 
@@ -413,12 +413,12 @@ class Media(object):
 			Options.config['media_thumb_type'] == "fixed_height" and
 			image_width > image_height
 		):
-			veredict = thumb_size * image_width / image_height < image_width
+			veredict = (thumb_size * image_width / image_height < image_width)
 		elif Options.config['media_thumb_type'] == "square":
 			min_image_size = min(image_width, image_height)
-			veredict = thumb_size < min_image_size
+			veredict = (thumb_size < min_image_size)
 		else:
-			veredict = thumb_size < max_image_size
+			veredict = (thumb_size < max_image_size)
 		return veredict
 			
 	def _photo_thumbnails_parallel(self, start_image, photo_path, thumbs_path):
@@ -465,25 +465,25 @@ class Media(object):
 	
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb_size = Options.config['reduced_sizes'][0]
-		thumb = self.reduce_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size)
+		thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size)
 		self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
-		# this function calls self.reduce_or_make_thumbnail() with the proper image self.reduce_or_make_thumbnail() needs
+		# this function calls self.reduce_image_size_or_make_thumbnail() with the proper image self.reduce_image_size_or_make_thumbnail() needs
 		# so that the thumbnail doesn't get blurred
 		thumb = image
 		image_width = image.size[0]
 		image_height = image.size[1]
 		for thumb_size in Options.config['reduced_sizes']:
-			thumb = self.reduce_or_make_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
+			thumb = self.reduce_image_size_or_make_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
 		smallest_reduced_size_image = thumb
 		
 		# album size: square thumbnail are generated anyway, because they are needed by the php code that permits sharing albums
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
 		for i in range(2):
 			if thumb_type == "fit" or self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
-				thumb = self.reduce_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
+				thumb = self.reduce_image_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
 			else:
-				thumb = self.reduce_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
+				thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
 			if i == 0:
 				if thumb_type == "square":
 					# no need for a second iteration
@@ -494,11 +494,11 @@ class Media(object):
 		# at this point thumb is always square
 		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
 		if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
-			thumb = self.reduce_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
+			thumb = self.reduce_image_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
 		else:
-			thumb = self.reduce_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
+			thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
 	
-	def reduce_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
+	def reduce_image_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self.media_file_name, thumb_size, thumb_type))
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
@@ -711,13 +711,13 @@ class Media(object):
 			elif self._attributes["metadata"]["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-		self.reduce_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_image_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		if thumb_type == "fit":
 			# square thumbnail is needed too
 			thumb_type = "square"
-			self.reduce_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+			self.reduce_image_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-		self.reduce_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_image_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		
 		try:
 			os.unlink(tfn)
