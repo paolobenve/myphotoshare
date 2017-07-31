@@ -35,6 +35,7 @@ class Album(object):
 		self._subdir = ""
 		self.num_media_in_sub_tree = 0
 		self.num_media_in_album = 0
+		self.parent = None
 		
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
@@ -174,8 +175,9 @@ class Album(object):
 			"physicalPath": path_without_folders_marker,
 			"numMediaInSubTree": self.num_media_in_sub_tree,
 			"numMediaInAlbum": self.num_media_in_album
-			}
-		
+		}
+		if self.parent is not None:
+			dictionary["parentAlbumPath"] = trim_base_custom(self.parent.path, self.baseless_path)
 		return dictionary
 	def media_from_path(self, path):
 		for media in self.media_list:

@@ -1,5 +1,5 @@
 var Options = {};
-var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
+var nextLink = "", prevLink = "", albumLink = "", mediaLink = "", parentAlbumLink = "";
 var language;
 var isMobile = {
 	Android: function() {
@@ -635,6 +635,8 @@ $(document).ready(function() {
 			
 			if (currentMedia === null) {
 				mediaLink = "#!/" + photoFloat.mediaHash(currentAlbum, currentAlbum.media[0]);
+				if (currentAlbum.parentAlbum.path)
+					parentAlbumLink = "#!/" + photoFloat.albumHash(currentAlbum.parentAlbum);
 				if (populate === true || populate && needAlbumHtmlReverse()) {
 					subalbums = [];
 					
@@ -1171,11 +1173,14 @@ $(document).ready(function() {
 		$("#next-media").off("mousedown");
 		$('#next').off("click");
 		$('#prev').off("click");
-		albumLink = "#!/" + photoFloat.albumHash(currentAlbum);
+		
+		
 		if (currentAlbum.media.length == 1) {
+			parentAlbumLink = "#!/" + photoFloat.albumHash(currentAlbum.parent);
 			nextLink = "";
 			prevLink = "";
 		} else {
+			albumLink = "#!/" + photoFloat.albumHash(currentAlbum);
 			nextLink = "#!/" + photoFloat.mediaHash(currentAlbum, nextMedia);
 			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, prevMedia);
 			$("#next").show();
@@ -1463,10 +1468,14 @@ $(document).ready(function() {
 			return false;
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
 			// esc, arrow up, page up
-			if (currentMedia === null && ! e.keyCode === 27 )
-				swipeUp(mediaLink);
-			else if (currentMedia !== null)
-				swipeDown(albumLink);
+			if (currentMedia === null)
+				swipeDown(parentAlbumLink);
+			else if (currentMedia !== null) {
+				if (currentAlbum.media.length == 1)
+					swipeDown(parentAlbumLink);
+				else
+					swipeDown(albumLink);
+			}
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && e.keyCode === 40 || e.keyCode === 34) {
 			// arrow down, page down
 			if (currentMedia === null)

@@ -24,7 +24,8 @@ class TreeWalker:
 		self.all_albums = list()
 		self.tree_by_date = {}
 		self.all_media = list()
-		[folders_album, num] = self.walk(Options.config['album_path'])
+		origin_album = Album(Options.config['album_path'])
+		[folders_album, num] = self.walk(Options.config['album_path'], origin_album)
 		folders_album.num_media_in_sub_tree = num
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE")
@@ -32,8 +33,7 @@ class TreeWalker:
 			self.all_cache_entries.append("all_media.json")
 			self.all_cache_entries.append(Options.config['folders_string'] + ".json")
 			self.save_all_media_json()
-			by_date_album = self.generate_date_album()
-			origin_album = Album(Options.config['album_path'])
+			by_date_album = self.generate_date_album(origin_album)
 			origin_album.add_album(folders_album)
 			self.all_albums.append(origin_album)
 			if by_date_album is not None and not by_date_album.empty:
@@ -43,21 +43,24 @@ class TreeWalker:
 				origin_album.cache(Options.config['cache_path'])
 		self.remove_stale()
 		message("complete", "")
-	def generate_date_album(self):
+	def generate_date_album(self, parent_album):
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
 			year_path = os.path.join(by_date_path, str(year))
 			year_album = Album(year_path)
+			year_album.parent = by_date_album
 			by_date_album.add_album(year_album)
 			for month, days in self.tree_by_date[year].iteritems():
 				month_path = os.path.join(year_path, str(month))
 				month_album = Album(month_path)
+				month_album.parent = year_album
 				year_album.add_album(month_album)
 				for day, media in self.tree_by_date[year][month].iteritems():
 					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
+					day_album.parent = month_album
 					month_album.add_album(day_album)
 					for single_media in media:
 						day_album.add_media(single_media)
@@ -83,6 +86,7 @@ class TreeWalker:
 		self.all_albums.append(by_date_album)
 		root_cache = os.path.join(Options.config['cache_path'], json_name(Options.config['album_path']))
 		if not by_date_album.empty:
+			by_date_album.parent = parent_album
 			by_date_album.cache(Options.config['cache_path'])
 		return by_date_album
 	def add_media_to_tree_by_date(self, media):
@@ -94,7 +98,7 @@ class TreeWalker:
 		if not media.day in self.tree_by_date[media.year][media.month].keys():
 			self.tree_by_date[media.year][media.month][media.day] = list()
 		self.tree_by_date[media.year][media.month][media.day].append(media)
-	def walk(self, absolute_path):
+	def walk(self, absolute_path, parent_album):
 		trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 		absolute_path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
 		if trimmed_path:
@@ -141,6 +145,7 @@ class TreeWalker:
 		
 		if not json_cache_OK:
 			album = Album(absolute_path_with_marker)
+		album.parent = parent_album
 		message("  subdir", "  " + album.subdir)
 		
 		for entry in sorted(os.listdir(absolute_path)):
@@ -159,7 +164,7 @@ class TreeWalker:
 			
 			entry_with_path = os.path.join(absolute_path, entry)
 			if os.path.isdir(entry_with_path):
-				[next_walked_album, num] = self.walk(entry_with_path)
+				[next_walked_album, num] = self.walk(entry_with_path, album)
 				album.num_media_in_sub_tree += num
 				if next_walked_album is not None:
 					album.add_album(next_walked_album)

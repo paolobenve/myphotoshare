@@ -80,24 +80,24 @@
 	};
 	
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
-		var index, album, media;
+		var index, albumHash, mediaHash, media = null, self = this;
 		hash = PhotoFloat.cleanHash(hash);
 		index = hash.lastIndexOf("/");
 		if (! hash.length) {
-			album = PhotoFloat.cachePath(Options.folders_string);
-			media = null;
+			albumHash = PhotoFloat.cachePath(Options.folders_string);
+			mediaHash = null;
 		} else if (index !== -1 && index !== hash.length - 1) {
-			media = hash.substring(index + 1);
-			album = hash.substring(0, index);
+			mediaHash = hash.substring(index + 1);
+			albumHash = hash.substring(0, index);
 		} else {
-			album = hash;
-			media = null;
+			albumHash = hash;
+			mediaHash = null;
 		}
-		this.getAlbum(album, function(theAlbum) {
+		this.getAlbum(albumHash, function(theAlbum) {
 			var i = -1;
-			if (media !== null) {
+			if (mediaHash !== null) {
 				for (i = 0; i < theAlbum.media.length; ++i) {
-					if (PhotoFloat.cachePath(theAlbum.media[i].name) === media) {
+					if (PhotoFloat.cachePath(theAlbum.media[i].name) === mediaHash) {
 						media = theAlbum.media[i];
 						break;
 					}
@@ -112,7 +112,13 @@
 					i = -1;
 				}
 			}
-			callback(theAlbum, media, i);
+			if (theAlbum.parentAlbumPath) {
+				self.getAlbum(PhotoFloat.cachePath(theAlbum.parentAlbumPath), function(theParentAlbum) {
+					theAlbum.parent = theParentAlbum;
+					callback(theAlbum, media, i);
+				});
+			}
+			
 		}, error);
 	};
 	PhotoFloat.prototype.authenticate = function(password, result) {
