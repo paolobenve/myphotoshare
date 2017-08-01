@@ -1487,7 +1487,10 @@ $(document).ready(function() {
 				swipeUp(mediaLink);
 			else
 				swipeLeft(nextLink);
-		} 
+		} else if (e.keyCode === 70)
+			//                f
+			if (currentMedia !== null)
+				goFullscreen(e);
 		return true;
 	});
 	$(document).mousewheel(function(event, delta) {
@@ -1525,20 +1528,21 @@ $(document).ready(function() {
 	$("#next, #prev").mouseleave(function() {
 		$(this).stop().fadeTo("fast", 0.4);
 	});
+	goFullscreen = function(e) {
+		e.preventDefault();
+		$('#media').off('loadstart').unbind("load");
+		$("#media-box").fullScreen({
+			callback: function(isFullscreen) {
+				fullScreenStatus = isFullscreen;
+				$("#enter-fullscreen").toggle();
+				$("#exit-fullscreen").toggle();
+				showMedia(currentAlbum);
+			}
+		});
+	}
 	if ($.support.fullscreen) {
 		$("#fullscreen").show();
-		$("#fullscreen").click(function(e) {
-			e.preventDefault();
-			$('#media').off('loadstart').unbind("load");
-			$("#media-box").fullScreen({
-				callback: function(isFullscreen) {
-					fullScreenStatus = isFullscreen;
-					$("#enter-fullscreen").toggle();
-					$("#exit-fullscreen").toggle();
-					showMedia(currentAlbum);
-				}
-			});
-		});
+		$("#fullscreen").click(goFullscreen);
 	}
 	$("#metadata-show").click(function() {
 		$("#metadata-show").hide();
