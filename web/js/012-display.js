@@ -1487,10 +1487,16 @@ $(document).ready(function() {
 				swipeUp(mediaLink);
 			else
 				swipeLeft(nextLink);
-		} else if (e.keyCode === 70)
-			//                f
+		} else if (e.keyCode === 70) {
+			//               f
 			if (currentMedia !== null)
 				goFullscreen(e);
+		} else if (e.keyCode === 77)
+			//               m
+			if (currentMedia !== null) {
+				//~ $("#links").toggle();
+				showMetadata(e);
+			}
 		return true;
 	});
 	$(document).mousewheel(function(event, delta) {
@@ -1528,7 +1534,7 @@ $(document).ready(function() {
 	$("#next, #prev").mouseleave(function() {
 		$(this).stop().fadeTo("fast", 0.4);
 	});
-	goFullscreen = function(e) {
+	function goFullscreen(e) {
 		e.preventDefault();
 		$('#media').off('loadstart').unbind("load");
 		$("#media-box").fullScreen({
@@ -1544,29 +1550,33 @@ $(document).ready(function() {
 		$("#fullscreen").show();
 		$("#fullscreen").click(goFullscreen);
 	}
-	$("#metadata-show").click(function() {
-		$("#metadata-show").hide();
-		$("#metadata-hide").show();
-		$("#metadata")
-			.stop()
-			.css("height", 0)
-			.css("padding-top", 0)
-			.css("padding-bottom", 0)
-			.show()
-			.stop()
-			.animate({ height: $("#metadata > table").height(), paddingTop: 3, paddingBottom: 3 }, "slow", function() {
-				$(this).css("height", "auto");
-			});
-	});
-	$("#metadata-hide").click(function() {
-		$("#metadata-show").show();
-		$("#metadata-hide").hide();
-		$("#metadata")
-			.stop()
-			.animate({ height: 0, paddingTop: 0, paddingBottom: 0 }, "slow", function() {
-				$(this).hide();
-			});
-	});
+	$("#metadata-show").click(showMetadata);
+	$("#metadata-hide").click(showMetadata);
+	
+	function showMetadata() {
+		if ($("#metadata").css("display") == "none") {
+			$("#metadata-show").hide();
+			$("#metadata-hide").show();
+			$("#metadata")
+				.stop()
+				.css("height", 0)
+				.css("padding-top", 0)
+				.css("padding-bottom", 0)
+				.show()
+				.stop()
+				.animate({ height: $("#metadata > table").height(), paddingTop: 3, paddingBottom: 3 }, "slow", function() {
+					$(this).css("height", "auto");
+				});
+		} else {
+			$("#metadata-show").show();
+			$("#metadata-hide").hide();
+			$("#metadata")
+				.stop()
+				.animate({ height: 0, paddingTop: 0, paddingBottom: 0 }, "slow", function() {
+					$(this).hide();
+				});
+		}
+	}
 	$("#auth-form").submit(function() {
 		var password = $("#password");
 		password.css("background-color", "rgb(128, 128, 200)");
