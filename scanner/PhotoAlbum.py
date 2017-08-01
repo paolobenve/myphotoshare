@@ -177,7 +177,7 @@ class Album(object):
 			"numMediaInAlbum": self.num_media_in_album
 		}
 		if self.parent is not None:
-			dictionary["parentAlbumPath"] = trim_base_custom(self.parent.path, self.baseless_path)
+			dictionary["parentCacheBase"] = cache_base(self.parent.path)
 		return dictionary
 	def media_from_path(self, path):
 		for media in self.media_list:

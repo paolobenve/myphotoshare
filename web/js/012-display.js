@@ -539,7 +539,7 @@ $(document).ready(function() {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, bydateStringWithTrailingSeparator, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1;
+		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, index;
 		
 		if (Options.albums_slide_style)
 			slideBorder = 3;
@@ -634,9 +634,16 @@ $(document).ready(function() {
 			}
 			
 			if (currentMedia === null) {
-				mediaLink = "#!/" + photoFloat.mediaHash(currentAlbum, currentAlbum.media[0]);
-				if (currentAlbum.parentAlbum.path)
-					parentAlbumLink = "#!/" + photoFloat.albumHash(currentAlbum.parentAlbum);
+				if (currentAlbum.media.length) {
+					index = 0;
+					if (typeof currenMediaIndex !== "undefined")
+						index = currentMediaIndex;
+					mediaLink = "#!/" + photoFloat.mediaHash(currentAlbum, currentAlbum.media[index]);
+				}
+				if (currentAlbum.parentCacheBase)
+					albumLink = "#!/" + currentAlbum.parentCacheBase;
+				else
+					albumLink = "";
 				if (populate === true || populate && needAlbumHtmlReverse()) {
 					subalbums = [];
 					
@@ -1176,7 +1183,10 @@ $(document).ready(function() {
 		
 		
 		if (currentAlbum.media.length == 1) {
-			parentAlbumLink = "#!/" + photoFloat.albumHash(currentAlbum.parent);
+			if (currentAlbum.parentCacheBase)
+				albumLink = "#!/" + theAlbum.parentCacheBase;
+			else
+				albumLink = "";
 			nextLink = "";
 			prevLink = "";
 		} else {
@@ -1468,19 +1478,13 @@ $(document).ready(function() {
 			return false;
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
 			// esc, arrow up, page up
-			if (currentMedia === null)
-				swipeDown(parentAlbumLink);
-			else if (currentMedia !== null) {
-				if (currentAlbum.media.length == 1)
-					swipeDown(parentAlbumLink);
-				else
-					swipeDown(albumLink);
-			}
+			if (albumLink)
+				swipeDown(albumLink);
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && e.keyCode === 40 || e.keyCode === 34) {
 			// arrow down, page down
 			if (currentMedia === null)
 				swipeUp(mediaLink);
-			else
+			else if (albumLink)
 				swipeUp(albumLink);
 		} 
 		return true;

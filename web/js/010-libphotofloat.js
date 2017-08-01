@@ -112,13 +112,10 @@
 					i = -1;
 				}
 			}
-			if (theAlbum.parentAlbumPath) {
-				self.getAlbum(PhotoFloat.cachePath(theAlbum.parentAlbumPath), function(theParentAlbum) {
-					theAlbum.parent = theParentAlbum;
-					callback(theAlbum, media, i);
-				});
-			}
+			if (theAlbum.parentCacheBase)
+				theAlbum.parentAlbumLink = "#!/" + theAlbum.parentCacheBase;
 			
+			callback(theAlbum, media, i);
 		}, error);
 	};
 	PhotoFloat.prototype.authenticate = function(password, result) {
