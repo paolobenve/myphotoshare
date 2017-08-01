@@ -1184,7 +1184,7 @@ $(document).ready(function() {
 		
 		if (currentAlbum.media.length == 1) {
 			if (currentAlbum.parentCacheBase)
-				albumLink = "#!/" + theAlbum.parentCacheBase;
+				albumLink = "#!/" + currentAlbum.parentCacheBase;
 			else
 				albumLink = "";
 			nextLink = "";
@@ -1469,23 +1469,23 @@ $(document).ready(function() {
 	
 	$(document).keydown(function(e){
 		if (! e.ctrlKey && ! e.shiftKey && ! e.altKey && (e.keyCode === 39)) {
-			// arrow right
+			//                                              arrow right
 			swipeLeft(nextLink);
 			return false;
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 37)) {
-			// arrow left
+			//                                                      arrow left
 			swipeRight(prevLink);
 			return false;
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
-			// esc, arrow up, page up
+			//                                                             esc,           arrow up,            page up
 			if (albumLink)
 				swipeDown(albumLink);
-		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && e.keyCode === 40 || e.keyCode === 34) {
-			// arrow down, page down
+		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  &&                      e.keyCode === 40 || e.keyCode === 34) {
+			//                                                                          arrow down,          page down
 			if (currentMedia === null)
 				swipeUp(mediaLink);
-			else if (albumLink)
-				swipeUp(albumLink);
+			else
+				swipeLeft(nextLink);
 		} 
 		return true;
 	});
