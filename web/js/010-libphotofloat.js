@@ -93,6 +93,10 @@
 			albumHash = hash;
 			mediaHash = null;
 		}
+		if (albumHash)
+			albumHash = decodeURI(albumHash);
+		if (mediaHash)
+			mediaHash = decodeURI(mediaHash);
 		this.getAlbum(albumHash, function(theAlbum) {
 			var i = -1;
 			if (mediaHash !== null) {
@@ -112,8 +116,6 @@
 					i = -1;
 				}
 			}
-			if (theAlbum.parentCacheBase)
-				theAlbum.parentAlbumLink = "#!/" + theAlbum.parentCacheBase;
 			
 			callback(theAlbum, media, i);
 		}, error);
@@ -161,6 +163,12 @@
 	};
 	PhotoFloat.mediaHash = function(album, media) {
 		return PhotoFloat.pathJoin([PhotoFloat.albumHash(album), PhotoFloat.cachePath(media.name)]);
+	};
+	PhotoFloat.mediaHashURIEncoded = function(album, media) {
+		return PhotoFloat.pathJoin([
+				encodeURIComponent(PhotoFloat.albumHash(album)),
+				encodeURIComponent(PhotoFloat.cachePath(media.name))
+			]);
 	};
 	PhotoFloat.mediaHashFolder = function(album, media) {
 		var hash;
@@ -261,6 +269,7 @@
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cachePath = PhotoFloat.cachePath;
 	PhotoFloat.prototype.mediaHash = PhotoFloat.mediaHash;
+	PhotoFloat.prototype.mediaHashURIEncoded = PhotoFloat.mediaHashURIEncoded;
 	PhotoFloat.prototype.mediaHashFolder = PhotoFloat.mediaHashFolder;
 	PhotoFloat.prototype.pathJoin = PhotoFloat.pathJoin;
 	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;

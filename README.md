@@ -39,6 +39,7 @@ This is a Jason A. Donenfeld's Photofloat fork, enriched by following contributo
 * Single `index.php` file: `php` applies basic option to home page (crawlers and social media do not execute javascript)
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
+* Keyboard navigation: arrows, pageup/down, esc, f (fullscreen)
 
 ## Screenshots
 

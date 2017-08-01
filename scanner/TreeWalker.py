@@ -127,7 +127,6 @@ class TreeWalker:
 			try:
 				cached_album = Album.from_cache(json_cache_file)
 				if file_mtime(absolute_path) <= file_mtime(json_cache_file):
-				#~ if self.max_mtime_in_tree(absolute_path) <= file_mtime(json_cache_file):
 					message("  json cache file OK", "  " + json_message)
 					json_cache_OK = True
 					album = cached_album

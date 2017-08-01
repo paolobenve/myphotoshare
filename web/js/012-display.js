@@ -334,9 +334,9 @@ $(document).ready(function() {
 				if (i < components.length - 1 || currentMedia !== null)
 					if (i != 0 || ! dateTitle) {
 						if (i == 1 && dateTitle)
-							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + photoFloat.cachePath(last.substring(1)) + "\">" + title;
+							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(photoFloat.cachePath(last.substring(1))) + "\">" + title;
 						else
-							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + (i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
 					}
 				if (i == 1 && dateTitle)
 					title += "(" + _t("#by-date") + ")";
@@ -596,7 +596,7 @@ $(document).ready(function() {
 									"<span class=\"helper\"></span>" +
 									"<img title=\"" + currentAlbum.media[i].name + "\"" +
 										"alt=\"" + photoFloat.trimExtension(currentAlbum.media[i].name) + "\"" +
-										"src=\"" +  thumbHash + "\"" +
+										"src=\"" +  encodeURI(thumbHash) + "\"" +
 										"class=\"thumbnail" + "\"" +
 										"height=\"" + thumbHeight + "\"" +
 										"width=\"" + thumbWidth + "\"" +
@@ -609,7 +609,7 @@ $(document).ready(function() {
 					image = $(imageString);
 					
 					image.get(0).media = currentAlbum.media[i];
-					hash = photoFloat.mediaHash(currentAlbum, currentAlbum.media[i]);
+					hash = photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[i]);
 					link = $("<a href=\"#!/" + hash + "\"></a>");
 					link.append(image);
 					media.push(link);
@@ -638,10 +638,10 @@ $(document).ready(function() {
 					index = 0;
 					if (typeof currenMediaIndex !== "undefined")
 						index = currentMediaIndex;
-					mediaLink = "#!/" + photoFloat.mediaHash(currentAlbum, currentAlbum.media[index]);
+					mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[index]);
 				}
 				if (currentAlbum.parentCacheBase)
-					albumLink = "#!/" + currentAlbum.parentCacheBase;
+					albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 				else
 					albumLink = "";
 				if (populate === true || populate && needAlbumHtmlReverse()) {
@@ -663,7 +663,7 @@ $(document).ready(function() {
 					
 					
 					for (i = 0; i < currentAlbum.albums.length; ++i) {
-						link = $("<a href=\"#!/" + photoFloat.albumHash(currentAlbum.albums[i]) + "\"></a>");
+						link = $("<a href=\"#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum.albums[i])) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
 						//~ imageString += 			"width: " + (correctedAlbumThumbSize + 2 * buttonBorder) + "px;";
@@ -717,7 +717,7 @@ $(document).ready(function() {
 										"<img " +
 											"title=\"" + randomMedia.albumName + "\"" +
 											" class=\"thumbnail\"" +
-											" src=\"" + mediaSrc + "\"" +
+											" src=\"" + encodeURI(mediaSrc) + "\"" +
 											" style=\"width:" + thumbWidth + "px;" +
 												" height:" + thumbHeight + "px;" +
 												"\"" +
@@ -804,12 +804,12 @@ $(document).ready(function() {
 			if (currentAlbum.path == Options.folders_string) {
 				$("#folders-view").hide();
 				$("#date-view").show();
-				$("#day-folders-view-link").attr("href", "#!/" + Options.by_date_string);
+				$("#day-folders-view-link").attr("href", "#!/" + encodeURIComponent(Options.by_date_string));
 			}
 			else if (currentAlbum.path == Options.by_date_string) {
 				$("#folders-view").show();
 				$("#date-view").hide();
-				$("#day-folders-view-link").attr("href", "#!/" + Options.folders_string);
+				$("#day-folders-view-link").attr("href", "#!/" + encodeURIComponent(Options.folders_string));
 			} else {
 				$("#folders-view").hide();
 				$("#date-view").hide();
@@ -886,9 +886,9 @@ $(document).ready(function() {
 			if (photoSrc != previousSrc || media.attr("width") != width || media.attr("height") != height) {
 				$("link[rel=image_src]").remove();
 				$('link[rel="video_src"]').remove();
-				$("head").append("<link rel=\"image_src\" href=\"" + photoSrc + "\" />");
+				$("head").append("<link rel=\"image_src\" href=\"" + encodeURI(photoSrc) + "\" />");
 				media
-					.attr("src", photoSrc)
+					.attr("src", encodeURI(photoSrc))
 					.attr("width", width)
 					.attr("height", height)
 					.attr("ratio", ratio);
@@ -1097,10 +1097,10 @@ $(document).ready(function() {
 					.attr("width", width)
 					.attr("height", height)
 					.attr("ratio", width / height)
-					.attr("src", videoSrc)
+					.attr("src", encodeURI(videoSrc))
 					.attr("alt", currentMedia.name);
 				triggerLoad = 'loadstart';
-				linkTag = "<link rel=\"video_src\" href=\"" + videoSrc + "\" />";
+				linkTag = "<link rel=\"video_src\" href=\"" + encodeURI(videoSrc) + "\" />";
 			} else if (currentMedia.mediaType == "photo") {
 				choosen = chooseReducedPhoto(currentMedia, null);
 				photoSrc = choosen[0];
@@ -1123,10 +1123,10 @@ $(document).ready(function() {
 					.attr("width", width)
 					.attr("height", height)
 					.attr("ratio", width / height)
-					.attr("src", photoSrc)
+					.attr("src", encodeURI(photoSrc))
 					.attr("alt", currentMedia.name)
 					.attr("title", currentMedia.date);
-				linkTag = "<link rel=\"image_src\" href=\"" + photoSrc + "\" />";
+				linkTag = "<link rel=\"image_src\" href=\"" + encodeURI(photoSrc) + "\" />";
 				triggerLoad = 'load';
 			}
 			
@@ -1184,34 +1184,29 @@ $(document).ready(function() {
 		
 		if (currentAlbum.media.length == 1) {
 			if (currentAlbum.parentCacheBase)
-				albumLink = "#!/" + currentAlbum.parentCacheBase;
+				albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 			else
 				albumLink = "";
 			nextLink = "";
 			prevLink = "";
 		} else {
-			albumLink = "#!/" + photoFloat.albumHash(currentAlbum);
-			nextLink = "#!/" + photoFloat.mediaHash(currentAlbum, nextMedia);
-			prevLink = "#!/" + photoFloat.mediaHash(currentAlbum, prevMedia);
+			albumLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
+			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
+			prevLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, prevMedia);
 			$("#next").show();
 			$("#prev").show();
-			//~ $("#next-media").attr("oncontextmenu", "return false;");
-			$("#next-media").mousedown(function(ev){
-				if(ev.which == 1)
-					swipeLeft(nextLink);
-				else if(ev.which == 3) {
-					if (ev.shiftKey) {
-					}
-					else {
-						ev.preventDefault();
-						ev.stopPropagation();
-						$("#next-media").attr("oncontextmenu", "return false;");
+			$("#next-media")
+				.on('contextmenu', function(ev) {
+					if (! ev.shiftKey) {
+						ev.preventDefault();   
 						swipeRight(prevLink);
-						$("#next-media").attr("oncontextmenu", "");
 					}
-				}
-				return false; 
-			});
+				})
+				.mousedown(function(ev){
+					if(ev.which == 1)
+						swipeLeft(nextLink);
+					return false; 
+				});
 			$('#next').click(function(){
 				swipeLeft(nextLink);
 				return false;
@@ -1221,12 +1216,18 @@ $(document).ready(function() {
 				return false;
 			});
 		}
-		$("#original-link").attr("target", "_blank").attr("href", photoFloat.originalMediaPath(currentMedia));
+		$("#original-link").attr("target", "_blank").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia)));
 		
 		if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
-			changeViewLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.cachePath(currentMedia.foldersAlbum), PhotoFloat.cachePath(currentMedia.name)]);
+			changeViewLink = "#!/" + PhotoFloat.pathJoin([
+							encodeURIComponent(PhotoFloat.cachePath(currentMedia.foldersAlbum)),
+							encodeURIComponent(PhotoFloat.cachePath(currentMedia.name))
+						]);
 		else
-			changeViewLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.cachePath(currentMedia.dayAlbum), PhotoFloat.cachePath(currentMedia.name)]);
+			changeViewLink = "#!/" + PhotoFloat.pathJoin([
+							encodeURIComponent(PhotoFloat.cachePath(currentMedia.dayAlbum)),
+							encodeURIComponent(PhotoFloat.cachePath(currentMedia.name))
+						]);
 		$("#day-folders-view-link").attr("href", changeViewLink);
 		
 		text = "<table>";
