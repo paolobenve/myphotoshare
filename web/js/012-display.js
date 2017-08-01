@@ -640,10 +640,9 @@ $(document).ready(function() {
 						index = currentMediaIndex;
 					mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[index]);
 				}
+				albumLink = "";
 				if (currentAlbum.parentCacheBase)
 					albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
-				else
-					albumLink = "";
 				if (populate === true || populate && needAlbumHtmlReverse()) {
 					subalbums = [];
 					
@@ -1183,10 +1182,11 @@ $(document).ready(function() {
 		
 		
 		if (currentAlbum.media.length == 1) {
+			albumLink = "";
 			if (currentAlbum.parentCacheBase)
 				albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 			else
-				albumLink = "";
+				albumLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
 			nextLink = "";
 			prevLink = "";
 		} else {

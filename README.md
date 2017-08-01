@@ -39,7 +39,7 @@ This is a Jason A. Donenfeld's Photofloat fork, enriched by following contributo
 * Single `index.php` file: `php` applies basic option to home page (crawlers and social media do not execute javascript)
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
-* Keyboard navigation: arrows, pageup/down, esc, f (fullscreen)
+* Keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 
 ## Screenshots
 
@@ -222,7 +222,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ### version 2.4.2 (July 29, 2017):
 
-* right click on image moves back in album (opposite of left click)
+* keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 * `video_transcode_bitrate` option must now be an integer, the bitrate in bits/sec
 
 ### version 2.4.1 (July 26, 2017):
