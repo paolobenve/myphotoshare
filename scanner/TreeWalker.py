@@ -107,7 +107,7 @@ class TreeWalker:
 			message("access denied", os.path.basename(absolute_path), 1)
 			back_level()
 			return [None, 0]
-		message("Next folder", os.path.basename(absolute_path), 3)
+		message("Walking", os.path.basename(absolute_path), 3)
 		if Options.config['exclude_tree_marker'] in os.listdir(absolute_path):
 			next_level()
 			message("excluded with subfolders by marker file", Options.config['exclude_tree_marker'], 4)
@@ -243,7 +243,7 @@ class TreeWalker:
 		fp.close()
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
-			message("cleanup", "", 3)
+			message("Cleanup", "", 3)
 			next_level()
 			message("cleanup", "building stale list", 4)
 			for album in self.all_albums:
