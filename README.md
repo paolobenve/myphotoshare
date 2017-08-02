@@ -1,4 +1,4 @@
-# photofloat v. 2.4
+# photofloat v. 2.5
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -220,10 +220,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-### version 2.4.2 (July 29, 2017):
+### version 2.5 (August 2, 2017):
 
-* keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
-* `video_transcode_bitrate` option must now be an integer, the bitrate in bits/sec
+* keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)s/sec
+* added vertical swipe gestures: they are mapped on arrow up/down
 
 ### version 2.4.1 (July 26, 2017):
 

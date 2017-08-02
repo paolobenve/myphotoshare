@@ -98,19 +98,27 @@ $(document).ready(function() {
 	
 	// adapted from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
 	function detectSwipe(el,callback) {
-		var swipe_det, ele, min_x, direc;
+		var swipe_det, ele, min_x, min_y, max_x, max_y, direc;
 		var touchStart, touchMove, touchEnd;
 		touchStart = function(e){
 			var t = e.touches[0];
 			swipe_det.sX = t.screenX;
+			swipe_det.sY = t.screenY;
 		};
 		touchMove = function(e){
-			e.preventDefault();
+			//~ e.preventDefault();
 			var t = e.touches[0];
 			swipe_det.eX = t.screenX;
+			swipe_det.eY = t.screenY;
 		};
 		touchEnd = function(e){
-			if ((swipe_det.eX - swipe_det.sX > min_x || swipe_det.eX - swipe_det.sX < - min_x) && 
+			//~ if ((swipe_det.eX - swipe_det.sX > min_x || swipe_det.eX - swipe_det.sX < - min_x) && 
+				//~ swipe_det.eX > 0
+			//horizontal detection
+			if (
+				(swipe_det.eX - min_x > swipe_det.sX || swipe_det.eX + min_x < swipe_det.sX) &&
+				swipe_det.eY < swipe_det.sY + max_y &&
+				swipe_det.sY > swipe_det.eY - max_y &&
 				swipe_det.eX > 0
 			) {
 				if(swipe_det.eX > swipe_det.sX)
@@ -118,19 +126,36 @@ $(document).ready(function() {
 				else
 					direc = "l";
 			}
+			//vertical detection
+			else if (
+				(swipe_det.eY - min_y > swipe_det.sY || swipe_det.eY + min_y < swipe_det.sY) &&
+				swipe_det.eX < swipe_det.sX + max_x &&
+				swipe_det.sX > swipe_det.eX - max_x &&
+				swipe_det.eY > 0
+			) {
+				if(swipe_det.eY > swipe_det.sY)
+					direc = "d";
+				else
+					direc = "u";
+			}
 			
 			if (direc != "") {
 				if(typeof callback == 'function')
 					callback(el,direc);
 			}
 			direc = "";
-			swipe_det.sX = 0; swipe_det.eX = 0;
+			swipe_det.sX = 0;
+			swipe_det.eX = 0;
 		};
 		swipe_det = new Object();
 		swipe_det.sX = 0; swipe_det.eX = 0;
 		min_x = 30;  //min x swipe for horizontal swipe
+		max_x = 30;  //max x difference for vertical swipe
+		min_y = 50;  //min y swipe for vertical swipe
+		max_y = 60;  //max y difference for horizontal swipe
 		direc = "";
-		ele = document.getElementById(el);
+		//~ ele = document.getElementById(el);
+		ele = window;
 		ele.addEventListener('touchstart', touchStart, false);
 		ele.addEventListener('touchmove', touchMove, false);
 		ele.addEventListener('touchend', touchEnd, false);  
@@ -141,6 +166,16 @@ $(document).ready(function() {
 			swipeRight(prevLink);
 		} else if (d == "l") {
 			swipeLeft(nextLink);
+		} else if (d == "d") {
+			if (albumLink) {
+				fromEscKey = true;
+				swipeDown(albumLink);
+			}
+		} else if (d == "u") {
+			if (currentMedia === null)
+				swipeUp(mediaLink);
+			else
+				swipeLeft(nextLink);
 		}
 	}
 	
@@ -1494,6 +1529,7 @@ $(document).ready(function() {
 			if (albumLink) {
 				fromEscKey = true;
 				swipeDown(albumLink);
+				return false;
 			}
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  &&                      e.keyCode === 40 || e.keyCode === 34) {
 			//                                                                          arrow down,          page down
@@ -1501,15 +1537,18 @@ $(document).ready(function() {
 				swipeUp(mediaLink);
 			else
 				swipeLeft(nextLink);
+			return false;
 		} else if (e.keyCode === 70) {
 			//               f
 			if (currentMedia !== null)
 				goFullscreen(e);
+			return false;
 		} else if (e.keyCode === 77)
 			//               m
 			if (currentMedia !== null) {
 				//~ $("#links").toggle();
 				showMetadata(e);
+			return false;
 			}
 		return true;
 	});
