@@ -1,6 +1,4 @@
 var Options = {};
-var nextLink = "", prevLink = "", albumLink = "", mediaLink = "", parentAlbumLink = "";
-var language;
 var isMobile = {
 	Android: function() {
 		return navigator.userAgent.match(/Android/i);
@@ -21,38 +19,6 @@ var isMobile = {
 		return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
 	}
 };
-
-function getLanguage() {
-	language = "en";
-	if (Options.language && translations[Options.language] !== undefined)
-		language = Options.language;
-	else {
-		var userLang = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage;
-		language = userLang.split('-')[0];
-	}
-	return language;
-}
-
-function translate() {
-	language = getLanguage();
-	var selector;
-	for (var key in translations[language]) {
-		if (translations[language].hasOwnProperty(key)) {
-			if (key == '#title-string' && document.title.substr(0, 5) != "<?php")
-				// don't set page title, php has already set it
-				continue;
-			selector = $(key);
-			if (selector.length) {
-				selector.html(translations[language][key]);
-			}
-		}
-	}
-}
-
-function _t(id) {
-	language = getLanguage();
-	return translations[language][id];
-}
 
 $(document).ready(function() {
 	
@@ -90,12 +56,45 @@ $(document).ready(function() {
 	var numSubAlbumsReady = 0;
 	var fromEscKey = false;
 	var firstEscKey = true;
+	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
 	
 	if (! isMobile.any())
 		$(".ssk-whatsapp").hide();
 	
 	/* Displays */
 	
+	function _t(id) {
+		language = getLanguage();
+		return translations[language][id];
+	}
+	
+	function translate() {
+		language = getLanguage();
+		var selector;
+		for (var key in translations[language]) {
+			if (translations[language].hasOwnProperty(key)) {
+				if (key == '#title-string' && document.title.substr(0, 5) != "<?php")
+					// don't set page title, php has already set it
+					continue;
+				selector = $(key);
+				if (selector.length) {
+					selector.html(translations[language][key]);
+				}
+			}
+		}
+	}
+
+	function getLanguage() {
+		language = "en";
+		if (Options.language && translations[Options.language] !== undefined)
+			language = Options.language;
+		else {
+			var userLang = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage;
+			language = userLang.split('-')[0];
+		}
+		return language;
+	}
+
 	// adapted from https://stackoverflow.com/questions/15084675/how-to-implement-swipe-gestures-for-mobile-devices#answer-27115070
 	function detectSwipe(el,callback) {
 		var swipe_det, ele, min_x, min_y, max_x, max_y, direc;
@@ -576,7 +575,7 @@ $(document).ready(function() {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, bydateStringWithTrailingSeparator, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, index;
+		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1;
 		
 		if (Options.albums_slide_style)
 			slideBorder = 3;

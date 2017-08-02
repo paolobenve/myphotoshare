@@ -354,26 +354,6 @@ class Media(object):
 				if original:
 					self._attributes["metadata"]["originalSize"] = (int(s["width"]), int(s["height"]))
 				break
-	def resize_canvas(self, image, canvas_max_size, background_color, square_thumbnail = True):
-		old_width, old_height = image.size
-		if (square_thumbnail):
-			canvas_width = canvas_max_size
-			canvas_height = canvas_max_size
-		else:
-			if (old_width > old_height):
-				canvas_width = canvas_max_size
-				canvas_height = int(float(canvas_width) * float(old_height) / float(old_width))
-			else:
-				canvas_height = canvas_max_size
-				canvas_width = int(float(canvas_height) * float(old_width) / float(old_height))
-		
-		# Center the image
-		x1 = int(math.floor((canvas_width - old_width) / 2))
-		y1 = int(math.floor((canvas_height - old_height) / 2))
-		mode = image.mode
-		newImage = Image.new(mode, (canvas_width, canvas_height), background_color)
-		newImage.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
-		return newImage
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
 		# give image the correct orientation
 		mirror = image
