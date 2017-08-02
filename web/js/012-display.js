@@ -166,16 +166,16 @@ $(document).ready(function() {
 			swipeRight(prevLink);
 		} else if (d == "l") {
 			swipeLeft(nextLink);
-		} else if (d == "d") {
-			if (albumLink) {
-				fromEscKey = true;
-				swipeDown(albumLink);
-			}
-		} else if (d == "u") {
-			if (currentMedia === null)
-				swipeUp(mediaLink);
-			else
-				swipeLeft(nextLink);
+		//~ } else if (d == "d") {
+			//~ if (albumLink) {
+				//~ fromEscKey = true;
+				//~ swipeDown(albumLink);
+			//~ }
+		//~ } else if (d == "u") {
+			//~ if (currentMedia === null)
+				//~ swipeUp(mediaLink);
+			//~ else
+				//~ swipeLeft(nextLink);
 		}
 	}
 	

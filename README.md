@@ -224,6 +224,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 * keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)s/sec
 * added vertical swipe gestures: they are mapped on arrow up/down
+* restored cache use in scanner
 
 ### version 2.4.1 (July 26, 2017):
 
