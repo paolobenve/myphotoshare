@@ -88,6 +88,8 @@ $(document).ready(function() {
 	var language;
 	var byDateRegex;
 	var numSubAlbumsReady = 0;
+	var fromEscKey = false;
+	var firstEscKey = true;
 	
 	if (! isMobile.any())
 		$(".ssk-whatsapp").hide();
@@ -634,11 +636,16 @@ $(document).ready(function() {
 			}
 			
 			if (currentMedia === null) {
-				if (currentAlbum.media.length) {
-					index = 0;
-					if (typeof currenMediaIndex !== "undefined")
-						index = currentMediaIndex;
-					mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[index]);
+				if (fromEscKey && firstEscKey) {
+					// respect the existing mediaLink (you cannot do it more than once)
+					firstEscKey = false;
+				} else {
+					// reset mediaLink
+					if (currentAlbum.media.length)
+						mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[0]);
+					else
+						mediaLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
+					firstEscKey = true;
 				}
 				albumLink = "";
 				if (currentAlbum.parentCacheBase)
@@ -1029,6 +1036,9 @@ $(document).ready(function() {
 		//~ var windowWidth = $(window).width(), windowHeight = $(window).height();
 		var choosen, isOriginal, nextReducedPhoto, prevReducedPhoto;
 		
+		mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentMedia);
+		firstEscKey = true;
+		
 		thumbnailSize = Options.media_thumb_size;
 		$("#media-box").show();
 		if (currentAlbum.media.length == 1) {
@@ -1375,7 +1385,7 @@ $(document).ready(function() {
 		{
 			if (currentMedia === null) {
 				currentMedia = currentAlbum.media[0];
-				currentMediaIndex = 1;
+				currentMediaIndex = 0;
 			}
 			$("#day-folders-view-container").show();
 			nextMedia = null;
@@ -1383,6 +1393,7 @@ $(document).ready(function() {
 			showMedia(currentAlbum);
 		}
 		else {
+			
 			$("#day-folders-view-container").hide();
 		}
 		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
@@ -1398,6 +1409,7 @@ $(document).ready(function() {
 			// set social buttons events
 			$("#media").on("load", socialButtons);
 		}
+		fromEscKey = false;
 	}
 
 	function getOptions(cacheSubDir, callback) {
@@ -1479,8 +1491,10 @@ $(document).ready(function() {
 			return false;
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
 			//                                                             esc,           arrow up,            page up
-			if (albumLink)
+			if (albumLink) {
+				fromEscKey = true;
 				swipeDown(albumLink);
+			}
 		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  &&                      e.keyCode === 40 || e.keyCode === 34) {
 			//                                                                          arrow down,          page down
 			if (currentMedia === null)

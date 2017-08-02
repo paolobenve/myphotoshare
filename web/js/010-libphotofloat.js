@@ -80,15 +80,15 @@
 	};
 	
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
-		var index, albumHash, mediaHash, media = null, self = this;
+		var slashPosition, albumHash, mediaHash, media = null, self = this;
 		hash = PhotoFloat.cleanHash(hash);
-		index = hash.lastIndexOf("/");
+		slashPosition = hash.lastIndexOf("/");
 		if (! hash.length) {
 			albumHash = PhotoFloat.cachePath(Options.folders_string);
 			mediaHash = null;
-		} else if (index !== -1 && index !== hash.length - 1) {
-			mediaHash = hash.substring(index + 1);
-			albumHash = hash.substring(0, index);
+		} else if (slashPosition !== -1 && slashPosition !== hash.length - 1) {
+			mediaHash = hash.substring(slashPosition + 1);
+			albumHash = hash.substring(0, slashPosition);
 		} else {
 			albumHash = hash;
 			mediaHash = null;
@@ -116,7 +116,6 @@
 					i = -1;
 				}
 			}
-			
 			callback(theAlbum, media, i);
 		}, error);
 	};
