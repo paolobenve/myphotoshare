@@ -248,11 +248,11 @@ class Media(object):
 				value = value.strip().partition("\x00")[0]
 				if (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime"):
 					try:
-						value = datetime.strptime(value, '%Y:%m:%d %H:%M:%S')
+						value = datetime.strptime(value, Options.exif_date_time_format)
 					except KeyboardInterrupt:
 						raise
-					except:
-						continue
+					#~ except:
+						#~ continue
 			exif[decoded] = value
 		
 		if "Orientation" in exif:
@@ -284,15 +284,15 @@ class Media(object):
 				self._attributes["metadata"]["flash"] = self._photo_metadata.flash_dictionary[exif["Flash"]]
 			except KeyboardInterrupt:
 				raise
-			except:
-				pass
+			#~ except:
+				#~ pass
 		if "LightSource" in exif and exif["LightSource"] in self._photo_metadata.light_source_dictionary:
 			try:
 				self._attributes["metadata"]["lightSource"] = self._photo_metadata.light_source_dictionary[exif["LightSource"]]
 			except KeyboardInterrupt:
 				raise
-			except:
-				pass
+			#~ except:
+				#~ pass
 		if "ExposureProgram" in exif and exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
 			self._attributes["metadata"]["exposureProgram"] = self._photo_metadata.exposure_list[exif["ExposureProgram"]]
 		if "SpectralSensitivity" in exif:
@@ -311,14 +311,14 @@ class Media(object):
 			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureBiasValue"]
 		if "DateTimeOriginal" in exif:
 			try:
-				self._attributes["metadata"]["dateTimeOriginal"] = datetime.strptime(exif["DateTimeOriginal"], '%Y:%m:%d %H:%M:%S')
+				self._attributes["metadata"]["dateTimeOriginal"] = datetime.strptime(exif["DateTimeOriginal"], Options.exif_date_time_format)
 			except KeyboardInterrupt:
 				raise
 			except TypeError:
 				self._attributes["metadata"]["dateTimeOriginal"] = exif["DateTimeOriginal"]
 		if "DateTime" in exif:
 			try:
-				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], '%Y:%m:%d %H:%M:%S')
+				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], Options.exif_date_time_format)
 			except KeyboardInterrupt:
 				raise
 			except TypeError:
@@ -341,9 +341,9 @@ class Media(object):
 			return
 		info = json.loads(p)
 		for s in info["streams"]:
-			message("debug: codec_type", 'codec_type', 4)
+			message("debug: codec_type", 'codec_type', 5)
 			if 'codec_type' in s:
-				message("debug: s[codec_type]", s['codec_type'], 4)
+				message("debug: s[codec_type]", s['codec_type'], 5)
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
 				self._attributes["metadata"]["size"] = (int(s["width"]), int(s["height"]))
@@ -561,14 +561,14 @@ class Media(object):
 			# js will see that the thumbnail doesn't exist and use the original image
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("no reduced size, image is smaller", info_string, 3)
+				message("no reduced size, image is smaller", info_string, 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("no thumbnail for albums, image is smaller", info_string, 3)
+				message("no thumbnail for albums, image is smaller", info_string, 4)
 			else:
-				message("no thumbnail for media, image is smaller", info_string, 3)
+				message("no thumbnail for media, image is smaller", info_string, 4)
 			try:
 				os.unlink(thumb_path)
-			except:
+			except OSError:
 				pass
 			back_level()
 			return start_image
@@ -582,11 +582,11 @@ class Media(object):
 			):
 				next_level()
 				if original_thumb_size == Options.config['album_thumb_size']:
-					message("existing album thumbnail", info_string, 3)
+					message("existing album thumbnail", info_string, 4)
 				elif original_thumb_size == Options.config['media_thumb_size']:
-					message("existing thumbnail", info_string, 3)
+					message("existing thumbnail", info_string, 4)
 				else:
-					message("existing reduced size", info_string, 3)
+					message("existing reduced size", info_string, 4)
 				back_level()
 				return start_image
 			gc.collect()
@@ -606,11 +606,11 @@ class Media(object):
 			
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reducing size", info_string, 3)
+				message("reducing size", info_string, 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums", info_string, 3)
+				message("thumbing for albums", info_string, 4)
 			else:
-				message("thumbing for media", info_string, 3)
+				message("thumbing for media", info_string, 4)
 			try:
 				start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 				back_level()
@@ -639,7 +639,7 @@ class Media(object):
 				back_level()
 				try:
 					os.unlink(thumb_path)
-				except:
+				except OSError:
 					pass
 				back_level()
 				return start_image
@@ -662,7 +662,7 @@ class Media(object):
 			back_level()
 			try:
 				os.unlink(tfn)
-			except:
+			except OSError:
 				pass
 			self.is_valid = False
 			return
@@ -671,7 +671,7 @@ class Media(object):
 		except KeyboardInterrupt:
 			try:
 				os.unlink(tfn)
-			except:
+			except OSError:
 				pass
 			raise
 		except:
@@ -680,7 +680,7 @@ class Media(object):
 			back_level()
 			try:
 				os.unlink(tfn)
-			except:
+			except OSError:
 				pass
 			self.is_valid = False
 			return
@@ -703,7 +703,7 @@ class Media(object):
 		
 		try:
 			os.unlink(tfn)
-		except:
+		except OSError:
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
@@ -736,12 +736,12 @@ class Media(object):
 			file_mtime(transcode_path) >= self._attributes["dateTimeFile"]
 		):
 			next_level()
-			message("existent transcoded video", info_string, 3)
+			message("existent transcoded video", info_string, 4)
 			back_level()
 			self._video_metadata(transcode_path, False)
 			return
 		next_level()
-		message("transcoding", info_string, 3)
+		message("transcoding", info_string, 4)
 		back_level()
 		if "originalSize" in self._attributes["metadata"] and self._attributes["metadata"]["originalSize"][1] > 720:
 			transcode_cmd.append('-s')
@@ -778,8 +778,7 @@ class Media(object):
 			back_level()
 			try:
 				os.unlink(transcode_path)
-			except:
-				pass
+			except OSError:
 				self.is_valid = False
 			return
 		self._video_metadata(transcode_path, False)
@@ -901,7 +900,7 @@ class Media(object):
 		for key, value in dictionary.items():
 			if key.startswith("dateTime"):
 				try:
-					dictionary[key] = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+					dictionary[key] = datetime.strptime(value, Options.date_time_format)
 				except KeyboardInterrupt:
 					raise
 				#~ except:
@@ -910,7 +909,7 @@ class Media(object):
 				for key1, value1 in value.items():
 					if key1.startswith("dateTime"):
 						try:
-							dictionary[key][key1] = datetime.strptime(value1, "%Y-%m-%d %H:%M:%S")
+							dictionary[key][key1] = datetime.strptime(value1, Options.date_time_format)
 						except KeyboardInterrupt:
 							raise
 						#~ except:

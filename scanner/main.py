@@ -181,9 +181,9 @@ def main():
 	except:
 		try:
 			os.mkdir(Options.config['cache_path'])
-			message("directory created", Options.config['cache_path'], 3)
+			message("directory created", Options.config['cache_path'], 4)
 			os.chmod(Options.config['cache_path'], 0777)
-			message("permissions set", Options.config['cache_path'], 3)
+			message("permissions set", Options.config['cache_path'], 4)
 		except:
 			message("FATAL ERROR", Options.config['cache_path'] + " inexistent and couldn't be created, quitting")
 			sys.exit(-97)
@@ -193,7 +193,7 @@ def main():
 	try:
 		os.stat(albumCacheDir)
 	except:
-		message("creating album cache directory for php", albumCacheDir, 3)
+		message("creating album cache directory for php", albumCacheDir, 4)
 		os.mkdir(albumCacheDir)
 	os.chmod(albumCacheDir, 0777)
 	

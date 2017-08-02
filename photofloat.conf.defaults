@@ -16,14 +16,15 @@
 # scanner option
 ###########################################################
 
-# verbosity level, a number 0-4
+# verbosity level, a number 0-5
 # 0 = initial options and fatal errors
 # 1 = non-fatal errors
 # 2 = warnings
-# 3 = info
-# 4 = more info
+# 3 = browsing info
+# 4 = other info
+# 5 = more info
 
-max_verbose = 1
+max_verbose = 3
 
 # absolute path of the folder where index.html resides, by default album_path is "albums" inside it and cache_path is "cache" inside it
 index_html_path = 
