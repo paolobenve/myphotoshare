@@ -154,8 +154,8 @@ $(document).ready(function() {
 		min_y = 50;  //min y swipe for vertical swipe
 		max_y = 60;  //max y difference for horizontal swipe
 		direc = "";
-		//~ ele = document.getElementById(el);
-		ele = window;
+		ele = document.getElementById(el);
+		//~ ele = window;
 		ele.addEventListener('touchstart', touchStart, false);
 		ele.addEventListener('touchmove', touchMove, false);
 		ele.addEventListener('touchend', touchEnd, false);  
@@ -166,16 +166,16 @@ $(document).ready(function() {
 			swipeRight(prevLink);
 		} else if (d == "l") {
 			swipeLeft(nextLink);
-		//~ } else if (d == "d") {
-			//~ if (albumLink) {
-				//~ fromEscKey = true;
-				//~ swipeDown(albumLink);
-			//~ }
-		//~ } else if (d == "u") {
-			//~ if (currentMedia === null)
-				//~ swipeUp(mediaLink);
-			//~ else
-				//~ swipeLeft(nextLink);
+		} else if (d == "d") {
+			if (albumLink) {
+				fromEscKey = true;
+				swipeDown(albumLink);
+			}
+		} else if (d == "u") {
+			if (currentMedia === null)
+				swipeUp(mediaLink);
+			else
+				swipeLeft(nextLink);
 		}
 	}
 	
