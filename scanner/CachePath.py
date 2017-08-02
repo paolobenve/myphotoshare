@@ -5,6 +5,12 @@ import Options
 
 max_verbose = 0
 def message(category, text, verbose = 0):
+	# verbosity levels:
+	# 0 = fatal errors only
+	# 1 = add non-fatal errors
+	# 2 = add warnings
+	# 3 = add info
+	# 4 = add more info
 	global usrOptions
 	try:
 		max_verbose = Options.config['max_verbose']

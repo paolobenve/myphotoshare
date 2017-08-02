@@ -225,6 +225,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 * added vertical swipe gestures on media (they are mapped on arrow up/down)
 * restored cache use in scanner: scanner is now faster on already scanned albums
+* implemented verbosity levels, default is now 1 = errors
 
 ### version 2.4.1 (July 26, 2017):
 

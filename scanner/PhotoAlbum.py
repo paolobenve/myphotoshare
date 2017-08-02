@@ -214,7 +214,7 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 		except IOError:
-			message("unreadable, check permissions", media_path)
+			message("unreadable, check permissions", media_path, 1)
 		except:
 			self._video_metadata(media_path)
 		if isinstance(image, Image.Image):
@@ -341,9 +341,9 @@ class Media(object):
 			return
 		info = json.loads(p)
 		for s in info["streams"]:
-			message("debug: codec_type", 'codec_type', 1)
+			message("debug: codec_type", 'codec_type', 4)
 			if 'codec_type' in s:
-				message("debug: s[codec_type]", s['codec_type'], 1)
+				message("debug: s[codec_type]", s['codec_type'], 4)
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
 				self._attributes["metadata"]["size"] = (int(s["width"]), int(s["height"]))
@@ -561,11 +561,11 @@ class Media(object):
 			# js will see that the thumbnail doesn't exist and use the original image
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("no reduced size, image is smaller", info_string)
+				message("no reduced size, image is smaller", info_string, 3)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("no thumbnail for albums, image is smaller", info_string)
+				message("no thumbnail for albums, image is smaller", info_string, 3)
 			else:
-				message("no thumbnail for media, image is smaller", info_string)
+				message("no thumbnail for media, image is smaller", info_string, 3)
 			try:
 				os.unlink(thumb_path)
 			except:
@@ -582,11 +582,11 @@ class Media(object):
 			):
 				next_level()
 				if original_thumb_size == Options.config['album_thumb_size']:
-					message("existing album thumbnail", info_string)
+					message("existing album thumbnail", info_string, 3)
 				elif original_thumb_size == Options.config['media_thumb_size']:
-					message("existing thumbnail", info_string)
+					message("existing thumbnail", info_string, 3)
 				else:
-					message("existing reduced size", info_string)
+					message("existing reduced size", info_string, 3)
 				back_level()
 				return start_image
 			gc.collect()
@@ -606,11 +606,11 @@ class Media(object):
 			
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reducing size", info_string)
+				message("reducing size", info_string, 3)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums", info_string)
+				message("thumbing for albums", info_string, 3)
 			else:
-				message("thumbing for media", info_string)
+				message("thumbing for media", info_string, 3)
 			try:
 				start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 				back_level()
@@ -629,13 +629,13 @@ class Media(object):
 					except:
 						raise
 				next_level()
-				message(str(thumb_size) + " thumbnail", "OK (bug workaround)", )
+				message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 2)
 				back_level()
 				back_level()
 				return start_image_copy
 			except:
 				next_level()
-				message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path))
+				message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
 				back_level()
 				try:
 					os.unlink(thumb_path)
@@ -658,7 +658,7 @@ class Media(object):
 		)
 		if p == False:
 			next_level()
-			message("couldn't extract video frame", os.path.basename(original_path))
+			message("couldn't extract video frame", os.path.basename(original_path), 1)
 			back_level()
 			try:
 				os.unlink(tfn)
@@ -676,7 +676,7 @@ class Media(object):
 			raise
 		except:
 			next_level()
-			message("couldn't open video thumbnail", tfn)
+			message("couldn't open video thumbnail", tfn, 1)
 			back_level()
 			try:
 				os.unlink(tfn)
@@ -736,12 +736,12 @@ class Media(object):
 			file_mtime(transcode_path) >= self._attributes["dateTimeFile"]
 		):
 			next_level()
-			message("existent transcoded video", info_string)
+			message("existent transcoded video", info_string, 3)
 			back_level()
 			self._video_metadata(transcode_path, False)
 			return
 		next_level()
-		message("transcoding", info_string)
+		message("transcoding", info_string, 3)
 		back_level()
 		if "originalSize" in self._attributes["metadata"] and self._attributes["metadata"]["originalSize"][1] > 720:
 			transcode_cmd.append('-s')
@@ -765,7 +765,7 @@ class Media(object):
 			# done to avoid this error;
 			# x264 [error]: baseline profile doesn't support 4:2:2
 			next_level()
-			message("transcoding failure, trying yuv420p", os.path.basename(original_path))
+			message("transcoding failure, trying yuv420p", os.path.basename(original_path), 2)
 			back_level()
 			tmp_transcode_cmd.append('-pix_fmt')
 			tmp_transcode_cmd.append('yuv420p')
@@ -774,7 +774,7 @@ class Media(object):
 		
 		if p == False:
 			next_level()
-			message("transcoding failure", os.path.basename(original_path))
+			message("transcoding failure", os.path.basename(original_path), 1)
 			back_level()
 			try:
 				os.unlink(transcode_path)
