@@ -40,7 +40,7 @@ This is a Jason A. Donenfeld's Photofloat fork, enriched by following contributo
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
 * Keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
-* verbosity levels in scanner
+* Verbosity levels in scanner
 
 ## Screenshots
 
@@ -226,7 +226,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 * added vertical swipe gestures on media (they are mapped on arrow up/down)
 * restored cache use in scanner: scanner is now faster on already scanned albums
-* implemented verbosity levels, default is now 1 = errors
+* implemented verbosity levels, default is now 3 = errors, warnings, walkings
 
 ### version 2.4.1 (July 26, 2017):
 
