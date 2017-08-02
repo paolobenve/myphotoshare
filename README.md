@@ -40,6 +40,7 @@ This is a Jason A. Donenfeld's Photofloat fork, enriched by following contributo
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
 * Keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
+* verbosity levels in scanner
 
 ## Screenshots
 
