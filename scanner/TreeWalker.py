@@ -220,10 +220,6 @@ class TreeWalker:
 		
 		return [album, album.num_media_in_sub_tree]
 	
-	def max_mtime_in_tree(self, path):
-		max_time = max(file_mtime(root) for root,_,_ in os.walk(path))
-		return max_time
-	
 	def save_all_media_json(self):
 		media_list = []
 		self.all_media.sort()
