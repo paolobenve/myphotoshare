@@ -1105,16 +1105,11 @@ $(document).ready(function() {
 		
 		if (currentMedia.mediaType == "video") {
 			if (! Modernizr.video) {
-				$('<div id="video-unsupported">' +
-						'<p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element!</p>' +
-						'<p>Here\'s a <a href="http://caniuse.com/video">list of which browsers do</a>.</p>' +
-					'</div>').appendTo('#media-box-inner');
+				$('<div id="video-unsupported-html5">' + _t("#video-unsupported-html5") + '</div>').appendTo('#media-box-inner');
 				videoOK = false;
 			}
 			else if (! Modernizr.video.h264) {
-				$('<div id="video-unsupported">' +
-						'<p>Sorry, your browser doesn\'t support the H.264 video format!</p>' +
-					'</div>').appendTo('#media-box-inner');
+				$('<div id="video-unsupported-h264">' + _t("#video-unsupported-h264") + '</div>').appendTo('#media-box-inner');
 				videoOK = false;
 			}
 		}

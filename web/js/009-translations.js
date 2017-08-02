@@ -21,7 +21,9 @@ var translations =
 			"#album-sort-reverse": "sort albums reverse (earlier content firt)",
 			"#media-sort-normal": "sort photos and videos normal (older content first)",
 			"#media-sort-reverse": "sort photos and videos reverse (earlier content first)",
-			"whatsapp-mobile-only": "Whatsapp sharing is available on mobile devices only",
+			"#video-unsupported-html5": "<p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element.</p><p>Here's a <a href=\"http://caniuse.com/video\">list of which browsers do</a>.</p>",
+			"#video-unsupported-h264": "<p>Sorry, your browser doesn't support the H.264 video format.</p>",
+		
 		},
 		'it': {
 			"#metadata-show": "metadati",
@@ -44,7 +46,8 @@ var translations =
 			"#album-sort-reverse": "ordina inverso gli album (contenuti più recenti prima)",
 			"#media-sort-normal": "ordina normale foto e video (contenuti più vecchi prima)",
 			"#media-sort-reverse": "ordina inverso foto e video (contenuti più recenti prima)",
-			"whatsapp-mobile-only": "La condivisione su whatsapp è disponibile solo sui dispositivi mobili",
+			"#video-unsupported-html5": "<p>Purtroppo il tuo navigatore non supporta l'elemento video &lt;video&gt; dell'HTML5.</p><p>Ecco una <a href=\"http://caniuse.com/video\">lista dei navigatori che lo supportano</a>.</p>",
+			"#video-unsupported-h264": "<p>Purtroppo il tuo navigatore non supporta il formato video H.264.</p>",
 		},
 		'es': {
 			"#metadata-show": "metadatos",
@@ -67,6 +70,7 @@ var translations =
 			"#album-sort-reverse": "ordena inverso los álbum (contenido más reciente primero)",
 			"#media-sort-normal": "ordena normal fotos y videos (contenido más viejo primero)",
 			"#media-sort-reverse": "ordena inverso fotos y videos (contenido más reciente primero)",
-			"whatsapp-mobile-only": "Compartir sobre Whatsapp es posible únicamente su aparatos móbiles",
+			"#video-unsupported-html5": "<p>Lamentablemente tu navegador no suporta el elemento &lt;video&gt; de HTML5!</p><p>He aquí una <a href=\"http://caniuse.com/video\">lista de los navegadores que lo suportan</a>.</p>",
+			"#video-unsupported-h264": "<p>Lamentablemente tu navegador no suporta el formato de video H.264.</p>",
 		}
 	};
