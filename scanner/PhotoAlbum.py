@@ -483,6 +483,10 @@ class Media(object):
 	
 	def reduce_image_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self.media_file_name, thumb_size, thumb_type))
+		# if the reduced image/thumbnail is there and is valid, exit immediately
+		if not os.path.exists(thumb_path) or file_mtime(thumb_path) > file_mtime(os.path.join(thumbs_path, self.album.json_file)):
+			return start_image
+		
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
 		if thumb_type == "square": 

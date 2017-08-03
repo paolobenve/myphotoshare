@@ -183,6 +183,20 @@ class TreeWalker:
 						cache_hit = True
 						for cache_file in cache_files:
 							absolute_cache_file = os.path.join(Options.config['cache_path'], cache_file)
+							if (
+								Options.config['recreate_fixed_height_thumbnails'] and
+								os.path.exists(absolute_cache_file) and file_mtime(absolute_cache_file) < file_mtime(json_cache_file)
+							):
+								# remove wide images, in order not to have blurred thumbnails
+								fixed_height_thumbnail_re = "_" + str(Options.config['media_thumb_size']) + "tf\.jpg$"
+								match = re.search(fixed_height_thumbnail_re, cache_file)
+								if match and cached_media._attributes["metadata"]["size"][0] > cached_media._attributes["metadata"]["size"][1]:
+									try:
+										os.unlink(os.path.join(Options.config['cache_path'], cache_file))
+										message("deleted and re-creating fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 3)
+									except OSError:
+										message("error deleting fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 1)
+								
 							if not os.path.exists(absolute_cache_file) or file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
 								cache_hit = False
 								break

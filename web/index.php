@@ -59,13 +59,15 @@
 				 
 				$tileWidth = $tileHeight = $options['album_thumb_size'];
 				$linearNumberOfTiles = intval(sqrt($maxThumbnailNumber));
-				$pxBetweenTiles = $options['thumb_spacing'];
+				//~ $pxBetweenTiles = $options['thumb_spacing'];
+				$pxBetweenTiles = 1;
 				$sideOffSet = 1;
 				 
 				$mapWidth = $sideOffSet + ($tileWidth + $pxBetweenTiles) * $linearNumberOfTiles - $pxBetweenTiles + $sideOffSet;
 				$mapHeight = $sideOffSet + ($tileWidth + $pxBetweenTiles) * $linearNumberOfTiles - $pxBetweenTiles + $sideOffSet;
 				$mapImage = imagecreatetruecolor($mapWidth, $mapHeight);
-				$bgColor = imagecolorallocate($mapImage, 50, 40, 0);
+				//~ $bgColor = imagecolorallocate($mapImage, 50, 40, 0);
+				$bgColor = imagecolorallocate($mapImage, 255, 255, 255);
 				imagefill($mapImage, 0, 0, $bgColor);
 				 
 				/*

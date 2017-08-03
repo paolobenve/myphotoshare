@@ -64,11 +64,12 @@ def main():
 				'show_media_names_below_thumbs_in_albums',
 				'persistent_metadata',
 				'default_album_reverse_sort',
-				'default_media_reverse_sort'
+				'default_media_reverse_sort',
+				'recreate_fixed_height_thumbnails'
 		):
 			try:
 				Options.config[option] = usr_config.getboolean('options', option)
-			except:
+			except ValueError:
 				next_level()
 				message("WARNING: option " + option + " in user config file", "is not boolean, using default value")
 				back_level()
