@@ -11,7 +11,8 @@ import re
 class TreeWalker:
 	def __init__(self):
 		self.save_json_options()
-		self.all_cache_entries= ["options.json"]
+		self.all_cache_entries = ["options.json"]
+		self.all_cache_entries_by_subdir = {}
 		if (Options.config['thumbnail_generation_mode'] == "parallel"):
 			message("method", "parallel thumbnail generation", 4)
 		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
@@ -263,34 +264,43 @@ class TreeWalker:
 			for album in self.all_albums:
 				self.all_cache_entries.append(album.json_file)
 			for media in self.all_media:
+				album_subdir = media.album.subdir
 				for entry in media.image_caches:
-					self.all_cache_entries.append(entry)
-		else:
-			self.all_cache_entries = cache_list
-		info = "in cache path"
+					entry = entry[len(album_subdir) + 1:]
+					try:
+						self.all_cache_entries_by_subdir[album_subdir].append(entry)
+					except KeyError:
+						self.all_cache_entries_by_subdir[album_subdir] = list()
+						self.all_cache_entries_by_subdir[album_subdir].append(entry)
+		#~ else:
+			#~ self.all_cache_entries = cache_list
 		if subdir:
 			info = "in subdir " + subdir
+			deletable_files_suffixes_re = "_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10}))?\.mp4$"
+			# reduced sizes, thumbnails, old style thumbnails
+			deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
+		else:
+			info = "in cache path"
+			deletable_files_suffixes_re ="\.json$"
 		message("searching", info, 4)
-		deletable_files_suffixes_re ="\.json$"
-		deletable_files_suffixes_re += "|_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10}))?\.mp4$"
-		# reduced sizes, thumbnails, old style thumbnails
-		deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
+		
 		next_level()
 		
 		for cache_file in sorted(os.listdir(os.path.join(Options.config['cache_path'], subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache_file)):
-				if not cache_file == "album":
+				if cache_file == "album":
+					continue
+				next_level()
+				self.remove_stale(cache_file)
+				if not os.listdir(os.path.join(Options.config['cache_path'], cache_file)):
 					next_level()
-					self.remove_stale(cache_file, self.all_cache_entries)
-					if not os.listdir(os.path.join(Options.config['cache_path'], cache_file)):
-						next_level()
-						message("empty subdir, deleting", "xxxx", 4)
-						back_level()
-						file_to_delete = os.path.join(Options.config['cache_path'], cache_file)
-						os.rmdir(os.path.join(Options.config['cache_path'], file_to_delete))
+					message("empty subdir, deleting", "xxxx", 4)
 					back_level()
+					file_to_delete = os.path.join(Options.config['cache_path'], cache_file)
+					os.rmdir(os.path.join(Options.config['cache_path'], file_to_delete))
+				back_level()
 			else:
-				cache_with_subdir = os.path.join(subdir, cache_file)
+				#~ cache_with_subdir = os.path.join(subdir, cache_file)
 				# only delete json's, transcoded videos, reduced images and thumbnails
 				found = False
 				match = re.search(deletable_files_suffixes_re, cache_file)
@@ -301,12 +311,16 @@ class TreeWalker:
 						raise
 					#~ except:
 						#~ pass
-					if cache_with_subdir not in self.all_cache_entries:
-						message("cleanup", cache_with_subdir, 4)
-						file_to_delete = os.path.join(Options.config['cache_path'], cache_with_subdir)
-						os.unlink(os.path.join(Options.config['cache_path'], file_to_delete))
+					if subdir:
+						cache_list = self.all_cache_entries_by_subdir[subdir]
+					else:
+						cache_list = self.all_cache_entries
+					if cache_file not in cache_list:
+						message("cleanup", cache_file, 4)
+						file_to_delete = os.path.join(Options.config['cache_path'], subdir, cache_file)
+						os.unlink(file_to_delete)
 				else:
-					message("not deleting", cache_with_subdir, 2)
+					message("not deleting", cache_file, 2)
 					continue
 				
 		if not subdir:
