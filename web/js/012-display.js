@@ -575,7 +575,7 @@ $(document).ready(function() {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, bydateStringWithTrailingSeparator, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1;
+		var mediaWidth, mediaHeight, choosen, isOriginal, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, margin;
 		
 		if (Options.albums_slide_style)
 			slideBorder = 3;
@@ -700,18 +700,23 @@ $(document).ready(function() {
 							correctedAlbumThumbSize =
 								Math.floor(albumViewWidth / Options.min_album_thumbnail - Options.thumb_spacing - 2 * buttonBorder);
 					}
-					
+					margin = 0;
+					if (Options.albums_slide_style)
+						margin = Math.round(correctedAlbumThumbSize * 0.05);
 					
 					for (i = 0; i < currentAlbum.albums.length; ++i) {
 						link = $("<a href=\"#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum.albums[i])) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
-						//~ imageString += 			"width: " + (correctedAlbumThumbSize + 2 * buttonBorder) + "px;";
-						//~ imageString += 			" height: " + (correctedAlbumThumbSize + 2 * buttonBorder) + "px;";
 						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
 						imageString += 			" height: " + correctedAlbumThumbSize + "px;";
-						if (! Options.albums_slide_style)
+						imageString += 			" margin-top: " + margin + "px;";
+						imageString += 			" margin-left: " + margin + "px;";
+						imageString += 			" margin-right: " + margin + "px;";
+						if (Options.albums_slide_style)
 							imageString +=		" background-color: " + Options.album_button_background_color + ";";
+						else
+							imageString +=		" border: none;";
 						imageString += 			"\"";
 						imageString += 		">";
 						imageString += "</div>";
@@ -751,6 +756,9 @@ $(document).ready(function() {
 											thumbHeight = correctedAlbumThumbSize;
 										}
 										distance = (correctedAlbumThumbSize - thumbHeight) / 2;
+									} else {
+										thumbWidth = correctedAlbumThumbSize;
+										thumbHeight = correctedAlbumThumbSize;
 									}
 								}
 								htmlText =	"<span class=\"helper\"></span>" +
@@ -787,7 +795,6 @@ $(document).ready(function() {
 								html += 	"height: " + buttonAndCaptionHeight + "px; " +
 										"margin-right: " + Options.thumb_spacing + "px; ";
 								html +=		"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
-								html += 	"padding-top: " + Math.round(correctedAlbumThumbSize * 0.05) + "px; ";
 								if (Options.albums_slide_style)
 									html += "background-color: " + Options.album_button_background_color + "; ";
 								html += 	"\"";
