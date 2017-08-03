@@ -247,13 +247,14 @@ class Media(object):
 				value = value[0]
 			if isinstance(value, str) or isinstance(value, unicode):
 				value = value.strip().partition("\x00")[0]
-				if (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime"):
-					try:
-						value = datetime.strptime(value, Options.exif_date_time_format)
-					except KeyboardInterrupt:
-						raise
-					#~ except:
-						#~ continue
+				#~ # the following lines (commented out) seem unuseful
+				#~ if (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime"):
+					#~ try:
+						#~ value = datetime.strptime(value, Options.exif_date_time_format)
+					#~ except KeyboardInterrupt:
+						#~ raise
+					#~ except ValueError:
+						#~ pass
 			exif[decoded] = value
 		
 		if "Orientation" in exif:
@@ -315,15 +316,17 @@ class Media(object):
 				self._attributes["metadata"]["dateTimeOriginal"] = datetime.strptime(exif["DateTimeOriginal"], Options.exif_date_time_format)
 			except KeyboardInterrupt:
 				raise
-			except TypeError:
-				self._attributes["metadata"]["dateTimeOriginal"] = exif["DateTimeOriginal"]
+			except ValueError:
+				# value isn't usable, forget it
+				pass
 		if "DateTime" in exif:
 			try:
 				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], Options.exif_date_time_format)
 			except KeyboardInterrupt:
 				raise
-			except TypeError:
-				self._attributes["metadata"]["dateTime"] = exif["DateTime"]
+			except ValueError:
+				# value isn't usable, forget it
+				pass
 
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
 	_photo_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
