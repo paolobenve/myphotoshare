@@ -227,6 +227,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * added vertical swipe gestures on media (they are mapped on arrow up/down)
 * restored cache use in scanner: scanner is now faster on already scanned albums
 * implemented verbosity levels, default is now 3 = errors, warnings, walkings
+* new option `recreate_fixed_height_thumbnails`: makes the scanner delete wide media fixed height thumbnail, in order to get rid of a previous versions bug which caused these thumbnail be generated blurred. Set it to `true`/`1` and make the scanner work, then reset again it to `false`/`0`
 
 #### Known issues:
 

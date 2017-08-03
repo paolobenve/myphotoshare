@@ -65,7 +65,7 @@ exclude_tree_marker = .photofloat.exclude.tree
 
 # recreate fixed height media thumbnails if their ratio (width/height) is > 1,
 # in order to get rid of a past bug in thumbnail generator
-recreate_fixed_height_thumbnails = true
+recreate_fixed_height_thumbnails = false
 
 ###########################################################
 # scanner and ui options
