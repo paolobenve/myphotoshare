@@ -12,35 +12,37 @@ This is a Jason A. Donenfeld's Photofloat fork, enriched by following contributo
 
 ## Features
 
+* Fullscreen mode
+* Metadata display
+* Link to original images
 * Manages images and videos
 * Animations to make the interface feel nice
-* Fullscreen mode
-* Swipe gestures for mobile
 * Separate album view and photo view
 * Album metadata pre-fetching
 * Photo pre-loading
 * Recursive async randomized tree walking album thumbnail algorithm
-* Smooth up and down scaling
-* Mouse-wheel support
-* Metadata display
+* Smooth media scaling
 * Consistent hash url format
-* Linkable states via ajax urls
-* Link to original images
-* Optional Google Analytics integration
+* Optional Google Analytics and Piwik integration
 * Optional server-side authentication support
 * Media can be browsed by folder or by date
 * Many customization through config file
 * Cache folder can be managed with subdirs (useful for large repositories)
 * Albums and cache server folders can be anywhere, even on another server
 * Images and folders can be sorted ascending/descending (via a cookie)
-* User interface translated via separate translation file
 * Thumbnails can be square (cropped) or full-content
-* Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+` a preview of the image/album is shared
 * Single `index.php` file: `php` applies basic option to home page (crawlers and social media do not execute javascript)
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
-* Keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 * Verbosity levels in scanner
+
+Usability:
+
+* Swipe gestures for mobile
+* Keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
+* Mouse-wheel support
+* Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+`: a preview of the image/album is shared
+* User interface translated via separate translation file
 
 ## Screenshots
 
@@ -221,7 +223,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-### version 2.5 (August 2, 2017):
+### version 2.5 (August 3, 2017):
 
 * keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 * added vertical swipe gestures on media (they are mapped on arrow up/down)
