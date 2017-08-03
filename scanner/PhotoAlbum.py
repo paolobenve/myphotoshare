@@ -236,6 +236,7 @@ class Media(object):
 			raise
 		except:
 			return
+		
 		if not info:
 			return
 		
@@ -618,16 +619,18 @@ class Media(object):
 			except KeyboardInterrupt:
 				try:
 					os.unlink(thumb_path)
-				except:
-					raise
+				except OSError:
+					pass
+				raise
 			except IOError:
 				try:
 					start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 				except KeyboardInterrupt:
 					try:
 						os.unlink(thumb_path)
-					except:
-						raise
+					except OSError:
+						pass
+					raise
 				next_level()
 				message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 2)
 				back_level()
@@ -903,8 +906,8 @@ class Media(object):
 					dictionary[key] = datetime.strptime(value, Options.date_time_format)
 				except KeyboardInterrupt:
 					raise
-				#~ except:
-					#~ pass
+				except ValueError:
+					pass
 			if key == "metadata":
 				for key1, value1 in value.items():
 					if key1.startswith("dateTime"):
@@ -912,8 +915,8 @@ class Media(object):
 							dictionary[key][key1] = datetime.strptime(value1, Options.date_time_format)
 						except KeyboardInterrupt:
 							raise
-						#~ except:
-							#~ pass
+						except ValueError:
+							pass
 					
 		return Media(album, media_path, None, dictionary)
 	def to_dict(self):
