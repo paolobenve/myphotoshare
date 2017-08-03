@@ -243,7 +243,7 @@ class TreeWalker:
 		fp.close()
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
-			message("Cleanup", "", 3)
+			message("Cleanup", "be patient!", 3)
 			next_level()
 			message("cleanup", "building stale list", 4)
 			for album in self.all_albums:

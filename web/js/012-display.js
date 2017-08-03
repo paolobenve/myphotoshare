@@ -804,8 +804,9 @@ $(document).ready(function() {
 								// this function must be called every time a album slide is created,
 								// in order to include this images in the composite php will create
 								numSubAlbumsReady ++;
-								if (numSubAlbumsReady == originalAlbum.albums.length) {
-									// only run the function when all the album has loaded their random image
+								if (numSubAlbumsReady >= originalAlbum.albums.length) {
+									// now all the subalbums random thumbnails has been loaded
+									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
 								}
 							}, function error() {
@@ -1388,6 +1389,7 @@ $(document).ready(function() {
 		var populateAlbum;
 		undie();
 		$("#loading").hide();
+		numSubAlbumsReady = 0;
 		
 		$(window).off("resize");
 		
@@ -1434,10 +1436,16 @@ $(document).ready(function() {
 			$(".media-caption").show();
 		// options function must be called again in order to set elements previously absent
 		setOptions();
-		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length) {
+		if (currentMedia !== null) {
 			// no subalbums, nothing to wait
 			// set social buttons events
 			$("#media").on("load", socialButtons);
+		} else  if (currentAlbum !== null && ! currentAlbum.albums.length) {
+			// no subalbums
+			// set social buttons href's when all the stuff is loaded
+			$(window).on("load", socialButtons());
+		} else {
+			// subalbums are present, we have to wait when all the random thumbnails will be loaded
 		}
 		fromEscKey = false;
 	}

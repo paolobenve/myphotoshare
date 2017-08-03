@@ -228,6 +228,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * restored cache use in scanner: scanner is now faster on already scanned albums
 * implemented verbosity levels, default is now 3 = errors, warnings, walkings
 
+#### Known issues:
+
+* When media thumbnail type is fixed height, thumbnail generated with previous versions of the scanner could result blurred; it seems difficult to detect the "failed" thumbnails, and it would probably create many false positives, recreating many thumbnails all the times the scanner is run. So the solution is to manually delete the "failed" thumbnail, or to delete once for ever all the cache.
+
 ### version 2.4.1 (July 26, 2017):
 
 * do not produce canvas for small images: they are shown in their original size
