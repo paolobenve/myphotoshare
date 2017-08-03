@@ -616,7 +616,7 @@ $(document).ready(function() {
 							thumbHeight = Options.media_thumb_size;
 							thumbWidth = thumbHeight * width / height;
 							calculatedWidth = thumbWidth;
-						} else {
+						} else if (Options.media_thumb_type == "square") {
 							thumbHeight = thumbnailSize;
 							thumbWidth = thumbnailSize;
 							calculatedWidth = Options.media_thumb_size;
@@ -756,7 +756,7 @@ $(document).ready(function() {
 											thumbHeight = correctedAlbumThumbSize;
 										}
 										distance = (correctedAlbumThumbSize - thumbHeight) / 2;
-									} else {
+									} else if (Options.album_thumb_type == "square") {
 										thumbWidth = correctedAlbumThumbSize;
 										thumbHeight = correctedAlbumThumbSize;
 									}

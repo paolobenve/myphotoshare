@@ -471,7 +471,7 @@ class Media(object):
 				if thumb_type == "square":
 					# no need for a second iteration
 					break
-				else:
+				elif thumb_type == "fit":
 					thumb_type = "square"
 		# media size
 		# at this point thumb is always square
