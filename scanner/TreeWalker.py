@@ -193,7 +193,7 @@ class TreeWalker:
 								if match and cached_media._attributes["metadata"]["size"][0] > cached_media._attributes["metadata"]["size"][1]:
 									try:
 										os.unlink(os.path.join(Options.config['cache_path'], cache_file))
-										message("deleted and re-creating fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 3)
+										message("deleted, re-creating fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 3)
 									except OSError:
 										message("error deleting fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 1)
 								
