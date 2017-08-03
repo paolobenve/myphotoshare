@@ -44,7 +44,7 @@ def cache_base(path, filepath=False):
 	if not filepath:
 		path = remove_album_path(path)
 	if path:
-		path = path.replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
+		path = path.replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('+', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
 		while path.find("--") != -1:
 			path = path.replace("--", "-")
 		while path.find("__") != -1:

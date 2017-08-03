@@ -237,8 +237,12 @@ $(document).ready(function() {
 			$(".thumbnail").each(function() {
 				src = $(this).attr("src");
 				position = src.search(re);
-				src = src.substring(0, position + 1) + Options.album_thumb_size + "as.jpg";
-				src = src.substring(Options.server_cache_path.length);
+				if (position == -1) {
+					// it's not a thumbnail, it's a small image
+				} else {
+					src = src.substring(0, position + 1) + Options.album_thumb_size + "as.jpg";
+					src = src.substring(Options.server_cache_path.length + 1);
+				}
 				if (allThumbnails.indexOf(src) == -1)
 					allThumbnails.push(src);
 			});
@@ -274,7 +278,8 @@ $(document).ready(function() {
 				}
 			}
 		} else {
-			mediaArray.push($("#media").attr("src"));
+			mediaArray[0] = $("#media").attr("src");
+			//~ mediaArray[0] = mediaArray[0].substring(Options.server_cache_path.length + 1);
 			if (currentMedia.mediaType == "video") {
 				type = "v";
 			} else if (currentMedia.mediaType == "photo") {

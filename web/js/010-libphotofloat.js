@@ -142,6 +142,7 @@
 			path = path.substring(1);
 		path = path
 			.replace(/ /g, "_")
+			.replace(/\+/g, "_")
 			.replace(/\//g, Options.cache_folder_separator)
 			.replace(/\(/g, "")
 			.replace(/\)/g, "")

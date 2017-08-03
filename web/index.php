@@ -34,20 +34,53 @@
 	<script type="text/javascript" src="js/012-display.js"></script>
 	
 	<?php
+		//~ ini_set('display_errors', 1);
+		//~ error_reporting(E_ALL);
 		function join_paths() {
 			return preg_replace('~[/\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
 		}
 		
+		// from http://skills2earn.blogspot.it/2012/01/how-to-check-if-file-exists-on.html , solution # 3
+		function url_exist($url) {
+			if (@fopen($url,"r"))
+				return true;
+			else 
+				return false;
+		}
+
+		
 		// put the <link rel=".."> tag in <head> for getting the image thumbnail when sharing
-		if ($_GET['t']) {
-			if ($_GET['t'] == 'a') {
-				$i = 0;
-				$srcImagePaths = array();
-				$url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['CONTEXT_PREFIX'] . '/';
-				while (array_key_exists('s' . $i, $_GET)) {
-					$srcImagePaths[] = $url . $options['server_cache_path'] . '/' . $_GET['s' . $i];
-					$i ++;
+		if (isset($_GET['t']) && $_GET['t']) {
+			$i = 0;
+			$srcImagePaths = array();
+			$url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['CONTEXT_PREFIX'] . '/';
+			while (array_key_exists('s' . $i, $_GET) && $_GET['s' . $i]) {
+				// Prevent directory traversal security vulnerability
+				$realPath = realpath($_GET['s' . $i]);
+				echo "\n\n$realPath";
+				$addCachePath = false;
+				if ($realPath == "") {
+					// it's a thumbnail add the cache prefix
+					$realPath = realpath(join_paths($options['server_cache_path'], $_GET['s' . $i]));
+					$addCachePath = true;
 				}
+				echo "\n$realPath";
+				
+				if (strpos($realPath, realpath($options['server_cache_path'])) === 0 || strpos($realPath, realpath($options['server_album_path'])) === 0) {
+					//~ $path = $url . join_paths($options['server_cache_path'], $_GET['s' . $i]);
+					$path = $url . $_GET['s' . $i];
+					if ($addCachePath)
+						$path = $path = $url . join_paths($options['server_cache_path'], $_GET['s' . $i]);
+					if (url_exist($realPath)) {
+						$srcImagePaths[] = $path;
+					}
+				}
+				$i ++;
+			}
+			var_dump($srcImagePaths);
+			if ($_GET['t'] == 'a') {
+				// album: generate the composite image
+				
 				$maxThumbnailNumber = count($srcImagePaths);
 				// following code got from
 				// https://stackoverflow.com/questions/30429383/combine-16-images-into-1-big-image-with-php#30429557
@@ -99,18 +132,22 @@
 				// save the image
 				$result = imagejpeg($mapImage, $absoluteImagePath);
 				$media = $serverImagePath;
+				$pathInfo = pathinfo($_SERVER['PHP_SELF'])['dirname'];
+				$mediaWithPath = '/' .$media;
+				if ($pathInfo != '/')
+					$mediaWithPath = $pathInfo .$mediaWithPath;
 				
 			} else {
-				$media = $_GET['s0'];
+				// photo or video
+				$mediaWithPath = $srcImagePaths[0];
 			}
-			$pathInfo = pathinfo($_SERVER['PHP_SELF'])['dirname'];
-			$mediaWithPath = '/' .$media;
-			if ($pathInfo != '/')
-				$mediaWithPath = $pathInfo .$mediaWithPath;
+			
 			$linkTag = '<link ';
 			if ($_GET['t'] == 'p' || $_GET['t'] == 'a')
+				// 'p': photo, 'a': album
 				$linkTag .= 'rel="image_src" ';
 			else if ($_GET['t'] == 'v')
+				// 'v': video
 				$linkTag .= 'rel="video_src" ';
 			$linkTag .= 'href="' . $mediaWithPath . '"';
 			$linkTag .= '>';
@@ -155,7 +192,7 @@
 		<noscript><p><img src="//cathopedia.org:8080/piwik/piwik.php?idsite=15" style="border:0;" alt="" /></p></noscript>
 		<!-- End Piwik Code -->
 	<?php } ?>  
-	<?php if ($options['google_analitics_id']) { ?>
+	<?php if (isset($options['google_analitics_id'])) { ?>
 		<!-- google analytics -->
 		<script type="text/javascript">
 			// from https://git.zx2c4.com/PhotoFloat/tree/web/js/999-googletracker.js
