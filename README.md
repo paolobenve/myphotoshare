@@ -8,7 +8,7 @@
 
 Content (albums, media files) can be shared over some popular social plaforms.
 
-`myphotoshare` is a Jason A. Donenfeld's `photofloat` fork, enriched by following contributors: Jerome Charaoui's patches about showing videos, and Paolo Benvenuto's following development.
+`myphotoshare` is a Jason A. Donenfeld's `photofloat` fork, enriched by Jerome Charaoui's patches permitting showing videos, and Paolo Benvenuto's following development.
 
 [Check out a demo!](http://palmaro.qumran2.net/)
 
