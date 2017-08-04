@@ -30,7 +30,7 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Media can be browsed by folder or by date
 * Many customization through config file
 * Cache folder can be managed with subdirs (useful for large repositories)
-* Albums and cache server folders can be anywhere, even on another server
+* Albums and cache server folders can be anywhere on the server
 * Images and folders can be sorted ascending/descending (via a cookie)
 * Thumbnails can be square (cropped) or full-content
 * Single `index.php` file: `php` applies basic option to home page (crawlers and social media do not execute javascript)
