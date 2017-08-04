@@ -1,14 +1,14 @@
-# photoshare v. 2.5
+# myphotoshare v. 2.5
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
 ## Description
 
-`photoshare` is an open source web photo gallery aimed at sleekness and speed. It works over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
+`myphotoshare` is an open source web photo gallery aimed at sleekness and speed. It works over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
 Content (albums, media files) can be shared over some popular social plaforms.
 
-`photoshare` is a Jason A. Donenfeld's `photofloat` fork, enriched by following contributors: Jerome Charaoui's patches about showing videos, and Paolo Benvenuto's following development.
+`myphotoshare` is a Jason A. Donenfeld's `photofloat` fork, enriched by following contributors: Jerome Charaoui's patches about showing videos, and Paolo Benvenuto's following development.
 
 [Check out a demo!](http://palmaro.qumran2.net/)
 
@@ -55,7 +55,7 @@ Usability:
 
 ## How It Works
 
-``photoshare`` consists of two segments – a Python script and a JavaScript application.
+``myphotoshare`` consists of two segments – a Python script and a JavaScript application.
 
 The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. It writes an `options.json` file too in html root folder, putting inside it all the options from default config file or user config file. The scanner extracts metadata from EXIF tags in JPEG photos. Photofloat is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be quite fast if there are few or zero changes since the last time you ran it.
 
@@ -79,16 +79,16 @@ Photofloat needs:
 
 ### Download the source code from the git repository:
 
-    $ git clone https://github.com/paolobenve/photoshare.git
-    $ cd photoshare
+    $ git clone https://github.com/paolobenve/myphotoshare.git
+    $ cd myphotoshare
 
 ### Copy and tweak the configuration file
 
-    $ sudo mkdir /etc/photoshare
-    $ sudo cp photoshare.conf.defaults /etc/photoshare/myproject.conf
-    $ sudo vim /etc/photoshare/myproject.conf
+    $ sudo mkdir /etc/myphotoshare
+    $ sudo cp myphotoshare.conf.defaults /etc/myphotoshare/myproject.conf
+    $ sudo vim /etc/myphotoshare/myproject.conf
 
-In your config file (myproject.conf, name can be whatever you want) you must set the proper folders for albums (your photo, they won't be modified) and cache (all the stuff `photoshare` requieres in order to work)
+In your config file (myproject.conf, name can be whatever you want) you must set the proper folders for albums (your photo, they won't be modified) and cache (all the stuff `myphotoshare` requieres in order to work)
 
 ### Build the web page.
 
@@ -110,16 +110,16 @@ The simplest way to configure the web server is:
 
 However, "debian's way" could be better:
 
-* clone `photoshare` repository in `/usr/share`, so that you end with a `/usr/share/photoshare` directory
-* copy `photoshare.conf.defaults` to `/etc/photoshare` and properly config it
-* in your web site root, put links to `photoshare` web folder files and directories: `css`, `favicon.ico`, `fonts`, `img`, `index.php`, `js`
+* clone `myphotoshare` repository in `/usr/share`, so that you end with a `/usr/share/myphotoshare` directory
+* copy `myphotoshare.conf.defaults` to `/etc/myphotoshare` and properly config it
+* in your web site root, put links to `myphotoshare` web folder files and directories: `css`, `favicon.ico`, `fonts`, `img`, `index.php`, `js`
 * make sure the scanner has write access to your web site root
 
-### (When `photoshare` code is updated) Update your `photoshare` installation
+### (When `myphotoshare` code is updated) Update your `myphotoshare` installation
 
 Go to the folder you cloned the repository in and execute:
 
-    $ git pull https://github.com/paolobenve/photoshare.git
+    $ git pull https://github.com/paolobenve/myphotoshare.git
     $ ./js-css-minify.sh
 
 Obviously the scanner should be launched too.
@@ -128,7 +128,7 @@ Obviously the scanner should be launched too.
 
 When you're done run the static generator (you need Python≥2.6 and the Python Imaging Library; for video something like libav-conv is requiered too):
 
-    $ /your/photoshare/installation/dir/scanner/main.py /etc/photoshare/myproject.conf
+    $ /your/myphotoshare/installation/dir/scanner/main.py /etc/myphotoshare/myproject.conf
 
 After it finishes, you will be all set. Simply have your web server serve pages out of your web directory. You may want to do the scanning step in a cronjob, if you don't use the deployment makefiles mentioned below.
 
@@ -136,18 +136,18 @@ Note: The albums web folder and the cache one could be anywhere in the file syst
 
 #### `cron` file example:
 
-You can automate the updating process, so that you don't need to worry of running the scanner, simply do whatever you want on your albums tree, and `photoshare` will be updated every night:
+You can automate the updating process, so that you don't need to worry of running the scanner, simply do whatever you want on your albums tree, and `myphotoshare` will be updated every night:
 
-    # update photoshare cache
-    58 1  * * * root    /your/photoshare/installation/dir/scanner/main.py /etc/photoshare/myproject.conf > /var/log/myphotoshareproject.log
+    # update myphotoshare cache
+    58 1  * * * root    /your/myphotoshare/installation/dir/scanner/main.py /etc/myphotoshare/myproject.conf > /var/log/my-myphotoshare-project.log
 
-Instead or running `photoshare` as root, you can use whatever user that have access to the directories you set up in your config file
+Instead or running `myphotoshare` as root, you can use whatever user that have access to the directories you set up in your config file
 
 ## Optional: Server-side Authentication
 
 The JavaScript application uses a very simple API to determine if a photo can be viewed or not. If a JSON file returns error `403`, the album is hidden from view. To authenticate, `POST` a username and a password to `/auth`. If unsuccessful, `403` is returned. If successful, `200` is returned, and the previously denied json files may now be requested. If an unauthorized album is directly requested in a URL when the page loads, an authentication box is shown.
 
-`photoshare` ships with an optional server side component called FloatApp to faciliate this, which lives in `scanner/floatapp`. It is a simple Flask-based Python web application.
+`myphotoshare` ships with an optional server side component called FloatApp to faciliate this, which lives in `scanner/floatapp`. It is a simple Flask-based Python web application.
 
 #### Edit the app.cfg configuration file:
 
@@ -176,34 +176,34 @@ FloatApp makes use of `X-Accel-Buffering` and `X-Accel-Redirect` to force the se
     
             include uwsgi_params;
             location /albums/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photoshare.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
             }
             location /cache/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photoshare.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
             }
             location /scan {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photoshare.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
             }
             location /auth {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photoshare.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
             }
             location /photos {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/photoshare.socket;
+                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
             }
     
             location /internal-cache/ {
                     internal;
-                    alias /var/www/uwsgi/photoshare/cache/;
+                    alias /var/www/uwsgi/myphotoshare/cache/;
             }
             location /internal-albums/ {
                     internal;
-                    alias /var/www/uwsgi/photoshare/albums/;
+                    alias /var/www/uwsgi/myphotoshare/albums/;
             }
     }
 
 Note that the `internal-*` paths must match that of `app.cfg`. This makes use of uwsgi for execution:
 
-    metheny ~ # cat /etc/uwsgi.d/photoshare.ini 
+    metheny ~ # cat /etc/uwsgi.d/myphotoshare.ini 
     [uwsgi]
     chdir = /var/www/uwsgi/%n
     master = true
@@ -227,7 +227,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ### version 2.5 (August 3, 2017):
 
-* project name is now `photoshare`
+* project name is now `myphotoshare`
 * keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 * added vertical swipe gestures on media (they are mapped on arrow up/down)
 * restored cache use in scanner: scanner is now faster on already scanned albums
@@ -295,7 +295,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * A date tree is builded, permitting photo to be seen by year, month, date
 * When a photo is viewed, the user can switch between the folder and the date the photo was taken
 * Better error management: if folder is wrong, show root folder; if image is wrong, show album
-* In addition to former invocation (with albums and cache paths), `photoshare` can be invoked with one parameter: the customization file, which adds many configuration variables;
+* In addition to former invocation (with albums and cache paths), `myphotoshare` can be invoked with one parameter: the customization file, which adds many configuration variables;
 * web site appearance now is very customizable:
 * - choose between cascade, parallel and mixed thumbnails generation
 * - fhoose between putting thumbnails in cache dir or in subdir, by 2-letters, from folder md5 or beginning of folder
