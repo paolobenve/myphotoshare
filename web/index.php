@@ -280,7 +280,7 @@
 		</div>
 		<div id="powered-by">
 			<span id="powered-by-string"></span>
-			<a href="https://github.com/paolobenve/photoshare" target="_blank">PhotoFloat</a>
+			<a href="https://github.com/paolobenve/photoshare" target="_blank">PhotoShare</a>
 		</div>
 	</div>
 

@@ -227,6 +227,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ### version 2.5 (August 3, 2017):
 
+* project name is now `photoshare`
 * keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 * added vertical swipe gestures on media (they are mapped on arrow up/down)
 * restored cache use in scanner: scanner is now faster on already scanned albums
