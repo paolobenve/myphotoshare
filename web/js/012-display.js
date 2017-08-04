@@ -53,7 +53,7 @@ $(document).ready(function() {
 	var photoSrc, videoSrc;
 	var language;
 	var byDateRegex;
-	var numSubAlbumsReady = 0;
+	var numSubAlbumsReady;
 	var fromEscKey = false;
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
@@ -232,7 +232,7 @@ $(document).ready(function() {
 			// album: prepare the thumbnail names, they will be passed to php code for generating a n-thumbnail image
 			type = "a";
 			re = new  RegExp("_(" + Options.album_thumb_size + "a(s|f)\\.jpg|" +
-				Options.media_thumb_size + "t(s|f)\\.jpg)$");
+				Options.media_thumb_size + "t(s|f))\\.jpg$");
 			// recollect all the thumbnails showed in page
 			$(".thumbnail").each(function() {
 				src = $(this).attr("src");
@@ -247,6 +247,9 @@ $(document).ready(function() {
 					allThumbnails.push(src);
 			});
 			
+			if (allThumbnails.length < 3 || Options.max_album_share_thumbnails_number == 1)
+				maxThumbnailNumber = 1;
+			else if (allThumbnails.length < 16 || Options.max_album_share_thumbnails_number == 9)
 			if (allThumbnails.length < 9 || Options.max_album_share_thumbnails_number == 4)
 				maxThumbnailNumber = 4;
 			else if (allThumbnails.length < 16 || Options.max_album_share_thumbnails_number == 9)
@@ -1452,7 +1455,10 @@ $(document).ready(function() {
 			// no subalbums, nothing to wait
 			// set social buttons events
 			$("#media").on("load", socialButtons);
-		} else  if (currentAlbum !== null && ! currentAlbum.albums.length) {
+		} else  if (
+			currentAlbum !== null && ! currentAlbum.albums.length ||
+			numSubAlbumsReady >= album.albums.length
+		) {
 			// no subalbums
 			// set social buttons href's when all the stuff is loaded
 			$(window).on("load", socialButtons());
