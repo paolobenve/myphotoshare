@@ -213,8 +213,8 @@ class Media(object):
 			image = Image.open(media_path)
 		except KeyboardInterrupt:
 			raise
-		except IOError:
-			message("unreadable, check permissions", media_path, 1)
+		#~ except IOError:
+			#~ message("unreadable, check permissions", media_path, 1)
 		except:
 			self._video_metadata(media_path)
 		if isinstance(image, Image.Image):

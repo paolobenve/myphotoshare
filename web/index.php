@@ -13,10 +13,11 @@
 	<title><?php if ($options['page_title']) echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
+<!--
 	<link href="css/styles.min.css" rel="stylesheet" type="text/css" /> 
 	<script type="text/javascript" src="js/scripts.min.js"></script> 
+-->
 
-<!--
 	<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 	<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 	<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
@@ -31,7 +32,6 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
--->
 	
 	<?php
 		//~ ini_set('display_errors', 1);
@@ -57,15 +57,12 @@
 			while (array_key_exists('s' . $i, $_GET) && $_GET['s' . $i]) {
 				// Prevent directory traversal security vulnerability
 				$realPath = realpath($_GET['s' . $i]);
-				echo "\n\n$realPath";
 				$addCachePath = false;
 				if ($realPath == "") {
 					// it's a thumbnail add the cache prefix
 					$realPath = realpath(join_paths($options['server_cache_path'], $_GET['s' . $i]));
 					$addCachePath = true;
 				}
-				echo "\n$realPath";
-				
 				if (strpos($realPath, realpath($options['server_cache_path'])) === 0 || strpos($realPath, realpath($options['server_album_path'])) === 0) {
 					//~ $path = $url . join_paths($options['server_cache_path'], $_GET['s' . $i]);
 					$path = $url . $_GET['s' . $i];
