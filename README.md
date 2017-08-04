@@ -46,6 +46,14 @@ Usability:
 * Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+`: a preview of the image/album is shared
 * User interface translated via separate translation file
 
+## Community
+
+Github platform permits you to report bugs.
+
+You can fork `myphotoshare` and submit pull requests, too! We're open to adding more features!
+
+If you have any question, feel free to contact the `myphotoshare` community via our [mailing list/discussion group](https://groups.google.com/forum/#!forum/myphotoshareapp).
+
 ## Screenshots
 
 ![Screenshot](screnshot-panorama-2.2.png)
