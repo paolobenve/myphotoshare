@@ -65,13 +65,13 @@ If you have any question, feel free to contact the `myphotoshare` community via 
 
 ``myphotoshare`` consists of two segments – a Python script and a JavaScript application.
 
-The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. It writes an `options.json` file too in html root folder, putting inside it all the options from default config file or user config file. The scanner extracts metadata from EXIF tags in JPEG photos. Photofloat is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be quite fast if there are few or zero changes since the last time you ran it.
+The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. It writes an `options.json` file too in html root folder, putting inside it all the options from default config file or user config file. The scanner extracts metadata from EXIF tags in JPEG photos and other data from videos. Photofloat is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be quite fast if there are few or zero changes since the last time you ran it.
 
 The JavaScript application consists of a single `index.php` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the `options.json` file and the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface.
 
 Photofloat features share buttons, and `php` permits to pass the shared image/video/album to social medias.
 
-It is, essentially, the slickest and fastest, most minimal but still well-featured photo gallery app on the net.
+It is, essentially, a slick and fast, minimal but still well-featured photo gallery app on the net.
 
 ## Installation
 
