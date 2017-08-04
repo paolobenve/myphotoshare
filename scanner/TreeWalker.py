@@ -312,7 +312,10 @@ class TreeWalker:
 					#~ except:
 						#~ pass
 					if subdir:
-						cache_list = self.all_cache_entries_by_subdir[subdir]
+						if subdir in self.all_cache_entries_by_subdir:
+							cache_list = self.all_cache_entries_by_subdir[subdir]
+						else:
+							cache_list = list()
 					else:
 						cache_list = self.all_cache_entries
 					if cache_file not in cache_list:
