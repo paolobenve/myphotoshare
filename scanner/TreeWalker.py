@@ -97,7 +97,8 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month] = {}
 		if not media.day in self.tree_by_date[media.year][media.month].keys():
 			self.tree_by_date[media.year][media.month][media.day] = list()
-		self.tree_by_date[media.year][media.month][media.day].append(media)
+		if not media in self.tree_by_date[media.year][media.month][media.day]:
+			self.tree_by_date[media.year][media.month][media.day].append(media)
 	def walk(self, absolute_path, parent_album = None):
 		trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 		absolute_path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
@@ -211,10 +212,12 @@ class TreeWalker:
 				if media.is_valid:
 					album.num_media_in_sub_tree += 1
 					album.num_media_in_album += 1
-					if not json_cache_OK:
+					if not media in self.all_media:
 						self.all_media.append(media)
+					if not media in album.media_list:
 						album.add_media(media)
-						self.add_media_to_tree_by_date(media)
+					# following function has a check on media already present
+					self.add_media_to_tree_by_date(media)
 				elif not media.is_valid:
 					next_level()
 					message("unreadable file", ":-(", 1)

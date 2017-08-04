@@ -78,7 +78,7 @@ def main():
 			Options.config[option] = eval(usr_config.get('options', option))
 		else:
 			Options.config[option] = usr_config.get('options', option)
-			
+		
 		option_value = str(Options.config[option])
 		option_length = len(option_value)
 		max_length = 40
@@ -99,7 +99,13 @@ def main():
 		else:
 			option_value = "* " + option_value + spaces + "[DEFAULT: " + default_option_value + default_spaces + "]"
 		
+		
+		
 		message(option, option_value)
+	
+	# all cache names are lower case => bit rate must be lower case too
+	Options.config['video_transcode_bitrate'] = Options.config['video_transcode_bitrate'].lower()
+
 	# values that have type != string
 	back_level()
 	
