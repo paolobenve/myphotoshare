@@ -17,7 +17,7 @@ def main():
 		return
 	
 	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")
-	default_config_file = os.path.join(project_dir, "photofloat.conf.defaults")
+	default_config_file = os.path.join(project_dir, "photoshare.conf.defaults")
 	default_config = ConfigParser.ConfigParser()
 	default_config.readfp(open(default_config_file))
 	usr_config = ConfigParser.ConfigParser()

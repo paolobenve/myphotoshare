@@ -1,4 +1,4 @@
-# Default options file for photofloat
+# Default options file for photoshare
 #
 # This file is imported through the ConfigParser standard module
 #       boolean values:
@@ -7,7 +7,7 @@
 #
 # This file sets the default options: they are read by scanner/ModOptions.py
 #
-# Do not modify this file: copy it to any location on your disk (e.g. /etc/photofloat), rename it removing the trailing ".defaults" and have fun customizing it!
+# Do not modify this file: copy it to any location on your disk (e.g. /etc/photoshare), rename it removing the trailing ".defaults" and have fun customizing it!
 # Your config values will supersede the standard ones defined here
 
 [options]
@@ -60,8 +60,8 @@ video_transcode_bitrate = 1M
 jpeg_quality = 95
 
 # markers that permit not to scan files in folder or whole trees
-exclude_files_marker = .photofloat.exclude.files
-exclude_tree_marker = .photofloat.exclude.tree
+exclude_files_marker = .photoshare.exclude.files
+exclude_tree_marker = .photoshare.exclude.tree
 
 # recreate fixed height media thumbnails if their ratio (width/height) is > 1,
 # in order to get rid of a past bug in thumbnail generator
