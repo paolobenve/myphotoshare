@@ -74,7 +74,6 @@
 				}
 				$i ++;
 			}
-			var_dump($srcImagePaths);
 			if ($_GET['t'] == 'a') {
 				// album: generate the composite image
 				
