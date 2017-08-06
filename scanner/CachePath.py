@@ -41,7 +41,6 @@ def trim_base_custom(path, base):
 def remove_album_path(path):
 	return trim_base_custom(path, Options.config['album_path'])
 def cache_base(path, album, filepath=False):
-	print 1111,path, album
 	if not filepath:
 		path = remove_album_path(path)
 	if path:
@@ -59,7 +58,6 @@ def cache_base(path, album, filepath=False):
 				path += "_" + str(distinguish_suffix)
 			cache_name_absent = True
 			for media in album.media_list:
-				print 333,path,media.cache_base
 				if path == media.cache_base:
 					cache_name_absent = False
 					distinguish_suffix += 1
@@ -68,7 +66,6 @@ def cache_base(path, album, filepath=False):
 				break
 	else:
 		path = "root"
-	print 2222,path
 	return path
 def json_name(path, album = None):
 	return cache_base(path, album) + ".json"
