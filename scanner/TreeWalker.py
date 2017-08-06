@@ -151,7 +151,7 @@ class TreeWalker:
 			album = Album(absolute_path_with_marker)
 		if parent_album is not None:
 			album.parent = parent_album
-		message("  subdir", "  " + album.subdir, 3)
+		message("  subdir", " " + album.subdir, 3)
 		
 		for entry in sorted(os.listdir(absolute_path)):
 			if entry[0] == '.':

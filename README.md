@@ -85,6 +85,12 @@ Photofloat needs:
 * `php5-gd` in order to create albums share images
 * `curl`, used by minify script
 
+#### Why `php`? Isn't it enough with javascript?
+
+`php` is *needed* for sharing, because social media do not execute any javascript when they receive an *URI*. Without `php`, sharing any sit page is perfectly equivalent to sharing the simple index.html: no information of the particular page you want to share is retained.
+
+`php` does the job you need for sharing: based on the page hash, it sets the proper html page title and the proper tag in `<head></head>` which permits the social media to get the info you want it to get and show a preview of the media/album you are sharing.
+
 ### Download the source code from the git repository:
 
     $ git clone https://github.com/paolobenve/myphotoshare.git
