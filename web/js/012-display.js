@@ -1028,18 +1028,18 @@ $(document).ready(function() {
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
 			if (Options.reduced_sizes[i] >= mediaSize)
 				continue;
-			if (container !== null) {
-				if (mediaWidth > mediaHeight) {
-					reducedWidth = Options.reduced_sizes[i];
-					reducedHeight = Options.reduced_sizes[i] * mediaHeight / mediaWidth;
-				} else {
-					reducedHeight = Options.reduced_sizes[i];
-					reducedWidth = Options.reduced_sizes[i] * mediaWidth / mediaHeight;
-				}
-				
-				if (reducedWidth < container.width() && reducedHeight < container.height())
-					break;
+			
+			if (mediaWidth > mediaHeight) {
+				reducedWidth = Options.reduced_sizes[i];
+				reducedHeight = Options.reduced_sizes[i] * mediaHeight / mediaWidth;
+			} else {
+				reducedHeight = Options.reduced_sizes[i];
+				reducedWidth = Options.reduced_sizes[i] * mediaWidth / mediaHeight;
 			}
+			
+			if (reducedWidth < container.width() && reducedHeight < container.height())
+				break;
+			
 			chosenMedia = photoFloat.mediaPath(currentAlbum, media, Options.reduced_sizes[i]);
 			maxSize = Options.reduced_sizes[i];
 			isOriginal = false;
@@ -1050,27 +1050,29 @@ $(document).ready(function() {
 	}
 	
 	function chooseThumbnail(album, media, thumbnailSize, calculatedThumbnailSize) {
-		var chosenMedia = PhotoFloat.originalMediaPath(media);
-		var mediaWidth = media.metadata.size[0], mediaHeight = media.metadata.size[1];
-		var mediaMaxSize = Math.max(mediaWidth, mediaHeight);
-		var mediaMinSize = Math.min(mediaWidth, mediaHeight);
-		var isOriginal = true;
+		return [photoFloat.mediaPath(album, media, thumbnailSize), false];
 		
-		if (
-			thumbnailSize == Options.album_thumb_size && (
-				Options.album_thumb_type == "square" && mediaMinSize > thumbnailSize ||
-				Options.album_thumb_type == "fit" && mediaMaxSize > thumbnailSize
-			) || thumbnailSize == Options.media_thumb_size && (
-				Options.media_thumb_type == "square" && mediaMinSize > thumbnailSize ||
-				Options.media_thumb_type == "fixed_height" && mediaHeight > thumbnailSize
+		//~ var chosenMedia = PhotoFloat.originalMediaPath(media);
+		//~ var mediaWidth = media.metadata.size[0], mediaHeight = media.metadata.size[1];
+		//~ var mediaMaxSize = Math.max(mediaWidth, mediaHeight);
+		//~ var mediaMinSize = Math.min(mediaWidth, mediaHeight);
+		//~ var isOriginal = true;
+		
+		//~ if (
+			//~ thumbnailSize == Options.album_thumb_size && (
+				//~ Options.album_thumb_type == "square" && mediaMinSize > thumbnailSize ||
+				//~ Options.album_thumb_type == "fit" && mediaMaxSize > thumbnailSize
+			//~ ) || thumbnailSize == Options.media_thumb_size && (
+				//~ Options.media_thumb_type == "square" && mediaMinSize > thumbnailSize ||
+				//~ Options.media_thumb_type == "fixed_height" && mediaHeight > thumbnailSize
 				
-			)
-		) {
-			chosenMedia = photoFloat.mediaPath(album, media, thumbnailSize);
-			isOriginal = false;
-		}
+			//~ )
+		//~ ) {
+			//~ chosenMedia = photoFloat.mediaPath(album, media, thumbnailSize);
+			//~ isOriginal = false;
+		//~ }
 		
-		return [chosenMedia, isOriginal];
+		//~ return [chosenMedia, isOriginal];
 	}
 	
 	//~ function imageExists(imageUrl){

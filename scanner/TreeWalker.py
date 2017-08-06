@@ -125,10 +125,14 @@ class TreeWalker:
 		json_cache_OK = False
 		cached_album = None
 		if os.path.exists(json_cache_file):
-			json_message = json_cache_file + " for " + os.path.basename(absolute_path)
+			json_message = json_cache_file + " (path: " + os.path.basename(absolute_path) + ")"
 			try:
 				cached_album = Album.from_cache(json_cache_file)
-				if file_mtime(absolute_path) <= file_mtime(json_cache_file):
+				if (
+					file_mtime(absolute_path) <= file_mtime(json_cache_file) and
+					cached_album.absolutePath and
+					cached_album.absolutePath == absolute_path
+				):
 					message("  json cache file OK", "  " + json_message, 4)
 					json_cache_OK = True
 					album = cached_album
@@ -147,7 +151,7 @@ class TreeWalker:
 			album = Album(absolute_path_with_marker)
 		if parent_album is not None:
 			album.parent = parent_album
-		message("  subdir", "  " + album.subdir, 5)
+		message("  subdir", "  " + album.subdir, 3)
 		
 		for entry in sorted(os.listdir(absolute_path)):
 			if entry[0] == '.':
@@ -212,10 +216,9 @@ class TreeWalker:
 				if media.is_valid:
 					album.num_media_in_sub_tree += 1
 					album.num_media_in_album += 1
+					album.add_media(media)
 					if not media in self.all_media:
 						self.all_media.append(media)
-					if not media in album.media_list:
-						album.add_media(media)
 					# following function has a check on media already present
 					self.add_media_to_tree_by_date(media)
 				elif not media.is_valid:
@@ -322,7 +325,7 @@ class TreeWalker:
 					else:
 						cache_list = self.all_cache_entries
 					if cache_file not in cache_list:
-						message("cleanup", cache_file, 4)
+						message("cleanup", cache_file, 3)
 						file_to_delete = os.path.join(Options.config['cache_path'], subdir, cache_file)
 						os.unlink(file_to_delete)
 				else:

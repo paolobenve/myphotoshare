@@ -27,6 +27,7 @@ def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb
 
 class Album(object):
 	def __init__(self, path):
+		self.absolute_path = path
 		self.baseless_path = remove_album_path(path)
 		self.media_list = list()
 		self.albums_list = list()
@@ -91,8 +92,9 @@ class Album(object):
 		except TypeError:
 			return 1
 	def add_media(self, media):
-		self.media_list.append(media)
-		self.media_list_is_sorted = False
+		if not media in self.media_list:
+			self.media_list.append(media)
+			self.media_list_is_sorted = False
 	def add_album(self, album):
 		self.albums_list.append(album)
 		self.albums_list_is_sorted = False
@@ -168,6 +170,7 @@ class Album(object):
 		path_without_folders_marker = self.remove_folders_marker(self.path)
 		dictionary = {
 			"path": self.path,
+			"absolutePath": self.absolute_path,
 			"date": self.date,
 			"albums": subalbums,
 			"media": self.media_list,
@@ -488,10 +491,10 @@ class Media(object):
 		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self.media_file_name, thumb_size, thumb_type))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		if os.path.exists(thumb_path) and file_mtime(thumb_path) < file_mtime(os.path.join(thumbs_path, self.album.json_file)):
-			message("existent and valid reduced size/thumbnail, skipping", thumb_path, 5)
+			message("reduction/thumbnail OK, skipping", thumb_path, 5)
 			return start_image
 		
-		message("inexistent or invalid reduced size/thumbnail, creating", thumb_path, 5)
+		message("reduction/thumbnail not OK, creating", thumb_path, 5)
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
 		if thumb_type == "square": 
@@ -501,6 +504,7 @@ class Media(object):
 		elif thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height":
 			info_string += ", fixed height"
 		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
+		is_video = self._attributes["mediaType"] == "video"
 		
 		start_image_width = start_image.size[0]
 		start_image_height = start_image.size[1]
@@ -563,98 +567,101 @@ class Media(object):
 		
 		# now thumbnail_width and thumbnail_height are the values the thumbnail will get,
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
+		next_level()
 		
-		if max(start_image_width, start_image_height) <= thumb_size:
-			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
-			# do not to produce canvas; anyway they render very badly with gif's,
-			# simply don't make the thumbnail, and delete it if it exists
-			# js will see that the thumbnail doesn't exist and use the original image
-			next_level()
-			if original_thumb_size > Options.config['album_thumb_size']:
-				message("no reduced size, image is smaller", info_string, 4)
-			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("no thumbnail for albums, image is smaller", info_string, 4)
+		if (
+			os.path.exists(thumb_path) and
+			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
+				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
+				is_thumbnail and not Options.config['recreate_thumbnails']
+			)
+		):
+			if original_thumb_size == Options.config['album_thumb_size']:
+				message("existing album thumbnail", info_string, 4)
+			elif original_thumb_size == Options.config['media_thumb_size']:
+				message("existing thumbnail", info_string, 4)
 			else:
-				message("no thumbnail for media, image is smaller", info_string, 4)
-			try:
-				os.unlink(thumb_path)
-			except OSError:
-				pass
+				message("existing reduced size", info_string, 4)
 			back_level()
 			return start_image
-		else:
-			if (
-				os.path.exists(thumb_path) and
-				file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
-					not is_thumbnail and not Options.config['recreate_reduced_photos'] or
-					is_thumbnail and not Options.config['recreate_thumbnails']
-				)
-			):
-				next_level()
-				if original_thumb_size == Options.config['album_thumb_size']:
-					message("existing album thumbnail", info_string, 4)
-				elif original_thumb_size == Options.config['media_thumb_size']:
-					message("existing thumbnail", info_string, 4)
-				else:
-					message("existing reduced size", info_string, 4)
-				back_level()
-				return start_image
-			gc.collect()
-			try:
-				start_image_copy = start_image.copy()
-			except KeyboardInterrupt:
-				raise
-			except:
-				start_image_copy = start_image.copy() # we try again to work around PIL bug
-				
-			# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
-			# we can resize, but first crop to square if needed
-			if must_crop:
-				start_image_copy = start_image_copy.crop((left, top, right, bottom))
-			gc.collect()
-			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+		
+		must_resize = True
+		if max(start_image_width, start_image_height) <= thumb_size:
+			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
+			# simply copy the start image to the thumbnail
+			must_resize = False
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("image smaller than reduced size, no reduction", info_string, 4)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("image smaller than album thumbnail, no reduction", info_string, 4)
+			else:
+				message("image smaller than media thumbnail, no reduction", info_string, 4)
+			#~ try:
+				#~ os.unlink(thumb_path)
+			#~ except OSError:
+				#~ pass
+			#~ return start_image
+		
+		try:
+			start_image_copy = start_image.copy()
+		except KeyboardInterrupt:
+			raise
+		except:
+			start_image_copy = start_image.copy() # we try again to work around PIL bug
 			
-			next_level()
+		# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
+		# we can resize, but first crop to square if needed
+		if must_crop:
+			message("cropping", info_string, 4)
+			start_image_copy = start_image_copy.crop((left, top, right, bottom))
+		
+		if must_resize:
+			# resizing
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reducing size", info_string, 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
 				message("thumbing for albums", info_string, 4)
 			else:
 				message("thumbing for media", info_string, 4)
+			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+		
+		gc.collect()
+		
+		try:
+			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			message("saved!", info_string, 5)
+			back_level()
+			gc.collect()
+			return start_image_copy
+		except KeyboardInterrupt:
 			try:
-				start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				os.unlink(thumb_path)
+			except OSError:
+				pass
+			raise
+		except IOError:
+			try:
+				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				message("saved (2nd try)!", info_string, 2)
 				back_level()
-				return start_image_copy
 			except KeyboardInterrupt:
 				try:
 					os.unlink(thumb_path)
 				except OSError:
 					pass
 				raise
-			except IOError:
-				try:
-					start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-				except KeyboardInterrupt:
-					try:
-						os.unlink(thumb_path)
-					except OSError:
-						pass
-					raise
-				next_level()
-				message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 2)
-				back_level()
-				back_level()
-				return start_image_copy
-			except:
-				next_level()
-				message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
-				back_level()
-				try:
-					os.unlink(thumb_path)
-				except OSError:
-					pass
-				back_level()
-				return start_image
+			gc.collect()
+			return start_image_copy
+		except:
+			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
+			back_level()
+			try:
+				os.unlink(thumb_path)
+			except OSError:
+				pass
+			back_level()
+			gc.collect()
+			return start_image
 	
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
