@@ -69,9 +69,9 @@ The Python script scans a directory tree of images, whereby each directory const
 
 The JavaScript application consists of a single `index.php` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the `options.json` file and the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface.
 
-Photofloat features share buttons, and `php` permits to pass the shared image/video/album to social medias.
+Photofloat features share buttons, and `php` permits to pass the shared image/video/album to social media.
 
-It is, essentially, a slick and fast, minimal but still well-featured photo gallery app on the net.
+It is, essentially, a slick and fast, minimal but still well-featured photo gallery app on the net, suitable for sharing your media with your friends.
 
 ## Installation
 
