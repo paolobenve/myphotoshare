@@ -1554,7 +1554,7 @@ $(document).ready(function() {
 				swipeDown(albumLink);
 				return false;
 			}
-		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  &&                      e.keyCode === 40 || e.keyCode === 34) {
+		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  &&                     (e.keyCode === 40 || e.keyCode === 34)) {
 			//                                                                          arrow down,          page down
 			if (currentMedia === null)
 				swipeUp(mediaLink);

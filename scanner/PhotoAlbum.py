@@ -629,7 +629,7 @@ class Media(object):
 		
 		try:
 			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			message("saved!", info_string, 5)
+			message("saved anyway", info_string, 5)
 			back_level()
 			gc.collect()
 			return start_image_copy
