@@ -99,6 +99,11 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month][media.day] = list()
 		if not media in self.tree_by_date[media.year][media.month][media.day]:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
+	def listdir_sorted_by_time(self, path):
+		# this function returns the directory listing sorted by mtime
+		mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
+		return list(sorted(os.listdir(path), key=mtime))
+
 	def walk(self, absolute_path, parent_album = None):
 		trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 		absolute_path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
@@ -124,36 +129,39 @@ class TreeWalker:
 		json_cache_file = os.path.join(Options.config['cache_path'], trimmed_json_cache_file)
 		json_cache_OK = False
 		cached_album = None
-		if os.path.exists(json_cache_file):
-			json_message = json_cache_file + " (path: " + os.path.basename(absolute_path) + ")"
-			try:
-				cached_album = Album.from_cache(json_cache_file)
-				if (
-					file_mtime(absolute_path) <= file_mtime(json_cache_file) and
-					cached_album.absolutePath and
-					cached_album.absolutePath == absolute_path
-				):
-					message("  json cache file OK", "  " + json_message, 4)
-					json_cache_OK = True
-					album = cached_album
-					for media in album.media:
-						self.all_media.append(media)
-						self.add_media_to_tree_by_date(media)
-				else:
-					message("  json cache file invalid (old)", json_message, 4)
-			except KeyboardInterrupt:
-				raise
-			except (ValueError, AttributeError, KeyError) as e:
-				message("  json cache file invalid", json_message, 4)
-				cached_album = None
+		#~ if os.path.exists(json_cache_file):
+		json_message = json_cache_file + " (path: " + os.path.basename(absolute_path) + ")"
+		try:
+			cached_album = Album.from_cache(json_cache_file)
+			if (
+				file_mtime(absolute_path) <= file_mtime(json_cache_file) and
+				hasattr(cached_album,"absolute_path") and
+				cached_album.absolute_path == absolute_path
+			):
+				message(" json file OK", "  " + json_message, 4)
+				json_cache_OK = True
+				album = cached_album
+				for media in album.media:
+					self.all_media.append(media)
+					self.add_media_to_tree_by_date(media)
+			else:
+				message(" json file invalid (old or invalid path)", json_message, 4)
+		except KeyboardInterrupt:
+			raise
+		except IOError:
+			message(" json file unexistent", json_message, 4)
+		except (ValueError, AttributeError, KeyError) as e:
+			message(" json file invalid", json_message, 4)
+			cached_album = None
 		
 		if not json_cache_OK:
-			album = Album(absolute_path_with_marker)
+			album = Album(absolute_path)
 		if parent_album is not None:
 			album.parent = parent_album
 		message("  subdir", " " + album.subdir, 3)
 		
-		for entry in sorted(os.listdir(absolute_path)):
+		#~ for entry in sorted(os.listdir(absolute_path)):
+		for entry in self.listdir_sorted_by_time(absolute_path):
 			if entry[0] == '.':
 				continue
 			
@@ -223,12 +231,12 @@ class TreeWalker:
 					self.add_media_to_tree_by_date(media)
 				elif not media.is_valid:
 					next_level()
-					message("unreadable file", ":-(", 1)
+					message("unreadable file", entry, 1)
 					back_level()
 				back_level()
 		if not album.empty:
 			next_level()
-			message("saving json cache file", os.path.basename(absolute_path), 4)
+			message("saving json file", os.path.basename(absolute_path), 4)
 			back_level()
 			album.cache(Options.config['cache_path'])
 			self.all_albums.append(album)
