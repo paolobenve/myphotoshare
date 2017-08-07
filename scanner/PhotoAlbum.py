@@ -185,11 +185,13 @@ class Album(object):
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
 		if by_date_position == -1 and self.cache_base != "root" and (folder_position == -1 or folder_position > 0):
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
+		
 		ancestors_cache_base = list()
 		_parent = self.parent
 		while _parent is not None:
 			ancestors_cache_base.append(_parent.cache_base)
 			_parent = _parent.parent
+		ancestors_cache_base.reverse()
 		
 		dictionary = {
 			"path": path_to_dict,
@@ -238,7 +240,8 @@ class Media(object):
 		self._attributes["metadata"] = {}
 		self._attributes["dateTimeFile"] = mtime
 		self._attributes["mediaType"] = "photo"
-		self.cache_base = cache_base(self.media_file_name)
+		print trim_base_custom(media_path, album.absolute_path)
+		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
 		# let's avoid that different media names have the same cache base
 		distinguish_suffix = 0
 		while True:
@@ -985,17 +988,19 @@ class Media(object):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 		
 		media = self.attributes
-		media["name"]		= self.name
-		media["cacheBase"]	= self.cache_base
-		media["date"]		= self.date
-		media["yearAlbum"]	= self.year_album_path
-		media["monthAlbum"]	= self.month_album_path
-		media["dayAlbum"]	= self.day_album_path
+		media["name"]			= self.name
+		media["cacheBase"]		= self.cache_base
+		media["date"]			= self.date
+		media["yearAlbum"]		= self.year_album_path
+		media["monthAlbum"]		= self.month_album_path
+		media["dayAlbum"]		= self.day_album_path
+		media["dayAlbumCacheBase"]	= cache_base(self.day_album_path, True)
 		
 		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
-		media["albumName"]	= self.album_path
-		media["foldersAlbum"]	= foldersAlbum
-		media["cacheSubdir"]	= self.album.subdir
+		media["albumName"]		= self.album_path
+		media["foldersAlbum"]		= foldersAlbum
+		media["foldersCacheBase"]	= self.album.cache_base
+		media["cacheSubdir"]		= self.album.subdir
 		
 		return media
 

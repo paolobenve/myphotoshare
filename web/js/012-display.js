@@ -378,9 +378,11 @@ $(document).ready(function() {
 				if (i < components.length - 1 || currentMedia !== null)
 					if (i != 0 || ! dateTitle) {
 						if (i == 1 && dateTitle)
-							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(PhotoFloat.cacheBase(last.substring(1))) + "\">" + title;
+							//~ title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(PhotoFloat.cacheBase(last.substring(1))) + "\">" + title;
+							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "\">" + title;
 						else
-							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? PhotoFloat.cacheBase(last.substring(1)) : "") + "\">";
+							//~ title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? PhotoFloat.cacheBase(last.substring(1)) : "") + "\">";
+							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "\">";
 					}
 				if (i == 1 && dateTitle)
 					title += "(" + _t("#by-date") + ")";
@@ -1278,15 +1280,19 @@ $(document).ready(function() {
 		$("#original-link").attr("target", "_blank").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia)));
 		
 		if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
+			// by date album: change to folder view
 			//~ changeViewLink = "#!/" + PhotoFloat.pathJoin([
 							//~ encodeURIComponent(PhotoFloat.cacheBase(currentMedia.foldersAlbum)),
 							//~ encodeURIComponent(PhotoFloat.cacheBase(currentMedia.name))
 						//~ ]);
-			changeViewLink = "#!/" + currentMedia.cacheBase;
-		else {
-			
 			changeViewLink = "#!/" + PhotoFloat.pathJoin([
-							encodeURIComponent(PhotoFloat.cacheBase(currentMedia.dayAlbum)),
+							encodeURIComponent(currentMedia.foldersCacheBase),
+							encodeURIComponent(currentMedia.cacheBase)
+						]);
+		else {
+			// folder album: change to by date view
+			changeViewLink = "#!/" + PhotoFloat.pathJoin([
+							encodeURIComponent(currentMedia.dayAlbumCacheBase),
 							encodeURIComponent(currentMedia.cacheBase)
 						]);
 		}
