@@ -181,13 +181,14 @@ class Album(object):
 		path_without_folders_marker = self.remove_folders_marker(self.path)
 		
 		path_to_dict = self.path
-		if path_to_dict == "":
-			path_to_dict = Options.config['folders_string']
-		
-		cache_base_ancestors = list()
+		folder_position = path_to_dict.find(Options.config['folders_string'])
+		by_date_position = path_to_dict.find(Options.config['by_date_string'])
+		if by_date_position == -1 and self.cache_base != "root" and (folder_position == -1 or folder_position > 0):
+			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
+		ancestors_cache_base = list()
 		_parent = self.parent
 		while _parent is not None:
-			cache_base_ancestors.append(_parent.cache_base)
+			ancestors_cache_base.append(_parent.cache_base)
 			_parent = _parent.parent
 		
 		dictionary = {
@@ -198,7 +199,7 @@ class Album(object):
 			"albums": subalbums,
 			"media": self.media_list,
 			"cacheBase": self.cache_base,
-			"cacheBaseAncestors": cache_base_ancestors,
+			"ancestorsCacheBase": ancestors_cache_base,
 			"physicalPath": path_without_folders_marker,
 			"numMediaInSubTree": self.num_media_in_sub_tree,
 			"numMediaInAlbum": self.num_media_in_album
