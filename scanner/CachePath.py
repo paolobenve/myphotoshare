@@ -40,36 +40,21 @@ def trim_base_custom(path, base):
 	return path
 def remove_album_path(path):
 	return trim_base_custom(path, Options.config['album_path'])
-def cache_base(path, album, filepath=False):
+def cache_base(path, filepath=False):
 	if not filepath:
 		path = remove_album_path(path)
 	if path:
-		# this suffix will be used in case that different files produce the same cache name
-		distinguish_suffix = 0
-		while True:
-			path = path.replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('+', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
-			while path.find("--") != -1:
-				path = path.replace("--", "-")
-			while path.find("__") != -1:
-				path = path.replace("__", "_")
-			if album is None:
-				break
-			if distinguish_suffix:
-				path += "_" + str(distinguish_suffix)
-			cache_name_absent = True
-			for media in album.media_list:
-				if path == media.cache_base:
-					cache_name_absent = False
-					distinguish_suffix += 1
-					break
-			if cache_name_absent:
-				break
+		path = path.replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('+', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
+		while path.find("--") != -1:
+			path = path.replace("--", "-")
+		while path.find("__") != -1:
+			path = path.replace("__", "_")
 	else:
 		path = "root"
 	return path
-def json_name(path, album = None):
-	return cache_base(path, album) + ".json"
-def photo_cache_name(album, path, size, thumb_type = ""):
+#~ def json_name(path):
+	#~ return cache_base(path) + ".json"
+def photo_cache_name(photo, size, thumb_type = ""):
 	# this function is used for video thumbnails too
 	photo_suffix = "_"
 	photo_suffix += str(size)
@@ -86,10 +71,10 @@ def photo_cache_name(album, path, size, thumb_type = ""):
 		elif thumb_type == "fixed_height":
 			photo_suffix += "f"
 	photo_suffix += ".jpg"
-	result = cache_base(path, album, True) + photo_suffix
+	result = photo.cache_base + photo_suffix
 	
 	return result
-def video_cache_name(album, path):
-	return cache_base(path, album, True) + "_transcoded_" + Options.config['video_transcode_bitrate'] + ".mp4"
+def video_cache_name(video):
+	return video.cache_base + "_transcoded_" + Options.config['video_transcode_bitrate'] + ".mp4"
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))

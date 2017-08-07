@@ -78,7 +78,8 @@ class Album(object):
 		return self.path
 	@property
 	def json_file(self):
-		return json_name(self.path)
+		#~ return json_name(self.path)
+		return self.cache_base + ".json"
 	@property
 	def subdir(self):
 		return self._subdir
@@ -163,8 +164,13 @@ class Album(object):
 		if path_is_cripple:
 			for sub in self.albums_list:
 				if not sub.empty:
+					path_to_dict = trim_base_custom(sub.path, self.baseless_path)
+					if path_to_dict == "":
+						path_to_dict = Options.config['folders_string']
+					
 					subalbums.append({
-						"path": trim_base_custom(sub.path, self.baseless_path),
+						"path": path_to_dict,
+						"cacheBase": sub.cache_base,
 						"date": sub.date,
 						"numMediaInSubTree": sub.num_media_in_sub_tree
 					})
@@ -174,20 +180,31 @@ class Album(object):
 					subalbums.append(sub)
 		path_without_folders_marker = self.remove_folders_marker(self.path)
 		
+		path_to_dict = self.path
+		if path_to_dict == "":
+			path_to_dict = Options.config['folders_string']
+		
+		cache_base_ancestors = list()
+		_parent = self.parent
+		while _parent is not None:
+			cache_base_ancestors.append(_parent.cache_base)
+			_parent = _parent.parent
+		
 		dictionary = {
-			"path": self.path,
+			"path": path_to_dict,
 			"absolutePath": self.absolute_path,
 			"cacheSubdir": self._subdir,
 			"date": self.date,
 			"albums": subalbums,
 			"media": self.media_list,
-			"cacheBase": cache_base(self.path, self),
+			"cacheBase": self.cache_base,
+			"cacheBaseAncestors": cache_base_ancestors,
 			"physicalPath": path_without_folders_marker,
 			"numMediaInSubTree": self.num_media_in_sub_tree,
 			"numMediaInAlbum": self.num_media_in_album
 		}
 		if self.parent is not None:
-			dictionary["parentCacheBase"] = cache_base(self.parent.path, self)
+			dictionary["parentCacheBase"] = self.parent.cache_base
 		return dictionary
 	def media_from_path(self, path):
 		for media in self.media_list:
@@ -202,7 +219,7 @@ class Media(object):
 		self.folders = remove_album_path(os.path.dirname(self.media_file_name))
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
 		self.is_valid = True
-		self.cache_base = cache_base(self.name, album)
+		
 		image = None
 		try:
 			mtime = file_mtime(media_path)
@@ -214,11 +231,28 @@ class Media(object):
 		if attributes is not None and attributes["dateTimeFile"] >= mtime:
 		#~ if attributes is not None and attributes["date"] >= mtime:
 			self._attributes = attributes
+			self.cache_base = attributes["cacheBase"]
 			return
 		self._attributes = {}
 		self._attributes["metadata"] = {}
 		self._attributes["dateTimeFile"] = mtime
 		self._attributes["mediaType"] = "photo"
+		self.cache_base = cache_base(self.media_file_name)
+		# let's avoid that different media names have the same cache base
+		distinguish_suffix = 0
+		while True:
+			_cache_base = self.cache_base
+			if distinguish_suffix:
+				_cache_base += "_" + str(distinguish_suffix)
+			cache_name_absent = True
+			for _media in album.media_list:
+				if _cache_base == _media.cache_base:
+					cache_name_absent = False
+					distinguish_suffix += 1
+					break
+			if cache_name_absent:
+				self.cache_base = _cache_base
+				break
 		
 		try:
 			image = Image.open(media_path)
@@ -496,7 +530,7 @@ class Media(object):
 			thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
 	
 	def reduce_image_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
-		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self.album, self.media_file_name, thumb_size, thumb_type))
+		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self, thumb_size, thumb_type))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_path = os.path.join(thumbs_path, self.album.json_file)
 		if os.path.exists(thumb_path) and (not os.path.exists(json_path) or file_mtime(thumb_path) < file_mtime(json_path)):
@@ -735,7 +769,7 @@ class Media(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, self.album.subdir, video_cache_name(self.album, self.media_file_name))
+		transcode_path = os.path.join(transcode_path, self.album.subdir, video_cache_name(self))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -824,7 +858,7 @@ class Media(object):
 		caches = []
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			# transcoded video path
-			caches.append(os.path.join(self.album.subdir, video_cache_name(self.album, self.media_file_name)))
+			caches.append(os.path.join(self.album.subdir, video_cache_name(self)))
 		else:
 			# reduced sizes paths
 			for thumb_size in Options.config['reduced_sizes']:
@@ -832,8 +866,7 @@ class Media(object):
 					os.path.join(
 						self.album.subdir,
 						photo_cache_name(
-							self.album,
-							self.media_file_name,
+							self,
 							thumb_size
 						)
 					)
@@ -843,8 +876,7 @@ class Media(object):
 			os.path.join(
 				self.album.subdir,
 				photo_cache_name(
-					self.album,
-					self.media_file_name,
+					self,
 					Options.config['album_thumb_size'],
 					Options.config['album_thumb_type']
 				)
@@ -856,8 +888,7 @@ class Media(object):
 				os.path.join(
 					self.album.subdir,
 					photo_cache_name(
-						self.album,
-						self.media_file_name,
+						self,
 						Options.config['album_thumb_size'],
 						"square"
 					)
@@ -868,8 +899,7 @@ class Media(object):
 			os.path.join(
 				self.album.subdir,
 				photo_cache_name(
-					self.album,
-					self.media_file_name,
+					self,
 					Options.config['media_thumb_size'],
 					Options.config['media_thumb_type']
 				)

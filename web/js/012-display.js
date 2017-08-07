@@ -378,9 +378,9 @@ $(document).ready(function() {
 				if (i < components.length - 1 || currentMedia !== null)
 					if (i != 0 || ! dateTitle) {
 						if (i == 1 && dateTitle)
-							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(photoFloat.cachePath(last.substring(1))) + "\">" + title;
+							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(PhotoFloat.cacheBase(last.substring(1))) + "\">" + title;
 						else
-							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? photoFloat.cachePath(last.substring(1)) : "") + "\">";
+							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? PhotoFloat.cacheBase(last.substring(1)) : "") + "\">";
 					}
 				if (i == 1 && dateTitle)
 					title += "(" + _t("#by-date") + ")";
@@ -610,10 +610,11 @@ $(document).ready(function() {
 						currentAlbum.media[i].completeName =
 							PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
 						thumbHash =
-							PhotoFloat.pathJoin([
-								PhotoFloat.cachePath(currentAlbum.media[i].completeName
-									.substring(0, currentAlbum.media[i].completeName.length - currentAlbum.media[i].name.length - 1)),
-								PhotoFloat.cachePath(currentAlbum.media[i].name)]);
+							//~ PhotoFloat.pathJoin([
+								//~ PhotoFloat.cacheBase(currentAlbum.media[i].completeName
+									//~ .substring(0, currentAlbum.media[i].completeName.length - currentAlbum.media[i].name.length - 1)),
+								//~ PhotoFloat.cacheBase(currentAlbum.media[i].name)]);
+							currentAlbum.media[i].cacheBase;
 					}
 					if (isOriginal) {
 						thumbHeight = height;
@@ -1277,15 +1278,18 @@ $(document).ready(function() {
 		$("#original-link").attr("target", "_blank").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia)));
 		
 		if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
+			//~ changeViewLink = "#!/" + PhotoFloat.pathJoin([
+							//~ encodeURIComponent(PhotoFloat.cacheBase(currentMedia.foldersAlbum)),
+							//~ encodeURIComponent(PhotoFloat.cacheBase(currentMedia.name))
+						//~ ]);
+			changeViewLink = "#!/" + currentMedia.cacheBase;
+		else {
+			
 			changeViewLink = "#!/" + PhotoFloat.pathJoin([
-							encodeURIComponent(PhotoFloat.cachePath(currentMedia.foldersAlbum)),
-							encodeURIComponent(PhotoFloat.cachePath(currentMedia.name))
+							encodeURIComponent(PhotoFloat.cacheBase(currentMedia.dayAlbum)),
+							encodeURIComponent(currentMedia.cacheBase)
 						]);
-		else
-			changeViewLink = "#!/" + PhotoFloat.pathJoin([
-							encodeURIComponent(PhotoFloat.cachePath(currentMedia.dayAlbum)),
-							encodeURIComponent(PhotoFloat.cachePath(currentMedia.name))
-						]);
+		}
 		$("#day-folders-view-link").attr("href", changeViewLink);
 		
 		text = "<table>";
