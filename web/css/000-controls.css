@@ -24,6 +24,10 @@ a:hover {
 	font-weight: bold;
 }
 
+.title-anchor {
+	padding: 0 .5em;
+}
+
 #buttons-container {
 	float: right;
 	margin-left: .5em;

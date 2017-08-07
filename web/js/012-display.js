@@ -378,10 +378,8 @@ $(document).ready(function() {
 				if (i < components.length - 1 || currentMedia !== null)
 					if (i != 0 || ! dateTitle) {
 						if (i == 1 && dateTitle)
-							//~ title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(PhotoFloat.cacheBase(last.substring(1))) + "\">" + title;
 							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "\">" + title;
 						else
-							//~ title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? PhotoFloat.cacheBase(last.substring(1)) : "") + "\">";
 							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "\">";
 					}
 				if (i == 1 && dateTitle)
@@ -396,7 +394,7 @@ $(document).ready(function() {
 				title += " ";
 			else if ((i < components.length - 1 || currentMedia !== null) &&
 				(i == components.length - 1 || components[i + 1] != Options.folders_string))
-				title += " &raquo; ";
+				title += "&raquo;";
 		}
 		
 		// leave only the last link on mobile, the last two otherwise

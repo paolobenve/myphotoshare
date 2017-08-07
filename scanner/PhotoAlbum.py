@@ -189,8 +189,10 @@ class Album(object):
 		
 		ancestors_cache_base = list()
 		_parent = self
-		while _parent.cache_base != "root":
-			ancestors_cache_base.append(_parent.parent.cache_base)
+		while True:
+			ancestors_cache_base.append(_parent.cache_base)
+			if _parent.parent is None:
+				break
 			_parent = _parent.parent
 		ancestors_cache_base.reverse()
 		
