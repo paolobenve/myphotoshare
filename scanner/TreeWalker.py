@@ -27,7 +27,6 @@ class TreeWalker:
 		self.all_media = list()
 		origin_album = Album(Options.config['album_path'])
 		origin_album.cache_base = cache_base(Options.config['album_path'])
-		#~ album_cache_base = os.path.join(Options.config['album_path'], Options.config['folders_string'])
 		album_cache_base = Options.config['folders_string']
 		[folders_album, num] = self.walk(Options.config['album_path'], album_cache_base, origin_album)
 		folders_album.num_media_in_sub_tree = num
@@ -51,6 +50,7 @@ class TreeWalker:
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
+		by_date_album.parent = origin_album
 		by_date_album.cache_base = cache_base(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
 			year_path = os.path.join(by_date_path, str(year))
@@ -92,10 +92,6 @@ class TreeWalker:
 			if not year_album.empty:
 				year_album.cache(Options.config['cache_path'])
 		self.all_albums.append(by_date_album)
-		#~ root_cache = os.path.join(Options.config['cache_path'], json_name(Options.config['album_path']))
-		root_json_file = cache_base(Options.config['album_path']) + ".json"
-		root_cache = os.path.join(Options.config['cache_path'], root_json_file)
-		by_date_album.parent = origin_album
 		if not by_date_album.empty:
 			by_date_album.cache(Options.config['cache_path'])
 		return by_date_album

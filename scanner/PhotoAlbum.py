@@ -186,10 +186,11 @@ class Album(object):
 		if by_date_position == -1 and self.cache_base != "root" and (folder_position == -1 or folder_position > 0):
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
 		
+		
 		ancestors_cache_base = list()
-		_parent = self.parent
-		while _parent is not None:
-			ancestors_cache_base.append(_parent.cache_base)
+		_parent = self
+		while _parent.cache_base != "root":
+			ancestors_cache_base.append(_parent.parent.cache_base)
 			_parent = _parent.parent
 		ancestors_cache_base.reverse()
 		
@@ -240,7 +241,6 @@ class Media(object):
 		self._attributes["metadata"] = {}
 		self._attributes["dateTimeFile"] = mtime
 		self._attributes["mediaType"] = "photo"
-		print trim_base_custom(media_path, album.absolute_path)
 		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
 		# let's avoid that different media names have the same cache base
 		distinguish_suffix = 0
