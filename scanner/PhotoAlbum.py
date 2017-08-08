@@ -732,7 +732,7 @@ class Media(object):
 			'-preset', 'slow',					# set specific preset that provides a certain encoding speed to compression ratio
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
-			'-crf', Options.config['video_crf'],			# set quality
+			'-crf', str(Options.config['video_crf']),			# set quality
 			'-b:v', Options.config['video_transcode_bitrate'],	# set videobitrate
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec
@@ -746,7 +746,7 @@ class Media(object):
 			'-y' 							# don't prompt for overwrite
 		]
 		filters = []
-		info_string = "mp4, h264, " + Options.config['video_transcode_bitrate'] + " bit/sec"
+		info_string = "mp4, h264, " + Options.config['video_transcode_bitrate'] + " bit/sec, crf=" + str(Options.config['video_crf'])
 		if (
 			os.path.exists(transcode_path) and
 			file_mtime(transcode_path) >= self._attributes["dateTimeFile"]

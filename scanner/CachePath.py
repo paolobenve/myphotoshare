@@ -73,6 +73,6 @@ def photo_cache_name(path, size, thumb_type = ""):
 	result = cache_base(path, True) + suffix
 	return result
 def video_cache_name(path):
-	return cache_base(path, True) + "_transcoded_" + Options.config['video_transcode_bitrate'] + ".mp4"
+	return cache_base(path, True) + "_transcoded_" + Options.config['video_transcode_bitrate'] + "_" + str(Options.config['video_crf']) + ".mp4"
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))
