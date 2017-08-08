@@ -190,9 +190,9 @@ class TreeWalker:
 				found = False
 				if json_cache_OK:
 					# let's search it's cache base in cached album
-					for _media in album.media:
-						if _media.name == entry:
-							next_album_cache_base = media.cache_base
+					for _subalbum in album.albums:
+						if _subalbum.path == entry:
+							next_album_cache_base = _subalbum.cache_base
 							found = True
 							break
 				if not found:

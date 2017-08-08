@@ -649,11 +649,11 @@ class Media(object):
 			# simply copy the start image to the thumbnail
 			must_resize = False
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("image smaller than reduced size, no reduction", info_string, 4)
+				message("image smaller, no reduction", info_string, 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("image smaller than album thumbnail, no reduction", info_string, 4)
+				message("image smaller, no thumbing for album", info_string, 4)
 			else:
-				message("image smaller than media thumbnail, no reduction", info_string, 4)
+				message("image smaller, no thumbing for media", info_string, 4)
 			#~ try:
 				#~ os.unlink(thumb_path)
 			#~ except OSError:
