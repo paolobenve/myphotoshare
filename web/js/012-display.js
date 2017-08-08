@@ -1141,7 +1141,8 @@ $(document).ready(function() {
 			}
 			
 			if (currentMedia.mediaType == "video") {
-				if (fullScreenStatus) {
+				 if (fullScreenStatus && currentMedia.albumName.match(/\.avi$/) === null) {
+					// .avi videos are not played by browsers
 					videoSrc = currentMedia.albumName;
 				} else {
 					videoSrc = photoFloat.mediaPath(currentAlbum, currentMedia, "");
