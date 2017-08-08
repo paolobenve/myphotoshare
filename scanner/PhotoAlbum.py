@@ -360,29 +360,33 @@ class Media(object):
 				break
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
 		# give image the correct orientation
-		mirror = image
-		if self._orientation == 2:
-			# Vertical Mirror
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
-		elif self._orientation == 3:
-			# Rotation 180
-			mirror = image.transpose(Image.ROTATE_180)
-		elif self._orientation == 4:
-			# Horizontal Mirror
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
-		elif self._orientation == 5:
-			# Horizontal Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
-		elif self._orientation == 6:
-			# Rotation 270
-			mirror = image.transpose(Image.ROTATE_270)
-		elif self._orientation == 7:
-			# Vertical Mirror + Rotation 270
-			mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
-		elif self._orientation == 8:
-			# Rotation 90
-			mirror = image.transpose(Image.ROTATE_90)
-		image = mirror
+		try:
+			mirror = image
+			if self._orientation == 2:
+				# Vertical Mirror
+				mirror = image.transpose(Image.FLIP_LEFT_RIGHT)
+			elif self._orientation == 3:
+				# Rotation 180
+				mirror = image.transpose(Image.ROTATE_180)
+			elif self._orientation == 4:
+				# Horizontal Mirror
+				mirror = image.transpose(Image.FLIP_TOP_BOTTOM)
+			elif self._orientation == 5:
+				# Horizontal Mirror + Rotation 270
+				mirror = image.transpose(Image.FLIP_TOP_BOTTOM).transpose(Image.ROTATE_270)
+			elif self._orientation == 6:
+				# Rotation 270
+				mirror = image.transpose(Image.ROTATE_270)
+			elif self._orientation == 7:
+				# Vertical Mirror + Rotation 270
+				mirror = image.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
+			elif self._orientation == 8:
+				# Rotation 90
+				mirror = image.transpose(Image.ROTATE_90)
+			image = mirror
+		except IOError:
+			# https://github.com/paolobenve/myphotoshare/issues/46 : some image make raise this exception
+			pass
 		
 		if (Options.config['thumbnail_generation_mode'] == "parallel"):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
