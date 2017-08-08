@@ -271,7 +271,10 @@ class TreeWalker:
 				back_level()
 		if not album.empty:
 			next_level()
-			message("saving json file", os.path.basename(absolute_path), 4)
+			message("saving json file for album", os.path.basename(absolute_path), 4)
+			next_level()
+			message("json file name", absolute_path, 5)
+			back_level()
 			back_level()
 			album.cache(Options.config['cache_path'])
 			self.all_albums.append(album)

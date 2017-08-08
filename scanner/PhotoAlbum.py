@@ -396,9 +396,11 @@ class Media(object):
 			return
 		info = json.loads(p)
 		for s in info["streams"]:
+			next_level()
 			message("debug: codec_type", 'codec_type', 5)
 			if 'codec_type' in s:
 				message("debug: s[codec_type]", s['codec_type'], 5)
+			back_level()
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
 				self._attributes["metadata"]["size"] = (int(s["width"]), int(s["height"]))
@@ -539,8 +541,10 @@ class Media(object):
 		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self, thumb_size, thumb_type))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_path = os.path.join(thumbs_path, self.album.json_file)
+		next_level()
 		if os.path.exists(thumb_path) and (not os.path.exists(json_path) or file_mtime(thumb_path) < file_mtime(json_path)):
 			message("reduction/thumbnail OK, skipping", thumb_path, 5)
+			back_level()
 			return start_image
 		
 		message("reduction/thumbnail not OK, creating", thumb_path, 5)
@@ -632,6 +636,7 @@ class Media(object):
 			else:
 				message("existing reduced size", info_string, 4)
 			back_level()
+			back_level()
 			return start_image
 		
 		must_resize = True
@@ -680,6 +685,7 @@ class Media(object):
 			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			message("saved anyway", info_string, 5)
 			back_level()
+			back_level()
 			gc.collect()
 			return start_image_copy
 		except KeyboardInterrupt:
@@ -692,7 +698,6 @@ class Media(object):
 			try:
 				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 				message("saved (2nd try)!", os.path.basename(thumb_path) + ", " + info_string, 2)
-				back_level()
 			except KeyboardInterrupt:
 				try:
 					os.unlink(thumb_path)
@@ -700,14 +705,16 @@ class Media(object):
 					pass
 				raise
 			gc.collect()
+			back_level()
+			back_level()
 			return start_image_copy
 		except:
 			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
-			back_level()
 			try:
 				os.unlink(thumb_path)
 			except OSError:
 				pass
+			back_level()
 			back_level()
 			gc.collect()
 			return start_image
