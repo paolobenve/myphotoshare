@@ -541,7 +541,7 @@ class Media(object):
 			thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
 	
 	def reduce_image_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
-		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self, thumb_size, thumb_type))
+		thumb_path = os.path.join(thumbs_path, self.album.subdir, self.album.cache_base + Options.config["cache_folder_separator"] + photo_cache_name(self, thumb_size, thumb_type))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_path = os.path.join(thumbs_path, self.album.json_file)
 		next_level()
@@ -785,7 +785,7 @@ class Media(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, self.album.subdir, video_cache_name(self))
+		transcode_path = os.path.join(transcode_path, self.album.subdir, self.album.cache_base + Options.config["cache_folder_separator"] + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -872,16 +872,17 @@ class Media(object):
 	@property
 	def image_caches(self):
 		caches = []
+		album_prefix = self.album.cache_base + Options.config["cache_folder_separator"]
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			# transcoded video path
-			caches.append(os.path.join(self.album.subdir, video_cache_name(self)))
+			caches.append(os.path.join(self.album.subdir, album_prefix + video_cache_name(self)))
 		else:
 			# reduced sizes paths
 			for thumb_size in Options.config['reduced_sizes']:
 				caches.append(
 					os.path.join(
 						self.album.subdir,
-						photo_cache_name(
+						album_prefix + photo_cache_name(
 							self,
 							thumb_size
 						)
@@ -891,7 +892,7 @@ class Media(object):
 		caches.append(
 			os.path.join(
 				self.album.subdir,
-				photo_cache_name(
+				album_prefix + photo_cache_name(
 					self,
 					Options.config['album_thumb_size'],
 					Options.config['album_thumb_type']
@@ -903,7 +904,7 @@ class Media(object):
 			caches.append(
 				os.path.join(
 					self.album.subdir,
-					photo_cache_name(
+					album_prefix + photo_cache_name(
 						self,
 						Options.config['album_thumb_size'],
 						"square"
@@ -914,7 +915,7 @@ class Media(object):
 		caches.append(
 			os.path.join(
 				self.album.subdir,
-				photo_cache_name(
+				album_prefix + photo_cache_name(
 					self,
 					Options.config['media_thumb_size'],
 					Options.config['media_thumb_type']
