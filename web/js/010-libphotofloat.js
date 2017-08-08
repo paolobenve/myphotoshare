@@ -233,18 +233,18 @@
 			}
 			suffix += ".jpg";
 		} else if (media.mediaType == "video") {
-			suffix += "transcoded_" + Options.video_transcode_bitrate + ".mp4";
+			suffix += "transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 		}
 		//~ hash = PhotoFloat.cacheBase(PhotoFloat.mediaHashFolder(album, media) + suffix);
-		hash = media.cacheBase + suffix;
-		if (hash.indexOf(rootString) === 0)
-			hash = hash.substring(rootString.length);
-		else {
-			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
-				hash = hash.substring(foldersStringWithTrailingSeparator.length);
-			else if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
-				hash = hash.substring(bydateStringWithTrailingSeparator.length);
-		}
+		hash = album.cacheBase + Options.cache_folder_separator + media.cacheBase + suffix;
+		//~ if (hash.indexOf(rootString) === 0)
+			//~ hash = hash.substring(rootString.length);
+		//~ else {
+			//~ if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
+				//~ hash = hash.substring(foldersStringWithTrailingSeparator.length);
+			//~ else if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
+				//~ hash = hash.substring(bydateStringWithTrailingSeparator.length);
+		//~ }
 		if (media.cacheSubdir)
 			return PhotoFloat.pathJoin([Options.server_cache_path, media.cacheSubdir, hash]);
 		else

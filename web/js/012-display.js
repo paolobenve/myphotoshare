@@ -616,7 +616,7 @@ $(document).ready(function() {
 								//~ PhotoFloat.cacheBase(currentAlbum.media[i].completeName
 									//~ .substring(0, currentAlbum.media[i].completeName.length - currentAlbum.media[i].name.length - 1)),
 								//~ PhotoFloat.cacheBase(currentAlbum.media[i].name)]);
-							currentAlbum.media[i].cacheBase;
+							currentAlbum.cacheBase + Options.cache_folder_separator + currentAlbum.media[i].cacheBase;
 					}
 					
 					if (Options.media_thumb_type == "fixed_height") {
