@@ -38,13 +38,17 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Folders (or trees) are not scanned if a marker in put inside them
 * Verbosity levels in scanner
 
-Usability:
+### Usability:
 
 * Swipe gestures for mobile
 * Keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
 * Mouse-wheel support
 * Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+`: a preview of the image/album is shared
 * User interface translated via separate translation file
+
+### Scanner times
+
+As a term of comparizon, on my medium-sized pc, with the images on a nfs mounted nas partition, scanning for the first time a 420 photos directory for a total size of 1100MB takes about 30 minutes.
 
 ## Community
 
