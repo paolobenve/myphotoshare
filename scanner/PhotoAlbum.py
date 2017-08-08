@@ -259,7 +259,6 @@ class Media(object):
 			if cache_name_absent:
 				self.cache_base = _cache_base
 				break
-		
 		try:
 			image = Image.open(media_path)
 		except KeyboardInterrupt:

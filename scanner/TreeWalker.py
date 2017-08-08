@@ -312,7 +312,7 @@ class TreeWalker:
 		if not subdir:
 			message("Cleanup", "be patient!", 3)
 			next_level()
-			message("cleanup", "building stale list", 4)
+			message("building stale list", "", 4)
 			for album in self.all_albums:
 				self.all_cache_entries.append(album.json_file)
 			for media in self.all_media:
@@ -324,10 +324,9 @@ class TreeWalker:
 					except KeyError:
 						self.all_cache_entries_by_subdir[album_subdir] = list()
 						self.all_cache_entries_by_subdir[album_subdir].append(entry_without_subdir)
-		
 		if subdir:
 			info = "in subdir " + subdir
-			deletable_files_suffixes_re = "_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[0-9][1-9]?)?)?\.mp4$"
+			deletable_files_suffixes_re = "_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
 			# reduced sizes, thumbnails, old style thumbnails
 			deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
 		else:
