@@ -328,7 +328,7 @@ $(document).ready(function() {
 	}
 	
 	function setTitle() {
-		var title = "", documentTitle = "", last = "", components, i, dateTitle, originalTitle;
+		var title = "", documentTitle = "", components, i, dateTitle, originalTitle;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks;
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
@@ -372,23 +372,27 @@ $(document).ready(function() {
 		if (isMobile.any())
 			titleAnchorClasses += ' mobile';
 		for (i = 0; i < components.length; ++i) {
-			if (i)
-				last += "/" + components[i];
 			if (i != 1 || components[i] != Options.folders_string) {
-				if (i < components.length - 1 || currentMedia !== null)
+				if (i < components.length - 1 || currentMedia !== null) {
 					if (i != 0 || ! dateTitle) {
 						if (i == 1 && dateTitle)
 							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "\">" + title;
 						else
 							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "\">";
 					}
+				} else {
+					title += "<span class='title-no-anchor'>";
+				}
 				if (i == 1 && dateTitle)
 					title += "(" + _t("#by-date") + ")";
 				else
 					title += textComponents[i];
-				if (i < components.length - 1 || currentMedia !== null)
+				if (i < components.length - 1 || currentMedia !== null) {
 					if (! (i == 0 && dateTitle))
 						title += "</a>";
+				} else {
+					title += "</span>";
+				}
 			}
 			if (i == 0 && dateTitle)
 				title += " ";
