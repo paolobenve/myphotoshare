@@ -221,7 +221,7 @@
 			}
 			suffix += ".jpg";
 		} else if (media.mediaType == "video") {
-			suffix += "transcoded_" + Options.video_transcode_bitrate + ".mp4";
+			suffix += "transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 		}
 		hash = PhotoFloat.cachePath(PhotoFloat.mediaHashFolder(album, media) + suffix);
 		if (hash.indexOf(rootString) === 0)

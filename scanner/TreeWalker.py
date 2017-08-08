@@ -279,7 +279,7 @@ class TreeWalker:
 			#~ self.all_cache_entries = cache_list
 		if subdir:
 			info = "in subdir " + subdir
-			deletable_files_suffixes_re = "_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10}))?\.mp4$"
+			deletable_files_suffixes_re = "_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
 			# reduced sizes, thumbnails, old style thumbnails
 			deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
 		else:
