@@ -743,19 +743,6 @@ $(document).ready(function() {
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, buttonAndCaptionHeight, html;
 								
 								mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
-								//~ if (isOriginal) {
-									//~ thumbWidth = randomMedia.metadata.size[0];
-									//~ thumbHeight = randomMedia.metadata.size[1];
-									//~ if (thumbWidth > correctedAlbumThumbSize || thumbHeight > correctedAlbumThumbSize) {
-										//~ if (thumbWidth > thumbHeight) {
-											//~ thumbHeight = Math.floor(correctedAlbumThumbSize * thumbHeight / thumbWidth);
-											//~ thumbWidth = correctedAlbumThumbSize;
-										//~ } else {
-											//~ thumbWidth = Math.floor(correctedAlbumThumbSize * thumbWidth / thumbHeight);
-											//~ thumbHeight = correctedAlbumThumbSize;
-										//~ }
-									//~ }
-								//~ }
 								
 								mediaWidth = randomMedia.metadata.size[0];
 								mediaHeight = randomMedia.metadata.size[1];
@@ -937,10 +924,6 @@ $(document).ready(function() {
 		if (currentMedia.mediaType == "photo") {
 			photoSrc = chooseReducedPhoto(currentMedia, container);
 			previousSrc = media.attr("src");
-			//~ if (! imageExists(photoSrc)) {
-				//~ photoSrc = photoFloat.originalMediaPath(currentMedia);
-			//~ } else 
-			//~ if (! isOriginal) {
 			// chooseReducedPhoto() sets maxSize to 0 if it returns the original media
 			if (width > height) {
 				height = Math.round(height * maxSize / width);
@@ -949,7 +932,6 @@ $(document).ready(function() {
 				width = Math.round(width * maxSize / height);
 				height = maxSize;
 			}
-			//~ }
 			if (photoSrc != previousSrc || media.attr("width") != width || media.attr("height") != height) {
 				$("link[rel=image_src]").remove();
 				$('link[rel="video_src"]').remove();
@@ -1060,36 +1042,7 @@ $(document).ready(function() {
 	
 	function chooseThumbnail(album, media, thumbnailSize, calculatedThumbnailSize) {
 		return photoFloat.mediaPath(album, media, thumbnailSize);
-		
-		//~ var chosenMedia = PhotoFloat.originalMediaPath(media);
-		//~ var mediaWidth = media.metadata.size[0], mediaHeight = media.metadata.size[1];
-		//~ var mediaMaxSize = Math.max(mediaWidth, mediaHeight);
-		//~ var mediaMinSize = Math.min(mediaWidth, mediaHeight);
-		//~ var isOriginal = true;
-		
-		//~ if (
-			//~ thumbnailSize == Options.album_thumb_size && (
-				//~ Options.album_thumb_type == "square" && mediaMinSize > thumbnailSize ||
-				//~ Options.album_thumb_type == "fit" && mediaMaxSize > thumbnailSize
-			//~ ) || thumbnailSize == Options.media_thumb_size && (
-				//~ Options.media_thumb_type == "square" && mediaMinSize > thumbnailSize ||
-				//~ Options.media_thumb_type == "fixed_height" && mediaHeight > thumbnailSize
-				
-			//~ )
-		//~ ) {
-			//~ chosenMedia = photoFloat.mediaPath(album, media, thumbnailSize);
-			//~ isOriginal = false;
-		//~ }
-		
-		//~ return [chosenMedia, isOriginal];
 	}
-	
-	//~ function imageExists(imageUrl){
-		//~ var http = new XMLHttpRequest();
-		//~ http.open('HEAD', imageUrl, false);
-		//~ http.send();
-		//~ return http.status != 404;
-	//~ }
 	
 	function showMedia(album) {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
@@ -1169,8 +1122,6 @@ $(document).ready(function() {
 				linkTag = "<link rel=\"video_src\" href=\"" + encodeURI(videoSrc) + "\" />";
 			} else if (currentMedia.mediaType == "photo") {
 				photoSrc = chooseReducedPhoto(currentMedia, null);
-				//~ if (maxSize && imageExists(photoSrc)) {
-				//~ if (! isOriginal) {
 				if (width > height) {
 					height = Math.round(height * maxSize / width);
 					width = maxSize;
@@ -1178,9 +1129,7 @@ $(document).ready(function() {
 					width = Math.round(width * maxSize / height);
 					height = maxSize;
 				}
-				//~ } else {
-					//~ photoSrc = photoFloat.originalMediaPath(currentMedia);
-				//~ }
+				
 				$('<img/>', { id: 'media' })
 					.appendTo('#media-box-inner')
 					.hide()
