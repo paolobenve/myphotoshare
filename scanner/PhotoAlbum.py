@@ -795,7 +795,7 @@ class Media(object):
 			'-preset', 'slow',					# set specific preset that provides a certain encoding speed to compression ratio
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
-			'-crf', '20',						# set quality
+			'-crf', Options.config['video_crf'],			# set quality
 			'-b:v', Options.config['video_transcode_bitrate'],	# set videobitrate
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec

@@ -55,6 +55,10 @@ subdir_method = md5
 # The transcode bitrate used for videos: an integer, the bitrate in bits/s, even in notation nnk, nnM
 video_transcode_bitrate = 1M
 
+# The crf used for videos (see http://slhck.info/video/2017/02/24/crf-guide.html)
+# an 0 <= integer <= 51
+video_crf = 20
+
 # The jpg quality parameter for generating the reduced size images and the tumbnails
 # an integer number 1 -100
 jpeg_quality = 95
