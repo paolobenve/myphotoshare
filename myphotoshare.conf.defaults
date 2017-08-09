@@ -98,8 +98,8 @@ media_thumb_size = 150
 media_thumb_type = fixed_height
 
 # strings used internally, do not change them unless you know what you are doing
-folders_string = _folders
-by_date_string = _by_date
+folders_string = _f
+by_date_string = _bd
 cache_folder_separator = -
 
 
