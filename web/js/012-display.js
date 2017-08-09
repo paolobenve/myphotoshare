@@ -546,6 +546,7 @@ $(document).ready(function() {
 
 	function scrollToThumb() {
 		var media, thumb;
+		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 
 		media = currentMedia;
 		if (media === null) {
@@ -554,7 +555,10 @@ $(document).ready(function() {
 				return;
 		}
 		$("#thumbs img").each(function() {
-			if (this.title === media.name) {
+			if (
+				currentAlbum.cacheBase.indexOf(bydateStringWithTrailingSeparator) !== 0 && this.title === media.name ||
+				currentAlbum.cacheBase.indexOf(bydateStringWithTrailingSeparator) === 0 && this.title === media.albumName
+			) {
 				thumb = $(this);
 				return false;
 			}
@@ -585,9 +589,10 @@ $(document).ready(function() {
 	
 	function showAlbum(populate) {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
-		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, bydateStringWithTrailingSeparator, populateMedia;
+		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
+		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, margin;
+		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, margin, imgTitle;
 		
 		if (Options.albums_slide_style)
 			slideBorder = 3;
@@ -607,7 +612,7 @@ $(document).ready(function() {
 					width = currentAlbum.media[i].metadata.size[0];
 					height = currentAlbum.media[i].metadata.size[1];
 					thumbHash = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize, thumbnailSize);
-					bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
+					
 					if (thumbHash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 						currentAlbum.media[i].completeName =
 							PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
@@ -638,6 +643,10 @@ $(document).ready(function() {
 						}
 						calculatedWidth = Options.media_thumb_size;
 					}
+					if (currentAlbum.cacheBase.indexOf(bydateStringWithTrailingSeparator) === 0)
+						imgTitle = currentAlbum.media[i].albumName;
+					else
+						imgTitle = currentAlbum.media[i].name;
 					
 					imageString =	"<div class=\"thumb-and-caption-container\" style=\"" +
 										"width: " + calculatedWidth + "px;\"" + 
@@ -647,7 +656,7 @@ $(document).ready(function() {
 										"height: " + Options.media_thumb_size + "px;" +
 									"\">" +
 									"<span class=\"helper\"></span>" +
-									"<img title=\"" + currentAlbum.media[i].name + "\"" +
+									"<img title=\"" + imgTitle + "\"" +
 										"alt=\"" + photoFloat.trimExtension(currentAlbum.media[i].name) + "\"" +
 										"src=\"" +  encodeURI(thumbHash) + "\"" +
 										"class=\"thumbnail" + "\"" +
@@ -1171,7 +1180,7 @@ $(document).ready(function() {
 						i --;
 					prevMedia = currentAlbum.media[i];
 					prevMedia.byDateName = PhotoFloat.pathJoin([prevMedia.dayAlbum, prevMedia.name]);
-				} while (prevMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
+				} while (false && prevMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
 				i = currentMediaIndex;
 				do {
@@ -1181,7 +1190,7 @@ $(document).ready(function() {
 						i ++;
 					nextMedia = currentAlbum.media[i];
 					nextMedia.byDateName = PhotoFloat.pathJoin([nextMedia.dayAlbum, nextMedia.name]);
-				} while (nextMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
+				} while (false && nextMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
 				
 				if (nextMedia.mediaType == "photo") {
 					nextReducedPhoto = chooseReducedPhoto(nextMedia, null);
@@ -1252,6 +1261,7 @@ $(document).ready(function() {
 			// folder album: change to by date view
 			changeViewLink = "#!/" + PhotoFloat.pathJoin([
 							encodeURIComponent(currentMedia.dayAlbumCacheBase),
+							encodeURIComponent(currentMedia.foldersCacheBase),
 							encodeURIComponent(currentMedia.cacheBase)
 						]);
 		}

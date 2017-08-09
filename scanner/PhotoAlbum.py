@@ -182,7 +182,7 @@ class Album(object):
 		path_to_dict = self.path
 		folder_position = path_to_dict.find(Options.config['folders_string'])
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
-		if by_date_position == -1 and self.cache_base != "root" and (folder_position == -1 or folder_position > 0):
+		if path_to_dict and by_date_position == -1 and self.cache_base != "root" and folder_position != 0:
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
 		
 		
