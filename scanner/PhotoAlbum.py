@@ -14,7 +14,7 @@ from VideoToolWrapper import *
 import math
 import Options
 import hashlib
-from pprint import pprint
+#~ from pprint import pprint
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -100,7 +100,8 @@ class Album(object):
 		except TypeError:
 			return 1
 	def add_media(self, media):
-		if not media in self.media_list:
+		if not any(media.media_file_name == _media.media_file_name for _media in self.media_list):
+		#~ if not media in self.media_list:
 			self.media_list.append(media)
 			self.media_list_is_sorted = False
 	def add_album(self, album):
@@ -245,9 +246,6 @@ class Media(object):
 		
 		# let's avoid that different media names have the same cache base
 		distinguish_suffix = 0
-		#~ print 1234321
-		#~ for _media in album.media_list:
-			#~ print 121,_media.cache_base
 		while True:
 			_cache_base = self.cache_base
 			if distinguish_suffix:
@@ -544,7 +542,6 @@ class Media(object):
 	
 	def reduce_image_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 		thumb_path = os.path.join(thumbs_path, self.album.subdir, remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"] + photo_cache_name(self, thumb_size, thumb_type))
-		print 123,thumb_path
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_file = os.path.join(thumbs_path, self.album.json_file)
 		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])

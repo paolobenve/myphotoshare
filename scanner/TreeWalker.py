@@ -7,6 +7,7 @@ from CachePath import *
 import json
 import Options
 import re
+from pprint import pprint
 
 class TreeWalker:
 	def __init__(self):
@@ -103,7 +104,8 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month] = {}
 		if not media.day in self.tree_by_date[media.year][media.month].keys():
 			self.tree_by_date[media.year][media.month][media.day] = list()
-		if not media in self.tree_by_date[media.year][media.month][media.day]:
+		if not any(media.media_file_name == _media.media_file_name for _media in self.tree_by_date[media.year][media.month][media.day]):
+		#~ if not media in self.tree_by_date[media.year][media.month][media.day]:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
 	def listdir_sorted_by_time(self, path):
 		# this function returns the directory listing sorted by mtime
@@ -148,8 +150,18 @@ class TreeWalker:
 				json_cache_OK = True
 				album = cached_album
 				for media in album.media:
-					self.all_media.append(media)
-					self.add_media_to_tree_by_date(media)
+					#~ self.all_media.append(media)
+					#~ self.add_media_to_tree_by_date(media)
+					if not any(media.media_file_name == _media.media_file_name for _media in album.media):
+					#~ found = False
+					#~ for _media in album.media:
+						#~ if media.media_file_name == _media.media_file_name:
+							#~ found = True
+					#~ if not found:
+						self.all_media.append(media)
+						self.add_media_to_tree_by_date(media)
+
+
 			else:
 				message(" json file invalid (old or invalid path)", json_message, 4)
 		except KeyboardInterrupt:
@@ -228,7 +240,6 @@ class TreeWalker:
 						file_mtime(entry_with_path) <= cached_media.attributes["dateTimeFile"]
 					):
 						cache_files = cached_media.image_caches
-						print cache_files
 						# check if the cache files actually exist and are not old
 						cache_hit = True
 						for cache_file in cache_files:
@@ -254,12 +265,6 @@ class TreeWalker:
 								json_cache_OK and file_mtime(absolute_cache_file) > file_mtime(json_cache_file) or
 								(Options.config['recreate_reduced_photos'] or Options.config['recreate_thumbnails'])
 							):
-								#~ print 111,absolute_cache_file,os.path.exists(absolute_cache_file)
-								#~ if os.path.exists(absolute_cache_file):
-									#~ print 222,file_mtime(absolute_cache_file),cached_media._attributes["dateTimeFile"]
-								#~ print 333,json_cache_OK
-								#~ if json_cache_OK:
-									#~ print 444,file_mtime(json_cache_file)
 								cache_hit = False
 								break
 						if cache_hit:
@@ -288,7 +293,12 @@ class TreeWalker:
 					album.num_media_in_sub_tree += 1
 					album.num_media_in_album += 1
 					album.add_media(media)
-					if not media in self.all_media:
+					#~ found = False
+					#~ for _media in self.all_media:
+						#~ if media.media_file_name == _media.media_file_name:
+							#~ found = True
+					#~ if not found:
+					if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
 						self.all_media.append(media)
 					# following function has a check on media already present
 					self.add_media_to_tree_by_date(media)
