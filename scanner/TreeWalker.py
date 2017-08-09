@@ -7,7 +7,7 @@ from CachePath import *
 import json
 import Options
 import re
-from pprint import pprint
+#~ from pprint import pprint
 
 class TreeWalker:
 	def __init__(self):
@@ -160,10 +160,9 @@ class TreeWalker:
 					#~ if not found:
 						self.all_media.append(media)
 						self.add_media_to_tree_by_date(media)
-
-
 			else:
 				message(" json file invalid (old or invalid path)", json_message, 4)
+				cached_album = None
 		except KeyboardInterrupt:
 			raise
 		except IOError:
@@ -280,6 +279,8 @@ class TreeWalker:
 						message("json file isn't OK", json_cache_file, 4)
 					elif not os.path.exists(absolute_cache_file):
 						message("unexistent", absolute_cache_file, 4)
+					elif cached_media is None:
+						message("file is not cached", absolute_cache_file, 4)
 					elif file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
 						message("reduction/thumbnail older than media", absolute_cache_file, 4)
 					elif json_cache_OK and file_mtime(absolute_cache_file) > file_mtime(json_cache_file):

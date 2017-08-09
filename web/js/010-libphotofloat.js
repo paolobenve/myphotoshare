@@ -68,10 +68,17 @@
 		var nextAlbum, self;
 		self = this;
 		nextAlbum = function(album) {
-			var index = Math.floor(Math.random() * (album.media.length + album.albums.length));
+			//~ var index = Math.floor(Math.random() * (album.media.length + album.albums.length));
+			var index = Math.floor(Math.random() * (album.numMediaInSubTree));
 			if (index >= album.media.length) {
 				index -= album.media.length;
-				self.getAlbum(album.albums[index], nextAlbum, error);
+				for (var i = 0; i < album.albums.length; i ++) {
+					if (index >= album.albums[i].numMediaInSubTree)
+						index -= album.albums[i].numMediaInSubTree;
+					else
+						break;
+				}
+				self.getAlbum(album.albums[i], nextAlbum, error);
 			} else
 				callback(album, album.media[index], container);
 		};

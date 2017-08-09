@@ -442,6 +442,7 @@ class Media(object):
 			image = mirror
 		except IOError:
 			# https://github.com/paolobenve/myphotoshare/issues/46 : some image make raise this exception
+			message("WARNING: Photo couldn't be trasposed", photo_path, 2)
 			pass
 		
 		if (Options.config['thumbnail_generation_mode'] == "parallel"):
