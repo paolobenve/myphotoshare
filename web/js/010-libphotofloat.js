@@ -228,7 +228,8 @@
 			suffix += "transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 		}
 		//~ hash = PhotoFloat.cacheBase(PhotoFloat.mediaHashFolder(album, media) + suffix);
-		hash = album.cacheBase + Options.cache_folder_separator + media.cacheBase + suffix;
+		//~ hash = album.cacheBase + Options.cache_folder_separator + media.cacheBase + suffix;
+		hash = media.foldersCacheBase + Options.cache_folder_separator + media.cacheBase + suffix;
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
