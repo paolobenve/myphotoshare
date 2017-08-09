@@ -14,6 +14,7 @@ from VideoToolWrapper import *
 import math
 import Options
 import hashlib
+from pprint import pprint
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -133,35 +134,30 @@ class Album(object):
 		fp = open(path, "r")
 		dictionary = json.load(fp)
 		fp.close()
+		# generate the album from the json file loaded
+		# subalbums are not generated yet
 		return Album.from_dict(dictionary)
 	@staticmethod
-	def from_dict(dictionary, path_is_cripple=True):
+	def from_dict(dictionary, cripple=True):
 		if "physicalPath" in dictionary:
 			path = dictionary["physicalPath"]
 		else:
 			path = dictionary["path"]
 		album = Album(os.path.join(Options.config['album_path'], path))
 		for media in dictionary["media"]:
-			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], album.remove_folders_marker(album.baseless_path)))
+			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], remove_folders_marker(album.baseless_path)))
 			album.add_media(new_media)
-		if not path_is_cripple:
+		if not cripple:
+			# it looks like the following code is never executed
 			for subalbum in dictionary["albums"]:
-				album.add_album(Album.from_dict(subalbum, path_is_cripple))
-		
+				album.add_album(Album.from_dict(subalbum, cripple))
 		album.sort_subalbums_and_media()
 		
 		return album
-	def remove_folders_marker(self, path):
-		marker_position = path.find(Options.config['folders_string'])
-		if marker_position == 0:
-			path = path[len(Options.config['folders_string']):]
-			if len(path) > 0:
-				path = path[1:]
-		return path
-	def to_dict(self, path_is_cripple=True):
+	def to_dict(self, cripple=True):
 		self.sort_subalbums_and_media()
 		subalbums = []
-		if path_is_cripple:
+		if cripple:
 			for sub in self.albums_list:
 				if not sub.empty:
 					path_to_dict = trim_base_custom(sub.path, self.baseless_path)
@@ -175,10 +171,12 @@ class Album(object):
 						"numMediaInSubTree": sub.num_media_in_sub_tree
 					})
 		else:
+			# it looks like the following code is never executed
 			for sub in self.albums_list:
 				if not sub.empty:
 					subalbums.append(sub)
-		path_without_folders_marker = self.remove_folders_marker(self.path)
+		
+		path_without_folders_marker = remove_folders_marker(self.path)
 		
 		path_to_dict = self.path
 		folder_position = path_to_dict.find(Options.config['folders_string'])
@@ -244,15 +242,19 @@ class Media(object):
 		self._attributes["dateTimeFile"] = mtime
 		self._attributes["mediaType"] = "photo"
 		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
+		
 		# let's avoid that different media names have the same cache base
 		distinguish_suffix = 0
+		#~ print 1234321
+		#~ for _media in album.media_list:
+			#~ print 121,_media.cache_base
 		while True:
 			_cache_base = self.cache_base
 			if distinguish_suffix:
 				_cache_base += "_" + str(distinguish_suffix)
 			cache_name_absent = True
 			for _media in album.media_list:
-				if _cache_base == _media.cache_base:
+				if _cache_base == _media.cache_base and self.media_file_name != _media.media_file_name:
 					cache_name_absent = False
 					distinguish_suffix += 1
 					break
@@ -541,11 +543,21 @@ class Media(object):
 			thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
 	
 	def reduce_image_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
-		thumb_path = os.path.join(thumbs_path, self.album.subdir, self.album.cache_base + Options.config["cache_folder_separator"] + photo_cache_name(self, thumb_size, thumb_type))
+		thumb_path = os.path.join(thumbs_path, self.album.subdir, remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"] + photo_cache_name(self, thumb_size, thumb_type))
+		print 123,thumb_path
 		# if the reduced image/thumbnail is there and is valid, exit immediately
-		json_path = os.path.join(thumbs_path, self.album.json_file)
+		json_file = os.path.join(thumbs_path, self.album.json_file)
+		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
+		is_video = self._attributes["mediaType"] == "video"
 		next_level()
-		if os.path.exists(thumb_path) and (not os.path.exists(json_path) or file_mtime(thumb_path) < file_mtime(json_path)):
+		if (
+			os.path.exists(thumb_path) and
+			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
+			(not os.path.exists(json_file) or file_mtime(thumb_path) < file_mtime(json_file)) and (
+				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
+				is_thumbnail and not Options.config['recreate_thumbnails']
+			)
+		):
 			message("reduction/thumbnail OK, skipping", thumb_path, 5)
 			back_level()
 			return start_image
@@ -559,13 +571,11 @@ class Media(object):
 			info_string += ", fit size"
 		elif thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height":
 			info_string += ", fixed height"
-		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
-		is_video = self._attributes["mediaType"] == "video"
 		
 		start_image_width = start_image.size[0]
 		start_image_height = start_image.size[1]
 		if thumb_type == "square":
-			# image is to be cropped
+			# image is to be cropped: calculate the cropping values
 			if min(start_image_width, start_image_height) >= thumb_size:
 				# image is bigger than the square which will result from cropping
 				if start_image_width > start_image_height:
@@ -625,22 +635,22 @@ class Media(object):
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
 		next_level()
 		
-		if (
-			os.path.exists(thumb_path) and
-			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
-				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
-				is_thumbnail and not Options.config['recreate_thumbnails']
-			)
-		):
-			if original_thumb_size == Options.config['album_thumb_size']:
-				message("existing album thumbnail", info_string, 4)
-			elif original_thumb_size == Options.config['media_thumb_size']:
-				message("existing thumbnail", info_string, 4)
-			else:
-				message("existing reduced size", info_string, 4)
-			back_level()
-			back_level()
-			return start_image
+		#~ if (
+			#~ os.path.exists(thumb_path) and
+			#~ file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
+				#~ not is_thumbnail and not Options.config['recreate_reduced_photos'] or
+				#~ is_thumbnail and not Options.config['recreate_thumbnails']
+			#~ )
+		#~ ):
+			#~ if original_thumb_size == Options.config['album_thumb_size']:
+				#~ message("existing album thumbnail", thumb_path, 4)
+			#~ elif original_thumb_size == Options.config['media_thumb_size']:
+				#~ message("existing thumbnail", thumb_path, 4)
+			#~ else:
+				#~ message("existing reduced size", thumb_path, 4)
+			#~ back_level()
+			#~ back_level()
+			#~ return start_image
 		
 		must_resize = True
 		if max(start_image_width, start_image_height) <= thumb_size:
@@ -785,7 +795,7 @@ class Media(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, self.album.subdir, self.album.cache_base + Options.config["cache_folder_separator"] + video_cache_name(self))
+		transcode_path = os.path.join(transcode_path, self.album.subdir, remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"] + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -872,7 +882,7 @@ class Media(object):
 	@property
 	def image_caches(self):
 		caches = []
-		album_prefix = self.album.cache_base + Options.config["cache_folder_separator"]
+		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			# transcoded video path
 			caches.append(os.path.join(self.album.subdir, album_prefix + video_cache_name(self)))

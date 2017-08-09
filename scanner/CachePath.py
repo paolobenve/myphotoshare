@@ -40,6 +40,13 @@ def trim_base_custom(path, base):
 	return path
 def remove_album_path(path):
 	return trim_base_custom(path, Options.config['album_path'])
+def remove_folders_marker(path):
+	marker_position = path.find(Options.config['folders_string'])
+	if marker_position == 0:
+		path = path[len(Options.config['folders_string']):]
+		if len(path) > 0:
+			path = path[1:]
+	return path
 def cache_base(path, filepath=False):
 	if not filepath:
 		path = remove_album_path(path)

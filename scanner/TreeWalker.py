@@ -141,7 +141,7 @@ class TreeWalker:
 			cached_album = Album.from_cache(json_cache_file)
 			if (
 				file_mtime(absolute_path) <= file_mtime(json_cache_file) and
-				hasattr(cached_album,"absolute_path") and
+				hasattr(cached_album, "absolute_path") and
 				cached_album.absolute_path == absolute_path
 			):
 				message(" json file OK", "  " + json_message, 4)
@@ -156,9 +156,9 @@ class TreeWalker:
 			raise
 		except IOError:
 			message(" json file unexistent", json_message, 4)
-		except (ValueError, AttributeError, KeyError) as e:
-			message(" json file invalid", json_message, 4)
-			cached_album = None
+		#~ except (ValueError, AttributeError, KeyError) as e:
+			#~ message(" json file invalid", json_message, 4)
+			#~ cached_album = None
 		
 		if not json_cache_OK:
 			album = Album(absolute_path)
@@ -188,30 +188,30 @@ class TreeWalker:
 				trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 				entry_for_cache_base = os.path.join(Options.config['folders_string'], trimmed_path, entry)
 				found = False
-				if json_cache_OK:
-					# let's search it's cache base in cached album
-					for _subalbum in album.albums:
-						if _subalbum.path == entry:
-							next_album_cache_base = _subalbum.cache_base
-							found = True
+				#~ if json_cache_OK:
+					#~ # let's search it's cache base in cached album
+					#~ for _subalbum in album.albums:
+						#~ if _subalbum.path == entry:
+							#~ next_album_cache_base = _subalbum.cache_base
+							#~ found = True
+							#~ break
+				#~ if not found:
+				next_album_cache_base = cache_base(entry_for_cache_base, True)
+				# let's avoid that different album names have the same cache base
+				distinguish_suffix = 0
+				while True:
+					_next_album_cache_base = next_album_cache_base
+					if distinguish_suffix:
+						_next_album_cache_base += "_" + str(distinguish_suffix)
+					cache_name_absent = True
+					for _album in album.albums_list:
+						if _next_album_cache_base == _album.cache_base and absolute_path != _album.absolute_path:
+							cache_name_absent = False
+							distinguish_suffix += 1
 							break
-				if not found:
-					next_album_cache_base = cache_base(entry_for_cache_base, True)
-					# let's avoid that different album names have the same cache base
-					distinguish_suffix = 0
-					while True:
-						_next_album_cache_base = next_album_cache_base
-						if distinguish_suffix:
-							_next_album_cache_base += "_" + str(distinguish_suffix)
-						cache_name_absent = True
-						for _album in album.albums_list:
-							if _next_album_cache_base == _album.cache_base:
-								cache_name_absent = False
-								distinguish_suffix += 1
-								break
-						if cache_name_absent:
-							next_album_cache_base = _next_album_cache_base
-							break
+					if cache_name_absent:
+						next_album_cache_base = _next_album_cache_base
+						break
 				[next_walked_album, num] = self.walk(entry_with_path, next_album_cache_base, album)
 				album.num_media_in_sub_tree += num
 				if next_walked_album is not None:
@@ -228,6 +228,7 @@ class TreeWalker:
 						file_mtime(entry_with_path) <= cached_media.attributes["dateTimeFile"]
 					):
 						cache_files = cached_media.image_caches
+						print cache_files
 						# check if the cache files actually exist and are not old
 						cache_hit = True
 						for cache_file in cache_files:
@@ -246,7 +247,19 @@ class TreeWalker:
 									except OSError:
 										message("error deleting fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 1)
 								
-							if not os.path.exists(absolute_cache_file) or file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
+							#~ if not os.path.exists(absolute_cache_file) or file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
+							if (
+								not os.path.exists(absolute_cache_file) or 
+								file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"] or
+								json_cache_OK and file_mtime(absolute_cache_file) > file_mtime(json_cache_file) or
+								(Options.config['recreate_reduced_photos'] or Options.config['recreate_thumbnails'])
+							):
+								#~ print 111,absolute_cache_file,os.path.exists(absolute_cache_file)
+								#~ if os.path.exists(absolute_cache_file):
+									#~ print 222,file_mtime(absolute_cache_file),cached_media._attributes["dateTimeFile"]
+								#~ print 333,json_cache_OK
+								#~ if json_cache_OK:
+									#~ print 444,file_mtime(json_cache_file)
 								cache_hit = False
 								break
 						if cache_hit:
@@ -254,6 +267,21 @@ class TreeWalker:
 							media = cached_media
 				if not cache_hit:
 					message(" processing image/video", os.path.basename(entry_with_path), 4)
+					next_level()
+					if not json_cache_OK:
+						message("json file isn't OK", json_cache_file, 4)
+					elif not os.path.exists(absolute_cache_file):
+						message("unexistent", absolute_cache_file, 4)
+					elif file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
+						message("reduction/thumbnail older than media", absolute_cache_file, 4)
+					elif json_cache_OK and file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
+						message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
+					
+					if Options.config['recreate_reduced_photos']:
+						message("reduced photo recreation requested", "", 4)
+					if Options.config['recreate_thumbnails']:
+						message("thumbnail recreation requested", "", 4)
+					back_level()
 					media = Media(album, entry_with_path, Options.config['cache_path'])
 				
 				if media.is_valid:
@@ -273,7 +301,7 @@ class TreeWalker:
 			next_level()
 			message("saving json file for album", os.path.basename(absolute_path), 4)
 			next_level()
-			message("json file name", absolute_path, 5)
+			message("json file name", json_cache_file, 5)
 			back_level()
 			back_level()
 			album.cache(Options.config['cache_path'])
