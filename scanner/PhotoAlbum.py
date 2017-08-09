@@ -951,16 +951,17 @@ class Media(object):
 		return str(self.date.year)
 	@property
 	def month(self):
-		return self.date.strftime("%B").capitalize() + " " + self.year
+		#~ return self.date.strftime("%B").capitalize() + " " + self.year
+		return self.date.strftime("%m")
 	@property
 	def day(self):
-		return str(self.date.day) + " " + self.month
-	@property
-	def year_month(self):
-		return self.year + " " + self.month
-	@property
-	def year_month_day(self):
-		return self.year_month + " " + self.day
+		return str(self.date.day)
+	#~ @property
+	#~ def year_month(self):
+		#~ return self.year + " " + self.month
+	#~ @property
+	#~ def year_month_day(self):
+		#~ return self.year_month + " " + self.day
 	@property
 	def year_album_path(self):
 		return Options.config['by_date_string'] + "/" + self.year
