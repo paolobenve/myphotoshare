@@ -200,14 +200,6 @@
 		}
 		return result;
 	};
-	PhotoFloat.albumHash = function(album) {
-		if (typeof album.media !== "undefined" && album.media !== null)
-			//~ return PhotoFloat.cacheBase(album.path);
-			return album.cacheBase;
-		console.log("albumHash!!!!");
-		return album.cacheBase;		
-		//~ return PhotoFloat.cacheBase(PhotoFloat.pathJoin([album.parent.path, album.path]));
-	};
 	PhotoFloat.mediaPath = function(album, media, size) {
 		var suffix = "_", hash, rootString = "root-";
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
@@ -283,7 +275,7 @@
 	PhotoFloat.prototype.mediaHashURIEncoded = PhotoFloat.mediaHashURIEncoded;
 	PhotoFloat.prototype.mediaHashFolder = PhotoFloat.mediaHashFolder;
 	PhotoFloat.prototype.pathJoin = PhotoFloat.pathJoin;
-	PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
+	//~ PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
 	PhotoFloat.prototype.mediaPath = PhotoFloat.mediaPath;
 	PhotoFloat.prototype.originalMediaPath = PhotoFloat.originalMediaPath;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;

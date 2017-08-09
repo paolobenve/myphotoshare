@@ -695,11 +695,12 @@ $(document).ready(function() {
 					if (currentAlbum.media.length)
 						mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[0]);
 					else
-						mediaLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
+						//~ mediaLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
+						mediaLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 					firstEscKey = true;
 				}
 				albumLink = "";
-				if (currentAlbum.parentCacheBase)
+				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
 					albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 				if (populate === true || populate && needAlbumHtmlReverse()) {
 					subalbums = [];
@@ -722,7 +723,8 @@ $(document).ready(function() {
 						margin = Math.round(correctedAlbumThumbSize * 0.05);
 					
 					for (i = 0; i < currentAlbum.albums.length; ++i) {
-						link = $("<a href=\"#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum.albums[i])) + "\"></a>");
+						//~ link = $("<a href=\"#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum.albums[i])) + "\"></a>");
+						link = $("<a href=\"#!/" + encodeURIComponent(currentAlbum.albums[i].cacheBase) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
 						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
@@ -1199,14 +1201,16 @@ $(document).ready(function() {
 		
 		if (currentAlbum.media.length == 1) {
 			albumLink = "";
-			if (currentAlbum.parentCacheBase)
+			if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
 				albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 			else
-				albumLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
+				//~ albumLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
+				albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "";
 			prevLink = "";
 		} else {
-			albumLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
+			//~ albumLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
+			albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
 			prevLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, prevMedia);
 			$("#next").show();
