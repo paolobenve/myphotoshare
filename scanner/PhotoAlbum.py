@@ -251,14 +251,18 @@ class Media(object):
 			if distinguish_suffix:
 				_cache_base += "_" + str(distinguish_suffix)
 			cache_name_absent = True
-			for _media in album.media_list:
-				if _cache_base == _media.cache_base and self.media_file_name != _media.media_file_name:
-					cache_name_absent = False
-					distinguish_suffix += 1
-					break
-			if cache_name_absent:
+			if any(_cache_base == _media.cache_base and self.media_file_name != _media.media_file_name for _media in album.media_list):
+				distinguish_suffix += 1
+			#~ for _media in album.media_list:
+				#~ if _cache_base == _media.cache_base and self.media_file_name != _media.media_file_name:
+					#~ cache_name_absent = False
+					#~ distinguish_suffix += 1
+					#~ break
+			#~ if cache_name_absent:
+			else:
 				self.cache_base = _cache_base
 				break
+			
 		try:
 			image = Image.open(media_path)
 		except KeyboardInterrupt:

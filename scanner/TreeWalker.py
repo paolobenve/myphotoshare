@@ -216,12 +216,15 @@ class TreeWalker:
 					if distinguish_suffix:
 						_next_album_cache_base += "_" + str(distinguish_suffix)
 					cache_name_absent = True
-					for _album in album.albums_list:
-						if _next_album_cache_base == _album.cache_base and absolute_path != _album.absolute_path:
-							cache_name_absent = False
-							distinguish_suffix += 1
-							break
-					if cache_name_absent:
+					if any(_next_album_cache_base == _album.cache_base and absolute_path != _album.absolute_path for _album in album.albums_list):
+						distinguish_suffix += 1
+					#~ for _album in album.albums_list:
+						#~ if _next_album_cache_base == _album.cache_base and absolute_path != _album.absolute_path:
+							#~ cache_name_absent = False
+							#~ distinguish_suffix += 1
+							#~ break
+					#~ if cache_name_absent:
+					else:
 						next_album_cache_base = _next_album_cache_base
 						break
 				[next_walked_album, num] = self.walk(entry_with_path, next_album_cache_base, album)
