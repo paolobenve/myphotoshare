@@ -457,17 +457,17 @@ class Media(object):
 		max_image_size = max(image_width, image_height)
 		if (
 			thumb_size == Options.config['media_thumb_size'] and
-			Options.config['media_thumb_type'] == "fixed_height" and
+			thumb_type == "fixed_height" and
 			image_width > image_height
 		):
-			veredict = (thumb_size * image_width / image_height < image_width)
-		elif Options.config['media_thumb_type'] == "square":
+			veredict = (thumb_size < image_height)
+		elif thumb_type == "square":
 			min_image_size = min(image_width, image_height)
 			veredict = (thumb_size < min_image_size)
 		else:
 			veredict = (thumb_size < max_image_size)
 		return veredict
-			
+	
 	def _photo_thumbnails_parallel(self, start_image, photo_path, thumbs_path):
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
