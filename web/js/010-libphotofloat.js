@@ -128,7 +128,7 @@
 					//~ if (PhotoFloat.cacheBase(theAlbum.media[i].name) === mediaHash) {
 					if (
 						theAlbum.media[i].cacheBase === mediaHash &&
-						foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash
+						(foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash)
 					) {
 						media = theAlbum.media[i];
 						break;

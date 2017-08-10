@@ -1033,24 +1033,19 @@ $(document).ready(function() {
 		}
 		
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
-			if (Options.reduced_sizes[i] >= mediaSize)
-				continue;
-			
-			if (mediaWidth > mediaHeight) {
-				reducedWidth = Options.reduced_sizes[i];
-				reducedHeight = Options.reduced_sizes[i] * mediaHeight / mediaWidth;
-			} else {
-				reducedHeight = Options.reduced_sizes[i];
-				reducedWidth = Options.reduced_sizes[i] * mediaWidth / mediaHeight;
+			if (Options.reduced_sizes[i] < mediaSize) {
+				if (mediaWidth > mediaHeight) {
+					reducedWidth = Options.reduced_sizes[i];
+					reducedHeight = Options.reduced_sizes[i] * mediaHeight / mediaWidth;
+				} else {
+					reducedHeight = Options.reduced_sizes[i];
+					reducedWidth = Options.reduced_sizes[i] * mediaWidth / mediaHeight;
+				}
+				if (reducedWidth < container.width() && reducedHeight < container.height())
+					break;
 			}
-			
-			if (reducedWidth < container.width() && reducedHeight < container.height())
-				break;
-			
 			chosenMedia = photoFloat.mediaPath(currentAlbum, media, Options.reduced_sizes[i]);
 			maxSize = Options.reduced_sizes[i];
-			if (container === null)
-				break;
 		}
 		return chosenMedia;
 	}
@@ -1172,25 +1167,20 @@ $(document).ready(function() {
 				i = currentMediaIndex;
 				currentAlbum.media[currentMediaIndex].byDateName =
 					PhotoFloat.pathJoin([currentAlbum.media[currentMediaIndex].dayAlbum, currentAlbum.media[currentMediaIndex].name]);
-				// following 2 iteration are needed with date album: the same photo could be present coming from different albums
-				do {
-					if (i == 0)
-						i = currentAlbum.media.length - 1;
-					else
-						i --;
-					prevMedia = currentAlbum.media[i];
-					prevMedia.byDateName = PhotoFloat.pathJoin([prevMedia.dayAlbum, prevMedia.name]);
-				} while (false && prevMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
+				if (i == 0)
+					i = currentAlbum.media.length - 1;
+				else
+					i --;
+				prevMedia = currentAlbum.media[i];
+				prevMedia.byDateName = PhotoFloat.pathJoin([prevMedia.dayAlbum, prevMedia.name]);
 				
 				i = currentMediaIndex;
-				do {
-					if (i == currentAlbum.media.length - 1)
-						i = 0;
-					else
-						i ++;
-					nextMedia = currentAlbum.media[i];
-					nextMedia.byDateName = PhotoFloat.pathJoin([nextMedia.dayAlbum, nextMedia.name]);
-				} while (false && nextMedia.byDateName == currentAlbum.media[currentMediaIndex].byDateName && i != currentMediaIndex);
+				if (i == currentAlbum.media.length - 1)
+					i = 0;
+				else
+					i ++;
+				nextMedia = currentAlbum.media[i];
+				nextMedia.byDateName = PhotoFloat.pathJoin([nextMedia.dayAlbum, nextMedia.name]);
 				
 				if (nextMedia.mediaType == "photo") {
 					nextReducedPhoto = chooseReducedPhoto(nextMedia, null);
