@@ -140,9 +140,9 @@ class TreeWalker:
 		#~ if os.path.exists(json_cache_file):
 		json_message = json_cache_file + " (path: " + os.path.basename(absolute_path) + ")"
 		try:
-			message("reading album from json file...", json_cache_file, 5)
+			message("reading json file to import album...", json_cache_file, 5)
 			cached_album = Album.from_cache(json_cache_file)
-			message("read album from json file", "", 5)
+			message("read json file", "", 5)
 			if (
 				file_mtime(absolute_path) <= file_mtime(json_cache_file) and
 				hasattr(cached_album, "absolute_path") and
@@ -305,15 +305,12 @@ class TreeWalker:
 		if not album.empty:
 			next_level()
 			message("saving json file for album", os.path.basename(absolute_path), 4)
-			next_level()
-			message("json file name", json_cache_file, 5)
-			back_level()
-			back_level()
 			album.cache(Options.config['cache_path'])
 			message("saved json file for album", "", 5)
 			message("adding album to big list...", "", 5)
 			self.all_albums.append(album)
 			message("added album to big list", "", 5)
+			back_level()
 		else:
 			next_level()
 			message("empty", os.path.basename(absolute_path), 4)

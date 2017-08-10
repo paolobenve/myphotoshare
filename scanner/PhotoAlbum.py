@@ -661,38 +661,48 @@ class Media(object):
 			#~ return start_image
 		
 		try:
-			message("making copy", info_string, 5)
+			message("making copy...", info_string, 5)
 			start_image_copy = start_image.copy()
-			message("made", info_string, 5)
+			message("made copy (" + str(thumb_size) + ")", "", 5)
 		except KeyboardInterrupt:
 			raise
 		except:
-			message("making copy (2nd try)", info_string, 5)
+			message("making copy (2nd try)...", info_string, 5)
 			start_image_copy = start_image.copy() # we try again to work around PIL bug
-			message("made (2nd try)", info_string, 5)
+			message("made copy(2nd try, " + str(thumb_size) + "))", info_string, 5)
 			
 		# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
 		# we can resize, but first crop to square if needed
 		if must_crop:
-			message("cropping", info_string, 4)
+			message("cropping...", info_string, 4)
 			start_image_copy = start_image_copy.crop((left, top, right, bottom))
-			message("cropped", info_string, 5)
+			message("cropped (" + str(thumb_size) + ")", info_string, 5)
 		
 		if must_resize:
 			# resizing
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reducing size", info_string, 4)
+				message("reducing size (" + str(thumb_size) + ")...", info_string, 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums", info_string, 4)
+				message("thumbing for albums (" + str(thumb_size) + ")...", info_string, 4)
 			else:
-				message("thumbing for media", info_string, 4)
+				message("thumbing for media (" + str(thumb_size) + ")...", info_string, 4)
 			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
-			message("done", info_string, 5)
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("reduced size (" + str(thumb_size) + ")", "", 5)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("thumbed for albums (" + str(thumb_size) + ")", "", 5)
+			else:
+				message("thumbed for media (" + str(thumb_size) + ")", "", 5)
 		
 		try:
-			message("saving...", info_string, 5)
+			message("saving  (" + str(thumb_size) + ")...", info_string, 5)
 			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			message("saved", info_string, 5)
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("saved reduced (" + str(thumb_size) + ")", "", 5)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("saved for albums (" + str(thumb_size) + ")", "", 5)
+			else:
+				message("saved for media (" + str(thumb_size) + ")", "", 5)
 			back_level()
 			back_level()
 			return start_image_copy
@@ -706,7 +716,12 @@ class Media(object):
 			try:
 				message("saving (2nd try)...", info_string, 5)
 				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-				message("saved (2nd try)", os.path.basename(thumb_path) + ", " + info_string, 2)
+				if original_thumb_size > Options.config['album_thumb_size']:
+					message("saved reduced (2nd try, " + str(thumb_size) + ")", "", 2)
+				elif original_thumb_size == Options.config['album_thumb_size']:
+					message("saved for albums (2nd try, " + str(thumb_size) + ")", "", 2)
+				else:
+					message("saved for media (2nd try, " + str(thumb_size) + ")", "", 2)
 			except KeyboardInterrupt:
 				try:
 					os.unlink(thumb_path)

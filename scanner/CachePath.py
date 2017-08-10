@@ -28,10 +28,42 @@ def message(category, text, verbose = 0):
 		time_elapsed = now - Options.last_time
 		Options.last_time = now
 		#~ milliseconds = time_elapsed.microseconds / 1000 + time_elapsed.seconds 
-		milliseconds = str(int(time_elapsed.total_seconds() * 1000))
-		if milliseconds == "0":
+		milliseconds = int(time_elapsed.total_seconds() * 1000)
+		if milliseconds == 0:
 			milliseconds = ""
+		else:
+			try:
+				Options.elapsed_times[category] += milliseconds
+				Options.elapsed_times_counter[category] += 1
+			except KeyError:
+				Options.elapsed_times[category] = milliseconds
+				Options.elapsed_times_counter[category] = 1
+			milliseconds = str(milliseconds)
 		print (5 - len(milliseconds)) * " ", milliseconds, "%s %s%s[%s]%s%s" % (now.isoformat(' '), max(0, message.level) * "  |", sep, str(category), max(1, (45 - len(str(category)))) * " ", str(text))
+
+def report_times():
+	print
+	print (50 - len("message")) * " ", "message", (15 - len("total time")) * " ", "total time", (15 - len("counter")) * " ", "counter", (20 - len("average time")) * " ", "average time"
+	print
+	total_time = 0
+	for category in sorted(Options.elapsed_times, key=Options.elapsed_times.get, reverse=True):
+		time = int(round(Options.elapsed_times[category]))
+		total_time += time
+		if time == 0:
+			_time = ""
+		elif time <= 1800:
+			_time = str(time) + " ms"
+		else:
+			_time = str(int(round(time / 1000))) + "    s "
+		counter = str(Options.elapsed_times_counter[category]) + " times"
+		average_time = str(int(Options.elapsed_times[category] / Options.elapsed_times_counter[category])) + " ms"
+		print (50 - len(category)) * " ", category, (15 - len(_time)) * " ", _time, (15 - len(counter)) * " ", counter, (20 - len(average_time)) * " ", average_time
+	if total_time <= 1800:
+		_total_time = str(int(round(total_time))) + " ms"
+	else:
+		_total_time = str(int(round(total_time / 1000))) + "    s "
+	print
+	print (50 - len("total time")) * " ", "total time", (15 - len(_total_time)) * " ", _total_time
 
 message.level = 0
 def next_level(verbose = 0):

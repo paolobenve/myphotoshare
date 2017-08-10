@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 from TreeWalker import TreeWalker
-from CachePath import message, next_level, back_level
+from CachePath import message, next_level, back_level, report_times
 import sys
 import os
 #~ import os.path
@@ -240,6 +240,7 @@ def main():
 	try:
 		os.umask(002)
 		TreeWalker()
+		report_times()
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)
