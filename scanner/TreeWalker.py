@@ -247,7 +247,7 @@ class TreeWalker:
 								cache_hit = False
 								break
 						if cache_hit:
-							message("all reduced size and thumbnails OK", os.path.basename(entry_with_path), 4)
+							message("reduced size images and thumbnails OK", os.path.basename(entry_with_path), 4)
 							media = cached_media
 						else:
 							absolute_cache_file = ""
