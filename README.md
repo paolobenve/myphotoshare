@@ -243,6 +243,13 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.6 (August 20, 2017):
+
+* new option `video_crf` for video quality
+* albums and media which have a companion which would have the same cache base are now managed correctly (solves #43, #44)
+* date albums with same image in two different folders are now managed correctly (solves #30)
+* scanner produced a final time report (useful for trimming the code)
+
 ### version 2.5 (August 3, 2017):
 
 * project name is now `myphotoshare`
