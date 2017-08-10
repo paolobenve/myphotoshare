@@ -140,7 +140,9 @@ class TreeWalker:
 		#~ if os.path.exists(json_cache_file):
 		json_message = json_cache_file + " (path: " + os.path.basename(absolute_path) + ")"
 		try:
+			message("reading album from json file...", json_cache_file, 5)
 			cached_album = Album.from_cache(json_cache_file)
+			message("read album from json file", "", 5)
 			if (
 				file_mtime(absolute_path) <= file_mtime(json_cache_file) and
 				hasattr(cached_album, "absolute_path") and
@@ -149,10 +151,12 @@ class TreeWalker:
 				message(" json file OK", "  " + json_message, 4)
 				json_cache_OK = True
 				album = cached_album
+				message("adding media in album to big lists...", "", 5)
 				for media in album.media:
 					if not any(media.media_file_name == _media.media_file_name for _media in album.media):
 						self.all_media.append(media)
 						self.add_media_to_tree_by_date(media)
+				message("added media to big lists", "", 5)
 			else:
 				message(" json file invalid (old or invalid path)", json_message, 4)
 				cached_album = None
@@ -165,14 +169,17 @@ class TreeWalker:
 			#~ cached_album = None
 		
 		if not json_cache_OK:
+			message("generating album...", absolute_path, 5)
 			album = Album(absolute_path)
+			message("generated album", "", 5)
 		if parent_album is not None:
 			album.parent = parent_album
 		album.cache_base = album_cache_base
 		
-		message("  subdir", " " + album.subdir, 3)
+		message("  subdir for cache files", " " + album.subdir, 3)
 		
 		#~ for entry in sorted(os.listdir(absolute_path)):
+		message("reading directory...", absolute_path, 5)
 		for entry in self.listdir_sorted_by_time(absolute_path):
 			if entry[0] == '.':
 				continue
@@ -191,6 +198,7 @@ class TreeWalker:
 			if os.path.isdir(entry_with_path):
 				trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 				entry_for_cache_base = os.path.join(Options.config['folders_string'], trimmed_path, entry)
+				message("determining cache base...", "", 5)
 				next_album_cache_base = cache_base(entry_for_cache_base, True)
 				# let's avoid that different album names have the same cache base
 				distinguish_suffix = 0
@@ -204,6 +212,7 @@ class TreeWalker:
 					else:
 						next_album_cache_base = _next_album_cache_base
 						break
+				message("determined cache base", "", 5)
 				[next_walked_album, num] = self.walk(entry_with_path, next_album_cache_base, album)
 				album.num_media_in_sub_tree += num
 				if next_walked_album is not None:
@@ -214,7 +223,9 @@ class TreeWalker:
 				next_level()
 				cache_hit = False
 				if cached_album:
+					message("reading cache media from cached album...", "", 5)
 					cached_media = cached_album.media_from_path(entry_with_path)
+					message("read cache media", "", 5)
 					if (
 						cached_media and
 						file_mtime(entry_with_path) <= cached_media.attributes["dateTimeFile"]
@@ -275,11 +286,17 @@ class TreeWalker:
 				if media.is_valid:
 					album.num_media_in_sub_tree += 1
 					album.num_media_in_album += 1
+					message("adding media to album...", "", 5)
 					album.add_media(media)
+					message("added media to album", "", 5)
+					message("adding media to big list...", "", 5)
 					if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
 						self.all_media.append(media)
+					message("added media to big list", "", 5)
 					# following function has a check on media already present
+					message("adding media to by date tree...", "", 5)
 					self.add_media_to_tree_by_date(media)
+					message("added media to by date tree", "", 5)
 				elif not media.is_valid:
 					next_level()
 					message("unreadable file", entry, 1)
@@ -293,7 +310,10 @@ class TreeWalker:
 			back_level()
 			back_level()
 			album.cache(Options.config['cache_path'])
+			message("saved json file for album", "", 5)
+			message("adding album to big list...", "", 5)
 			self.all_albums.append(album)
+			message("added album to big list", "", 5)
 		else:
 			next_level()
 			message("empty", os.path.basename(absolute_path), 4)

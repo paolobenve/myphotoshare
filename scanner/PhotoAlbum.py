@@ -688,9 +688,6 @@ class Media(object):
 				message("thumbing for media", info_string, 4)
 			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
 			message("done", info_string, 5)
-		message("collecting garbage", info_string, 5)
-		gc.collect()
-		message("collected", info_string, 5)
 		
 		try:
 			message("saving...", info_string, 5)
@@ -698,9 +695,6 @@ class Media(object):
 			message("saved", info_string, 5)
 			back_level()
 			back_level()
-			message("collecting garbage", info_string, 5)
-			gc.collect()
-			message("collected", info_string, 5)
 			return start_image_copy
 		except KeyboardInterrupt:
 			try:
@@ -719,9 +713,6 @@ class Media(object):
 				except OSError:
 					pass
 				raise
-			message("collecting garbage", info_string, 5)
-			gc.collect()
-			message("collected", info_string, 5)
 			back_level()
 			back_level()
 			return start_image_copy
@@ -733,9 +724,6 @@ class Media(object):
 				pass
 			back_level()
 			back_level()
-			message("collecting garbage...", info_string, 5)
-			gc.collect()
-			message("collected", info_string, 5)
 			return start_image
 	
 	def _video_thumbnails(self, thumbs_path, original_path):
@@ -900,10 +888,7 @@ class Media(object):
 				caches.append(
 					os.path.join(
 						self.album.subdir,
-						album_prefix + photo_cache_name(
-							self,
-							thumb_size
-						)
+						album_prefix + photo_cache_name(self,thumb_size)
 					)
 				)
 		# album thumbnail path
