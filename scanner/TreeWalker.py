@@ -150,14 +150,7 @@ class TreeWalker:
 				json_cache_OK = True
 				album = cached_album
 				for media in album.media:
-					#~ self.all_media.append(media)
-					#~ self.add_media_to_tree_by_date(media)
 					if not any(media.media_file_name == _media.media_file_name for _media in album.media):
-					#~ found = False
-					#~ for _media in album.media:
-						#~ if media.media_file_name == _media.media_file_name:
-							#~ found = True
-					#~ if not found:
 						self.all_media.append(media)
 						self.add_media_to_tree_by_date(media)
 			else:
@@ -198,15 +191,6 @@ class TreeWalker:
 			if os.path.isdir(entry_with_path):
 				trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 				entry_for_cache_base = os.path.join(Options.config['folders_string'], trimmed_path, entry)
-				found = False
-				#~ if json_cache_OK:
-					#~ # let's search it's cache base in cached album
-					#~ for _subalbum in album.albums:
-						#~ if _subalbum.path == entry:
-							#~ next_album_cache_base = _subalbum.cache_base
-							#~ found = True
-							#~ break
-				#~ if not found:
 				next_album_cache_base = cache_base(entry_for_cache_base, True)
 				# let's avoid that different album names have the same cache base
 				distinguish_suffix = 0
@@ -217,12 +201,6 @@ class TreeWalker:
 					cache_name_absent = True
 					if any(_next_album_cache_base == _album.cache_base and absolute_path != _album.absolute_path for _album in album.albums_list):
 						distinguish_suffix += 1
-					#~ for _album in album.albums_list:
-						#~ if _next_album_cache_base == _album.cache_base and absolute_path != _album.absolute_path:
-							#~ cache_name_absent = False
-							#~ distinguish_suffix += 1
-							#~ break
-					#~ if cache_name_absent:
 					else:
 						next_album_cache_base = _next_album_cache_base
 						break
@@ -259,8 +237,7 @@ class TreeWalker:
 										message("deleted, re-creating fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 3)
 									except OSError:
 										message("error deleting fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 1)
-								
-							#~ if not os.path.exists(absolute_cache_file) or file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
+							
 							if (
 								not os.path.exists(absolute_cache_file) or 
 								file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"] or
@@ -272,18 +249,20 @@ class TreeWalker:
 						if cache_hit:
 							message("all reduced size and thumbnails OK", os.path.basename(entry_with_path), 4)
 							media = cached_media
+						else:
+							absolute_cache_file = ""
 				if not cache_hit:
 					message(" processing image/video", os.path.basename(entry_with_path), 4)
 					next_level()
 					if not json_cache_OK:
 						message("json file isn't OK", json_cache_file, 4)
-					elif not os.path.exists(absolute_cache_file):
-						message("unexistent", absolute_cache_file, 4)
 					elif cached_media is None:
-						message("file is not cached", absolute_cache_file, 4)
+						message("media not cached", entry, 4)
+					elif not os.path.exists(absolute_cache_file):
+						message("unexistent reduction/thumbnail", absolute_cache_file, 4)
 					elif file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
 						message("reduction/thumbnail older than media", absolute_cache_file, 4)
-					elif json_cache_OK and file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
+					elif file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
 						message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
 					
 					if Options.config['recreate_reduced_photos']:
@@ -297,11 +276,6 @@ class TreeWalker:
 					album.num_media_in_sub_tree += 1
 					album.num_media_in_album += 1
 					album.add_media(media)
-					#~ found = False
-					#~ for _media in self.all_media:
-						#~ if media.media_file_name == _media.media_file_name:
-							#~ found = True
-					#~ if not found:
 					if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
 						self.all_media.append(media)
 					# following function has a check on media already present
@@ -393,7 +367,6 @@ class TreeWalker:
 				back_level()
 			else:
 				# only delete json's, transcoded videos, reduced images and thumbnails
-				found = False
 				match = re.search(deletable_files_suffixes_re, cache_file)
 				if match:
 					try:

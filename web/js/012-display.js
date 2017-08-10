@@ -940,12 +940,14 @@ $(document).ready(function() {
 			photoSrc = chooseReducedPhoto(currentMedia, container);
 			previousSrc = media.attr("src");
 			// chooseReducedPhoto() sets maxSize to 0 if it returns the original media
-			if (width > height && width > maxSize) {
-				height = Math.round(height * maxSize / width);
-				width = maxSize;
-			} else if (height > width && height > maxSize) {
-				width = Math.round(width * maxSize / height);
-				height = maxSize;
+			if (maxSize) {
+				if (width > height && width > maxSize) {
+					height = Math.round(height * maxSize / width);
+					width = maxSize;
+				} else if (height > width && height > maxSize) {
+					width = Math.round(width * maxSize / height);
+					height = maxSize;
+				}
 			}
 			if (photoSrc != previousSrc || media.attr("width") != width || media.attr("height") != height) {
 				$("link[rel=image_src]").remove();
@@ -1132,12 +1134,14 @@ $(document).ready(function() {
 				linkTag = "<link rel=\"video_src\" href=\"" + encodeURI(videoSrc) + "\" />";
 			} else if (currentMedia.mediaType == "photo") {
 				photoSrc = chooseReducedPhoto(currentMedia, null);
-				if (width > height &&  width > maxSize) {
-					height = Math.round(height * maxSize / width);
-					width = maxSize;
-				} else if (height > width && height > maxSize) {
-					width = Math.round(width * maxSize / height);
-					height = maxSize;
+				if (maxSize) {
+					if (width > height &&  width > maxSize) {
+						height = Math.round(height * maxSize / width);
+						width = maxSize;
+					} else if (height > width && height > maxSize) {
+						width = Math.round(width * maxSize / height);
+						height = maxSize;
+					}
 				}
 				
 				$('<img/>', { id: 'media' })

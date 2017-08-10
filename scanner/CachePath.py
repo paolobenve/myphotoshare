@@ -1,5 +1,6 @@
 import os.path
 from datetime import datetime
+from datetime import timedelta
 import hashlib
 import Options
 
@@ -23,7 +24,14 @@ def message(category, text, verbose = 0):
 			sep = "  "
 		else:
 			sep = "--"
-		print "%s %s%s[%s]%s%s" % (datetime.now().isoformat(' '), max(0, message.level) * "  |", sep, str(category), max(1, (45 - len(str(category)))) * " ", str(text))
+		now = datetime.now()
+		time_elapsed = now - Options.last_time
+		Options.last_time = now
+		#~ milliseconds = time_elapsed.microseconds / 1000 + time_elapsed.seconds 
+		milliseconds = str(int(time_elapsed.total_seconds() * 1000))
+		if milliseconds == "0":
+			milliseconds = ""
+		print (5 - len(milliseconds)) * " ", milliseconds, "%s %s%s[%s]%s%s" % (now.isoformat(' '), max(0, message.level) * "  |", sep, str(category), max(1, (45 - len(str(category)))) * " ", str(text))
 
 message.level = 0
 def next_level(verbose = 0):

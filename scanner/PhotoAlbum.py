@@ -212,8 +212,9 @@ class Album(object):
 			dictionary["parentCacheBase"] = self.parent.cache_base
 		return dictionary
 	def media_from_path(self, path):
+		_path = remove_album_path(path)
 		for media in self.media_list:
-			if remove_album_path(path) == media.media_file_name:
+			if _path == media.media_file_name:
 				return media
 		return None
 
@@ -546,12 +547,16 @@ class Media(object):
 			thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
 	
 	def reduce_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
-		thumb_path = os.path.join(thumbs_path, self.album.subdir, remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"] + photo_cache_name(self, thumb_size, thumb_type))
+		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
+		if album_prefix == Options.config["cache_folder_separator"]:
+			album_prefix = ""
+		thumb_path = os.path.join(thumbs_path, self.album.subdir, album_prefix + photo_cache_name(self, thumb_size, thumb_type))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_file = os.path.join(thumbs_path, self.album.json_file)
 		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
 		is_video = self._attributes["mediaType"] == "video"
 		next_level()
+		message("checking reduction/thumbnail", thumb_path, 5)
 		if (
 			os.path.exists(thumb_path) and
 			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
@@ -565,6 +570,7 @@ class Media(object):
 			return start_image
 		
 		message("reduction/thumbnail not OK, creating", thumb_path, 5)
+		message("calculations...", thumb_path, 5)
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
 		if thumb_type == "square": 
@@ -637,34 +643,17 @@ class Media(object):
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
 		next_level()
 		
-		#~ if (
-			#~ os.path.exists(thumb_path) and
-			#~ file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
-				#~ not is_thumbnail and not Options.config['recreate_reduced_photos'] or
-				#~ is_thumbnail and not Options.config['recreate_thumbnails']
-			#~ )
-		#~ ):
-			#~ if original_thumb_size == Options.config['album_thumb_size']:
-				#~ message("existing album thumbnail", thumb_path, 4)
-			#~ elif original_thumb_size == Options.config['media_thumb_size']:
-				#~ message("existing thumbnail", thumb_path, 4)
-			#~ else:
-				#~ message("existing reduced size", thumb_path, 4)
-			#~ back_level()
-			#~ back_level()
-			#~ return start_image
-		
 		must_resize = True
 		if max(start_image_width, start_image_height) <= thumb_size:
 			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
 			# simply copy the start image to the thumbnail
 			must_resize = False
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("image smaller, no reduction", info_string, 4)
+				message("small image, no reduction", info_string, 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("image smaller, no thumbing for album", info_string, 4)
+				message("small image, no thumbing for album", info_string, 4)
 			else:
-				message("image smaller, no thumbing for media", info_string, 4)
+				message("small image, no thumbing for media", info_string, 4)
 			#~ try:
 				#~ os.unlink(thumb_path)
 			#~ except OSError:
@@ -672,17 +661,22 @@ class Media(object):
 			#~ return start_image
 		
 		try:
+			message("making copy", info_string, 5)
 			start_image_copy = start_image.copy()
+			message("made", info_string, 5)
 		except KeyboardInterrupt:
 			raise
 		except:
+			message("making copy (2nd try)", info_string, 5)
 			start_image_copy = start_image.copy() # we try again to work around PIL bug
+			message("made (2nd try)", info_string, 5)
 			
 		# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
 		# we can resize, but first crop to square if needed
 		if must_crop:
 			message("cropping", info_string, 4)
 			start_image_copy = start_image_copy.crop((left, top, right, bottom))
+			message("cropped", info_string, 5)
 		
 		if must_resize:
 			# resizing
@@ -693,12 +687,14 @@ class Media(object):
 			else:
 				message("thumbing for media", info_string, 4)
 			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+			message("done", info_string, 5)
 		
 		gc.collect()
 		
 		try:
+			message("saving...", info_string, 5)
 			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-			message("saved anyway", info_string, 5)
+			message("saved", info_string, 5)
 			back_level()
 			back_level()
 			gc.collect()
@@ -711,8 +707,9 @@ class Media(object):
 			raise
 		except IOError:
 			try:
+				message("saving (2nd try)...", info_string, 5)
 				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-				message("saved (2nd try)!", os.path.basename(thumb_path) + ", " + info_string, 2)
+				message("saved (2nd try)", os.path.basename(thumb_path) + ", " + info_string, 2)
 			except KeyboardInterrupt:
 				try:
 					os.unlink(thumb_path)
@@ -731,7 +728,9 @@ class Media(object):
 				pass
 			back_level()
 			back_level()
+			message("collecting garbage...", info_string, 5)
 			gc.collect()
+			message("collected", info_string, 5)
 			return start_image
 	
 	def _video_thumbnails(self, thumbs_path, original_path):
@@ -885,6 +884,8 @@ class Media(object):
 	def image_caches(self):
 		caches = []
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
+		if album_prefix == Options.config["cache_folder_separator"]:
+			album_prefix = ""
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			# transcoded video path
 			caches.append(os.path.join(self.album.subdir, album_prefix + video_cache_name(self)))
