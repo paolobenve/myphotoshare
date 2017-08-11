@@ -7,6 +7,7 @@ from CachePath import *
 import json
 import Options
 import re
+import time
 #~ from pprint import pprint
 
 class TreeWalker:
@@ -109,7 +110,8 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
 	def listdir_sorted_by_time(self, path):
 		# this function returns the directory listing sorted by mtime
-		mtime = lambda f: os.stat(os.path.join(path, f)).st_mtime
+		# it takes into account the fact that the file is a symlink to an unexistent file
+		mtime = lambda f: os.path.exists(os.path.join(path, f)) and os.stat(os.path.join(path, f)).st_mtime or time.mktime(datetime.now().timetuple()) 
 		return list(sorted(os.listdir(path), key=mtime))
 
 	def walk(self, absolute_path, album_cache_base, parent_album = None):
@@ -195,7 +197,11 @@ class TreeWalker:
 				continue
 			
 			entry_with_path = os.path.join(absolute_path, entry)
-			if os.path.isdir(entry_with_path):
+			if not os.path.exists(entry_with_path):
+				next_level()
+				message("unexistent file, perhaps a symlink, skipping", entry_with_path, 2)
+				back_level()
+			elif os.path.isdir(entry_with_path):
 				trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 				entry_for_cache_base = os.path.join(Options.config['folders_string'], trimmed_path, entry)
 				message("determining cache base...", "", 5)
