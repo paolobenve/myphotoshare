@@ -634,7 +634,7 @@ $(document).ready(function() {
 						}
 						calculatedWidth = thumbWidth;
 					} else if (Options.media_thumb_type == "square") {
-						if (max(width, height) < Options.media_thumb_size) {
+						if (Math.max(width, height) < Options.media_thumb_size) {
 							thumbHeight = height;
 							thumbWidth = width;
 						} else {
