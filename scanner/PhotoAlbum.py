@@ -147,7 +147,8 @@ class Album(object):
 		album = Album(os.path.join(Options.config['album_path'], path))
 		for media in dictionary["media"]:
 			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], remove_folders_marker(album.baseless_path)))
-			album.add_media(new_media)
+			if new_media.is_valid:
+				album.add_media(new_media)
 		if not cripple:
 			# it looks like the following code is never executed
 			for subalbum in dictionary["albums"]:
@@ -235,7 +236,6 @@ class Media(object):
 			self.is_valid = False
 			return
 		if attributes is not None and attributes["dateTimeFile"] >= mtime:
-		#~ if attributes is not None and attributes["date"] >= mtime:
 			self._attributes = attributes
 			self.cache_base = attributes["cacheBase"]
 			return
@@ -254,12 +254,6 @@ class Media(object):
 			cache_name_absent = True
 			if any(_cache_base == _media.cache_base and self.media_file_name != _media.media_file_name for _media in album.media_list):
 				distinguish_suffix += 1
-			#~ for _media in album.media_list:
-				#~ if _cache_base == _media.cache_base and self.media_file_name != _media.media_file_name:
-					#~ cache_name_absent = False
-					#~ distinguish_suffix += 1
-					#~ break
-			#~ if cache_name_absent:
 			else:
 				self.cache_base = _cache_base
 				break
@@ -1012,7 +1006,6 @@ class Media(object):
 							raise
 						except ValueError:
 							pass
-					
 		return Media(album, media_path, None, dictionary)
 	def to_dict(self):
 		foldersAlbum = Options.config['folders_string']
