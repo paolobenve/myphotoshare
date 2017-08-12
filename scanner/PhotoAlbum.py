@@ -129,7 +129,7 @@ class Album(object):
 	def cache(self, base_dir):
 		self.sort_subalbums_and_media()
 		json_file_with_path = os.path.join(base_dir, self.json_file)
-		if not os.access(json_file_with_path, os.W_OK):
+		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
 			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
 			sys.exit(-97)
 		fp = open(json_file_with_path, 'w')
@@ -594,8 +594,8 @@ class Media(object):
 		next_level()
 		message("reduction/thumbnail not OK, creating", "", 5)
 		message("calculations...", "", 5)
-		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
+		info_string = str(original_thumb_size)
 		if thumb_type == "square": 
 			info_string += ", square"
 		if thumb_size == Options.config['album_thumb_size'] and thumb_type == "fit":
@@ -686,7 +686,7 @@ class Media(object):
 			message("making copy...", info_string, 5)
 			start_image_copy = start_image.copy()
 			next_level()
-			message("made copy (" + str(thumb_size) + ")", "", 5)
+			message("made copy (" + str(original_thumb_size) + ")", "", 5)
 			back_level()
 		except KeyboardInterrupt:
 			raise
@@ -694,7 +694,7 @@ class Media(object):
 			message("making copy (2nd try)...", info_string, 5)
 			start_image_copy = start_image.copy() # we try again to work around PIL bug
 			next_level()
-			message("made copy(2nd try, " + str(thumb_size) + "))", info_string, 5)
+			message("made copy(2nd try, " + str(original_thumb_size) + "))", info_string, 5)
 			back_level()
 			
 		# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
@@ -703,7 +703,7 @@ class Media(object):
 			message("cropping...", info_string, 4)
 			start_image_copy = start_image_copy.crop((left, top, right, bottom))
 			next_level()
-			message("cropped (" + str(thumb_size) + ")", "", 5)
+			message("cropped (" + str(original_thumb_size) + ")", "", 5)
 			back_level()
 		
 		if must_resize:
@@ -717,26 +717,33 @@ class Media(object):
 			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reduced size (" + str(thumb_size) + ")", "", 4)
+				message("reduced size (" + str(original_thumb_size) + ")", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbed for albums (" + str(thumb_size) + ")", "", 4)
+				message("thumbed for albums (" + str(original_thumb_size) + ")", "", 4)
 			else:
-				message("thumbed for media (" + str(thumb_size) + ")", "", 4)
+				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
 			back_level()
 		
+		# the subdir hadn't been created when creating the album in order to avoid to create empty directories
+		if not os.path.exists(thumbs_path_with_subdir):
+			message("creating still unexistent subdir", thumbs_path_with_subdir, 5)
+			os.makedirs(thumbs_path_with_subdir)
+			next_level()
+			message("created still unexistent subdir", "", 5)
+			back_level()
 		try:
 			message("saving...", info_string, 5)
-			# the subdir hadn't been created when creating the album in order to avoid to create empty directories
-			if not os.path.exists(thumbs_path_with_subdir):
-				os.makedirs(self.cache_path_with_subdir)
+			if os.path.exists(thumb_path) and not os.access(thumb_path, os.W_OK):
+				message("FATAL ERROR", thumb_path + " not writable, quitting")
+				sys.exit(-97)
 			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("saved reduced (" + str(thumb_size) + ")", "", 4)
+				message("saved reduced (" + str(original_thumb_size) + ")", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("saved for albums (" + str(thumb_size) + ")", "", 4)
+				message("saved for albums (" + str(original_thumb_size) + ")", "", 4)
 			else:
-				message("saved for media (" + str(thumb_size) + ")", "", 4)
+				message("saved for media (" + str(original_thumb_size) + ")", "", 4)
 			back_level()
 			back_level()
 			back_level()
@@ -753,11 +760,11 @@ class Media(object):
 				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 				next_level()
 				if original_thumb_size > Options.config['album_thumb_size']:
-					message("saved reduced (2nd try, " + str(thumb_size) + ")", "", 2)
+					message("saved reduced (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				elif original_thumb_size == Options.config['album_thumb_size']:
-					message("saved for albums (2nd try, " + str(thumb_size) + ")", "", 2)
+					message("saved for albums (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				else:
-					message("saved for media (2nd try, " + str(thumb_size) + ")", "", 2)
+					message("saved for media (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				back_level()
 			except KeyboardInterrupt:
 				try:
@@ -770,7 +777,7 @@ class Media(object):
 			return start_image_copy
 		except:
 			next_level()
-			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
+			message(str(original_thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
 			back_level()
 			try:
 				os.unlink(thumb_path)

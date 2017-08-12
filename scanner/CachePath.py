@@ -1,3 +1,5 @@
+# coding=utf8
+# do not remove previous line: it's not a comment!
 import os.path
 from datetime import datetime
 from datetime import timedelta
@@ -27,19 +29,18 @@ def message(category, text, verbose = 0):
 		now = datetime.now()
 		time_elapsed = now - Options.last_time
 		Options.last_time = now
-		#~ milliseconds = time_elapsed.microseconds / 1000 + time_elapsed.seconds 
-		milliseconds = int(time_elapsed.total_seconds() * 1000)
-		if milliseconds == 0:
-			milliseconds = ""
+		microseconds = int(time_elapsed.total_seconds() * 1000000)
+		if microseconds == 0:
+			microseconds = ""
 		else:
 			try:
-				Options.elapsed_times[category] += milliseconds
+				Options.elapsed_times[category] += microseconds
 				Options.elapsed_times_counter[category] += 1
 			except KeyError:
-				Options.elapsed_times[category] = milliseconds
+				Options.elapsed_times[category] = microseconds
 				Options.elapsed_times_counter[category] = 1
-			milliseconds = str(milliseconds)
-		print (5 - len(milliseconds)) * " ", milliseconds, "%s %s%s[%s]%s%s" % (now.isoformat(' '), max(0, message.level) * "  |", sep, str(category), max(1, (45 - len(str(category)))) * " ", str(text))
+			microseconds = str(microseconds)
+		print (9 - len(microseconds)) * " ", microseconds, "%s %s%s[%s]%s%s" % (now.isoformat(' '), max(0, message.level) * "  |", sep, str(category), max(1, (45 - len(str(category)))) * " ", str(text))
 
 def report_times():
 	print
@@ -48,22 +49,37 @@ def report_times():
 	total_time = 0
 	for category in sorted(Options.elapsed_times, key=Options.elapsed_times.get, reverse=True):
 		time = int(round(Options.elapsed_times[category]))
-		total_time += time
 		if time == 0:
 			_time = ""
 		elif time <= 1800:
-			_time = str(time) + " ms"
+			_time = str(time) + u" μs"
+		elif time <= 1800000:
+			_time = str(int(round(time / 1000))) + "    ms"
 		else:
-			_time = str(int(round(time / 1000))) + "    s "
+			_time = str(int(round(time / 1000000))) + "       s "
+		
+		total_time += time
+		
 		counter = str(Options.elapsed_times_counter[category]) + " times"
-		average_time = str(int(Options.elapsed_times[category] / Options.elapsed_times_counter[category])) + " ms"
-		print (50 - len(category)) * " ", category, (15 - len(_time)) * " ", _time, (15 - len(counter)) * " ", counter, (20 - len(average_time)) * " ", average_time
+		
+		average_time = int(Options.elapsed_times[category] / Options.elapsed_times_counter[category])
+		if average_time == 0:
+			_average_time = ""
+		elif average_time <= 1800:
+			_average_time = str(average_time) + u" μs"
+		elif average_time <= 1800000:
+			_average_time = str(int(round(average_time / 1000))) + "    ms"
+		else:
+			_average_time = str(int(round(average_time / 1000000))) + "       s "
+		print (50 - len(category)) * " ", category, (18 - len(_time)) * " ", _time, (15 - len(counter)) * " ", counter, (20 - len(_average_time)) * " ", _average_time
 	if total_time <= 1800:
-		_total_time = str(int(round(total_time))) + " ms"
+		_total_time = str(int(round(total_time))) + u" μs"
+	elif total_time <= 1800:
+		_total_time = str(int(round(total_time / 1000))) + "    ms"
 	else:
-		_total_time = str(int(round(total_time / 1000))) + "    s "
+		_total_time = str(int(round(total_time / 1000000))) + "       s "
 	print
-	print (50 - len("total time")) * " ", "total time", (15 - len(_total_time)) * " ", _total_time
+	print (50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time
 	print
 	_num_photo		= str(Options.num_photo)
 	_num_photo_processed	= str(Options.num_photo_processed)

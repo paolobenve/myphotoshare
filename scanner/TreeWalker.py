@@ -119,7 +119,7 @@ class TreeWalker:
 		#~ absolute_path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
 		#~ if trimmed_path:
 			#~ absolute_path_with_marker = os.path.join(absolute_path_with_marker, trimmed_path)
-		message("Walking --------------------->      ", os.path.basename(absolute_path), 3)
+		message("Walking                                 ", os.path.basename(absolute_path), 3)
 		next_level()
 		message("cache base", album_cache_base, 4)
 		if not os.access(absolute_path, os.R_OK | os.X_OK):
@@ -303,7 +303,7 @@ class TreeWalker:
 						else:
 							absolute_cache_file = ""
 				if not cache_hit:
-					message("processing file", os.path.basename(entry_with_path), 4)
+					message("processing file", entry_with_path, 4)
 					next_level()
 					if json_cache_OK:
 						if cached_media is None:
@@ -377,24 +377,36 @@ class TreeWalker:
 	
 	def save_all_media_json(self):
 		media_list = []
+		message("sorting", "media list", 5)
 		self.all_media.sort()
+		next_level()
+		message("sorted", "media list", 5)
+		back_level()
+		message("building", "media path list", 5)
 		for media in self.all_media:
 			media_list.append(media.path)
+		next_level()
+		message("built", "media list", 5)
+		back_level()
 		message("caching", "all media path list", 4)
 		fp = open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w')
 		json.dump(media_list, fp, cls=PhotoAlbumEncoder)
+		message("cached", "all media path list", 5)
 		fp.close()
 	def save_json_options(self):
 		try:
 			json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
+			message("saving json options file...", json_options_file, 4)
 			fp = open(json_options_file, 'w')
-			message("saving json options file", json_options_file, 4)
 		except IOError:
 			json_options_file_old = json_options_file
 			json_options_file = os.path.join(Options.config['cache_path'], 'options.json')
 			message("saving json options file", json_options_file + " (couldn not save " + json_options_file_old + ")", 4)
 			fp = open(json_options_file, 'w')
 		json.dump(Options.config, fp)
+		next_level()
+		message("saved json options file", "", 5)
+		back_level()
 		fp.close()
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
