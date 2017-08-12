@@ -14,6 +14,7 @@ from VideoToolWrapper import *
 import math
 import Options
 import hashlib
+import sys
 #~ from pprint import pprint
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
@@ -127,7 +128,11 @@ class Album(object):
 		
 	def cache(self, base_dir):
 		self.sort_subalbums_and_media()
-		fp = open(os.path.join(base_dir, self.json_file), 'w')
+		json_file_with_path = os.path.join(base_dir, self.json_file)
+		if not os.access(json_file_with_path, os.W_OK):
+			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
+			sys.exit(-97)
+		fp = open(json_file_with_path, 'w')
 		json.dump(self, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	@staticmethod

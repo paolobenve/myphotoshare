@@ -184,9 +184,12 @@ def main():
 		message("FATAL ERROR", Options.config['album_path'] + " doesn't exist or unreadable, quitting")
 		sys.exit(-97)
 		
-	# the cache directory must exist, or we'll try to create it
+	# the cache directory must exist and be writable, or we'll try to create it
 	try:
 		os.stat(Options.config['cache_path'])
+		if not os.access(Options.config['cache_path'], os.W_OK):
+			message("FATAL ERROR", Options.config['cache_path'] + " not writable, quitting")
+			sys.exit(-97)
 	except:
 		try:
 			os.mkdir(Options.config['cache_path'])

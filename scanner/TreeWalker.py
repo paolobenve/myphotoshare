@@ -139,11 +139,9 @@ class TreeWalker:
 			message("files excluded by marker file", Options.config['exclude_files_marker'], 4)
 			skip_files = True
 			back_level()
-		#~ trimmed_json_cache_file = json_name(absolute_path_with_marker)
 		json_cache_file = os.path.join(Options.config['cache_path'], album_cache_base) + ".json"
 		json_cache_OK = False
 		cached_album = None
-		#~ if os.path.exists(json_cache_file):
 		json_message = json_cache_file + " (path: " + os.path.basename(absolute_path) + ")"
 		try:
 			if os.path.exists(json_cache_file):
