@@ -62,9 +62,9 @@ class Album(object):
 					self._subdir = path[path.rfind("/") + 1:][:2].replace(" ", "_")
 					if len(self._subdir) == 1:
 						self._subdir += "_"
-			self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
-			if not os.path.exists(self.cache_path_with_subdir):
-				os.makedirs(self.cache_path_with_subdir)
+			#~ self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
+			#~ if not os.path.exists(self.cache_path_with_subdir):
+				#~ os.makedirs(self.cache_path_with_subdir)
 	
 	@property
 	def media(self):
@@ -563,7 +563,8 @@ class Media(object):
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
 		if album_prefix == Options.config["cache_folder_separator"]:
 			album_prefix = ""
-		thumb_path = os.path.join(thumbs_path, self.album.subdir, album_prefix + photo_cache_name(self, thumb_size, thumb_type))
+		thumbs_path_with_subdir = os.path.join(thumbs_path, self.album.subdir)
+		thumb_path = os.path.join(thumbs_path_with_subdir, album_prefix + photo_cache_name(self, thumb_size, thumb_type))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_file = os.path.join(thumbs_path, self.album.json_file)
 		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
@@ -571,6 +572,7 @@ class Media(object):
 		next_level()
 		message("checking reduction/thumbnail", thumb_path, 5)
 		if (
+			os.path.exists(thumbs_path_with_subdir) and
 			os.path.exists(thumb_path) and
 			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
 			(not os.path.exists(json_file) or file_mtime(thumb_path) < file_mtime(json_file)) and (
@@ -719,6 +721,9 @@ class Media(object):
 		
 		try:
 			message("saving...", info_string, 5)
+			# the subdir hadn't been created when creating the album in order to avoid to create empty directories
+			if not os.path.exists(thumbs_path_with_subdir):
+				os.makedirs(self.cache_path_with_subdir)
 			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
@@ -836,7 +841,10 @@ class Media(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, self.album.subdir, remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"] + video_cache_name(self))
+		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
+		if album_prefix == Options.config["cache_folder_separator"]:
+			album_prefix = ""
+		transcode_path = os.path.join(transcode_path, self.album.subdir, album_prefix + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [

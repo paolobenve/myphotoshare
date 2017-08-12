@@ -119,7 +119,7 @@ class TreeWalker:
 		#~ absolute_path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
 		#~ if trimmed_path:
 			#~ absolute_path_with_marker = os.path.join(absolute_path_with_marker, trimmed_path)
-		message("Walking --------------------->", os.path.basename(absolute_path), 3)
+		message("Walking --------------------->      ", os.path.basename(absolute_path), 3)
 		next_level()
 		message("cache base", album_cache_base, 4)
 		if not os.access(absolute_path, os.R_OK | os.X_OK):
@@ -400,7 +400,7 @@ class TreeWalker:
 		fp.close()
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
-			message("Cleanup", "be patient!", 3)
+			message("cleaning up...", "be patient!", 3)
 			next_level()
 			message("building stale list", "", 4)
 			for album in self.all_albums:
