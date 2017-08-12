@@ -125,15 +125,18 @@ class TreeWalker:
 			back_level()
 			return [None, 0]
 		message("Walking", os.path.basename(absolute_path), 3)
-		if Options.config['exclude_tree_marker'] in os.listdir(absolute_path):
+		listdir = os.listdir(absolute_path)
+		if Options.config['exclude_tree_marker'] in listdir:
 			next_level()
 			message("excluded with subfolders by marker file", Options.config['exclude_tree_marker'], 4)
 			back_level()
 			back_level()
 			return [None, 0]
-		if Options.config['exclude_files_marker'] in os.listdir(absolute_path):
+		skip_files = False
+		if Options.config['exclude_files_marker'] in listdir:
 			next_level()
 			message("files excluded by marker file", Options.config['exclude_files_marker'], 4)
+			skip_files = True
 			back_level()
 		#~ trimmed_json_cache_file = json_name(absolute_path_with_marker)
 		json_cache_file = os.path.join(Options.config['cache_path'], album_cache_base) + ".json"
@@ -184,6 +187,7 @@ class TreeWalker:
 		message("reading directory...", absolute_path, 5)
 		for entry in self.listdir_sorted_by_time(absolute_path):
 			if entry[0] == '.':
+				# skip hidden files and directories
 				continue
 			
 			try:
@@ -224,7 +228,7 @@ class TreeWalker:
 				if next_walked_album is not None:
 					album.add_album(next_walked_album)
 			elif os.path.isfile(entry_with_path):
-				if Options.config['exclude_files_marker'] in os.listdir(absolute_path):
+				if skip_files:
 					continue
 				next_level()
 				cache_hit = False
@@ -271,16 +275,15 @@ class TreeWalker:
 				if not cache_hit:
 					message(" processing image/video", os.path.basename(entry_with_path), 4)
 					next_level()
-					if not json_cache_OK:
-						message("json file isn't OK", json_cache_file, 4)
-					elif cached_media is None:
-						message("media not cached", entry, 4)
-					elif not os.path.exists(absolute_cache_file):
-						message("unexistent reduction/thumbnail", absolute_cache_file, 4)
-					elif file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
-						message("reduction/thumbnail older than media", absolute_cache_file, 4)
-					elif file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
-						message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
+					if json_cache_OK:
+						if cached_media is None:
+							message("media not cached", entry, 4)
+						elif not os.path.exists(absolute_cache_file):
+							message("unexistent reduction/thumbnail", absolute_cache_file, 4)
+						elif file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
+							message("reduction/thumbnail older than media", absolute_cache_file, 4)
+						elif file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
+							message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
 					
 					if Options.config['recreate_reduced_photos']:
 						message("reduced photo recreation requested", "", 4)

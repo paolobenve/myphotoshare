@@ -265,6 +265,10 @@ class Media(object):
 		except IOError:
 			# file is not an image
 			self._video_metadata(media_path)
+		except ValueError:
+			# PIL cannot read this file (seen for .xpm file)
+			# next lines will see that the image is invalid
+			pass
 		
 		if isinstance(image, Image.Image):
 			self._photo_metadata(image)
