@@ -37,8 +37,16 @@ class TreeWalker:
 		else:
 			self.all_cache_entries.append("all_media.json")
 			self.all_cache_entries.append(Options.config['folders_string'] + ".json")
+			message("saving all media json file...", "", 4)
 			self.save_all_media_json()
+			next_level()
+			message("saved all media json file", "", 5)
+			back_level()
+			message("generating date album...", "", 4)
 			by_date_album = self.generate_date_album(origin_album)
+			next_level()
+			message("generated date album", "", 5)
+			back_level()
 			origin_album.add_album(folders_album)
 			self.all_albums.append(origin_album)
 			if by_date_album is not None and not by_date_album.empty:
@@ -377,21 +385,21 @@ class TreeWalker:
 	
 	def save_all_media_json(self):
 		media_list = []
-		message("sorting", "media list", 5)
+		message("sorting media list...", "", 5)
 		self.all_media.sort()
 		next_level()
-		message("sorted", "media list", 5)
+		message("sorted media list", "", 5)
 		back_level()
-		message("building", "media path list", 5)
+		message("building media path list...", "", 5)
 		for media in self.all_media:
 			media_list.append(media.path)
 		next_level()
-		message("built", "media list", 5)
+		message("built media path list", "", 5)
 		back_level()
-		message("caching", "all media path list", 4)
+		message("caching all media path list...", "", 4)
 		fp = open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w')
 		json.dump(media_list, fp, cls=PhotoAlbumEncoder)
-		message("cached", "all media path list", 5)
+		message("cached all media path list", "", 5)
 		fp.close()
 	def save_json_options(self):
 		try:
@@ -410,9 +418,9 @@ class TreeWalker:
 		fp.close()
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
-			message("cleaning up...", "be patient!", 3)
+			message("cleaning up, be patient...", "", 3)
 			next_level()
-			message("building stale list", "", 4)
+			message("building stale list...", "", 4)
 			for album in self.all_albums:
 				self.all_cache_entries.append(album.json_file)
 			for media in self.all_media:
@@ -424,6 +432,9 @@ class TreeWalker:
 					except KeyError:
 						self.all_cache_entries_by_subdir[album_subdir] = list()
 						self.all_cache_entries_by_subdir[album_subdir].append(entry_without_subdir)
+			next_level()
+			message("built stale list", "", 5)
+			back_level()
 		if subdir:
 			info = "in subdir " + subdir
 			deletable_files_suffixes_re = "_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
@@ -432,7 +443,7 @@ class TreeWalker:
 		else:
 			info = "in cache path"
 			deletable_files_suffixes_re ="\.json$"
-		message("searching", info, 4)
+		message("searching for stale cache files", info, 4)
 		
 		next_level()
 		
@@ -443,15 +454,21 @@ class TreeWalker:
 				next_level()
 				self.remove_stale(cache_file)
 				if not os.listdir(os.path.join(Options.config['cache_path'], cache_file)):
-					next_level()
-					message("empty subdir, deleting", "xxxx", 4)
-					back_level()
+					message("empty subdir, deleting...", "", 4)
 					file_to_delete = os.path.join(Options.config['cache_path'], cache_file)
 					os.rmdir(os.path.join(Options.config['cache_path'], file_to_delete))
+					next_level()
+					message("empty subdir, deleted", "", 5)
+					back_level()
 				back_level()
 			else:
 				# only delete json's, transcoded videos, reduced images and thumbnails
+				message
+				message("deciding whether to keep a cache file...", cache_file, 6)
 				match = re.search(deletable_files_suffixes_re, cache_file)
+				next_level()
+				message("decided whether to keep a cache file", "", 6)
+				back_level()
 				if match:
 					try:
 						cache_file = cache_file.decode(sys.getfilesystemencoding())
@@ -467,11 +484,14 @@ class TreeWalker:
 					else:
 						cache_list = self.all_cache_entries
 					if cache_file not in cache_list:
-						message("cleanup", cache_file, 3)
+						message("removing stale cache file...", cache_file, 3)
 						file_to_delete = os.path.join(Options.config['cache_path'], subdir, cache_file)
 						os.unlink(file_to_delete)
+						next_level()
+						message("removed stale cache file", "", 5)
+						back_level()
 				else:
-					message("not deleting", cache_file, 2)
+					message("not a stale cache file, keeping it", cache_file, 2)
 					continue
 				
 		if not subdir:
