@@ -60,7 +60,8 @@ def main():
 				message("WARNING: option " + option + " in user config file", "is not integer, using default value")
 				back_level()
 				Options.config[option] = default_config.getint('options', option)
-		elif option in ('different_album_thumbnails',
+		elif option in ('follow_symlinks',
+				'different_album_thumbnails',
 				'albums_slide_style',
 				'show_media_names_below_thumbs_in_albums',
 				'persistent_metadata',
@@ -201,9 +202,13 @@ def main():
 	try:
 		os.stat(albumCacheDir)
 	except:
-		message("creating album cache directory for php", albumCacheDir, 4)
-		os.mkdir(albumCacheDir)
-	os.chmod(albumCacheDir, 0777)
+		try:
+			message("creating cache directory for php", albumCacheDir, 4)
+			os.mkdir(albumCacheDir)
+			os.chmod(albumCacheDir, 0777)
+		except OSError:
+			message("FATAL ERROR", Options.config['cache_path'] + " not writable, quitting")
+			sys.exit(-97)
 	
 	json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
 	try:

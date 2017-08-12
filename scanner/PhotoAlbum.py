@@ -233,6 +233,9 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 		except:
+			next_level()
+			message("could not read file_mtime", media_path, 5)
+			back_level()
 			self.is_valid = False
 			return
 		if attributes is not None and attributes["dateTimeFile"] >= mtime:
@@ -263,22 +266,32 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 		except IOError:
-			# file is not an image
-			self._video_metadata(media_path)
+			next_level()
+			message("Image.open() raised IOError, could be a video", media_path, 5)
+			back_level()
 		except ValueError:
 			# PIL cannot read this file (seen for .xpm file)
-			# next lines will see that the image is invalid
-			pass
+			# next lines will detect that the image is invalid
+			next_level()
+			message("ValueError when Image.open(), could be a video", media_path, 5)
+			back_level()
 		
-		if isinstance(image, Image.Image):
-			self._photo_metadata(image)
-			self._photo_thumbnails(image, media_path, Options.config['cache_path'])
-		elif self._attributes["mediaType"] == "video":
-			self._video_transcode(thumbs_path, media_path)
-			self._video_thumbnails(thumbs_path, media_path)
-		else:
-			self.is_valid = False
-			return
+		if self.is_valid:
+			if isinstance(image, Image.Image):
+				self._photo_metadata(image)
+				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
+			else:
+				# try with video detection
+				self._video_metadata(media_path)
+				if self._attributes["mediaType"] == "video":
+					self._video_transcode(thumbs_path, media_path)
+					self._video_thumbnails(thumbs_path, media_path)
+				else:
+					next_level()
+					message("error transcodind, not a video?", media_path, 5)
+					back_level()
+					self.is_valid = False
+					return
 		
 	def _photo_metadata(self, image):
 		self._attributes["metadata"]["size"] = image.size
@@ -394,15 +407,17 @@ class Media(object):
 	def _video_metadata(self, path, original=True):
 		p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
 		if p == False:
+			next_level()
+			message("error probing video, not a video?", path, 5)
+			back_level()
 			self.is_valid = False
 			return
 		info = json.loads(p)
 		for s in info["streams"]:
-			next_level()
-			message("debug: codec_type", 'codec_type', 5)
 			if 'codec_type' in s:
+				next_level()
 				message("debug: s[codec_type]", s['codec_type'], 5)
-			back_level()
+				back_level()
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
 				self._attributes["metadata"]["size"] = (int(s["width"]), int(s["height"]))
@@ -563,12 +578,15 @@ class Media(object):
 				is_thumbnail and not Options.config['recreate_thumbnails']
 			)
 		):
-			message("reduction/thumbnail OK, skipping", thumb_path, 5)
+			next_level()
+			message("reduction/thumbnail OK, skipping", "", 5)
+			back_level()
 			back_level()
 			return start_image
 		
-		message("reduction/thumbnail not OK, creating", thumb_path, 5)
-		message("calculations...", thumb_path, 5)
+		next_level()
+		message("reduction/thumbnail not OK, creating", "", 5)
+		message("calculations...", "", 5)
 		info_string = str(thumb_size)
 		original_thumb_size = thumb_size
 		if thumb_type == "square": 
@@ -639,7 +657,6 @@ class Media(object):
 		
 		# now thumbnail_width and thumbnail_height are the values the thumbnail will get,
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
-		next_level()
 		
 		must_resize = True
 		if max(start_image_width, start_image_height) <= thumb_size:
@@ -661,46 +678,56 @@ class Media(object):
 		try:
 			message("making copy...", info_string, 5)
 			start_image_copy = start_image.copy()
+			next_level()
 			message("made copy (" + str(thumb_size) + ")", "", 5)
+			back_level()
 		except KeyboardInterrupt:
 			raise
 		except:
 			message("making copy (2nd try)...", info_string, 5)
 			start_image_copy = start_image.copy() # we try again to work around PIL bug
+			next_level()
 			message("made copy(2nd try, " + str(thumb_size) + "))", info_string, 5)
+			back_level()
 			
 		# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
 		# we can resize, but first crop to square if needed
 		if must_crop:
 			message("cropping...", info_string, 4)
 			start_image_copy = start_image_copy.crop((left, top, right, bottom))
-			message("cropped (" + str(thumb_size) + ")", info_string, 5)
+			next_level()
+			message("cropped (" + str(thumb_size) + ")", "", 5)
+			back_level()
 		
 		if must_resize:
 			# resizing
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reducing size (" + str(thumb_size) + ")...", info_string, 4)
+				message("reducing size...", info_string, 5)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums (" + str(thumb_size) + ")...", info_string, 4)
+				message("thumbing for albums...", info_string, 5)
 			else:
-				message("thumbing for media (" + str(thumb_size) + ")...", info_string, 4)
+				message("thumbing for media...", info_string, 5)
 			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reduced size (" + str(thumb_size) + ")", "", 5)
+				message("reduced size (" + str(thumb_size) + ")", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbed for albums (" + str(thumb_size) + ")", "", 5)
+				message("thumbed for albums (" + str(thumb_size) + ")", "", 4)
 			else:
-				message("thumbed for media (" + str(thumb_size) + ")", "", 5)
+				message("thumbed for media (" + str(thumb_size) + ")", "", 4)
+			back_level()
 		
 		try:
-			message("saving  (" + str(thumb_size) + ")...", info_string, 5)
+			message("saving...", info_string, 5)
 			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("saved reduced (" + str(thumb_size) + ")", "", 5)
+				message("saved reduced (" + str(thumb_size) + ")", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("saved for albums (" + str(thumb_size) + ")", "", 5)
+				message("saved for albums (" + str(thumb_size) + ")", "", 4)
 			else:
-				message("saved for media (" + str(thumb_size) + ")", "", 5)
+				message("saved for media (" + str(thumb_size) + ")", "", 4)
+			back_level()
 			back_level()
 			back_level()
 			return start_image_copy
@@ -714,12 +741,14 @@ class Media(object):
 			try:
 				message("saving (2nd try)...", info_string, 5)
 				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				next_level()
 				if original_thumb_size > Options.config['album_thumb_size']:
 					message("saved reduced (2nd try, " + str(thumb_size) + ")", "", 2)
 				elif original_thumb_size == Options.config['album_thumb_size']:
 					message("saved for albums (2nd try, " + str(thumb_size) + ")", "", 2)
 				else:
 					message("saved for media (2nd try, " + str(thumb_size) + ")", "", 2)
+				back_level()
 			except KeyboardInterrupt:
 				try:
 					os.unlink(thumb_path)
@@ -730,7 +759,9 @@ class Media(object):
 			back_level()
 			return start_image_copy
 		except:
+			next_level()
 			message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
+			back_level()
 			try:
 				os.unlink(thumb_path)
 			except OSError:
@@ -759,6 +790,9 @@ class Media(object):
 				os.unlink(tfn)
 			except OSError:
 				pass
+			next_level()
+			message("error extracting video frame", path, 5)
+			back_level()
 			self.is_valid = False
 			return
 		try:
@@ -771,13 +805,13 @@ class Media(object):
 			raise
 		except:
 			next_level()
-			message("couldn't open video thumbnail", tfn, 1)
+			message("error opening video thumbnail", tfn + " from " + path, 5)
 			back_level()
+			self.is_valid = False
 			try:
 				os.unlink(tfn)
 			except OSError:
 				pass
-			self.is_valid = False
 			return
 		mirror = image
 		if "rotate" in self._attributes:
@@ -835,9 +869,6 @@ class Media(object):
 			back_level()
 			self._video_metadata(transcode_path, False)
 			return
-		next_level()
-		message("transcoding", info_string, 4)
-		back_level()
 		if "originalSize" in self._attributes["metadata"] and self._attributes["metadata"]["originalSize"][1] > 720:
 			transcode_cmd.append('-s')
 			transcode_cmd.append('hd720')
@@ -852,9 +883,16 @@ class Media(object):
 			transcode_cmd.append('-vf')
 			transcode_cmd.append(','.join(filters))
 		
+		next_level()
+		message("transcoding", info_string, 4)
+		back_level()
 		tmp_transcode_cmd = transcode_cmd[:]
 		transcode_cmd.append(transcode_path)
-		p = VideoTranscodeWrapper().call(*transcode_cmd)
+		try:
+			p = VideoTranscodeWrapper().call(*transcode_cmd)
+		except KeyboardInterrupt:
+			raise
+		
 		if p == False:
 			# add another option, try transcoding again
 			# done to avoid this error;
@@ -865,17 +903,21 @@ class Media(object):
 			tmp_transcode_cmd.append('-pix_fmt')
 			tmp_transcode_cmd.append('yuv420p')
 			tmp_transcode_cmd.append(transcode_path)
-			p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
-		
-		if p == False:
-			next_level()
-			message("transcoding failure", os.path.basename(original_path), 1)
-			back_level()
 			try:
-				os.unlink(transcode_path)
-			except OSError:
+				p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
+			except KeyboardInterrupt:
+				raise
+			
+			if p == False:
+				next_level()
+				message("transcoding failure", os.path.basename(original_path), 1)
+				back_level()
 				self.is_valid = False
-			return
+				try:
+					os.unlink(transcode_path)
+				except OSError:
+					pass
+				return
 		self._video_metadata(transcode_path, False)
 
 	@property

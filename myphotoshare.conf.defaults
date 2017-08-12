@@ -71,6 +71,10 @@ exclude_tree_marker = .myphotoshare.exclude.tree
 # in order to get rid of a past bug in thumbnail generator
 recreate_fixed_height_thumbnails = false
 
+# should symlinks be follwed when scanning the albums tree?
+# beware: setting to true exposes to the risk of never endind loops
+follow_symlinks = false
+
 ###########################################################
 # scanner and ui options
 ###########################################################

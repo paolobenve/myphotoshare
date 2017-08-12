@@ -64,6 +64,25 @@ def report_times():
 		_total_time = str(int(round(total_time / 1000))) + "    s "
 	print
 	print (50 - len("total time")) * " ", "total time", (15 - len(_total_time)) * " ", _total_time
+	print
+	if Options.num_photo > 0:
+		_num_photo = str(Options.num_photo)
+	else:
+		_num_photo = ""
+	if Options.num_photo_processed > 0:
+		_num_photo_processed = str(Options.num_photo_processed)
+	else:
+		_num_photo_processed = ""
+	if Options.num_video > 0:
+		_num_video = str(Options.num_video)
+	else:
+		_num_video = ""
+	if Options.num_video_processed > 0:
+		_num_video_processed = str(Options.num_video_processed)
+	else:
+		_num_photo = ""
+	print "Photos: total = ", (10 - len(_num_photo)) * " ", _num_photo, ", processed = ", (10 - len(_num_photo_processed)) * " ", _num_photo_processed
+	print "Video : total = ", (10 - len(_num_video)) * " ", _num_video, ", processed = ", (10 - len(_num_video_processed)) * " ", _num_video_processed
 
 message.level = 0
 def next_level(verbose = 0):
