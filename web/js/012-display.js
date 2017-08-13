@@ -325,6 +325,11 @@ $(document).ready(function() {
 				//~ }
 			//~ }
 		});
+		if (! Modernizr.flexbox && bottomSocialButtons()) {
+			var numSocial = 5;
+			socialWidth = Math.floor(window.innerWidth / numSocial);
+			$('.ssk').width(socialWidth * 2 + "px");
+		}
 	}
 	
 	function setTitle() {
