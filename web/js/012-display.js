@@ -281,9 +281,10 @@ $(document).ready(function() {
 				}
 			}
 		} else {
-			mediaArray[0] = $("#media").attr("src");
-			if (mediaArray[0].indexOf(Options.server_cache_path) === 0)
-				mediaArray[0] = mediaArray[0].substring(Options.server_cache_path.length + 1);
+			var reducedSizesIndex = 1;
+			if (Options.reduced_sizes.length == 1)
+				reducedSizesIndex = 1;
+			mediaArray[0] = PhotoFloat.pathJoin([currentMedia.cacheSubdir, currentMedia.cacheBase]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 			if (currentMedia.mediaType == "video") {
 				type = "v";
 			} else if (currentMedia.mediaType == "photo") {
