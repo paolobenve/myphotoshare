@@ -14,19 +14,29 @@ from VideoToolWrapper import *
 import math
 import Options
 import hashlib
+import sys
+#~ from pprint import pprint
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
 	# Everything that goes through the queue.Queue must be pickable, and since
-	# self.reduce_image_size_or_make_thumbnail is not defined at the top level, it's not pickable.
+	# self.reduce_size_or_make_thumbnail is not defined at the top level, it's not pickable.
 	# This is why we have this "dummy" function, so that it's pickable.
 	try:
-		self.reduce_image_size_or_make_thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_size_or_make_thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
 	except KeyboardInterrupt:
 		raise
 
 class Album(object):
+	#~ def __init__(self, path, path_has_folder_marker):
 	def __init__(self, path):
+		#~ if path_has_folder_marker:
+			#~ path = remove_album_path(path)
+			#~ path = trim_base_custom(path, Options.config['album_path'])
+			#~ path = os.join(Options.config['album_path'], path)
+		if path[-1:] == '/':
+			path = path[0:-1]
+		self.absolute_path = path
 		self.baseless_path = remove_album_path(path)
 		self.media_list = list()
 		self.albums_list = list()
@@ -40,10 +50,9 @@ class Album(object):
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
 			(
-				self.baseless_path.find(Options.config['by_date_string']) != 0 and
-				self.baseless_path != ""
+				self.baseless_path.find(Options.config['by_date_string']) != 0
+				#~ and self.baseless_path != ""
 			)
-			
 		):
 			if Options.config['subdir_method'] == "md5":
 				self._subdir = hashlib.md5(path).hexdigest()[:2]
@@ -54,9 +63,9 @@ class Album(object):
 					self._subdir = path[path.rfind("/") + 1:][:2].replace(" ", "_")
 					if len(self._subdir) == 1:
 						self._subdir += "_"
-			self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
-			if not os.path.exists(self.cache_path_with_subdir):
-				os.makedirs(self.cache_path_with_subdir)
+			#~ self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
+			#~ if not os.path.exists(self.cache_path_with_subdir):
+				#~ os.makedirs(self.cache_path_with_subdir)
 	
 	@property
 	def media(self):
@@ -71,7 +80,8 @@ class Album(object):
 		return self.path
 	@property
 	def json_file(self):
-		return json_name(self.path)
+		#~ return json_name(self.path)
+		return self.cache_base + ".json"
 	@property
 	def subdir(self):
 		return self._subdir
@@ -91,8 +101,10 @@ class Album(object):
 		except TypeError:
 			return 1
 	def add_media(self, media):
-		self.media_list.append(media)
-		self.media_list_is_sorted = False
+		if not any(media.media_file_name == _media.media_file_name for _media in self.media_list):
+		#~ if not media in self.media_list:
+			self.media_list.append(media)
+			self.media_list_is_sorted = False
 	def add_album(self, album):
 		self.albums_list.append(album)
 		self.albums_list_is_sorted = False
@@ -116,7 +128,11 @@ class Album(object):
 		
 	def cache(self, base_dir):
 		self.sort_subalbums_and_media()
-		fp = open(os.path.join(base_dir, self.json_file), 'w')
+		json_file_with_path = os.path.join(base_dir, self.json_file)
+		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
+			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
+			sys.exit(-97)
+		fp = open(json_file_with_path, 'w')
 		json.dump(self, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	@staticmethod
@@ -124,64 +140,87 @@ class Album(object):
 		fp = open(path, "r")
 		dictionary = json.load(fp)
 		fp.close()
+		# generate the album from the json file loaded
+		# subalbums are not generated yet
 		return Album.from_dict(dictionary)
 	@staticmethod
-	def from_dict(dictionary, path_is_cripple=True):
-		#~ if "physicalPath" in dictionary:
-			#~ path = dictionary["physicalPath"]
-		#~ else:
-			#~ path = dictionary["path"]
-		path = dictionary["path"]
+	def from_dict(dictionary, cripple=True):
+		if "physicalPath" in dictionary:
+			path = dictionary["physicalPath"]
+		else:
+			path = dictionary["path"]
 		album = Album(os.path.join(Options.config['album_path'], path))
 		for media in dictionary["media"]:
-			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], album.remove_folders_marker(album.baseless_path)))
-			album.add_media(new_media)
-		if not path_is_cripple:
+			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], remove_folders_marker(album.baseless_path)))
+			if new_media.is_valid:
+				album.add_media(new_media)
+		if not cripple:
+			# it looks like the following code is never executed
 			for subalbum in dictionary["albums"]:
-				album.add_album(Album.from_dict(subalbum, path_is_cripple))
-		
+				album.add_album(Album.from_dict(subalbum, cripple))
 		album.sort_subalbums_and_media()
 		
 		return album
-	def remove_folders_marker(self, path):
-		marker_position = path.find(Options.config['folders_string'])
-		if marker_position == 0:
-			path = path[len(Options.config['folders_string']):]
-			if len(path) > 0:
-				path = path[1:]
-		return path
-	def to_dict(self, path_is_cripple=True):
+	def to_dict(self, cripple=True):
 		self.sort_subalbums_and_media()
 		subalbums = []
-		if path_is_cripple:
+		if cripple:
 			for sub in self.albums_list:
 				if not sub.empty:
+					path_to_dict = trim_base_custom(sub.path, self.baseless_path)
+					if path_to_dict == "":
+						path_to_dict = Options.config['folders_string']
+					
 					subalbums.append({
-						"path": trim_base_custom(sub.path, self.baseless_path),
+						"path": path_to_dict,
+						"cacheBase": sub.cache_base,
 						"date": sub.date,
 						"numMediaInSubTree": sub.num_media_in_sub_tree
 					})
 		else:
+			# it looks like the following code is never executed
 			for sub in self.albums_list:
 				if not sub.empty:
 					subalbums.append(sub)
-		path_without_folders_marker = self.remove_folders_marker(self.path)
+		
+		path_without_folders_marker = remove_folders_marker(self.path)
+		
+		path_to_dict = self.path
+		folder_position = path_to_dict.find(Options.config['folders_string'])
+		by_date_position = path_to_dict.find(Options.config['by_date_string'])
+		if path_to_dict and by_date_position == -1 and self.cache_base != "root" and folder_position != 0:
+			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
+		
+		
+		ancestors_cache_base = list()
+		_parent = self
+		while True:
+			ancestors_cache_base.append(_parent.cache_base)
+			if _parent.parent is None:
+				break
+			_parent = _parent.parent
+		ancestors_cache_base.reverse()
+		
 		dictionary = {
-			"path": self.path,
+			"path": path_to_dict,
+			"absolutePath": self.absolute_path,
+			"cacheSubdir": self._subdir,
 			"date": self.date,
 			"albums": subalbums,
 			"media": self.media_list,
-			"cacheBase": cache_base(self.path),
+			"cacheBase": self.cache_base,
+			"ancestorsCacheBase": ancestors_cache_base,
 			"physicalPath": path_without_folders_marker,
 			"numMediaInSubTree": self.num_media_in_sub_tree,
 			"numMediaInAlbum": self.num_media_in_album
 		}
 		if self.parent is not None:
-			dictionary["parentCacheBase"] = cache_base(self.parent.path)
+			dictionary["parentCacheBase"] = self.parent.cache_base
 		return dictionary
 	def media_from_path(self, path):
+		_path = remove_album_path(path)
 		for media in self.media_list:
-			if remove_album_path(path) == media.media_file_name:
+			if _path == media.media_file_name:
 				return media
 		return None
 
@@ -192,40 +231,72 @@ class Media(object):
 		self.folders = remove_album_path(os.path.dirname(self.media_file_name))
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
 		self.is_valid = True
+		
 		image = None
 		try:
 			mtime = file_mtime(media_path)
 		except KeyboardInterrupt:
 			raise
 		except:
+			next_level()
+			message("could not read file_mtime", media_path, 5)
+			back_level()
 			self.is_valid = False
 			return
 		if attributes is not None and attributes["dateTimeFile"] >= mtime:
-		#~ if attributes is not None and attributes["date"] >= mtime:
 			self._attributes = attributes
+			self.cache_base = attributes["cacheBase"]
 			return
 		self._attributes = {}
 		self._attributes["metadata"] = {}
 		self._attributes["dateTimeFile"] = mtime
 		self._attributes["mediaType"] = "photo"
+		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
 		
+		# let's avoid that different media names have the same cache base
+		distinguish_suffix = 0
+		while True:
+			_cache_base = self.cache_base
+			if distinguish_suffix:
+				_cache_base += "_" + str(distinguish_suffix)
+			cache_name_absent = True
+			if any(_cache_base == _media.cache_base and self.media_file_name != _media.media_file_name for _media in album.media_list):
+				distinguish_suffix += 1
+			else:
+				self.cache_base = _cache_base
+				break
+			
 		try:
 			image = Image.open(media_path)
 		except KeyboardInterrupt:
 			raise
 		except IOError:
-			# file is not an image
-			self._video_metadata(media_path)
+			next_level()
+			message("Image.open() raised IOError, could be a video", media_path, 5)
+			back_level()
+		except ValueError:
+			# PIL cannot read this file (seen for .xpm file)
+			# next lines will detect that the image is invalid
+			next_level()
+			message("ValueError when Image.open(), could be a video", media_path, 5)
+			back_level()
 		
-		if isinstance(image, Image.Image):
-			self._photo_metadata(image)
-			self._photo_thumbnails(image, media_path, Options.config['cache_path'])
-		elif self._attributes["mediaType"] == "video":
-			self._video_transcode(thumbs_path, media_path)
-			self._video_thumbnails(thumbs_path, media_path)
-		else:
-			self.is_valid = False
-			return
+		if self.is_valid:
+			if isinstance(image, Image.Image):
+				self._photo_metadata(image)
+				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
+			else:
+				# try with video detection
+				self._video_metadata(media_path)
+				if self._attributes["mediaType"] == "video":
+					self._video_transcode(thumbs_path, media_path)
+					self._video_thumbnails(thumbs_path, media_path)
+				else:
+					next_level()
+					message("error transcodind, not a video?", media_path, 5)
+					back_level()
+					self.is_valid = False
+					return
 		
 	def _photo_metadata(self, image):
 		self._attributes["metadata"]["size"] = image.size
@@ -341,13 +412,17 @@ class Media(object):
 	def _video_metadata(self, path, original=True):
 		p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
 		if p == False:
+			next_level()
+			message("error probing video, not a video?", path, 5)
+			back_level()
 			self.is_valid = False
 			return
 		info = json.loads(p)
 		for s in info["streams"]:
-			message("debug: codec_type", 'codec_type', 5)
 			if 'codec_type' in s:
+				next_level()
 				message("debug: s[codec_type]", s['codec_type'], 5)
+				back_level()
 			if 'codec_type' in s and s['codec_type'] == 'video':
 				self._attributes["mediaType"] = "video"
 				self._attributes["metadata"]["size"] = (int(s["width"]), int(s["height"]))
@@ -386,6 +461,7 @@ class Media(object):
 			image = mirror
 		except IOError:
 			# https://github.com/paolobenve/myphotoshare/issues/46 : some image make raise this exception
+			message("WARNING: Photo couldn't be trasposed", photo_path, 2)
 			pass
 		
 		if (Options.config['thumbnail_generation_mode'] == "parallel"):
@@ -400,17 +476,17 @@ class Media(object):
 		max_image_size = max(image_width, image_height)
 		if (
 			thumb_size == Options.config['media_thumb_size'] and
-			Options.config['media_thumb_type'] == "fixed_height" and
+			thumb_type == "fixed_height" and
 			image_width > image_height
 		):
-			veredict = (thumb_size * image_width / image_height < image_width)
-		elif Options.config['media_thumb_type'] == "square":
+			veredict = (thumb_size < image_height)
+		elif thumb_type == "square":
 			min_image_size = min(image_width, image_height)
 			veredict = (thumb_size < min_image_size)
 		else:
 			veredict = (thumb_size < max_image_size)
 		return veredict
-			
+	
 	def _photo_thumbnails_parallel(self, start_image, photo_path, thumbs_path):
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
@@ -455,25 +531,25 @@ class Media(object):
 	
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb_size = Options.config['reduced_sizes'][0]
-		thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size)
+		thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size)
 		self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
-		# this function calls self.reduce_image_size_or_make_thumbnail() with the proper image self.reduce_image_size_or_make_thumbnail() needs
+		# this function calls self.reduce_size_or_make_thumbnail() with the proper image self.reduce_size_or_make_thumbnail() needs
 		# so that the thumbnail doesn't get blurred
 		thumb = image
 		image_width = image.size[0]
 		image_height = image.size[1]
 		for thumb_size in Options.config['reduced_sizes']:
-			thumb = self.reduce_image_size_or_make_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
+			thumb = self.reduce_size_or_make_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
 		smallest_reduced_size_image = thumb
 		
 		# album size: square thumbnail are generated anyway, because they are needed by the php code that permits sharing albums
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
 		for i in range(2):
 			if thumb_type == "fit" or self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
-				thumb = self.reduce_image_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
+				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
 			else:
-				thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
+				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
 			if i == 0:
 				if thumb_type == "square":
 					# no need for a second iteration
@@ -484,32 +560,53 @@ class Media(object):
 		# at this point thumb is always square
 		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
 		if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
-			thumb = self.reduce_image_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
+			thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
 		else:
-			thumb = self.reduce_image_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
+			thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
 	
-	def reduce_image_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
-		thumb_path = os.path.join(thumbs_path, self.album.subdir, photo_cache_name(self.media_file_name, thumb_size, thumb_type))
+	def reduce_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
+		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
+		if album_prefix == Options.config["cache_folder_separator"]:
+			album_prefix = ""
+		thumbs_path_with_subdir = os.path.join(thumbs_path, self.album.subdir)
+		thumb_path = os.path.join(thumbs_path_with_subdir, album_prefix + photo_cache_name(self, thumb_size, thumb_type))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
-		if os.path.exists(thumb_path) and file_mtime(thumb_path) < file_mtime(os.path.join(thumbs_path, self.album.json_file)):
-			message("existent and valid reduced size/thumbnail, skipping", thumb_path, 5)
+		json_file = os.path.join(thumbs_path, self.album.json_file)
+		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
+		is_video = self._attributes["mediaType"] == "video"
+		next_level()
+		message("checking reduction/thumbnail", thumb_path, 5)
+		if (
+			os.path.exists(thumbs_path_with_subdir) and
+			os.path.exists(thumb_path) and
+			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
+			(not os.path.exists(json_file) or file_mtime(thumb_path) < file_mtime(json_file)) and (
+				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
+				is_thumbnail and not Options.config['recreate_thumbnails']
+			)
+		):
+			next_level()
+			message("reduction/thumbnail OK, skipping", "", 5)
+			back_level()
+			back_level()
 			return start_image
 		
-		message("inexistent or invalid reduced size/thumbnail, creating", thumb_path, 5)
-		info_string = str(thumb_size)
+		next_level()
+		message("reduction/thumbnail not OK, creating", "", 5)
+		message("calculations...", "", 5)
 		original_thumb_size = thumb_size
+		info_string = str(original_thumb_size)
 		if thumb_type == "square": 
 			info_string += ", square"
 		if thumb_size == Options.config['album_thumb_size'] and thumb_type == "fit":
 			info_string += ", fit size"
 		elif thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height":
 			info_string += ", fixed height"
-		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
 		
 		start_image_width = start_image.size[0]
 		start_image_height = start_image.size[1]
 		if thumb_type == "square":
-			# image is to be cropped
+			# image is to be cropped: calculate the cropping values
 			if min(start_image_width, start_image_height) >= thumb_size:
 				# image is bigger than the square which will result from cropping
 				if start_image_width > start_image_height:
@@ -568,97 +665,127 @@ class Media(object):
 		# now thumbnail_width and thumbnail_height are the values the thumbnail will get,
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
 		
+		must_resize = True
 		if max(start_image_width, start_image_height) <= thumb_size:
 			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
-			# do not to produce canvas; anyway they render very badly with gif's,
-			# simply don't make the thumbnail, and delete it if it exists
-			# js will see that the thumbnail doesn't exist and use the original image
+			# simply copy the start image to the thumbnail
+			must_resize = False
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("small image, no reduction", info_string, 4)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("small image, no thumbing for album", info_string, 4)
+			else:
+				message("small image, no thumbing for media", info_string, 4)
+			#~ try:
+				#~ os.unlink(thumb_path)
+			#~ except OSError:
+				#~ pass
+			#~ return start_image
+		
+		try:
+			message("making copy...", info_string, 5)
+			start_image_copy = start_image.copy()
+			next_level()
+			message("made copy (" + str(original_thumb_size) + ")", "", 5)
+			back_level()
+		except KeyboardInterrupt:
+			raise
+		except:
+			message("making copy (2nd try)...", info_string, 5)
+			start_image_copy = start_image.copy() # we try again to work around PIL bug
+			next_level()
+			message("made copy(2nd try, " + str(original_thumb_size) + "))", info_string, 5)
+			back_level()
+			
+		# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
+		# we can resize, but first crop to square if needed
+		if must_crop:
+			message("cropping...", info_string, 4)
+			start_image_copy = start_image_copy.crop((left, top, right, bottom))
+			next_level()
+			message("cropped (" + str(original_thumb_size) + ")", "", 5)
+			back_level()
+		
+		if must_resize:
+			# resizing
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("reducing size...", info_string, 5)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("thumbing for albums...", info_string, 5)
+			else:
+				message("thumbing for media...", info_string, 5)
+			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("no reduced size, image is smaller", info_string, 4)
+				message("reduced size (" + str(original_thumb_size) + ")", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("no thumbnail for albums, image is smaller", info_string, 4)
+				message("thumbed for albums (" + str(original_thumb_size) + ")", "", 4)
 			else:
-				message("no thumbnail for media, image is smaller", info_string, 4)
+				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
+			back_level()
+		
+		# the subdir hadn't been created when creating the album in order to avoid to create empty directories
+		if not os.path.exists(thumbs_path_with_subdir):
+			message("creating still unexistent subdir", thumbs_path_with_subdir, 5)
+			os.makedirs(thumbs_path_with_subdir)
+			next_level()
+			message("created still unexistent subdir", "", 5)
+			back_level()
+		try:
+			message("saving...", info_string, 5)
+			if os.path.exists(thumb_path) and not os.access(thumb_path, os.W_OK):
+				message("FATAL ERROR", thumb_path + " not writable, quitting")
+				sys.exit(-97)
+			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			next_level()
+			if original_thumb_size > Options.config['album_thumb_size']:
+				message("saved reduced (" + str(original_thumb_size) + ")", "", 4)
+			elif original_thumb_size == Options.config['album_thumb_size']:
+				message("saved for albums (" + str(original_thumb_size) + ")", "", 4)
+			else:
+				message("saved for media (" + str(original_thumb_size) + ")", "", 4)
+			back_level()
+			back_level()
+			back_level()
+			return start_image_copy
+		except KeyboardInterrupt:
+			try:
+				os.unlink(thumb_path)
+			except OSError:
+				pass
+			raise
+		except IOError:
+			try:
+				message("saving (2nd try)...", info_string, 5)
+				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				next_level()
+				if original_thumb_size > Options.config['album_thumb_size']:
+					message("saved reduced (2nd try, " + str(original_thumb_size) + ")", "", 2)
+				elif original_thumb_size == Options.config['album_thumb_size']:
+					message("saved for albums (2nd try, " + str(original_thumb_size) + ")", "", 2)
+				else:
+					message("saved for media (2nd try, " + str(original_thumb_size) + ")", "", 2)
+				back_level()
+			except KeyboardInterrupt:
+				try:
+					os.unlink(thumb_path)
+				except OSError:
+					pass
+				raise
+			back_level()
+			back_level()
+			return start_image_copy
+		except:
+			next_level()
+			message(str(original_thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
+			back_level()
 			try:
 				os.unlink(thumb_path)
 			except OSError:
 				pass
 			back_level()
+			back_level()
 			return start_image
-		else:
-			if (
-				os.path.exists(thumb_path) and
-				file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and (
-					not is_thumbnail and not Options.config['recreate_reduced_photos'] or
-					is_thumbnail and not Options.config['recreate_thumbnails']
-				)
-			):
-				next_level()
-				if original_thumb_size == Options.config['album_thumb_size']:
-					message("existing album thumbnail", info_string, 4)
-				elif original_thumb_size == Options.config['media_thumb_size']:
-					message("existing thumbnail", info_string, 4)
-				else:
-					message("existing reduced size", info_string, 4)
-				back_level()
-				return start_image
-			gc.collect()
-			try:
-				start_image_copy = start_image.copy()
-			except KeyboardInterrupt:
-				raise
-			except:
-				start_image_copy = start_image.copy() # we try again to work around PIL bug
-				
-			# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
-			# we can resize, but first crop to square if needed
-			if must_crop:
-				start_image_copy = start_image_copy.crop((left, top, right, bottom))
-			gc.collect()
-			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
-			
-			next_level()
-			if original_thumb_size > Options.config['album_thumb_size']:
-				message("reducing size", info_string, 4)
-			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums", info_string, 4)
-			else:
-				message("thumbing for media", info_string, 4)
-			try:
-				start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-				back_level()
-				return start_image_copy
-			except KeyboardInterrupt:
-				try:
-					os.unlink(thumb_path)
-				except OSError:
-					pass
-				raise
-			except IOError:
-				try:
-					start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
-				except KeyboardInterrupt:
-					try:
-						os.unlink(thumb_path)
-					except OSError:
-						pass
-					raise
-				next_level()
-				message(str(thumb_size) + " thumbnail", "OK (bug workaround)", 2)
-				back_level()
-				back_level()
-				return start_image_copy
-			except:
-				next_level()
-				message(str(thumb_size) + " thumbnail", "save failure to " + os.path.basename(thumb_path), 1)
-				back_level()
-				try:
-					os.unlink(thumb_path)
-				except OSError:
-					pass
-				back_level()
-				return start_image
 	
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
@@ -680,6 +807,9 @@ class Media(object):
 				os.unlink(tfn)
 			except OSError:
 				pass
+			next_level()
+			message("error extracting video frame", path, 5)
+			back_level()
 			self.is_valid = False
 			return
 		try:
@@ -692,13 +822,13 @@ class Media(object):
 			raise
 		except:
 			next_level()
-			message("couldn't open video thumbnail", tfn, 1)
+			message("error opening video thumbnail", tfn + " from " + path, 5)
 			back_level()
+			self.is_valid = False
 			try:
 				os.unlink(tfn)
 			except OSError:
 				pass
-			self.is_valid = False
 			return
 		mirror = image
 		if "rotate" in self._attributes:
@@ -709,13 +839,13 @@ class Media(object):
 			elif self._attributes["metadata"]["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-		self.reduce_image_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		if thumb_type == "fit":
 			# square thumbnail is needed too
 			thumb_type = "square"
-			self.reduce_image_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+			self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-		self.reduce_image_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+		self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		
 		try:
 			os.unlink(tfn)
@@ -723,7 +853,10 @@ class Media(object):
 			pass
 
 	def _video_transcode(self, transcode_path, original_path):
-		transcode_path = os.path.join(transcode_path, self.album.subdir, video_cache_name(self.media_file_name))
+		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
+		if album_prefix == Options.config["cache_folder_separator"]:
+			album_prefix = ""
+		transcode_path = os.path.join(transcode_path, self.album.subdir, album_prefix + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -732,7 +865,7 @@ class Media(object):
 			'-preset', 'slow',					# set specific preset that provides a certain encoding speed to compression ratio
 			'-profile:v', 'baseline',				# set output to specific h264 profile
 			'-level', '3.0',					# sets highest compatibility with target devices
-			'-crf', str(Options.config['video_crf']),			# set quality
+			'-crf', str(Options.config['video_crf']),		# set quality
 			'-b:v', Options.config['video_transcode_bitrate'],	# set videobitrate
 			'-strict', 'experimental',				# allow native aac codec below
 			'-c:a', 'aac',						# set aac as audiocodec
@@ -756,9 +889,6 @@ class Media(object):
 			back_level()
 			self._video_metadata(transcode_path, False)
 			return
-		next_level()
-		message("transcoding", info_string, 4)
-		back_level()
 		if "originalSize" in self._attributes["metadata"] and self._attributes["metadata"]["originalSize"][1] > 720:
 			transcode_cmd.append('-s')
 			transcode_cmd.append('hd720')
@@ -773,9 +903,16 @@ class Media(object):
 			transcode_cmd.append('-vf')
 			transcode_cmd.append(','.join(filters))
 		
+		next_level()
+		message("transcoding", info_string, 4)
+		back_level()
 		tmp_transcode_cmd = transcode_cmd[:]
 		transcode_cmd.append(transcode_path)
-		p = VideoTranscodeWrapper().call(*transcode_cmd)
+		try:
+			p = VideoTranscodeWrapper().call(*transcode_cmd)
+		except KeyboardInterrupt:
+			raise
+		
 		if p == False:
 			# add another option, try transcoding again
 			# done to avoid this error;
@@ -786,17 +923,21 @@ class Media(object):
 			tmp_transcode_cmd.append('-pix_fmt')
 			tmp_transcode_cmd.append('yuv420p')
 			tmp_transcode_cmd.append(transcode_path)
-			p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
-		
-		if p == False:
-			next_level()
-			message("transcoding failure", os.path.basename(original_path), 1)
-			back_level()
 			try:
-				os.unlink(transcode_path)
-			except OSError:
+				p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
+			except KeyboardInterrupt:
+				raise
+			
+			if p == False:
+				next_level()
+				message("transcoding failure", os.path.basename(original_path), 1)
+				back_level()
 				self.is_valid = False
-			return
+				try:
+					os.unlink(transcode_path)
+				except OSError:
+					pass
+				return
 		self._video_metadata(transcode_path, False)
 
 	@property
@@ -810,27 +951,27 @@ class Media(object):
 	@property
 	def image_caches(self):
 		caches = []
+		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
+		if album_prefix == Options.config["cache_folder_separator"]:
+			album_prefix = ""
 		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
 			# transcoded video path
-			caches.append(os.path.join(self.album.subdir, video_cache_name(self.media_file_name)))
+			caches.append(os.path.join(self.album.subdir, album_prefix + video_cache_name(self)))
 		else:
 			# reduced sizes paths
 			for thumb_size in Options.config['reduced_sizes']:
 				caches.append(
 					os.path.join(
 						self.album.subdir,
-						photo_cache_name(
-							self.media_file_name,
-							thumb_size
-						)
+						album_prefix + photo_cache_name(self,thumb_size)
 					)
 				)
 		# album thumbnail path
 		caches.append(
 			os.path.join(
 				self.album.subdir,
-				photo_cache_name(
-					self.media_file_name,
+				album_prefix + photo_cache_name(
+					self,
 					Options.config['album_thumb_size'],
 					Options.config['album_thumb_type']
 				)
@@ -841,8 +982,8 @@ class Media(object):
 			caches.append(
 				os.path.join(
 					self.album.subdir,
-					photo_cache_name(
-						self.media_file_name,
+					album_prefix + photo_cache_name(
+						self,
 						Options.config['album_thumb_size'],
 						"square"
 					)
@@ -852,8 +993,8 @@ class Media(object):
 		caches.append(
 			os.path.join(
 				self.album.subdir,
-				photo_cache_name(
-					self.media_file_name,
+				album_prefix + photo_cache_name(
+					self,
 					Options.config['media_thumb_size'],
 					Options.config['media_thumb_type']
 				)
@@ -877,16 +1018,17 @@ class Media(object):
 		return str(self.date.year)
 	@property
 	def month(self):
-		return self.date.strftime("%B").capitalize() + " " + self.year
+		#~ return self.date.strftime("%B").capitalize() + " " + self.year
+		return self.date.strftime("%m")
 	@property
 	def day(self):
-		return str(self.date.day) + " " + self.month
-	@property
-	def year_month(self):
-		return self.year + " " + self.month
-	@property
-	def year_month_day(self):
-		return self.year_month + " " + self.day
+		return str(self.date.day)
+	#~ @property
+	#~ def year_month(self):
+		#~ return self.year + " " + self.month
+	#~ @property
+	#~ def year_month_day(self):
+		#~ return self.year_month + " " + self.day
 	@property
 	def year_album_path(self):
 		return Options.config['by_date_string'] + "/" + self.year
@@ -930,7 +1072,6 @@ class Media(object):
 							raise
 						except ValueError:
 							pass
-					
 		return Media(album, media_path, None, dictionary)
 	def to_dict(self):
 		foldersAlbum = Options.config['folders_string']
@@ -938,17 +1079,19 @@ class Media(object):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 		
 		media = self.attributes
-		media["name"]		= self.name
-		media["cacheBase"]	= cache_base(self.name)
-		media["date"]		= self.date
-		media["yearAlbum"]	= self.year_album_path
-		media["monthAlbum"]	= self.month_album_path
-		media["dayAlbum"]	= self.day_album_path
+		media["name"]			= self.name
+		media["cacheBase"]		= self.cache_base
+		media["date"]			= self.date
+		media["yearAlbum"]		= self.year_album_path
+		media["monthAlbum"]		= self.month_album_path
+		media["dayAlbum"]		= self.day_album_path
+		media["dayAlbumCacheBase"]	= cache_base(self.day_album_path, True)
 		
 		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
-		media["albumName"]	= self.album_path
-		media["foldersAlbum"]	= foldersAlbum
-		media["cacheSubdir"]	= self.album.subdir
+		media["albumName"]		= self.album_path
+		media["foldersAlbum"]		= foldersAlbum
+		media["foldersCacheBase"]	= self.album.cache_base
+		media["cacheSubdir"]		= self.album.subdir
 		
 		return media
 
