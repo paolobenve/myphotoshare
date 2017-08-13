@@ -284,7 +284,10 @@ $(document).ready(function() {
 			var reducedSizesIndex = 1;
 			if (Options.reduced_sizes.length == 1)
 				reducedSizesIndex = 1;
-			mediaArray[0] = PhotoFloat.pathJoin([currentMedia.cacheSubdir, currentMedia.cacheBase]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
+			mediaArray[0] = PhotoFloat.pathJoin([
+				currentMedia.cacheSubdir,
+				removeFolderMarker(currentMedia.foldersCacheBase) + Options.cache_folder_separator + currentMedia.cacheBase
+				]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 			if (currentMedia.mediaType == "video") {
 				type = "v";
 			} else if (currentMedia.mediaType == "photo") {
@@ -334,6 +337,14 @@ $(document).ready(function() {
 		}
 	}
 	
+	function removeFolderMarker(cacheBase) {
+		if (cacheBase.indexOf(Options.folders_string) == 0) {
+			cacheBase = cacheBase.substring(Options.folders_string.length);
+			if (cacheBase.length > 0)
+				cacheBase = cacheBase.substring(1);
+		}
+		return cacheBase;
+	}
 	function setTitle() {
 		var title = "", documentTitle = "", components, i, dateTitle, originalTitle;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks;
