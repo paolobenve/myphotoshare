@@ -770,7 +770,7 @@ $(document).ready(function() {
 						link.append(image);
 						subalbums.push(link);
 						(function(theContainer, theAlbum, theImage, theLink) {
-							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum) {
+							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var distance = 0;
 								var htmlText, mediaSrc;
 								var folderArray, originalAlbumFoldersArray, folder, captionHeight, buttonAndCaptionHeight, html;
@@ -814,12 +814,19 @@ $(document).ready(function() {
 										">";
 								theImage.html(htmlText);
 								
-								if (originalAlbum.path.indexOf(Options.by_date_string) === 0)
-									folderArray = randomMedia.dayAlbum.split("/");
-								else
-									folderArray = randomMedia.albumName.split("/");
-								originalAlbumFoldersArray = originalAlbum.path.split("/");
-								folder = folderArray[originalAlbumFoldersArray.length];
+								if (originalAlbum.path.indexOf(Options.by_date_string) === 0) {
+									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator);
+									folder = "";
+									if (folderArray.length >= 2)
+										folder += folderArray[1];
+									if (folderArray.length >= 3)
+										folder += "-" + folderArray[2];
+									if (folderArray.length == 4)
+										folder += "-" + folderArray[3];
+								}
+								else {
+									folder = subalbum.path;
+								}
 								
 								// get the value in style sheet (element with that class doesn't exist in DOM
 								var $el = $('<div class="album-caption"></div>');
@@ -842,6 +849,7 @@ $(document).ready(function() {
 								html += 	"\"";
 								html += ">";
 								theImage.wrap(html);
+								
 								html = "<div class=\"album-caption\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
 										"font-size: " + Math.round((captionHeight / 3)) + "px; " +
@@ -891,12 +899,12 @@ $(document).ready(function() {
 			$("#media-box").hide();
 			$("#thumbs").show();
 			$("#day-folders-view-container").show();
-			if (currentAlbum.path == Options.folders_string) {
+			if (currentAlbum.cacheBase == Options.folders_string) {
 				$("#folders-view").hide();
 				$("#date-view").show();
 				$("#day-folders-view-link").attr("href", "#!/" + encodeURIComponent(Options.by_date_string));
 			}
-			else if (currentAlbum.path == Options.by_date_string) {
+			else if (currentAlbum.cacheBase == Options.by_date_string) {
 				$("#folders-view").show();
 				$("#date-view").hide();
 				$("#day-folders-view-link").attr("href", "#!/" + encodeURIComponent(Options.folders_string));
@@ -1125,11 +1133,11 @@ $(document).ready(function() {
 		}
 		
 		if (currentMedia.mediaType == "photo" || currentMedia.mediaType == "video" && videoOK) {
-			if (currentAlbum.path == currentMedia.foldersAlbum) {
+			if (currentAlbum.cacheBase.indexOf(Options.folders_string) == 0) {
 				$("#folders-view").hide();
 				$("#date-view").show();
 			}
-			else {
+			if (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0) {
 				$("#folders-view").show();
 				$("#date-view").hide();
 			}

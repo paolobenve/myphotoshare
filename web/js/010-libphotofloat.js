@@ -80,7 +80,7 @@
 				}
 				self.getAlbum(album.albums[i], nextAlbum, error);
 			} else
-				callback(album, album.media[index], container);
+				callback(album, album.media[index], container, subalbum);
 		};
 		if (typeof subalbum.media !== "undefined" && subalbum.media !== null)
 			nextAlbum(subalbum);
