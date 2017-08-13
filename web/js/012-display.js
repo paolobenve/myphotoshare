@@ -282,7 +282,8 @@ $(document).ready(function() {
 			}
 		} else {
 			mediaArray[0] = $("#media").attr("src");
-			//~ mediaArray[0] = mediaArray[0].substring(Options.server_cache_path.length + 1);
+			if (mediaArray[0].indexOf(Options.server_cache_path) === 0)
+				mediaArray[0] = mediaArray[0].substring(Options.server_cache_path.length + 1);
 			if (currentMedia.mediaType == "video") {
 				type = "v";
 			} else if (currentMedia.mediaType == "photo") {
