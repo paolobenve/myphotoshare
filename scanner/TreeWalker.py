@@ -61,6 +61,7 @@ class TreeWalker:
 		self.remove_stale()
 		message("complete", "", 4)
 	def generate_date_album(self, origin_album):
+		next_level()
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
 		album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
@@ -98,21 +99,38 @@ class TreeWalker:
 					#day_cache = os.path.join(Options.config['cache_path'], json_name_by_date(day_path))
 					if not day_album.empty:
 						day_album.cache(Options.config['cache_path'])
+					message("generated composite image", day_album.cache_base, 5)
 					self.generate_composite_image(day_album, album_cache_path)
+					next_level()
+					message("generated composite image", "", 5)
+					back_level()
 				self.all_albums.append(month_album)
 				#month_cache = os.path.join(Options.config['cache_path'], json_name_by_date(month_path))
 				if not month_album.empty:
 					month_album.cache(Options.config['cache_path'])
+				message("generated composite image", month_album.cache_base, 5)
 				self.generate_composite_image(month_album, album_cache_path)
+				next_level()
+				message("generated composite image", "", 5)
+				back_level()
 			self.all_albums.append(year_album)
 			#year_cache = os.path.join(Options.config['cache_path'], json_name_by_date(year_path))
 			if not year_album.empty:
 				year_album.cache(Options.config['cache_path'])
+			message("generated composite image", year_album.cache_base, 5)
 			self.generate_composite_image(year_album, album_cache_path)
+			next_level()
+			message("generated composite image", "", 5)
+			back_level()
 		self.all_albums.append(by_date_album)
 		if not by_date_album.empty:
 			by_date_album.cache(Options.config['cache_path'])
+		message("generated composite image", by_date_album.cache_base, 5)
 		self.generate_composite_image(by_date_album, album_cache_path)
+		next_level()
+		message("generated composite image", "", 5)
+		back_level()
+		back_level()
 		return by_date_album
 	def add_media_to_tree_by_date(self, media):
 		# add the given media to a temporary structure where media are organazide by year, month, date
@@ -402,7 +420,11 @@ class TreeWalker:
 				back_level()
 			
 			# generate the album composite image for sharing
+			message("generating composite image...", album.cache_base, 5)
 			self.generate_composite_image(album, album_cache_path)
+			next_level()
+			message("generated composite image", "", 5)
+			back_level()
 		back_level()
 		
 		return [album, album.num_media_in_sub_tree]
