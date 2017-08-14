@@ -229,61 +229,16 @@ $(document).ready(function() {
 		folders = folders.substring(0, folders.lastIndexOf('/'));
 		url += folders;
 		if (currentMedia === null) {
-			// album: prepare the thumbnail names, they will be passed to php code for generating a n-thumbnail image
-			type = "a";
-			re = new  RegExp("_(" + Options.album_thumb_size + "a(s|f)\\.jpg|" +
-				Options.media_thumb_size + "t(s|f))\\.jpg$");
-			// recollect all the thumbnails showed in page
-			$(".thumbnail").each(function() {
-				src = $(this).attr("src");
-				position = src.search(re);
-				if (position == -1) {
-					// it's not a thumbnail, it's a small image
-				} else {
-					src = src.substring(0, position + 1) + Options.album_thumb_size + "as.jpg";
-					src = src.substring(Options.server_cache_path.length + 1);
-				}
-				if (allThumbnails.indexOf(src) == -1)
-					allThumbnails.push(src);
-			});
-			
-			if (allThumbnails.length < 3 || Options.max_album_share_thumbnails_number == 1)
-				maxThumbnailNumber = 1;
-			else if (allThumbnails.length < 16 || Options.max_album_share_thumbnails_number == 9)
-			if (allThumbnails.length < 9 || Options.max_album_share_thumbnails_number == 4)
-				maxThumbnailNumber = 4;
-			else if (allThumbnails.length < 16 || Options.max_album_share_thumbnails_number == 9)
-				maxThumbnailNumber = 9;
-			else if (allThumbnails.length < 25 || Options.max_album_share_thumbnails_number == 16)
-				maxThumbnailNumber = 16;
-			else if (allThumbnails.length < 36 || Options.max_album_share_thumbnails_number == 25)
-				maxThumbnailNumber = 25;
-			else
-				maxThumbnailNumber = Options.max_album_share_thumbnails_number;
-			// maxThumbnailNumber random thumbnail will be passed to php as url parameters
-			if (allThumbnails.length <= maxThumbnailNumber) {
-				// add the thumbnails (repeating them) until length is maxThumbnailNumber
-				iCorrected = 0;
-				for (i = 0; i < maxThumbnailNumber; i ++) {
-					mediaArray.push(allThumbnails[iCorrected]);
-					iCorrected ++;
-					if (iCorrected == allThumbnails.length)
-						iCorrected = 0;
-				}
-			} else if (allThumbnails.length > maxThumbnailNumber) {
-				for (i = 0; i < allThumbnails.length * 5; i ++) {
-					// 0 <= random index < allThumbnails.length
-					randomIndex = Math.floor(Math.random() * (allThumbnails.length - 1)) + 1;
-					if (mediaArray.indexOf(allThumbnails[randomIndex]) == -1)
-						mediaArray.push(allThumbnails[randomIndex]);
-					if (mediaArray.length == maxThumbnailNumber)
-						break;
-				}
-			}
+			mediaArray[0] = PhotoFloat.pathJoin([
+				currentMedia.cacheSubdir,
+				Options.cache_album_subdir,
+				currentAlbum.cacheBase
+				]) + ".jpg";
+			type = "p";
 		} else {
 			var reducedSizesIndex = 1;
 			if (Options.reduced_sizes.length == 1)
-				reducedSizesIndex = 1;
+				reducedSizesIndex = 0;
 			mediaArray[0] = PhotoFloat.pathJoin([
 				currentMedia.cacheSubdir,
 				removeFolderMarker(currentMedia.foldersCacheBase) + Options.cache_folder_separator + currentMedia.cacheBase
