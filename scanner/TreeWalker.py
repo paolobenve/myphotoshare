@@ -418,16 +418,18 @@ class TreeWalker:
 		else:
 			random_number -= len(album.media_list)
 			for subalbum in album.albums_list:
-				[picked_image, random_number] = self.pick_random_image(subalbum, random_number)
-				if picked_image:
-					return [picked_image, random_number]
+				if random_number < subalbum.num_media_in_sub_tree:
+					[picked_image, random_number] = self.pick_random_image(subalbum, random_number)
+					if picked_image:
+						return [picked_image, random_number]
+				random_number -= len(subalbum.media_list)
 		return [None, random_number]
 	def generate_composite_image(self, album, album_cache_path):
 		# pick a maximum of Options.max_album_share_thumbnails_number random images in album and subalbums
 		# and generate a square composite image
 		
 		# determine the number of images to use
-		if album.num_media_in_sub_tree < 3 or Options.config['max_album_share_thumbnails_number'] == 1:
+		if album.num_media_in_sub_tree == 1 or Options.config['max_album_share_thumbnails_number'] == 1:
 			max_thumbnail_number = 1
 		elif album.num_media_in_sub_tree < 9 or Options.config['max_album_share_thumbnails_number'] == 4:
 			max_thumbnail_number = 4
@@ -444,11 +446,12 @@ class TreeWalker:
 		random_thumbnails = list()
 		random.seed()
 		random_list = list()
-		for i in range(max_thumbnail_number):
+		for i in range(min(max_thumbnail_number, album.num_media_in_sub_tree)):
 			while True:
 				random_number = random.randint(0, album.num_media_in_sub_tree - 1)
 				if random_number not in random_list:
 					break
+			random_list.append(random_number)
 			[random_media, random_number] = self.pick_random_image(album, random_number)
 			folder_prefix = remove_folders_marker(random_media.album.cache_base)
 			if folder_prefix:
@@ -459,6 +462,12 @@ class TreeWalker:
 					folder_prefix + random_media.cache_base
 				) + "_" + str(Options.config['album_thumb_size']) + "as.jpg"
 			random_thumbnails.append(thumbnail)
+		
+		# add the missing images, repeat the first ones
+		if len(random_thumbnails) < max_thumbnail_number:
+			for i in range(max_thumbnail_number - len(random_thumbnails)):
+				print i, max_thumbnail_number
+				random_thumbnails.append(random_thumbnails[i])
 		
 		# generate the composite image
 		# following code inspired from
