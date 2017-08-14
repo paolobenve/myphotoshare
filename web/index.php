@@ -51,115 +51,20 @@
 		
 		// put the <link rel=".."> tag in <head> for getting the image thumbnail when sharing
 		if (isset($_GET['t']) && $_GET['t']) {
-			$i = 0;
-			$srcImagePaths = array();
-			$url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['CONTEXT_PREFIX'] . '/';
-			while (array_key_exists('s' . $i, $_GET) && $_GET['s' . $i]) {
-				// Prevent directory traversal security vulnerability
-				$realPath = realpath($_GET['s' . $i]);
-				$addCachePath = false;
-				if ($realPath == "") {
-					// it's a thumbnail add the cache prefix
-					$realPath = realpath(join_paths($options['server_cache_path'], $_GET['s' . $i]));
-					$addCachePath = true;
-				}
-				if (strpos($realPath, realpath($options['server_cache_path'])) === 0 || strpos($realPath, realpath($options['server_album_path'])) === 0) {
-					//~ $path = $url . join_paths($options['server_cache_path'], $_GET['s' . $i]);
-					$path = $url . $_GET['s' . $i];
-					if ($addCachePath)
-						$path = $path = $url . join_paths($options['server_cache_path'], $_GET['s' . $i]);
-					if (url_exist($realPath)) {
-						$srcImagePaths[] = $path;
-					}
-				}
-				$i ++;
+			// Prevent directory traversal security vulnerability
+			$realPath = realpath($_GET['m']);
+			if (strpos($realPath, realpath($options['server_cache_path'])) === 0  && url_exist($realPath)) {
+				$linkTag = '<link rel="';
+				if ($_GET['t'] == 'p' || $_GET['t'] == 'a')
+					// 'p': photo, 'a': album
+					$linkTag .= 'image_src';
+				else if ($_GET['t'] == 'v')
+					// 'v': video
+					$linkTag .= 'video_src';
+				$linkTag .= '" href="' . $_GET['m'] . '"';
+				$linkTag .= '>';
+				echo "$linkTag\n";
 			}
-			if ($_GET['t'] == 'a') {
-				// album: generate the composite image
-				
-				$maxThumbnailNumber = count($srcImagePaths);
-				// following code got from
-				// https://stackoverflow.com/questions/30429383/combine-16-images-into-1-big-image-with-php#30429557
-				// thanks to Adarsh Vardhan who wrote it!
-				
-				/*
-				 * INIT BASE IMAGE FILLED WITH BACKGROUND COLOR
-				 */
-				 
-				$tileWidth = $tileHeight = $options['album_thumb_size'];
-				$linearNumberOfTiles = intval(sqrt($maxThumbnailNumber));
-				//~ $pxBetweenTiles = $options['thumb_spacing'];
-				$pxBetweenTiles = 1;
-				$sideOffSet = 1;
-				 
-				$mapWidth = $sideOffSet + ($tileWidth + $pxBetweenTiles) * $linearNumberOfTiles - $pxBetweenTiles + $sideOffSet;
-				$mapHeight = $sideOffSet + ($tileWidth + $pxBetweenTiles) * $linearNumberOfTiles - $pxBetweenTiles + $sideOffSet;
-				$mapImage = imagecreatetruecolor($mapWidth, $mapHeight);
-				//~ $bgColor = imagecolorallocate($mapImage, 50, 40, 0);
-				$bgColor = imagecolorallocate($mapImage, 255, 255, 255);
-				imagefill($mapImage, 0, 0, $bgColor);
-				 
-				/*
-				 *  PUT SRC IMAGES ON BASE IMAGE
-				 */
-				 
-				function indexToCoords($index)
-				{
-					global $tileWidth, $pxBetweenTiles, $sideOffSet, $linearNumberOfTiles;
-
-					$x = $sideOffSet + ($index % $linearNumberOfTiles) * ($tileWidth + $pxBetweenTiles);
-					$y = $sideOffSet + floor($index / $linearNumberOfTiles) * ($tileWidth + $pxBetweenTiles);
-					return Array($x, $y);
-				}
-				 
-				foreach ($srcImagePaths as $index => $srcImagePath)
-				{
-					list ($x, $y) = indexToCoords($index);
-					$tileImg = imagecreatefromjpeg($srcImagePath);
-
-					imagecopy($mapImage, $tileImg, $x, $y, 0, 0, $tileWidth, $tileHeight);
-					imagedestroy($tileImg);
-				}
-				
-				$imageFile = join_paths("album", strval(rand()) . ".jpg");
-				$absoluteImagePath = join_paths($options['cache_path'], $imageFile);
-				$serverImagePath = join_paths($options['server_cache_path'], $imageFile);
-				
-				// save the image
-				$result = imagejpeg($mapImage, $absoluteImagePath);
-				$media = $serverImagePath;
-				$pathInfo = pathinfo($_SERVER['PHP_SELF'])['dirname'];
-				$mediaWithPath = '/' .$media;
-				if ($pathInfo != '/')
-					$mediaWithPath = $pathInfo .$mediaWithPath;
-				
-			} else {
-				// photo or video
-				$mediaWithPath = $srcImagePaths[0];
-			}
-			
-			$linkTag = '<link ';
-			if ($_GET['t'] == 'p' || $_GET['t'] == 'a')
-				// 'p': photo, 'a': album
-				$linkTag .= 'rel="image_src" ';
-			else if ($_GET['t'] == 'v')
-				// 'v': video
-				$linkTag .= 'rel="video_src" ';
-			$linkTag .= 'href="' . $mediaWithPath . '"';
-			$linkTag .= '>';
-			echo "$linkTag\n";
-			
-			// it seems that facebook keeps using the shared images, it must not be deleted
-			//~ $files = glob(join_paths(join_paths($options['cache_path'], "album"), "*"));
-			//~ $now   = time();
-			//~ foreach ($files as $file) {
-				//~ if (is_file($file)) {
-					//~ if ($now - filemtime($file) >= 60 * 60) { // 1 hour
-						//~ unlink($file);
-						//~ echo "<!-- removed file $file\n -->";
-					//~ }
-				//~ }
-			//~ }
 		}
 	?>
 	<?php if ($options['piwik_server'] && $options['piwik_id']) { ?>

@@ -466,7 +466,6 @@ class TreeWalker:
 		# add the missing images, repeat the first ones
 		if len(random_thumbnails) < max_thumbnail_number:
 			for i in range(max_thumbnail_number - len(random_thumbnails)):
-				print i, max_thumbnail_number
 				random_thumbnails.append(random_thumbnails[i])
 		
 		# generate the composite image

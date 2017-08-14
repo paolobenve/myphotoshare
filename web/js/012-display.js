@@ -230,7 +230,7 @@ $(document).ready(function() {
 		url += folders;
 		if (currentMedia === null) {
 			mediaArray[0] = PhotoFloat.pathJoin([
-				currentMedia.cacheSubdir,
+				Options.server_cache_path,
 				Options.cache_album_subdir,
 				currentAlbum.cacheBase
 				]) + ".jpg";
@@ -239,9 +239,13 @@ $(document).ready(function() {
 			var reducedSizesIndex = 1;
 			if (Options.reduced_sizes.length == 1)
 				reducedSizesIndex = 0;
+			prefix = removeFolderMarker(currentMedia.foldersCacheBase);
+			if (prefix)
+				prefix += Options.cache_folder_separator;
 			mediaArray[0] = PhotoFloat.pathJoin([
+				Options.server_cache_path,
 				currentMedia.cacheSubdir,
-				removeFolderMarker(currentMedia.foldersCacheBase) + Options.cache_folder_separator + currentMedia.cacheBase
+				prefix + currentMedia.cacheBase
 				]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 			if (currentMedia.mediaType == "video") {
 				type = "v";
@@ -252,8 +256,7 @@ $(document).ready(function() {
 		
 		hash = location.hash;
 		myShareUrl = url + '?';
-		for (i = 0; i < mediaArray.length; i ++)
-			myShareUrl += 's' + i + '=' + encodeURIComponent(mediaArray[i]) + '&';
+		myShareUrl += 'm=' + encodeURIComponent(mediaArray[0]) + '&';
 		myShareUrl += 't=' + type + '#' + hash.substring(1);
 		
 		myShareText = Options.page_title;
