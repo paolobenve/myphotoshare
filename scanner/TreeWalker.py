@@ -444,7 +444,7 @@ class TreeWalker:
 					[picked_image, random_number] = self.pick_random_image(subalbum, random_number)
 					if picked_image:
 						return [picked_image, random_number]
-				random_number -= len(subalbum.media_list)
+				random_number -= subalbum.num_media_in_sub_tree
 		return [None, random_number]
 	def generate_composite_image(self, album, album_cache_path):
 		# pick a maximum of Options.max_album_share_thumbnails_number random images in album and subalbums
