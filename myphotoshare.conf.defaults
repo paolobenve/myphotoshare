@@ -35,6 +35,9 @@ album_path =
 # cache folder absolute path, for use in python 
 cache_path = 
 
+# cache subfolder: where the album composite images will be saved
+cache_album_subdir = cache_album
+
 # what method will be used to generate tumbnails?
 # permitted values:
 #    cascade : the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
