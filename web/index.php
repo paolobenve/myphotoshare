@@ -36,10 +36,6 @@
 	<?php
 		//~ ini_set('display_errors', 1);
 		//~ error_reporting(E_ALL);
-		function join_paths() {
-			return preg_replace('~[/\\\]+~', DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
-		}
-		
 		// from http://skills2earn.blogspot.it/2012/01/how-to-check-if-file-exists-on.html , solution # 3
 		function url_exist($url) {
 			if (@fopen($url,"r"))
@@ -47,7 +43,6 @@
 			else 
 				return false;
 		}
-
 		
 		// put the <link rel=".."> tag in <head> for getting the image thumbnail when sharing
 		if (isset($_GET['t']) && $_GET['t']) {

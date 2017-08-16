@@ -126,7 +126,9 @@ class Album(object):
 	def cache(self):
 		message("sorting album...", "", 5)
 		self.sort_subalbums_and_media()
-		message("sorted album", json_file_with_path, 4)
+		next_level()
+		message("sorted album", self.absolute_path, 4)
+		back_level()
 		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
 			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
@@ -134,18 +136,24 @@ class Album(object):
 		message("saving album...", "", 5)
 		with open(json_file_with_path, 'w') as fp:
 			json.dump(self, fp, cls=PhotoAlbumEncoder)
+		next_level()
 		message("saved album", json_file_with_path, 3)
+		back_level()
 	@staticmethod
 	def from_cache(path, album_cache_base):
 		message("reading album...", "", 5)
 		with open(path, "r") as fp:
 			dictionary = json.load(fp)
+		next_level()
 		message("read album", path, 5)
+		back_level()
 		# generate the album from the json file loaded
 		# subalbums are not generated yet
 		message("converting album to dictionary...", "", 5)
 		dictionary = Album.from_dict(dictionary, album_cache_base)
+		next_level()
 		message("converted album to dictionary", "", 4)
+		back_level()
 		return dictionary
 	@staticmethod
 	def from_dict(dictionary, album_cache_base, cripple=True):
