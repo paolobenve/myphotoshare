@@ -90,6 +90,7 @@
 	
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		var hashParts, lastSlashPosition, slashNumber, albumHash, mediaHash = null, foldersHash = null, media = null;
+		$("#error-too-many-images").hide();
 		hash = PhotoFloat.cleanHash(hash);
 		// count the number of slashes in hash, by date hashes have 2, folders ones 1
 		if (! hash.length) {
