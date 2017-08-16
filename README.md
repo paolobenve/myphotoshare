@@ -1,4 +1,4 @@
-# myphotoshare v. 2.5
+# myphotoshare v. 2.6.1
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -33,7 +33,9 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Albums and cache server folders can be anywhere on the server
 * Images and folders can be sorted ascending/descending (via a cookie)
 * Thumbnails can be square (cropped) or full-content
-* Single `index.php` file: `php` applies basic option to home page (crawlers and social media do not execute javascript)
+* Single `index.php` file (crawlers and social media do not execute javascript); `php` does a bit of work:
+* - inserts link tag in <head></head> in order to let social media see the shared content
+* - applies basic options to home page 
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
 * Verbosity levels in scanner
