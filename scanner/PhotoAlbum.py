@@ -124,20 +124,29 @@ class Album(object):
 		return True
 		
 	def cache(self):
+		message("sorting album...", "", 5)
 		self.sort_subalbums_and_media()
+		message("sorted album", json_file_with_path, 4)
 		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
 			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
 			sys.exit(-97)
+		message("saving album...", "", 5)
 		with open(json_file_with_path, 'w') as fp:
 			json.dump(self, fp, cls=PhotoAlbumEncoder)
+		message("saved album", json_file_with_path, 3)
 	@staticmethod
 	def from_cache(path, album_cache_base):
+		message("reading album...", "", 5)
 		with open(path, "r") as fp:
 			dictionary = json.load(fp)
+		message("read album", path, 5)
 		# generate the album from the json file loaded
 		# subalbums are not generated yet
-		return Album.from_dict(dictionary, album_cache_base)
+		message("converting album to dictionary...", "", 5)
+		dictionary = Album.from_dict(dictionary, album_cache_base)
+		message("converted album to dictionary", "", 4)
+		return dictionary
 	@staticmethod
 	def from_dict(dictionary, album_cache_base, cripple=True):
 		if "physicalPath" in dictionary:

@@ -106,6 +106,7 @@ class TreeWalker:
 					#~ day_json_file_with_path = os.path.join(Options.config['cache_path'], day_album.json_file)
 					day_max_file_date = None
 					month_album.add_album(day_album)
+					message("elaborating day album...", "", 5)
 					for single_media in media:
 						day_album.add_media(single_media)
 						day_album.num_media_in_sub_tree += 1
@@ -133,6 +134,7 @@ class TreeWalker:
 							by_date_max_file_date = max(by_date_max_file_date, single_media_date)
 						else:
 							by_date_max_file_date = single_media_date
+					message("elaborated day album", media[0].year + "-" + media[0].month + "-" + media[0].day, 4)
 					self.all_albums.append(day_album)
 					json_file = os.path.join(Options.config['cache_path'], day_album.json_file)
 					if not day_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < day_max_file_date):
