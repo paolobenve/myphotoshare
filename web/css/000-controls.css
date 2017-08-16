@@ -307,6 +307,7 @@ a.title-anchor.mobile {
 	font-size: 1em;
 	font-weight: bold;
 	font-style: italic;
+	display: none;
 }
 #video-unsupported {
 	background-image: url(../img/video-unsupported.png);
