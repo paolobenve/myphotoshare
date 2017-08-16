@@ -102,6 +102,11 @@ a.title-anchor.mobile {
 	height: 3em;
 }
 
+.album-caption-count {
+	margin-top: .2em;
+	text-align: center
+}
+
 /* this class is needed in order to get the thumbnails vertically centered,
  * see https://stackoverflow.com/questions/7273338/how-to-vertically-align-an-image-inside-a-div#7310398*/
 .helper {

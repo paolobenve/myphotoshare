@@ -732,7 +732,7 @@ $(document).ready(function() {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var distance = 0;
 								var htmlText, mediaSrc;
-								var folderArray, originalAlbumFoldersArray, folder, captionHeight, buttonAndCaptionHeight, html;
+								var folderArray, originalAlbumFoldersArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html;
 								
 								mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								
@@ -793,8 +793,9 @@ $(document).ready(function() {
 								var paddingTop = parseInt($($el).css('padding-top'));
 								$($el).remove();
 								
-								captionHeight = Math.round(em2px("body", 3) * correctedAlbumThumbSize / Options.album_thumb_size);
-								buttonAndCaptionHeight = correctedAlbumThumbSize + captionHeight + paddingTop + 3 * 4;
+								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
+								captionHeight = captionFontSize * 3;
+								buttonAndCaptionHeight = correctedAlbumThumbSize + captionHeight * 1.6 + paddingTop + 3 * 4;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
 									html += " slide";
@@ -811,11 +812,23 @@ $(document).ready(function() {
 								
 								html = "<div class=\"album-caption\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
-										"font-size: " + Math.round((captionHeight / 3)) + "px; " +
+										//~ "font-size: " + Math.round((captionHeight / 4)) + "px; " +
+										"font-size: " + captionFontSize + "px; " +
 										"height: " + captionHeight + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
 								html += "\"";
-								html += ">" + folder + "</div>";
+								html += ">" + folder ;
+								html += "</div>";
+								html += "<div class=\"album-caption-count\"";
+								html += 	"style=\"font-size: " + Math.round((captionFontSize / 1.5)) + "px;" +
+										"height: " + Math.round(captionHeight / 2) + "px; ";
+								html += 	"color: " + Options.album_caption_color + ";\"";
+								html += ">(";
+								html +=		subalbum.numMediaInSubTree;
+								html +=		" <span id=\"album-caption-total\">";
+								html +=		_t(".album-caption-total");
+								html +=		"</span>";
+								html += ")</div>";
 								theImage.parent().append(html);
 								// this function must be called every time a album slide is created,
 								// in order to include this images in the composite php will create
