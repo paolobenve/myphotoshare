@@ -59,10 +59,10 @@ class TreeWalker:
 			next_level()
 			message("saved all media json file", "", 5)
 			back_level()
-			message("generating date album...", "", 4)
+			message("generating date albums...", "", 4)
 			by_date_album = self.generate_date_album(origin_album)
 			next_level()
-			message("generated date album", "", 5)
+			message("generated date albums", "", 5)
 			back_level()
 			origin_album.add_album(folders_album)
 			self.all_albums.append(origin_album)
@@ -76,31 +76,35 @@ class TreeWalker:
 	def generate_date_album(self, origin_album):
 		next_level()
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
-		all_max_file_date = None
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		by_date_album.parent = origin_album
 		by_date_album.cache_base = cache_base(by_date_path)
+		#~ by_date_json_file_with_path = os.path.join(Options.config['cache_path'], by_date_album.json_file)
+		by_date_max_file_date = None
 		for year, months in self.tree_by_date.iteritems():
-			year_max_file_date = None
 			year_path = os.path.join(by_date_path, str(year))
 			year_album = Album(year_path)
 			year_album.parent = by_date_album
 			year_album.cache_base = cache_base(year_path)
+			#~ year_json_file_with_path = os.path.join(Options.config['cache_path'], year_album.json_file)
+			year_max_file_date = None
 			by_date_album.add_album(year_album)
 			for month, days in self.tree_by_date[year].iteritems():
-				month_max_file_date = None
 				month_path = os.path.join(year_path, str(month))
 				month_album = Album(month_path)
 				month_album.parent = year_album
 				month_album.cache_base = cache_base(month_path)
+				#~ month_json_file_with_path = os.path.join(Options.config['cache_path'], month_album.json_file)
+				month_max_file_date = None
 				year_album.add_album(month_album)
 				for day, media in self.tree_by_date[year][month].iteritems():
-					day_max_file_date = None
 					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
 					day_album.parent = month_album
 					day_album.cache_base = cache_base(day_path)
+					#~ day_json_file_with_path = os.path.join(Options.config['cache_path'], day_album.json_file)
+					day_max_file_date = None
 					month_album.add_album(day_album)
 					for single_media in media:
 						day_album.add_media(single_media)
@@ -110,44 +114,48 @@ class TreeWalker:
 						month_album.num_media_in_sub_tree += 1
 						year_album.add_media(single_media)
 						year_album.num_media_in_sub_tree += 1
+						by_date_album.add_media(single_media)
 						by_date_album.num_media_in_sub_tree += 1
-						if day_max_file_date is None:
-							day_max_file_date = single_media._attributes["dateTimeFile"]
+						single_media_date = max(single_media._attributes["dateTimeFile"], single_media._attributes["dateTimeDir"])
+						if day_max_file_date:
+							day_max_file_date = max(day_max_file_date, single_media_date)
 						else:
-							day_max_file_date = max(day_max_file_date, single_media._attributes["dateTimeFile"])
-						if month_max_file_date is None:
-							month_max_file_date = single_media._attributes["dateTimeFile"]
+							day_max_file_date = single_media_date
+						if month_max_file_date:
+							month_max_file_date = max(month_max_file_date, single_media_date)
 						else:
-							month_max_file_date = max(month_max_file_date, single_media._attributes["dateTimeFile"])
-						if year_max_file_date is None:
-							year_max_file_date = single_media._attributes["dateTimeFile"]
+							month_max_file_date = single_media_date
+						if year_max_file_date:
+							year_max_file_date = max(year_max_file_date, single_media_date)
 						else:
-							year_max_file_date = max(year_max_file_date, single_media._attributes["dateTimeFile"])
-						if all_max_file_date is None:
-							all_max_file_date = single_media._attributes["dateTimeFile"]
+							year_max_file_date = single_media_date
+						if by_date_max_file_date:
+							by_date_max_file_date = max(by_date_max_file_date, single_media_date)
 						else:
-							all_max_file_date = max(all_max_file_date, single_media._attributes["dateTimeFile"])
+							by_date_max_file_date = single_media_date
 					self.all_albums.append(day_album)
-					#day_cache = os.path.join(Options.config['cache_path'], json_name_by_date(day_path))
-					if not day_album.empty:
+					json_file = os.path.join(Options.config['cache_path'], day_album.json_file)
+					if not day_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < day_max_file_date):
 						day_album.cache()
 					self.generate_composite_image(day_album, day_max_file_date)
 				self.all_albums.append(month_album)
-				#month_cache = os.path.join(Options.config['cache_path'], json_name_by_date(month_path))
-				if not month_album.empty:
+				json_file = os.path.join(Options.config['cache_path'], month_album.json_file)
+				if not month_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < month_max_file_date):
 					month_album.cache()
 				self.generate_composite_image(month_album, month_max_file_date)
 			self.all_albums.append(year_album)
-			#year_cache = os.path.join(Options.config['cache_path'], json_name_by_date(year_path))
-			if not year_album.empty:
+			json_file = os.path.join(Options.config['cache_path'], year_album.json_file)
+			if not year_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < year_max_file_date):
 				year_album.cache()
 			self.generate_composite_image(year_album, year_max_file_date)
 		self.all_albums.append(by_date_album)
-		if not by_date_album.empty:
+		json_file = os.path.join(Options.config['cache_path'], by_date_album.json_file)
+		if not by_date_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < by_date_max_file_date):
 			by_date_album.cache()
-		self.generate_composite_image(by_date_album, all_max_file_date)
+		self.generate_composite_image(by_date_album, by_date_max_file_date)
 		back_level()
 		return by_date_album
+	
 	def add_media_to_tree_by_date(self, media):
 		# add the given media to a temporary structure where media are organazide by year, month, date
 		if not media.year in self.tree_by_date.keys():
@@ -171,7 +179,6 @@ class TreeWalker:
 		#~ if trimmed_path:
 			#~ absolute_path_with_marker = os.path.join(absolute_path_with_marker, trimmed_path)
 		max_file_date = file_mtime(absolute_path)
-		print absolute_path, max_file_date
 		message("Walking                                 ", os.path.basename(absolute_path), 3)
 		next_level()
 		message("cache base", album_cache_base, 4)
@@ -303,7 +310,8 @@ class TreeWalker:
 				next_level()
 				message("determined cache base", "", 5)
 				back_level()
-				[next_walked_album, num, max_file_date] = self.walk(entry_with_path, next_album_cache_base, album)
+				[next_walked_album, num, sub_max_file_date] = self.walk(entry_with_path, next_album_cache_base, album)
+				max_file_date = max(max_file_date, sub_max_file_date)
 				album.num_media_in_sub_tree += num
 				if next_walked_album is not None:
 					album.add_album(next_walked_album)
@@ -313,10 +321,7 @@ class TreeWalker:
 				next_level()
 				cache_hit = False
 				mtime = file_mtime(entry_with_path)
-				if max_file_date is not None:
-					max_file_date = max(max_file_date, mtime)
-				else:
-					max_file_date = mtime
+				max_file_date = max(max_file_date, mtime)
 				if cached_album:
 					message("reading cache media from cached album...", "", 5)
 					cached_media = cached_album.media_from_path(entry_with_path)
@@ -414,11 +419,15 @@ class TreeWalker:
 				back_level()
 		if not album.empty:
 			next_level()
-			message("saving json file for album", os.path.basename(absolute_path), 4)
-			album.cache()
-			next_level()
-			message("saved json file for album", "", 5)
-			back_level()
+			json_file = os.path.join(Options.config['cache_path'], album.json_file)
+			if not os.path.exists(json_file) or file_mtime(json_file) < max_file_date:
+				message("saving json file for album", "", 5)
+				album.cache()
+				next_level()
+				message("saved json file for album", os.path.basename(absolute_path), 4)
+				back_level()
+			else:
+				message("no need to save json file for album", os.path.basename(absolute_path), 4)
 			message("adding album to big list...", "", 5)
 			self.all_albums.append(album)
 			next_level()
@@ -559,25 +568,26 @@ class TreeWalker:
 		message("built media path list", "", 5)
 		back_level()
 		message("caching all media path list...", "", 4)
-		fp = open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w')
-		json.dump(media_list, fp, cls=PhotoAlbumEncoder)
+		with open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w') as fp:
+			json.dump(media_list, fp, cls=PhotoAlbumEncoder)
 		message("cached all media path list", "", 5)
 		fp.close()
 	def save_json_options(self):
 		try:
 			json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
 			message("saving json options file...", json_options_file, 4)
-			fp = open(json_options_file, 'w')
+			with open(json_options_file, 'w') as fp:
+				json.dump(Options.config, fp)
 		except IOError:
 			json_options_file_old = json_options_file
 			json_options_file = os.path.join(Options.config['cache_path'], 'options.json')
 			message("saving json options file", json_options_file + " (couldn not save " + json_options_file_old + ")", 4)
-			fp = open(json_options_file, 'w')
-		json.dump(Options.config, fp)
+			with open(json_options_file, 'w') as fp:
+				json.dump(Options.config, fp)
 		next_level()
 		message("saved json options file", "", 5)
 		back_level()
-		fp.close()
+		
 	def remove_stale(self, subdir = "", cache_list = {}):
 		if not subdir:
 			message("cleaning up, be patient...", "", 3)

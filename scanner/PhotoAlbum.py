@@ -129,14 +129,12 @@ class Album(object):
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
 			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
 			sys.exit(-97)
-		fp = open(json_file_with_path, 'w')
-		json.dump(self, fp, cls=PhotoAlbumEncoder)
-		fp.close()
+		with open(json_file_with_path, 'w') as fp:
+			json.dump(self, fp, cls=PhotoAlbumEncoder)
 	@staticmethod
 	def from_cache(path, album_cache_base):
-		fp = open(path, "r")
-		dictionary = json.load(fp)
-		fp.close()
+		with open(path, "r") as fp:
+			dictionary = json.load(fp)
 		# generate the album from the json file loaded
 		# subalbums are not generated yet
 		return Album.from_dict(dictionary, album_cache_base)
@@ -226,28 +224,34 @@ class Media(object):
 	def __init__(self, album, media_path, thumbs_path=None, attributes=None):
 		self.album = album
 		self.media_file_name = remove_album_path(media_path)
-		self.folders = remove_album_path(os.path.dirname(self.media_file_name))
+		dirname = os.path.dirname(media_path)
+		self.folders = remove_album_path(dirname)
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
+		
 		self.is_valid = True
 		
 		image = None
 		try:
 			mtime = file_mtime(media_path)
+			dir_mtime = file_mtime(dirname)
 		except KeyboardInterrupt:
 			raise
 		except:
 			next_level()
-			message("could not read file_mtime", media_path, 5)
+			message("could not read file or dir mtime", media_path, 5)
 			back_level()
 			self.is_valid = False
 			return
+		
 		if attributes is not None and attributes["dateTimeFile"] >= mtime:
 			self._attributes = attributes
+			self._attributes["dateTimeDir"] = dir_mtime
 			self.cache_base = attributes["cacheBase"]
 			return
 		self._attributes = {}
 		self._attributes["metadata"] = {}
 		self._attributes["dateTimeFile"] = mtime
+		self._attributes["dateTimeDir"] = dir_mtime
 		self._attributes["mediaType"] = "photo"
 		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
 		
