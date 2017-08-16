@@ -582,7 +582,11 @@ $(document).ready(function() {
 			if (populateMedia === true && ! ! currentAlbum.path.match(byDateRegex))
 				populateMedia = populateMedia && (currentAlbum.media.length < Options.big_date_folders_threshold);
 			
-			if (populateMedia === true || populateMedia && needMediaHtmlReverse()) {
+			if (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 && currentAlbum.media.length > Options.big_date_folders_threshold) {
+				$("#thumbs").empty();
+				$("#error-too-many-images").html("<span id=\"too-many-images\">Too many images</span>: " + currentAlbum.media.length +
+							" (<span id=\"too-many-images-limit-is\">limit for date album is</span> " + Options.big_date_folders_threshold +  ")</span>");
+			} else if (populateMedia === true || populateMedia && needMediaHtmlReverse()) {
 				media = [];
 				for (i = 0; i < currentAlbum.media.length; ++i) {
 					width = currentAlbum.media[i].metadata.size[0];
@@ -666,9 +670,6 @@ $(document).ready(function() {
 				
 				if (needMediaHtmlReverse())
 					currentAlbum.mediaReverseSort = ! currentAlbum.mediaReverseSort;
-			} else if (currentAlbum.media.length < Options.big_date_folders_threshold) {
-				$("#thumbs").html("<span id=\"too-many-images\">Too many images: " + currentAlbum.media.length + " (limit for date album is " + Options.big_date_folders_threshold +  ")</span>");
-				$("#thumbs").empty();
 			}
 			
 			if (currentMedia === null) {

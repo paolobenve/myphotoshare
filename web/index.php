@@ -173,12 +173,13 @@
 		<div id="thumbs">
 			<div id="loading"></div>
 		</div>
+		<div id="error-too-many-images"></div>
 		<div id="powered-by">
 			<span id="powered-by-string"></span>
 			<a href="https://github.com/paolobenve/myphotoshare" target="_blank">MyPhotoShare</a>
 		</div>
 	</div>
-
+	
 	<div id="error-overlay"></div>
 	<div id="error-options-file"></div>
 	<div id="error-text-folder"></div>
