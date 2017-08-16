@@ -70,7 +70,7 @@ class TreeWalker:
 				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
 				origin_album.add_album(by_date_album)
 			if not origin_album.empty:
-				origin_album.cache(Options.config['cache_path'])
+				origin_album.cache()
 		self.remove_stale()
 		message("complete", "", 4)
 	def generate_date_album(self, origin_album):
@@ -130,21 +130,21 @@ class TreeWalker:
 					self.all_albums.append(day_album)
 					#day_cache = os.path.join(Options.config['cache_path'], json_name_by_date(day_path))
 					if not day_album.empty:
-						day_album.cache(Options.config['cache_path'])
+						day_album.cache()
 					self.generate_composite_image(day_album, day_max_file_date)
 				self.all_albums.append(month_album)
 				#month_cache = os.path.join(Options.config['cache_path'], json_name_by_date(month_path))
 				if not month_album.empty:
-					month_album.cache(Options.config['cache_path'])
+					month_album.cache()
 				self.generate_composite_image(month_album, month_max_file_date)
 			self.all_albums.append(year_album)
 			#year_cache = os.path.join(Options.config['cache_path'], json_name_by_date(year_path))
 			if not year_album.empty:
-				year_album.cache(Options.config['cache_path'])
+				year_album.cache()
 			self.generate_composite_image(year_album, year_max_file_date)
 		self.all_albums.append(by_date_album)
 		if not by_date_album.empty:
-			by_date_album.cache(Options.config['cache_path'])
+			by_date_album.cache()
 		self.generate_composite_image(by_date_album, all_max_file_date)
 		back_level()
 		return by_date_album
@@ -170,7 +170,8 @@ class TreeWalker:
 		#~ absolute_path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
 		#~ if trimmed_path:
 			#~ absolute_path_with_marker = os.path.join(absolute_path_with_marker, trimmed_path)
-		max_file_date = None
+		max_file_date = file_mtime(absolute_path)
+		print absolute_path, max_file_date
 		message("Walking                                 ", os.path.basename(absolute_path), 3)
 		next_level()
 		message("cache base", album_cache_base, 4)
@@ -324,7 +325,7 @@ class TreeWalker:
 					back_level()
 					if (
 						cached_media and
-						file_mtime(entry_with_path) <= cached_media.attributes["dateTimeFile"]
+						mtime <= cached_media.attributes["dateTimeFile"]
 					):
 						cache_files = cached_media.image_caches
 						# check if the cache files actually exist and are not old
@@ -414,7 +415,7 @@ class TreeWalker:
 		if not album.empty:
 			next_level()
 			message("saving json file for album", os.path.basename(absolute_path), 4)
-			album.cache(Options.config['cache_path'])
+			album.cache()
 			next_level()
 			message("saved json file for album", "", 5)
 			back_level()

@@ -123,9 +123,9 @@ class Album(object):
 				return False
 		return True
 		
-	def cache(self, base_dir):
+	def cache(self):
 		self.sort_subalbums_and_media()
-		json_file_with_path = os.path.join(base_dir, self.json_file)
+		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
 			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
 			sys.exit(-97)
