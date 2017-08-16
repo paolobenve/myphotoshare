@@ -89,7 +89,7 @@
 	};
 	
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
-		var hashParts, firstSlashPosition, lastSlashPosition, slashNumber, albumHash, mediaHash = null, foldersHash = null, media = null;
+		var hashParts, lastSlashPosition, slashNumber, albumHash, mediaHash = null, foldersHash = null, media = null;
 		hash = PhotoFloat.cleanHash(hash);
 		// count the number of slashes in hash, by date hashes have 2, folders ones 1
 		if (! hash.length) {

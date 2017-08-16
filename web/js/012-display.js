@@ -222,8 +222,8 @@ $(document).ready(function() {
 	
 	function socialButtons() {
 		var url, hash, myShareUrl = "";
-		var type, mediaArray = [], allThumbnails = [], src, re, position, randomIndex;
-		var i, iCorrected, folders, myShareText, myShareTextAdd, maxThumbnailNumber;
+		var type, mediaArray = [];
+		var folders, myShareText, myShareTextAdd;
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
@@ -734,7 +734,7 @@ $(document).ready(function() {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var distance = 0;
 								var htmlText, mediaSrc;
-								var folderArray, originalAlbumFoldersArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html;
+								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html;
 								
 								mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								
