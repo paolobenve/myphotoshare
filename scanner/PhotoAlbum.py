@@ -63,9 +63,6 @@ class Album(object):
 					self._subdir = path[path.rfind("/") + 1:][:2].replace(" ", "_")
 					if len(self._subdir) == 1:
 						self._subdir += "_"
-			#~ self.cache_path_with_subdir = os.path.join(Options.config['cache_path'], self._subdir)
-			#~ if not os.path.exists(self.cache_path_with_subdir):
-				#~ os.makedirs(self.cache_path_with_subdir)
 	
 	@property
 	def media(self):
@@ -136,20 +133,21 @@ class Album(object):
 		json.dump(self, fp, cls=PhotoAlbumEncoder)
 		fp.close()
 	@staticmethod
-	def from_cache(path):
+	def from_cache(path, album_cache_base):
 		fp = open(path, "r")
 		dictionary = json.load(fp)
 		fp.close()
 		# generate the album from the json file loaded
 		# subalbums are not generated yet
-		return Album.from_dict(dictionary)
+		return Album.from_dict(dictionary, album_cache_base)
 	@staticmethod
-	def from_dict(dictionary, cripple=True):
+	def from_dict(dictionary, album_cache_base, cripple=True):
 		if "physicalPath" in dictionary:
 			path = dictionary["physicalPath"]
 		else:
 			path = dictionary["path"]
 		album = Album(os.path.join(Options.config['album_path'], path))
+		album.cache_base = album_cache_base
 		for media in dictionary["media"]:
 			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], remove_folders_marker(album.baseless_path)))
 			if new_media.is_valid:

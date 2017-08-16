@@ -15,6 +15,7 @@ from PIL import Image
 
 class TreeWalker:
 	def __init__(self):
+		random.seed()
 		self.save_json_options()
 		self.all_cache_entries = ["options.json"]
 		self.all_cache_entries_by_subdir = {}
@@ -31,10 +32,22 @@ class TreeWalker:
 		self.tree_by_date = {}
 		self.all_media = list()
 		self.all_album_composite_images = list()
+		self.album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
+		if os.path.exists(self.album_cache_path):
+			if not os.access(self.album_cache_path, os.W_OK):
+				message("FATAL ERROR", self.album_cache_path + " not writable, quitting")
+				sys.exit(-97)
+		else:
+			message("creating still unexistent album cache subdir", self.album_cache_path, 4)
+			os.makedirs(self.album_cache_path)
+			next_level()
+			message("created still unexistent subdir", "", 5)
+			back_level()
+
 		origin_album = Album(Options.config['album_path'])
 		origin_album.cache_base = cache_base(Options.config['album_path'])
 		album_cache_base = Options.config['folders_string']
-		[folders_album, num] = self.walk(Options.config['album_path'], album_cache_base, origin_album)
+		[folders_album, num, max_file_date] = self.walk(Options.config['album_path'], album_cache_base, origin_album)
 		folders_album.num_media_in_sub_tree = num
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
@@ -63,24 +76,27 @@ class TreeWalker:
 	def generate_date_album(self, origin_album):
 		next_level()
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
-		album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
+		all_max_file_date = None
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		by_date_album.parent = origin_album
 		by_date_album.cache_base = cache_base(by_date_path)
 		for year, months in self.tree_by_date.iteritems():
+			year_max_file_date = None
 			year_path = os.path.join(by_date_path, str(year))
 			year_album = Album(year_path)
 			year_album.parent = by_date_album
 			year_album.cache_base = cache_base(year_path)
 			by_date_album.add_album(year_album)
 			for month, days in self.tree_by_date[year].iteritems():
+				month_max_file_date = None
 				month_path = os.path.join(year_path, str(month))
 				month_album = Album(month_path)
 				month_album.parent = year_album
 				month_album.cache_base = cache_base(month_path)
 				year_album.add_album(month_album)
 				for day, media in self.tree_by_date[year][month].iteritems():
+					day_max_file_date = None
 					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
 					day_album.parent = month_album
@@ -95,41 +111,41 @@ class TreeWalker:
 						year_album.add_media(single_media)
 						year_album.num_media_in_sub_tree += 1
 						by_date_album.num_media_in_sub_tree += 1
+						if day_max_file_date is None:
+							day_max_file_date = single_media._attributes["dateTimeFile"]
+						else:
+							day_max_file_date = max(day_max_file_date, single_media._attributes["dateTimeFile"])
+						if month_max_file_date is None:
+							month_max_file_date = single_media._attributes["dateTimeFile"]
+						else:
+							month_max_file_date = max(month_max_file_date, single_media._attributes["dateTimeFile"])
+						if year_max_file_date is None:
+							year_max_file_date = single_media._attributes["dateTimeFile"]
+						else:
+							year_max_file_date = max(year_max_file_date, single_media._attributes["dateTimeFile"])
+						if all_max_file_date is None:
+							all_max_file_date = single_media._attributes["dateTimeFile"]
+						else:
+							all_max_file_date = max(all_max_file_date, single_media._attributes["dateTimeFile"])
 					self.all_albums.append(day_album)
 					#day_cache = os.path.join(Options.config['cache_path'], json_name_by_date(day_path))
 					if not day_album.empty:
 						day_album.cache(Options.config['cache_path'])
-					message("generated composite image", day_album.cache_base, 5)
-					self.generate_composite_image(day_album, album_cache_path)
-					next_level()
-					message("generated composite image", "", 5)
-					back_level()
+					self.generate_composite_image(day_album, day_max_file_date)
 				self.all_albums.append(month_album)
 				#month_cache = os.path.join(Options.config['cache_path'], json_name_by_date(month_path))
 				if not month_album.empty:
 					month_album.cache(Options.config['cache_path'])
-				message("generated composite image", month_album.cache_base, 5)
-				self.generate_composite_image(month_album, album_cache_path)
-				next_level()
-				message("generated composite image", "", 5)
-				back_level()
+				self.generate_composite_image(month_album, month_max_file_date)
 			self.all_albums.append(year_album)
 			#year_cache = os.path.join(Options.config['cache_path'], json_name_by_date(year_path))
 			if not year_album.empty:
 				year_album.cache(Options.config['cache_path'])
-			message("generated composite image", year_album.cache_base, 5)
-			self.generate_composite_image(year_album, album_cache_path)
-			next_level()
-			message("generated composite image", "", 5)
-			back_level()
+			self.generate_composite_image(year_album, year_max_file_date)
 		self.all_albums.append(by_date_album)
 		if not by_date_album.empty:
 			by_date_album.cache(Options.config['cache_path'])
-		message("generated composite image", by_date_album.cache_base, 5)
-		self.generate_composite_image(by_date_album, album_cache_path)
-		next_level()
-		message("generated composite image", "", 5)
-		back_level()
+		self.generate_composite_image(by_date_album, all_max_file_date)
 		back_level()
 		return by_date_album
 	def add_media_to_tree_by_date(self, media):
@@ -148,26 +164,27 @@ class TreeWalker:
 		# it takes into account the fact that the file is a symlink to an unexistent file
 		mtime = lambda f: os.path.exists(os.path.join(path, f)) and os.stat(os.path.join(path, f)).st_mtime or time.mktime(datetime.now().timetuple()) 
 		return list(sorted(os.listdir(path), key=mtime))
-
+	
 	def walk(self, absolute_path, album_cache_base, parent_album = None):
 		#~ trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 		#~ absolute_path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
 		#~ if trimmed_path:
 			#~ absolute_path_with_marker = os.path.join(absolute_path_with_marker, trimmed_path)
+		max_file_date = None
 		message("Walking                                 ", os.path.basename(absolute_path), 3)
 		next_level()
 		message("cache base", album_cache_base, 4)
 		if not os.access(absolute_path, os.R_OK | os.X_OK):
 			message("access denied to directory", os.path.basename(absolute_path), 1)
 			back_level()
-			return [None, 0]
+			return [None, 0, None]
 		listdir = os.listdir(absolute_path)
 		if Options.config['exclude_tree_marker'] in listdir:
 			next_level()
 			message("excluded with subfolders by marker file", Options.config['exclude_tree_marker'], 4)
 			back_level()
 			back_level()
-			return [None, 0]
+			return [None, 0, None]
 		skip_files = False
 		if Options.config['exclude_files_marker'] in listdir:
 			next_level()
@@ -186,7 +203,7 @@ class TreeWalker:
 					message("json file unwritable", json_cache_file, 1)
 				else:
 					message("reading json file to import album...", json_cache_file, 5)
-					cached_album = Album.from_cache(json_cache_file)
+					cached_album = Album.from_cache(json_cache_file, album_cache_base)
 					next_level()
 					message("read json file", "", 5)
 					back_level()
@@ -252,7 +269,6 @@ class TreeWalker:
 				# skip hidden files and directories
 				continue
 			
-			
 			entry_with_path = os.path.join(absolute_path, entry)
 			if not os.path.exists(entry_with_path):
 				next_level()
@@ -286,7 +302,7 @@ class TreeWalker:
 				next_level()
 				message("determined cache base", "", 5)
 				back_level()
-				[next_walked_album, num] = self.walk(entry_with_path, next_album_cache_base, album)
+				[next_walked_album, num, max_file_date] = self.walk(entry_with_path, next_album_cache_base, album)
 				album.num_media_in_sub_tree += num
 				if next_walked_album is not None:
 					album.add_album(next_walked_album)
@@ -295,6 +311,11 @@ class TreeWalker:
 					continue
 				next_level()
 				cache_hit = False
+				mtime = file_mtime(entry_with_path)
+				if max_file_date is not None:
+					max_file_date = max(max_file_date, mtime)
+				else:
+					max_file_date = mtime
 				if cached_album:
 					message("reading cache media from cached album...", "", 5)
 					cached_media = cached_album.media_from_path(entry_with_path)
@@ -407,27 +428,11 @@ class TreeWalker:
 			message("VOID: no media in this directory", os.path.basename(absolute_path), 4)
 		
 		if album.num_media_in_sub_tree:
-			album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
-			if os.path.exists(album_cache_path):
-				if not os.access(album_cache_path, os.W_OK):
-					message("FATAL ERROR", album_cache_path + " not writable, quitting")
-					sys.exit(-97)
-			else:
-				message("creating still unexistent album cache subdir", album_cache_path, 4)
-				os.makedirs(album_cache_path)
-				next_level()
-				message("created still unexistent subdir", "", 5)
-				back_level()
-			
 			# generate the album composite image for sharing
-			message("generating composite image...", album.cache_base, 5)
-			self.generate_composite_image(album, album_cache_path)
-			next_level()
-			message("generated composite image", "", 5)
-			back_level()
+			self.generate_composite_image(album, max_file_date)
 		back_level()
 		
-		return [album, album.num_media_in_sub_tree]
+		return [album, album.num_media_in_sub_tree, max_file_date]
 	
 	def index_to_coords(self, index, tile_width, px_between_tiles, side_off_set, linear_number_of_tiles):
 		x = side_off_set + (index % linear_number_of_tiles) * (tile_width + px_between_tiles)
@@ -446,7 +451,16 @@ class TreeWalker:
 						return [picked_image, random_number]
 				random_number -= subalbum.num_media_in_sub_tree
 		return [None, random_number]
-	def generate_composite_image(self, album, album_cache_path):
+	def generate_composite_image(self, album, max_file_date):
+		composite_image_name = album.cache_base + ".jpg"
+		self.all_album_composite_images.append(composite_image_name)
+		composite_image_path = os.path.join(self.album_cache_path, composite_image_name)
+		if os.path.exists(composite_image_path) and file_mtime(composite_image_path) > max_file_date:
+			message("composite image OK", composite_image_path, 5)
+			return
+		
+		message("generating composite image...", composite_image_path, 5)
+		
 		# pick a maximum of Options.max_album_share_thumbnails_number random images in album and subalbums
 		# and generate a square composite image
 		
@@ -466,15 +480,18 @@ class TreeWalker:
 		
 		# pick max_thumbnail_number random square album thumbnails
 		random_thumbnails = list()
-		random.seed()
 		random_list = list()
-		for i in range(min(max_thumbnail_number, album.num_media_in_sub_tree)):
-			while True:
-				random_number = random.randint(0, album.num_media_in_sub_tree - 1)
-				if random_number not in random_list:
-					break
-			random_list.append(random_number)
-			[random_media, random_number] = self.pick_random_image(album, random_number)
+		num_random_thumbnails = min(max_thumbnail_number, album.num_media_in_sub_tree)
+		for i in range(num_random_thumbnails):
+			if num_random_thumbnails == 1:
+				random_media = album.media[0]
+			else:
+				while True:
+					random_number = random.randint(0, album.num_media_in_sub_tree - 1)
+					if random_number not in random_list:
+						break
+				random_list.append(random_number)
+				[random_media, random_number] = self.pick_random_image(album, random_number)
 			folder_prefix = remove_folders_marker(random_media.album.cache_base)
 			if folder_prefix:
 				folder_prefix += Options.config['cache_folder_separator']
@@ -522,10 +539,11 @@ class TreeWalker:
 			img.paste(tile, (x, y))
 		
 		# save the composite image
-		image_name = album.cache_base + ".jpg"
-		img_path = os.path.join(album_cache_path, image_name)
-		img.save(img_path, "JPEG", quality=Options.config['jpeg_quality'])
-		self.all_album_composite_images.append(image_name)
+		img.save(composite_image_path, "JPEG", quality=Options.config['jpeg_quality'])
+		next_level()
+		message("generated composite image", "", 5)
+		back_level()
+	
 	def save_all_media_json(self):
 		media_list = []
 		message("sorting media list...", "", 5)
