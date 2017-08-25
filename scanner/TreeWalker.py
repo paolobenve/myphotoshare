@@ -315,9 +315,9 @@ class TreeWalker:
 				message("determined cache base", "", 5)
 				back_level()
 				[next_walked_album, num, sub_max_file_date] = self.walk(entry_with_path, next_album_cache_base, album)
-				max_file_date = max(max_file_date, sub_max_file_date)
-				album.num_media_in_sub_tree += num
 				if next_walked_album is not None:
+					max_file_date = max(max_file_date, sub_max_file_date)
+					album.num_media_in_sub_tree += num
 					album.add_album(next_walked_album)
 			elif os.path.isfile(entry_with_path):
 				if skip_files:
