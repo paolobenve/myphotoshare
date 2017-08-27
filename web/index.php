@@ -155,8 +155,8 @@
 					<a id="metadata-show" href="javascript:void(0)"></a>
 					<a id="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
 					<a id="original-link" target="_blank"></a>
-					<span id="fullscreen-divider"> | </span>
 					<a id="fullscreen" href="javascript:void(0)">
+						<span id="fullscreen-divider"> | </span>
 						<span id="enter-fullscreen"></span>
 						<span id="exit-fullscreen"></span>
 					</a>
