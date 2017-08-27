@@ -290,7 +290,7 @@ $(document).ready(function() {
 		});
 		if (! Modernizr.flexbox && bottomSocialButtons()) {
 			var numSocial = 5;
-			socialWidth = Math.floor(window.innerWidth / numSocial);
+			var socialWidth = Math.floor(window.innerWidth / numSocial);
 			$('.ssk').width(socialWidth * 2 + "px");
 		}
 	}
@@ -1513,40 +1513,40 @@ $(document).ready(function() {
 	
 	
 	$(document).keydown(function(e){
-		if (! e.ctrlKey && ! e.shiftKey && ! e.altKey && (e.keyCode === 39)) {
-			//                                              arrow right
+		if ((e.keyCode === 39) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+			// arrow right
 			swipeLeft(nextLink);
 			return false;
-		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 37)) {
-			//                                                      arrow left
+		} else if ((e.keyCode === 37) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+			//        arrow left
 			swipeRight(prevLink);
 			return false;
-		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
-			//                                                             esc,           arrow up,            page up
+		} else if ((e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+			//               esc            arrow up             page up
 			if (albumLink) {
 				fromEscKey = true;
 				swipeDown(albumLink);
 				return false;
 			}
-		} else if (! e.ctrlKey && ! e.shiftKey && ! e.altKey  &&                     (e.keyCode === 40 || e.keyCode === 34)) {
-			//                                                                          arrow down,          page down
+		} else if ((e.keyCode === 40 || e.keyCode === 34) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+			//        arrow down           page down
 			if (currentMedia === null)
 				swipeUp(mediaLink);
 			else
 				swipeLeft(nextLink);
 			return false;
-		} else if (e.keyCode === 70) {
+		} else if (e.keyCode === 70 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey && $.support.fullscreen) {
 			//               f
 			if (currentMedia !== null)
 				goFullscreen(e);
 			return false;
-		} else if (e.keyCode === 77)
+		} else if (e.keyCode === 77 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//               m
 			if (currentMedia !== null) {
-				//~ $("#links").toggle();
 				showMetadata(e);
 			return false;
 			}
+		}
 		return true;
 	});
 	$(document).mousewheel(function(event, delta) {
