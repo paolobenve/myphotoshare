@@ -46,7 +46,7 @@
 		}
 		
 		// put the <link rel=".."> tag in <head> for getting the image thumbnail when sharing
-		if (isset($_GET['t']) && $_GET['t']) {
+		if (isset($_GET['t']) && $_GET['t'] && isset($_GET['m']) && $_GET['m']) {
 			// Prevent directory traversal security vulnerability
 			$realPath = realpath($_GET['m']);
 			if (strpos($realPath, realpath($options['server_cache_path'])) === 0  && url_exist($realPath)) {

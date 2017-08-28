@@ -239,7 +239,7 @@ $(document).ready(function() {
 			var reducedSizesIndex = 1;
 			if (Options.reduced_sizes.length == 1)
 				reducedSizesIndex = 0;
-			prefix = removeFolderMarker(currentMedia.foldersCacheBase);
+			var prefix = removeFolderMarker(currentMedia.foldersCacheBase);
 			if (prefix)
 				prefix += Options.cache_folder_separator;
 			mediaArray[0] = PhotoFloat.pathJoin([
@@ -1021,6 +1021,7 @@ $(document).ready(function() {
 		var chosenMedia, reducedWidth, reducedHeight;
 		var mediaWidth = media.metadata.size[0], mediaHeight = media.metadata.size[1];
 		var mediaSize = Math.max(mediaWidth, mediaHeight);
+		var mediaRatio = mediaWidth / mediaHeight, containerRatio;
 		
 		chosenMedia = PhotoFloat.originalMediaPath(media);
 		maxSize = 0;
@@ -1034,6 +1035,8 @@ $(document).ready(function() {
 			}
 		}
 		
+		containerRatio = container.width() / container.height();
+		
 		for (var i = 0; i < Options.reduced_sizes.length; i++) {
 			if (Options.reduced_sizes[i] < mediaSize) {
 				if (mediaWidth > mediaHeight) {
@@ -1043,7 +1046,12 @@ $(document).ready(function() {
 					reducedHeight = Options.reduced_sizes[i];
 					reducedWidth = Options.reduced_sizes[i] * mediaWidth / mediaHeight;
 				}
-				if (reducedWidth < container.width() && reducedHeight < container.height())
+				
+				if (
+					mediaRatio > containerRatio && reducedWidth < container.width() ||
+					mediaRatio < containerRatio && reducedHeight < container.height()
+				)
+				//~ if (reducedWidth < container.width() && reducedHeight < container.height())
 					break;
 			}
 			chosenMedia = photoFloat.mediaPath(currentAlbum, media, Options.reduced_sizes[i]);
@@ -1207,12 +1215,10 @@ $(document).ready(function() {
 			if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
 				albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 			else
-				//~ albumLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
 				albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "";
 			prevLink = "";
 		} else {
-			//~ albumLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
 			albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
 			prevLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, prevMedia);
@@ -1220,33 +1226,34 @@ $(document).ready(function() {
 			$("#prev").show();
 			$("#next-media")
 				.on('contextmenu', function(ev) {
-					if (! ev.shiftKey) {
+					if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						ev.preventDefault();   
 						swipeRight(prevLink);
 					}
 				})
 				.mousedown(function(ev){
-					if(ev.which == 1)
+					if(ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						swipeLeft(nextLink);
-					return false; 
+						return false; 
+					}
 				});
-			$('#next').click(function(){
-				swipeLeft(nextLink);
-				return false;
+			$('#next').click(function(ev){
+				if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+					swipeLeft(nextLink);
+					return false;
+				}
 			});
-			$('#prev').click(function(e){
-				swipeRight(prevLink);
-				return false;
+			$('#prev').click(function(ev){
+				if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+					swipeRight(prevLink);
+					return false;
+				}
 			});
 		}
 		$("#original-link").attr("target", "_blank").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia)));
 		
 		if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
 			// by date album: change to folder view
-			//~ changeViewLink = "#!/" + PhotoFloat.pathJoin([
-							//~ encodeURIComponent(PhotoFloat.cacheBase(currentMedia.foldersAlbum)),
-							//~ encodeURIComponent(PhotoFloat.cacheBase(currentMedia.name))
-						//~ ]);
 			changeViewLink = "#!/" + PhotoFloat.pathJoin([
 							encodeURIComponent(currentMedia.foldersCacheBase),
 							encodeURIComponent(currentMedia.cacheBase)
@@ -1448,9 +1455,6 @@ $(document).ready(function() {
 		if (Object.keys(Options).length > 0)
 			callback(location.hash, hashParsed, die);
 		else {
-			
-			//~ if (cacheSubDir && cacheSubDir.substr(-1) != "/")
-				//~ cacheSubDir += "/";
 			var optionsFile = PhotoFloat.pathJoin([cacheSubDir, "options.json"]);
 			var ajaxOptions = {
 				type: "GET",
