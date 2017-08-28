@@ -1535,7 +1535,7 @@ $(document).ready(function() {
 			else
 				swipeLeft(nextLink);
 			return false;
-		} else if (e.keyCode === 70 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey && $.support.fullscreen) {
+		} else if (e.keyCode === 70 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey && Modernizr.fullscreen) {
 			//               f
 			if (currentMedia !== null)
 				goFullscreen(e);
@@ -1596,7 +1596,7 @@ $(document).ready(function() {
 			}
 		});
 	}
-	if ($.support.fullscreen) {
+	if (Modernizr.fullscreen) {
 		$("#fullscreen").show();
 		$("#fullscreen").click(goFullscreen);
 	}

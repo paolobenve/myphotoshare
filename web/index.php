@@ -10,7 +10,8 @@
 		$jsonString = file_get_contents('options.json');
 		$options = json_decode($jsonString, true);
 	?>
-	<title><?php if ($options['page_title']) echo $options['page_title']; ?></title>
+	<title><?php if ($options['page_title'])
+			echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
 <!--
@@ -62,6 +63,7 @@
 			}
 		}
 	?>
+	
 	<?php if ($options['piwik_server'] && $options['piwik_id']) { ?>
 		<!-- Piwik -->
 		<script type="text/javascript">
@@ -87,6 +89,7 @@
 		<noscript><p><img src="//cathopedia.org:8080/piwik/piwik.php?idsite=15" style="border:0;" alt="" /></p></noscript>
 		<!-- End Piwik Code -->
 	<?php } ?>  
+	
 	<?php if (isset($options['google_analitics_id'])) { ?>
 		<!-- google analytics -->
 		<script type="text/javascript">
