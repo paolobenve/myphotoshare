@@ -369,17 +369,26 @@ $(document).ready(function() {
 				} else {
 					if (i == components.length - 1 && currentMedia === null && ! isMobile.any()) {
 						title += " <span id=\"title-count\">(";
-						if (currentAlbum.media.length) {
+						if (dateTitle) {
 							title += currentAlbum.media.length;
 							title += " ";
-							title += _t("#media-in-album");
-						}
-						if (currentAlbum.media.length && currentAlbum.albums.length)
-							title += ", ";
-						if (currentAlbum.albums.length) {
-							title += currentAlbum.numMediaInSubTree;
-							title += " ";
-							title += _t("#media-in-tree");
+							if (components.length >= 5)
+								title += _t("#media-in-day-album");
+							else
+								title += _t("#media-in-date-album");
+						} else {
+							if (currentAlbum.media.length) {
+								title += currentAlbum.media.length;
+								title += " ";
+								title += _t("#media-in-album");
+							}
+							if (currentAlbum.media.length && currentAlbum.albums.length)
+								title += ", ";
+							if (currentAlbum.albums.length) {
+								title += currentAlbum.numMediaInSubTree;
+								title += " ";
+								title += _t("#media-in-tree");
+							}
 						}
 						title += ")</span>";
 					}
