@@ -55,6 +55,20 @@ As a term of comparizon, on my medium-sized pc, with the images on a nfs mounted
 * scanning for the first time a 124 photos directory for a total size of 295 MB takes about 100 seconds (about 1 sec/media, 1 media/sec).
 * re-scan of "all OK" tree with 36000 media files for a total size of 87 GB takes about 14 minutes (about 20 ms/media, 50 media/sec)
 
+### Known issues:
+
+The scanner had bug in the past, so thumbnail generated with previous versions of the scanner could have some defect or lack something:
+* fixed height media thumbnails could result blurred
+* video thumbnails could lack the transparent video marker
+
+You can delete once for ever all the cache content, but perhaps you don't want to regenerate again all the thumbnails. The solution is to manually delete only the "failed" thumbnail.
+
+As an example, the command to delete thumbnails of `mp4` videos is:
+
+    find /your/cache/directory/ -iname "*mp4_*.jpg" -exec rm {} \;
+
+Repeat the same command for other video extensions, like `avi`.
+
 ## Community
 
 Github platform permits you to report bugs.
@@ -248,6 +262,13 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.6.2 (September 1, 2017):
+
+* videos: a transparency indicating it's a video is added to thumbnails
+* added media count in title
+* updated modernizr
+* bug fixes
+
 ### version 2.6.1 (August 16, 2017):
 
 * added media count to subalbums slides
@@ -272,10 +293,6 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * restored cache use in scanner: scanner is now faster on already scanned albums
 * implemented verbosity levels, default is now 3 = errors, warnings, walkings
 * new option `recreate_fixed_height_thumbnails`: makes the scanner delete wide media fixed height thumbnail, in order to get rid of a previous versions bug which caused these thumbnail be generated blurred. Set it to `true`/`1` and make the scanner work, then reset again it to `false`/`0`
-
-#### Known issues:
-
-* When media thumbnail type is fixed height, thumbnail generated with previous versions of the scanner could result blurred; it seems difficult to detect the "failed" thumbnails, and it would probably create many false positives, recreating many thumbnails all the times the scanner is run. So the solution is to manually delete the "failed" thumbnail, or to delete once for ever all the cache.
 
 ### version 2.4.1 (July 26, 2017):
 

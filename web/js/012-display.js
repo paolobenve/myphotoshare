@@ -343,7 +343,7 @@ $(document).ready(function() {
 				}
 			}
 		}
-		// generate the title in the page
+		// generate the title in the page top
 		titleAnchorClasses = 'title-anchor';
 		if (isMobile.any())
 			titleAnchorClasses += ' mobile';
@@ -367,6 +367,22 @@ $(document).ready(function() {
 					if (! (i == 0 && dateTitle))
 						title += "</a>";
 				} else {
+					if (i == components.length - 1 && currentMedia === null && ! isMobile.any()) {
+						title += " <span id=\"title-count\">(";
+						if (currentAlbum.media.length) {
+							title += currentAlbum.media.length;
+							title += " ";
+							title += _t("#media-in-album");
+						}
+						if (currentAlbum.media.length && currentAlbum.albums.length)
+							title += ", ";
+						if (currentAlbum.albums.length) {
+							title += currentAlbum.numMediaInSubTree;
+							title += " ";
+							title += _t("#media-in-tree");
+						}
+						title += ")</span>";
+					}
 					title += "</span>";
 				}
 			}

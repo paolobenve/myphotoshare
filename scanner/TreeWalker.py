@@ -139,7 +139,7 @@ class TreeWalker:
 					if not day_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < day_max_file_date):
 						day_album.cache()
 					next_level()
-					message("elaborated day album", media[0].year + "-" + media[0].month + "-" + media[0].day, 4)
+					message("day album elaborated", media[0].year + "-" + media[0].month + "-" + media[0].day, 4)
 					back_level()
 					self.generate_composite_image(day_album, day_max_file_date)
 				self.all_albums.append(month_album)
@@ -367,7 +367,10 @@ class TreeWalker:
 								cache_hit = False
 								break
 						if cache_hit:
-							message("reduced size images and thumbnails OK", os.path.basename(entry_with_path), 4)
+							if media._attributes["mediaType"] == "video":
+								message("reduced size transcoded video and thumbnails OK", os.path.basename(entry_with_path), 4)
+							else:
+								message("reduced size images and thumbnails OK", os.path.basename(entry_with_path), 4)
 							media = cached_media
 						#~ else:
 							#~ absolute_cache_file = ""

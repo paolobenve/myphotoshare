@@ -18,7 +18,11 @@ a:hover {
 	font-size: medium;
 }
 
-
+#title-count {
+	font-size: 80%;
+	font-style: italic;
+	font-weight: normal;
+}
 #title, #title:hover {
 	padding: 0.4em;
 	font-weight: bold;
