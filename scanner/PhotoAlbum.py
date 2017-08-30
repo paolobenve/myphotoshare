@@ -124,15 +124,15 @@ class Album(object):
 		return True
 		
 	def cache(self):
+		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
+		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
+			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
+			sys.exit(-97)
 		message("sorting album...", "", 5)
 		self.sort_subalbums_and_media()
 		next_level()
 		message("sorted album", self.absolute_path, 4)
 		back_level()
-		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
-		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
-			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
-			sys.exit(-97)
 		message("saving album...", "", 5)
 		with open(json_file_with_path, 'w') as fp:
 			json.dump(self, fp, cls=PhotoAlbumEncoder)
@@ -309,7 +309,8 @@ class Media(object):
 				self._video_metadata(media_path)
 				if self._attributes["mediaType"] == "video":
 					self._video_transcode(thumbs_path, media_path)
-					self._video_thumbnails(thumbs_path, media_path)
+					if self.is_valid:
+						self._video_thumbnails(thumbs_path, media_path)
 				else:
 					next_level()
 					message("error transcodind, not a video?", media_path, 5)
@@ -599,19 +600,34 @@ class Media(object):
 			os.path.exists(thumbs_path_with_subdir) and
 			os.path.exists(thumb_path) and
 			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
-			(not os.path.exists(json_file) or file_mtime(thumb_path) < file_mtime(json_file)) and (
+			(
+				os.path.exists(json_file) and file_mtime(thumb_path) < file_mtime(json_file)
+			) and
+			(
 				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
 				is_thumbnail and not Options.config['recreate_thumbnails']
 			)
 		):
 			next_level()
-			message("reduction/thumbnail OK, skipping", "", 5)
+			message("reduction/thumbnail OK, skipping", thumb_path, 5)
 			back_level()
 			back_level()
 			return start_image
 		
 		next_level()
-		message("reduction/thumbnail not OK, creating", "", 5)
+		message("reduction/thumbnail not OK, creating", thumbs_path_with_subdir, 5)
+		next_level()
+		if not os.path.exists(thumbs_path_with_subdir):
+			message("unexistent subdir", thumbs_path_with_subdir, 5)
+		elif not os.path.exists(thumb_path):
+			message("unexistent reduction/thumbnail", thumb_path, 5)
+		elif not file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
+			message("reduction/thumbnail older than media date time", thumb_path, 5)
+		elif not os.path.exists(json_file):
+			message("unexistent json file", json_file, 5)
+		elif not file_mtime(thumb_path) < file_mtime(json_file):
+			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
+		back_level()
 		message("calculations...", "", 5)
 		original_thumb_size = thumb_size
 		info_string = str(original_thumb_size)
@@ -695,25 +711,21 @@ class Media(object):
 				message("small image, no thumbing for album", info_string, 4)
 			else:
 				message("small image, no thumbing for media", info_string, 4)
-			#~ try:
-				#~ os.unlink(thumb_path)
-			#~ except OSError:
-				#~ pass
-			#~ return start_image
 		
 		try:
-			message("making copy...", info_string, 5)
+			message("making copy...", "", 5)
 			start_image_copy = start_image.copy()
 			next_level()
-			message("made copy (" + str(original_thumb_size) + ")", "", 5)
+			message("copy made", info_string, 4)
 			back_level()
 		except KeyboardInterrupt:
 			raise
 		except:
+			# we try again to work around PIL bug
 			message("making copy (2nd try)...", info_string, 5)
-			start_image_copy = start_image.copy() # we try again to work around PIL bug
+			start_image_copy = start_image.copy() 
 			next_level()
-			message("made copy(2nd try, " + str(original_thumb_size) + "))", info_string, 5)
+			message("copy made (2nd try)", info_string, 5)
 			back_level()
 			
 		# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
@@ -743,26 +755,42 @@ class Media(object):
 				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
 			back_level()
 		
-		# the subdir hadn't been created when creating the album in order to avoid to create empty directories
+		# the subdir hadn't been created when creating the album in order to avoid creation of empty directories
 		if not os.path.exists(thumbs_path_with_subdir):
-			message("creating still unexistent subdir", thumbs_path_with_subdir, 5)
+			message("creating unexistent subdir", "", 5)
 			os.makedirs(thumbs_path_with_subdir)
 			next_level()
-			message("created still unexistent subdir", "", 5)
+			message("unexistent subdir created", thumbs_path_with_subdir, 4)
 			back_level()
+		
+		if os.path.exists(thumb_path) and not os.access(thumb_path, os.W_OK):
+			message("FATAL ERROR", thumb_path + " not writable, quitting")
+			sys.exit(-97)
+		
+		if self._attributes["mediaType"] == "video":
+			message("adding video transparency...", "", 5)
+			start_image_copy_for_saving = start_image_copy.copy()
+			transparency_file = os.path.join(os.path.dirname(__file__), "../web/img/play_button_100_62.png")
+			video_transparency = Image.open(transparency_file)
+			x = (start_image_copy.size[0] - video_transparency.size[0]) / 2
+			y = (start_image_copy.size[1] - video_transparency.size[1]) / 2
+			start_image_copy_for_saving.paste(video_transparency, (x, y), video_transparency)
+			next_level()
+			message("video transparency added", "", 4)
+			back_level()
+		else:
+			start_image_copy_for_saving = start_image_copy
+		
+		message("saving...", info_string, 5)
 		try:
-			message("saving...", info_string, 5)
-			if os.path.exists(thumb_path) and not os.access(thumb_path, os.W_OK):
-				message("FATAL ERROR", thumb_path + " not writable, quitting")
-				sys.exit(-97)
-			start_image_copy.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			start_image_copy_for_saving.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("saved reduced (" + str(original_thumb_size) + ")", "", 4)
+				message("saved reduced", thumb_path, 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("saved for albums (" + str(original_thumb_size) + ")", "", 4)
+				message("saved for albums", thumb_path, 4)
 			else:
-				message("saved for media (" + str(original_thumb_size) + ")", "", 4)
+				message("saved for media", thumb_path, 4)
 			back_level()
 			back_level()
 			back_level()
@@ -774,9 +802,9 @@ class Media(object):
 				pass
 			raise
 		except IOError:
+			message("saving (2nd try)...", info_string, 5)
 			try:
-				message("saving (2nd try)...", info_string, 5)
-				start_image_copy.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+				start_image_copy_for_saving.convert('RGB').save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
 				next_level()
 				if original_thumb_size > Options.config['album_thumb_size']:
 					message("saved reduced (2nd try, " + str(original_thumb_size) + ")", "", 2)
@@ -790,7 +818,6 @@ class Media(object):
 					os.unlink(thumb_path)
 				except OSError:
 					pass
-				raise
 			back_level()
 			back_level()
 			return start_image_copy
@@ -857,6 +884,7 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["metadata"]["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
+		
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
 		self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		if thumb_type == "fit":
@@ -875,7 +903,20 @@ class Media(object):
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
 		if album_prefix == Options.config["cache_folder_separator"]:
 			album_prefix = ""
-		transcode_path = os.path.join(transcode_path, self.album.subdir, album_prefix + video_cache_name(self))
+		
+		album_cache_path = os.path.join(transcode_path, self.album.subdir)
+		if os.path.exists(album_cache_path):
+			if not os.access(album_cache_path, os.W_OK):
+				message("FATAL ERROR", album_cache_path + " not writable, quitting")
+				sys.exit(-97)
+		else:
+			message("creating still unexistent album cache subdir", "", 5)
+			os.makedirs(album_cache_path)
+			next_level()
+			message("created still unexistent subdir", album_cache_path, 4)
+			back_level()
+		
+		transcode_path = os.path.join(album_cache_path, album_prefix + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
 		transcode_cmd = [
@@ -923,12 +964,15 @@ class Media(object):
 			transcode_cmd.append(','.join(filters))
 		
 		next_level()
-		message("transcoding", info_string, 4)
-		back_level()
+		message("transcoding...", info_string, 5)
 		tmp_transcode_cmd = transcode_cmd[:]
 		transcode_cmd.append(transcode_path)
 		try:
 			p = VideoTranscodeWrapper().call(*transcode_cmd)
+			if p != False:
+				next_level()
+				message("transcoded", "", 4)
+				back_level()
 		except KeyboardInterrupt:
 			raise
 		
@@ -937,13 +981,16 @@ class Media(object):
 			# done to avoid this error;
 			# x264 [error]: baseline profile doesn't support 4:2:2
 			next_level()
-			message("transcoding failure, trying yuv420p", os.path.basename(original_path), 2)
-			back_level()
+			message("transcoding failure, trying yuv420p...", "", 3)
 			tmp_transcode_cmd.append('-pix_fmt')
 			tmp_transcode_cmd.append('yuv420p')
 			tmp_transcode_cmd.append(transcode_path)
 			try:
 				p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
+				if p != False:
+					next_level()
+					message("transcoded with yuv420p", "", 2)
+					back_level()
 			except KeyboardInterrupt:
 				raise
 			
@@ -957,7 +1004,11 @@ class Media(object):
 				except OSError:
 					pass
 				return
-		self._video_metadata(transcode_path, False)
+			back_level()
+
+		if self.is_valid:
+			self._video_metadata(transcode_path, False)
+		back_level()
 
 	@property
 	def name(self):
@@ -1041,7 +1092,7 @@ class Media(object):
 		return self.date.strftime("%m")
 	@property
 	def day(self):
-		return str(self.date.day)
+		return str(self.date.day).zfill(2)
 	#~ @property
 	#~ def year_month(self):
 		#~ return self.year + " " + self.month

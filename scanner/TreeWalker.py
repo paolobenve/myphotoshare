@@ -156,7 +156,7 @@ class TreeWalker:
 		json_file = os.path.join(Options.config['cache_path'], by_date_album.json_file)
 		if not by_date_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < by_date_max_file_date):
 			by_date_album.cache()
-		self.generate_composite_image(by_date_album, by_date_max_file_date)
+		#~ self.generate_composite_image(by_date_album, by_date_max_file_date)
 		back_level()
 		return by_date_album
 	
@@ -358,8 +358,10 @@ class TreeWalker:
 							
 							if (
 								not os.path.exists(absolute_cache_file) or 
-								file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"] or
-								json_cache_OK and file_mtime(absolute_cache_file) > file_mtime(json_cache_file) or
+								json_cache_OK and (
+									file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"] or
+									file_mtime(absolute_cache_file) > file_mtime(json_cache_file)
+								) or
 								(Options.config['recreate_reduced_photos'] or Options.config['recreate_thumbnails'])
 							):
 								cache_hit = False
@@ -367,20 +369,24 @@ class TreeWalker:
 						if cache_hit:
 							message("reduced size images and thumbnails OK", os.path.basename(entry_with_path), 4)
 							media = cached_media
-						else:
-							absolute_cache_file = ""
+						#~ else:
+							#~ absolute_cache_file = ""
 				if not cache_hit:
 					message("processing file", entry_with_path, 4)
 					next_level()
-					if json_cache_OK:
+					if not json_cache_OK:
+						message("json file not OK", "", 4)
+					else:
 						if cached_media is None:
 							message("media not cached", "", 4)
-						elif not os.path.exists(absolute_cache_file):
-							message("unexistent reduction/thumbnail", absolute_cache_file, 4)
-						elif file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
-							message("reduction/thumbnail older than media", absolute_cache_file, 4)
-						elif file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
-							message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
+						else:
+							if not os.path.exists(absolute_cache_file):
+								message("unexistent reduction/thumbnail", absolute_cache_file, 4)
+							else:
+								if file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
+									message("reduction/thumbnail older than cached media", absolute_cache_file, 4)
+								elif file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
+									message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
 					
 					if Options.config['recreate_reduced_photos']:
 						message("reduced photo recreation requested", "", 4)
@@ -432,11 +438,16 @@ class TreeWalker:
 				message("saved json file for album", os.path.basename(absolute_path), 4)
 				back_level()
 			else:
-				message("no need to save json file for album", os.path.basename(absolute_path), 4)
+				message("no need to save json file for album, only touching it", "", 5)
+				with open(json_file, 'a'):
+					os.utime(json_file, None)
+				next_level()
+				message("no need to save json file for album, touched", json_file, 4)
+				back_level()
 			message("adding album to big list...", "", 5)
 			self.all_albums.append(album)
 			next_level()
-			message("added album to big list", "", 5)
+			message("added album to big list", "", 4)
 			back_level()
 			back_level()
 		else:
@@ -471,7 +482,12 @@ class TreeWalker:
 		self.all_album_composite_images.append(composite_image_name)
 		composite_image_path = os.path.join(self.album_cache_path, composite_image_name)
 		if os.path.exists(composite_image_path) and file_mtime(composite_image_path) > max_file_date:
-			message("composite image OK", composite_image_path, 5)
+			message("composite image OK", "", 5)
+			with open(composite_image_path, 'a'):
+				os.utime(composite_image_path, None)
+			next_level()
+			message("composite image OK, touched", composite_image_path, 4)
+			back_level()
 			return
 		
 		message("generating composite image...", composite_image_path, 5)
@@ -496,14 +512,19 @@ class TreeWalker:
 		# pick max_thumbnail_number random square album thumbnails
 		random_thumbnails = list()
 		random_list = list()
+		bad_list = list()
 		num_random_thumbnails = min(max_thumbnail_number, album.num_media_in_sub_tree)
-		for i in range(num_random_thumbnails):
+		i = 0
+		good_media_number = album.num_media_in_sub_tree
+		while True:
+			if i >= good_media_number:
+				break
 			if num_random_thumbnails == 1:
 				random_media = album.media[0]
 			else:
 				while True:
 					random_number = random.randint(0, album.num_media_in_sub_tree - 1)
-					if random_number not in random_list:
+					if random_number not in random_list and random_number not in bad_list:
 						break
 				random_list.append(random_number)
 				[random_media, random_number] = self.pick_random_image(album, random_number)
@@ -515,7 +536,15 @@ class TreeWalker:
 					random_media.album.subdir,
 					folder_prefix + random_media.cache_base
 				) + "_" + str(Options.config['album_thumb_size']) + "as.jpg"
-			random_thumbnails.append(thumbnail)
+			if os.path.exists(thumbnail):
+				random_thumbnails.append(thumbnail)
+				i += 1
+				if i == num_random_thumbnails:
+					break
+			else:
+				print "unexistent " + thumbnail + ", i=", i, "good=", good_media_number
+				bad_list.append(thumbnail)
+				good_media_number -= 1
 		
 		# add the missing images, repeat the first ones
 		if len(random_thumbnails) < max_thumbnail_number:
