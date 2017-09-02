@@ -759,7 +759,7 @@ $(document).ready(function() {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var distance = 0;
 								var htmlText;
-								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html;
+								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								
 								mediaWidth = randomMedia.metadata.size[0];
@@ -788,9 +788,13 @@ $(document).ready(function() {
 									}
 								}
 								
+								if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
+									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]).substr(Options.by_date_string.length + 1);
+								else
+									titleName = randomMedia.albumName;
 								htmlText =	"<span class=\"helper\"></span>" +
 										"<img " +
-											"title=\"" + randomMedia.albumName + "\"" +
+											"title=\"" + titleName + "\"" +
 											" class=\"thumbnail\"" +
 											" src=\"" + encodeURI(mediaSrc) + "\"" +
 											" style=\"width:" + thumbWidth + "px;" +
