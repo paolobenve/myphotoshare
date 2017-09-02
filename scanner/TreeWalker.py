@@ -156,7 +156,7 @@ class TreeWalker:
 		json_file = os.path.join(Options.config['cache_path'], by_date_album.json_file)
 		if not by_date_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < by_date_max_file_date):
 			by_date_album.cache()
-		#~ self.generate_composite_image(by_date_album, by_date_max_file_date)
+		self.generate_composite_image(by_date_album, by_date_max_file_date)
 		back_level()
 		return by_date_album
 	
