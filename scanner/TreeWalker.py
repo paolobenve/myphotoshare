@@ -215,6 +215,7 @@ class TreeWalker:
 					message("json file unwritable", json_cache_file, 1)
 				else:
 					message("reading json file to import album...", json_cache_file, 5)
+					# the following is the instruction which could raise the error
 					cached_album = Album.from_cache(json_cache_file, album_cache_base)
 					next_level()
 					message("read json file", "", 5)

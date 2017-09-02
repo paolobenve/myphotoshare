@@ -367,27 +367,27 @@ $(document).ready(function() {
 					if (! (i == 0 && dateTitle))
 						title += "</a>";
 				} else {
-					if (i == components.length - 1 && currentMedia === null && ! isMobile.any()) {
+					if (! isMobile.any()) {
 						title += " <span id=\"title-count\">(";
 						if (dateTitle) {
-							title += currentAlbum.media.length;
-							title += " ";
+							title += currentAlbum.media.length + " ";
+							title += _t(".title-media") + " ";
 							if (components.length >= 5)
-								title += _t("#media-in-day-album");
+								title += _t("#title-in-day-album");
 							else
-								title += _t("#media-in-date-album");
+								title += _t("#title-in-date-album");
 						} else {
 							if (currentAlbum.media.length) {
-								title += currentAlbum.media.length;
-								title += " ";
-								title += _t("#media-in-album");
+								title += currentAlbum.numMediaInSubTree + " ";
+								title += _t(".title-media") + " ";
+								title += _t("#title-in-album");
+								if (currentAlbum.albums.length)
+									title += ", ";
 							}
-							if (currentAlbum.media.length && currentAlbum.albums.length)
-								title += ", ";
 							if (currentAlbum.albums.length) {
-								title += currentAlbum.numMediaInSubTree;
-								title += " ";
-								title += _t("#media-in-tree");
+								title += currentAlbum.numMediaInSubTree + " ";
+								title += _t(".title-media") + " ";
+								title += _t("#title-in-tree");
 							}
 						}
 						title += ")</span>";
@@ -852,8 +852,8 @@ $(document).ready(function() {
 								html += 	"color: " + Options.album_caption_color + ";\"";
 								html += ">(";
 								html +=		subalbum.numMediaInSubTree;
-								html +=		" <span id=\"album-caption-total\">";
-								html +=		_t(".album-caption-total");
+								html +=		" <span class=\"title-media\">";
+								html +=		_t(".title-media");
 								html +=		"</span>";
 								html += ")</div>";
 								theImage.parent().append(html);
