@@ -759,7 +759,7 @@ $(document).ready(function() {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var distance = 0;
 								var htmlText;
-								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName;
+								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								
 								mediaWidth = randomMedia.metadata.size[0];
@@ -788,12 +788,24 @@ $(document).ready(function() {
 									}
 								}
 								
-								if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
+								if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
 									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]).substr(Options.by_date_string.length + 1);
-								else
+									link = PhotoFloat.pathJoin(["#!", randomMedia.dayAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
+								} else {
 									titleName = randomMedia.albumName.substr(Options.server_album_path.length + 1);
+									link = PhotoFloat.pathJoin(["#!", randomMedia.foldersCacheBase, randomMedia.cacheBase]);
+								}
 								titleName = titleName.substr(titleName.indexOf('/') + 1);
-								htmlText =	"<span class=\"helper\"></span>" +
+								htmlText =	"<a href=\"" + link + "\">" +
+										"<img src=\"img/link-arrow.png\" " + 
+											"title=\"" + _t(".go-to-this-image") + "\" " +
+											"alt=\"" + _t(".go-to-this-image") + "\" " +
+											"class=\"album-button-random-media-link\" " +
+											" style=\"width: 20px;" +
+												" height: 20px;" +
+												"\"" +">" + 
+										"</a>" +
+										"<span class=\"helper\"></span>" +
 										"<img " +
 											"title=\"" + titleName + "\"" +
 											" class=\"thumbnail\"" +
