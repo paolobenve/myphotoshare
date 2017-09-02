@@ -222,14 +222,14 @@ $(document).ready(function() {
 	
 	function socialButtons() {
 		var url, hash, myShareUrl = "";
-		var type, mediaArray = [];
+		var type, mediaParameter;
 		var folders, myShareText, myShareTextAdd;
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
 		url += folders;
 		if (currentMedia === null) {
-			mediaArray[0] = PhotoFloat.pathJoin([
+			mediaParameter = PhotoFloat.pathJoin([
 				Options.server_cache_path,
 				Options.cache_album_subdir,
 				currentAlbum.cacheBase
@@ -242,7 +242,7 @@ $(document).ready(function() {
 			var prefix = removeFolderMarker(currentMedia.foldersCacheBase);
 			if (prefix)
 				prefix += Options.cache_folder_separator;
-			mediaArray[0] = PhotoFloat.pathJoin([
+			mediaParameter = PhotoFloat.pathJoin([
 				Options.server_cache_path,
 				currentMedia.cacheSubdir,
 				prefix + currentMedia.cacheBase
@@ -256,7 +256,7 @@ $(document).ready(function() {
 		
 		hash = location.hash;
 		myShareUrl = url + '?';
-		myShareUrl += 'm=' + encodeURIComponent(mediaArray[0]) + '&';
+		myShareUrl += 'm=' + encodeURIComponent(mediaParameter) + '&';
 		myShareUrl += 't=' + type + '#' + hash.substring(1);
 		
 		myShareText = Options.page_title;
