@@ -57,6 +57,12 @@ As a term of comparizon, on my medium-sized pc, with the images on a nfs mounted
 
 ### Known issues:
 
+#### Fullscreen not working on apple products
+
+Fullscreen capabilities aren't detected on iphone/ipad
+
+#### Issues related to previous scanner versions
+
 The scanner had bug in the past, so thumbnail generated with previous versions of the scanner could have some defect or lack something:
 * fixed height media thumbnails could result blurred
 * video thumbnails could lack the transparent video marker
@@ -262,7 +268,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-### version 2.6.2 (September 1, 2017):
+### version 2.6.2 (September 2, 2017):
 
 * videos: a transparency indicating it's a video is added to thumbnails
 * added media count in title
