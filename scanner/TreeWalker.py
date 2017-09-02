@@ -435,19 +435,11 @@ class TreeWalker:
 		if not album.empty:
 			next_level()
 			json_file = os.path.join(Options.config['cache_path'], album.json_file)
-			if not os.path.exists(json_file) or file_mtime(json_file) < max_file_date:
-				message("saving json file for album", "", 5)
-				album.cache()
-				next_level()
-				message("saved json file for album", os.path.basename(absolute_path), 4)
-				back_level()
-			else:
-				message("no need to save json file for album, only touching it", "", 5)
-				with open(json_file, 'a'):
-					os.utime(json_file, None)
-				next_level()
-				message("no need to save json file for album, touched", json_file, 4)
-				back_level()
+			message("saving json file for album", "", 5)
+			album.cache()
+			next_level()
+			message("saved json file for album", os.path.basename(absolute_path), 4)
+			back_level()
 			message("adding album to big list...", "", 5)
 			self.all_albums.append(album)
 			next_level()
