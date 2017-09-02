@@ -22,6 +22,8 @@ a:hover {
 	font-size: 80%;
 	font-style: italic;
 	font-weight: normal;
+	opacity: 0.7;
+	filter: alpha(opacity=70); /* For IE8 and earlier */
 }
 #title, #title:hover {
 	padding: 0.4em;
@@ -108,7 +110,9 @@ a.title-anchor.mobile {
 
 .album-caption-count {
 	margin-top: .2em;
-	text-align: center
+	text-align: center;
+	opacity: 0.7;
+	filter: alpha(opacity=70); /* For IE8 and earlier */
 }
 
 /* this class is needed in order to get the thumbnails vertically centered,
