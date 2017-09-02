@@ -791,7 +791,8 @@ $(document).ready(function() {
 								if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
 									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]).substr(Options.by_date_string.length + 1);
 								else
-									titleName = randomMedia.albumName;
+									titleName = randomMedia.albumName.substr(Options.server_album_path.length + 1);
+								titleName = titleName.substr(titleName.indexOf('/') + 1);
 								htmlText =	"<span class=\"helper\"></span>" +
 										"<img " +
 											"title=\"" + titleName + "\"" +
