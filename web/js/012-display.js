@@ -758,10 +758,9 @@ $(document).ready(function() {
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var distance = 0;
-								var htmlText, mediaSrc;
+								var htmlText;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html;
-								
-								mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
+								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								
 								mediaWidth = randomMedia.metadata.size[0];
 								mediaHeight = randomMedia.metadata.size[1];
@@ -857,8 +856,6 @@ $(document).ready(function() {
 								html +=		"</span>";
 								html += ")</div>";
 								theImage.parent().append(html);
-								// this function must be called every time a album slide is created,
-								// in order to include this images in the composite php will create
 								numSubAlbumsReady ++;
 								if (numSubAlbumsReady >= originalAlbum.albums.length) {
 									// now all the subalbums random thumbnails has been loaded
