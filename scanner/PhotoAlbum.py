@@ -601,7 +601,7 @@ class Media(object):
 			os.path.exists(thumb_path) and
 			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
 			(
-				os.path.exists(json_file) and file_mtime(thumb_path) < file_mtime(json_file)
+				not os.path.exists(json_file) or file_mtime(thumb_path) < file_mtime(json_file)
 			) and
 			(
 				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
