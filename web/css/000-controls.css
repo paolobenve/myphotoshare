@@ -146,6 +146,11 @@ a.title-anchor.mobile {
 	border-bottom-color: lightgray;
 }
 
+.album-button-and-caption:hover {
+	opacity: 0.8;
+	filter: alpha(opacity=80); /* For IE8 and earlier */
+}
+
 .album-button img, .thumb-container img {
 	vertical-align: middle;
 }
