@@ -268,6 +268,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.6.3 (September 2, 2017):
+
+* album buttons has now a link to go to random image directly
+
 ### version 2.6.2 (September 2, 2017):
 
 * videos: a transparency indicating it's a video is added to thumbnails
