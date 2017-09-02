@@ -759,7 +759,7 @@ $(document).ready(function() {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var distance = 0;
 								var htmlText;
-								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link;
+								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								
 								mediaWidth = randomMedia.metadata.size[0];
@@ -796,10 +796,11 @@ $(document).ready(function() {
 									link = PhotoFloat.pathJoin(["#!", randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								}
 								titleName = titleName.substr(titleName.indexOf('/') + 1);
+								goTo = _t(".go-to") + " " + titleName;
 								htmlText =	"<a href=\"" + link + "\">" +
 										"<img src=\"img/link-arrow.png\" " + 
-											"title=\"" + _t(".go-to-this-image") + "\" " +
-											"alt=\"" + _t(".go-to-this-image") + "\" " +
+											"title=\"" + goTo + "\" " +
+											"alt=\"" + goTo + "\" " +
 											"class=\"album-button-random-media-link\" " +
 											" style=\"width: 20px;" +
 												" height: 20px;" +
