@@ -987,7 +987,7 @@ $(document).ready(function() {
 		containerRatio = containerWidth / containerHeight;
 		
 		media = $("#media");
-		media.off('loadstart').off("load");
+		media.off("loadstart").off("load");
 		
 		if (currentMedia.mediaType == "photo") {
 			photoSrc = chooseReducedPhoto(currentMedia, container);
@@ -1191,7 +1191,7 @@ $(document).ready(function() {
 					.attr("ratio", width / height)
 					.attr("src", encodeURI(videoSrc))
 					.attr("alt", currentMedia.name);
-				triggerLoad = 'loadstart';
+				triggerLoad = "loadstart";
 				linkTag = "<link rel=\"video_src\" href=\"" + encodeURI(videoSrc) + "\" />";
 			} else if (currentMedia.mediaType == "photo") {
 				photoSrc = chooseReducedPhoto(currentMedia, null);
@@ -1215,7 +1215,7 @@ $(document).ready(function() {
 					.attr("alt", currentMedia.name)
 					.attr("title", currentMedia.date);
 				linkTag = "<link rel=\"image_src\" href=\"" + encodeURI(photoSrc) + "\" />";
-				triggerLoad = 'load';
+				triggerLoad = "load";
 			}
 			
 			$("link[rel=image_src]").remove();
@@ -1646,7 +1646,7 @@ $(document).ready(function() {
 	});
 	function goFullscreen(e) {
 		e.preventDefault();
-		$('#media').off('loadstart').unbind("load");
+		$("#media").off("loadstart").unbind("load");
 		$("#media-box").fullScreen({
 			callback: function(isFullscreen) {
 				fullScreenStatus = isFullscreen;
