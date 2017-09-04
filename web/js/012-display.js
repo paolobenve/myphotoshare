@@ -58,9 +58,6 @@ $(document).ready(function() {
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
 	
-	if (! isMobile.any())
-		$(".ssk-whatsapp").hide();
-	
 	/* Displays */
 	
 	function _t(id) {
@@ -224,6 +221,18 @@ $(document).ready(function() {
 		var url, hash, myShareUrl = "";
 		var type, mediaParameter;
 		var folders, myShareText, myShareTextAdd;
+		
+		if (! isMobile.any()) {
+			$(".ssk-whatsapp").hide();
+		} else {
+			// with touchscreens luminosity on hover cannot be used
+			$(".album-button-and-caption").css("opacity", 1);
+			$(".thumb-container").css("opacity", 1);
+			$(".album-button-random-media-link").css("opacity", 1);
+			
+		}
+		
+		
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
