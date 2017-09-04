@@ -251,14 +251,18 @@ $(document).ready(function() {
 			var prefix = removeFolderMarker(currentMedia.foldersCacheBase);
 			if (prefix)
 				prefix += Options.cache_folder_separator;
-			mediaParameter = PhotoFloat.pathJoin([
-				Options.server_cache_path,
-				currentMedia.cacheSubdir,
-				prefix + currentMedia.cacheBase
-				]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 			if (currentMedia.mediaType == "video") {
+				mediaParameter = PhotoFloat.pathJoin([
+					Options.server_cache_path,
+					currentMedia.cacheSubdir,
+					]) + prefix + currentMedia.cacheBase + "_transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 				type = "v";
 			} else if (currentMedia.mediaType == "photo") {
+				mediaParameter = PhotoFloat.pathJoin([
+					Options.server_cache_path,
+					currentMedia.cacheSubdir,
+					prefix + currentMedia.cacheBase
+					]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 				type = "p";
 			}
 		}
@@ -1486,7 +1490,10 @@ $(document).ready(function() {
 		if (currentMedia !== null) {
 			// no subalbums, nothing to wait
 			// set social buttons events
-			$("#media").on("load", socialButtons);
+			if (currentMedia.mediaType == "video")
+				$("#media").on("loadstart", socialButtons);
+			else
+				$("#media").on("load", socialButtons);
 		} else  if (
 			currentAlbum !== null && ! currentAlbum.albums.length ||
 			numSubAlbumsReady >= album.albums.length
