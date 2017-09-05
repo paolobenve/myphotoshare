@@ -116,9 +116,9 @@ Photofloat needs:
 
 #### Why `php`? Isn't it enough with javascript?
 
-`php` is *needed* for sharing, because social media do not execute any javascript when they receive an *URI*. Without `php`, sharing any sit page is perfectly equivalent to sharing the simple index.html: no information of the particular page you want to share is retained.
+`php` is *needed* for sharing, because social app do not execute any javascript when they receive an *URI*. Without `php`, sharing any page is perfectly equivalent to sharing the simple index.html: no information of the particular page you want to share is retained.
 
-`php` does the job you need for sharing: based on the page hash, it sets the proper html page title and the proper tag in `<head></head>` which permits the social media to get the info you want it to get and show a preview of the media/album you are sharing.
+`php` does the job you need for sharing: `javascript` creates proper urls based on the page hash, and when a share button is pressed a parameter is passed to `php`, and it sets the proper html page title and appends the proper `<link rel='video_src' href="`video_link`">` or `<link rel='image_src' href="`image_link`">` tag to the `<head>` tag; this way the social media gets the data they need and show a preview of the media/album you are sharing.
 
 ### Download the source code from the git repository:
 
