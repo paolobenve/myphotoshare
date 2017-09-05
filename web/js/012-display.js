@@ -58,9 +58,6 @@ $(document).ready(function() {
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
 	
-	if (! isMobile.any())
-		$(".ssk-whatsapp").hide();
-	
 	/* Displays */
 	
 	function _t(id) {
@@ -222,8 +219,20 @@ $(document).ready(function() {
 	
 	function socialButtons() {
 		var url, hash, myShareUrl = "";
-		var type, mediaParameter;
+		var mediaParameter;
 		var folders, myShareText, myShareTextAdd;
+		
+		if (! isMobile.any()) {
+			$(".ssk-whatsapp").hide();
+		} else {
+			// with touchscreens luminosity on hover cannot be used
+			$(".album-button-and-caption").css("opacity", 1);
+			$(".thumb-container").css("opacity", 1);
+			$(".album-button-random-media-link").css("opacity", 1);
+			
+		}
+		
+		
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
@@ -234,7 +243,6 @@ $(document).ready(function() {
 				Options.cache_album_subdir,
 				currentAlbum.cacheBase
 				]) + ".jpg";
-			type = "p";
 		} else {
 			var reducedSizesIndex = 1;
 			if (Options.reduced_sizes.length == 1)
@@ -242,22 +250,25 @@ $(document).ready(function() {
 			var prefix = removeFolderMarker(currentMedia.foldersCacheBase);
 			if (prefix)
 				prefix += Options.cache_folder_separator;
-			mediaParameter = PhotoFloat.pathJoin([
-				Options.server_cache_path,
-				currentMedia.cacheSubdir,
-				prefix + currentMedia.cacheBase
-				]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 			if (currentMedia.mediaType == "video") {
-				type = "v";
+				mediaParameter = PhotoFloat.pathJoin([
+					Options.server_cache_path,
+					currentMedia.cacheSubdir,
+					]) + prefix + currentMedia.cacheBase + "_transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 			} else if (currentMedia.mediaType == "photo") {
-				type = "p";
+				mediaParameter = PhotoFloat.pathJoin([
+					Options.server_cache_path,
+					currentMedia.cacheSubdir,
+					prefix + currentMedia.cacheBase
+					]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 			}
 		}
 		
-		hash = location.hash;
 		myShareUrl = url + '?';
-		myShareUrl += 'm=' + encodeURIComponent(mediaParameter) + '&';
-		myShareUrl += 't=' + type + '#' + hash.substring(1);
+		myShareUrl += 'm=' + encodeURIComponent(mediaParameter);
+		hash = location.hash;
+		if (hash)
+			myShareUrl += '#' + hash.substring(1);
 		
 		myShareText = Options.page_title;
 		myShareTextAdd = currentAlbum.physicalPath;
@@ -974,7 +985,7 @@ $(document).ready(function() {
 		containerRatio = containerWidth / containerHeight;
 		
 		media = $("#media");
-		media.off('loadstart').off("load");
+		media.off("loadstart").off("load");
 		
 		if (currentMedia.mediaType == "photo") {
 			photoSrc = chooseReducedPhoto(currentMedia, container);
@@ -1178,7 +1189,7 @@ $(document).ready(function() {
 					.attr("ratio", width / height)
 					.attr("src", encodeURI(videoSrc))
 					.attr("alt", currentMedia.name);
-				triggerLoad = 'loadstart';
+				triggerLoad = "loadstart";
 				linkTag = "<link rel=\"video_src\" href=\"" + encodeURI(videoSrc) + "\" />";
 			} else if (currentMedia.mediaType == "photo") {
 				photoSrc = chooseReducedPhoto(currentMedia, null);
@@ -1202,7 +1213,7 @@ $(document).ready(function() {
 					.attr("alt", currentMedia.name)
 					.attr("title", currentMedia.date);
 				linkTag = "<link rel=\"image_src\" href=\"" + encodeURI(photoSrc) + "\" />";
-				triggerLoad = 'load';
+				triggerLoad = "load";
 			}
 			
 			$("link[rel=image_src]").remove();
@@ -1477,7 +1488,10 @@ $(document).ready(function() {
 		if (currentMedia !== null) {
 			// no subalbums, nothing to wait
 			// set social buttons events
-			$("#media").on("load", socialButtons);
+			if (currentMedia.mediaType == "video")
+				$("#media").on("loadstart", socialButtons);
+			else
+				$("#media").on("load", socialButtons);
 		} else  if (
 			currentAlbum !== null && ! currentAlbum.albums.length ||
 			numSubAlbumsReady >= album.albums.length
@@ -1630,7 +1644,7 @@ $(document).ready(function() {
 	});
 	function goFullscreen(e) {
 		e.preventDefault();
-		$('#media').off('loadstart').unbind("load");
+		$("#media").off("loadstart").unbind("load");
 		$("#media-box").fullScreen({
 			callback: function(isFullscreen) {
 				fullScreenStatus = isFullscreen;

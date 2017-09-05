@@ -45,18 +45,19 @@
 				return false;
 		}
 		
-		// put the <link rel=".."> tag in <head> for getting the image thumbnail when sharing
-		if (isset($_GET['t']) && $_GET['t'] && isset($_GET['m']) && $_GET['m']) {
+		// put the <link rel=".."> tag in <head> for letting facebook/google+ load the image/video when sharing
+		if (isset($_GET['m']) && $_GET['m']) {
 			// Prevent directory traversal security vulnerability
 			$realPath = realpath($_GET['m']);
 			if (strpos($realPath, realpath($options['server_cache_path'])) === 0  && url_exist($realPath)) {
 				$linkTag = '<link rel="';
-				if ($_GET['t'] == 'p' || $_GET['t'] == 'a')
-					// 'p': photo, 'a': album
-					$linkTag .= 'image_src';
-				else if ($_GET['t'] == 'v')
-					// 'v': video
+				$videoEnd = ".mp4";
+				if (substr($_GET['m'], - strlen($videoEnd)) === $strlen($videoEnd))
+					// video
 					$linkTag .= 'video_src';
+				else
+					// image
+					$linkTag .= 'image_src';
 				$linkTag .= '" href="' . $_GET['m'] . '"';
 				$linkTag .= '>';
 				echo "$linkTag\n";
@@ -116,7 +117,7 @@
 <body>
 	<?php
 		if ($_GET)
-			// redirect to parameters-less page
+			// redirect to same page without parameter
 			echo "
 	<script>
 		$(document).ready(
