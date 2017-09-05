@@ -1,4 +1,4 @@
-# myphotoshare v. 2.6.1
+# myphotoshare v. 2.6.4
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -268,7 +268,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-### version 2.6.4 (September 12, 2017):
+### version 2.6.4 (September 5, 2017):
 
 * fixed sharing of videos
 * removed unnecessary parameter when sharing
