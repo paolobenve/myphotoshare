@@ -219,7 +219,7 @@ $(document).ready(function() {
 	
 	function socialButtons() {
 		var url, hash, myShareUrl = "";
-		var type, mediaParameter;
+		var mediaParameter;
 		var folders, myShareText, myShareTextAdd;
 		
 		if (! isMobile.any()) {
@@ -243,7 +243,6 @@ $(document).ready(function() {
 				Options.cache_album_subdir,
 				currentAlbum.cacheBase
 				]) + ".jpg";
-			type = "p";
 		} else {
 			var reducedSizesIndex = 1;
 			if (Options.reduced_sizes.length == 1)
@@ -256,21 +255,20 @@ $(document).ready(function() {
 					Options.server_cache_path,
 					currentMedia.cacheSubdir,
 					]) + prefix + currentMedia.cacheBase + "_transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
-				type = "v";
 			} else if (currentMedia.mediaType == "photo") {
 				mediaParameter = PhotoFloat.pathJoin([
 					Options.server_cache_path,
 					currentMedia.cacheSubdir,
 					prefix + currentMedia.cacheBase
 					]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
-				type = "p";
 			}
 		}
 		
-		hash = location.hash;
 		myShareUrl = url + '?';
-		myShareUrl += 'm=' + encodeURIComponent(mediaParameter) + '&';
-		myShareUrl += 't=' + type + '#' + hash.substring(1);
+		myShareUrl += 'm=' + encodeURIComponent(mediaParameter);
+		hash = location.hash;
+		if (hash)
+			myShareUrl += '#' + hash.substring(1);
 		
 		myShareText = Options.page_title;
 		myShareTextAdd = currentAlbum.physicalPath;

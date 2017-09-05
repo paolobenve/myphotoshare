@@ -268,6 +268,11 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.6.4 (September 12, 2017):
+
+* fixed sharing of videos
+* removed unnecessary parameter when sharing
+
 ### version 2.6.3 (September 2, 2017):
 
 * album buttons has now a link to go to random image directly
