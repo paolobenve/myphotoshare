@@ -271,6 +271,9 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 ### version 2.7 (September 10, 2017):
 
 * added sorting by name of subalbums and media
+* modified default reverse sorting options, and now they only apply to date sorting (name default sorting is always normal)
+* - default_album_reverse_sort -> default_album_date_reverse_sort
+* - default_media_reverse_sort -> default_media_date_reverse_sort
 * bug fixes
 
 ### version 2.6.4 (September 12, 2017):
@@ -339,8 +342,8 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * translations are now managed via a separate js file: enthusiasts and followers are encouraged to provide the translation for their language 
 * better managing of errors
 * separated albums and media sorting
-* - default_album_reverse_sort (boolean) set default sorting for albums
-* - default_media_reverse_sort (boolean) sets the default sorting for images/video
+* - default_album_reverse_sort (boolean) sets default sorting for albums
+* - default_media_reverse_sort (boolean) sets default sorting for images/video
 * separate managing of album and media thumbnails
 * - albums thumbs can have square (classic behaviour) or fit (rectangular thumbnail) type, according to new album_thumb_type option
 * - images/video thumbs can have square (classic behaviour) or fixed height (rectangular thumbnail) type, according to new media_thumb_type option

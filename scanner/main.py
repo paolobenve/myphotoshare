@@ -67,8 +67,8 @@ def main():
 				'persistent_metadata',
 				'default_album_name_sort',
 				'default_media_name_sort',
-				'default_album_reverse_sort',
-				'default_media_reverse_sort',
+				'default_album_date_reverse_sort',
+				'default_media_date_reverse_sort',
 				'recreate_fixed_height_thumbnails'
 		):
 			try:
