@@ -406,7 +406,7 @@ a.title-anchor.mobile {
 }
 
 .sort img {
-	padding: 0 1em;
+	padding: 0 .5em;
 	cursor: pointer;
 }
 
@@ -417,6 +417,9 @@ a.title-anchor.mobile {
 
 .sort {
 	display: none;
+/*
+	white-space: nowrap;
+*/
 }
 
 #social, #social:hover {
