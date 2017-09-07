@@ -317,38 +317,45 @@ $(document).ready(function() {
 	
 	function HideShowSortButtons(albumOrMedia) {
 		var selectorInactive, selectorActive;
-		var ReverseSort = albumOrMedia + "ReverseSort", NameSort = albumOrMedia + "NameSort";
-		if (currentAlbum[ReverseSort] && currentAlbum[NameSort]) {
-			selectorInactive =
-				"." + albumOrMedia + "-sort-reverse." + albumOrMedia + "-sort-name";
-			selectorActive =
-				"." + albumOrMedia + "-sort-reverse." + albumOrMedia + "-sort-date, " +
-				"." + albumOrMedia + "-sort-normal."  + albumOrMedia + "-sort-name, " +
-				"." + albumOrMedia + "-sort-normal."  + albumOrMedia + "-sort-date";
+		var reverseSort = albumOrMedia + "ReverseSort", nameSort = albumOrMedia + "NameSort";
+		var sortReverseClass = "." + albumOrMedia + "-sort-reverse", sortNormalClass = "." + albumOrMedia + "-sort-normal";
+		var sortNameClass = "." + albumOrMedia + "-sort-name", sortDateClass = "." + albumOrMedia + "-sort-date";
+		var sortReverseNameClass = sortReverseClass + sortNameClass;
+		var sortReverseDateClass = sortReverseClass + sortDateClass;
+		var sortNormalNameClass  = sortNormalClass + sortNameClass;
+		var sortNormalDateClass  = sortNormalClass + sortDateClass;
+		$(sortReverseNameClass).attr("title", _t(sortNameClass) + " " + _t(".sort-reverse"));
+		$(sortReverseDateClass).attr("title", _t(sortDateClass) + " " + _t(".sort-reverse"));
+		$(sortNormalNameClass).attr("title", _t(sortNameClass));
+		$(sortNormalDateClass).attr("title", _t(sortNameClass));
+		
+		if (currentAlbum[reverseSort] && currentAlbum[nameSort]) {
+			selectorInactive = sortReverseNameClass;
+			selectorActive =   sortReverseDateClass + ", " +
+					   sortNormalNameClass + ", " +
+					   sortNormalDateClass;
+			$(sortReverseNameClass).attr("title", "");
 		}
-		if (! currentAlbum[ReverseSort] && currentAlbum[NameSort]) {
-			selectorInactive =
-				"." + albumOrMedia + "-sort-normal." + albumOrMedia + "-sort-name";
-			selectorActive =
-				"." + albumOrMedia + "-sort-normal."  + albumOrMedia + "-sort-date," +
-				"." + albumOrMedia + "-sort-reverse." + albumOrMedia + "-sort-name, " +
-				"." + albumOrMedia + "-sort-reverse." + albumOrMedia + "-sort-date";
+		if (! currentAlbum[reverseSort] && currentAlbum[nameSort]) {
+			selectorInactive = sortNormalNameClass;
+			selectorActive =   sortNormalDateClass + "," +
+					   sortReverseNameClass + ", " +
+					   sortReverseDateClass;
+			$(sortNormalNameClass).attr("title", "");
 		}
-		if (currentAlbum[ReverseSort] && ! currentAlbum[NameSort]) {
-			selectorInactive =
-				"." + albumOrMedia + "-sort-reverse." + albumOrMedia + "-sort-date";
-			selectorActive =
-				"." + albumOrMedia + "-sort-reverse." + albumOrMedia + "-sort-name, " +
-				"." + albumOrMedia + "-sort-normal."  + albumOrMedia + "-sort-date, " +
-				"." + albumOrMedia + "-sort-normal."  + albumOrMedia + "-sort-name";
+		if (currentAlbum[reverseSort] && ! currentAlbum[nameSort]) {
+			selectorInactive = sortReverseDateClass;
+			selectorActive =   sortReverseNameClass + ", " +
+					   sortNormalDateClass + ", " +
+					   sortNormalNameClass;
+			$(sortReverseDateClass).attr("title", "");
 		}
-		if (! currentAlbum[ReverseSort] && ! currentAlbum[NameSort]) {
-			selectorInactive =
-				"." + albumOrMedia + "-sort-normal." + albumOrMedia + "-sort-date";
-			selectorActive =
-				"." + albumOrMedia + "-sort-normal."  + albumOrMedia + "-sort-name, " +
-				"." + albumOrMedia + "-sort-reverse." + albumOrMedia + "-sort-date, " +
-				"." + albumOrMedia + "-sort-reverse." + albumOrMedia + "-sort-name";
+		if (! currentAlbum[reverseSort] && ! currentAlbum[nameSort]) {
+			selectorInactive = sortNormalDateClass;
+			selectorActive =   sortNormalNameClass + ", " +
+					   sortReverseDateClass + ", " +
+					   sortReverseNameClass;
+			$(sortNormalDateClass).attr("title", "");
 		}
 		
 		$(selectorInactive).addClass("opaque");
