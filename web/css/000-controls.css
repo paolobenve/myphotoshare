@@ -405,9 +405,20 @@ a.title-anchor.mobile {
 	text-decoration: none;
 }
 
-.arrows img {
+.sort img {
 	padding: 0 1em;
+	cursor: pointer;
+}
+
+.sort img.opaque {
+	opacity: 0.25;
+	cursor: default;
+}
+
+.sort {
+/*
 	display: none;
+*/
 }
 
 #social, #social:hover {

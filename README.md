@@ -268,6 +268,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.7 (September 20, 2017):
+
+* permit sorting of albums and media by name
+
 ### version 2.6.4 (September 12, 2017):
 
 * fixed sharing of videos

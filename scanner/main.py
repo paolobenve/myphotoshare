@@ -65,6 +65,8 @@ def main():
 				'albums_slide_style',
 				'show_media_names_below_thumbs_in_albums',
 				'persistent_metadata',
+				'default_album_name_sort',
+				'default_media_name_sort',
 				'default_album_reverse_sort',
 				'default_media_reverse_sort',
 				'recreate_fixed_height_thumbnails'
