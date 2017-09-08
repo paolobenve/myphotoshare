@@ -320,47 +320,61 @@ $(document).ready(function() {
 		var reverseNameSort = albumOrMedia + "NameReverseSort", reverseDateSort = albumOrMedia + "DateReverseSort";
 		var nameSort = albumOrMedia + "NameSort";
 		var sortReverseClass = "." + albumOrMedia + "-sort-reverse", sortNormalClass = "." + albumOrMedia + "-sort-normal";
-		var sortNameClass = "." + albumOrMedia + "-sort-name", sortDateClass = "." + albumOrMedia + "-sort-date";
-		var sortReverseNameClass = sortReverseClass + sortNameClass;
-		var sortReverseDateClass = sortReverseClass + sortDateClass;
-		var sortNormalNameClass  = sortNormalClass + sortNameClass;
-		var sortNormalDateClass  = sortNormalClass + sortDateClass;
-		$(sortReverseNameClass).attr("title", _t(sortNameClass) + " " + _t(".sort-reverse"));
-		$(sortReverseDateClass).attr("title", _t(sortDateClass) + " " + _t(".sort-reverse"));
-		$(sortNormalNameClass).attr("title", _t(sortNameClass));
-		$(sortNormalDateClass).attr("title", _t(sortNameClass));
+		var sort = "." + albumOrMedia + "-sort";
+		var sortNameClass = sort + "-name", sortDateClass = sort + "-date";
+		var sortReverseNameClass = sortNameClass + sortReverseClass;
+		var sortReverseDateClass = sortDateClass + sortReverseClass;
+		var sortNormalNameClass = sortNameClass + sortNormalClass;
+		var sortNormalDateClass = sortDateClass + sortNormalClass;
+		var currentSort = _t(".current-sort");
 		
-		if (currentAlbum[reverseNameSort] && currentAlbum[nameSort]) {
-			selectorInactive = sortReverseNameClass;
-			selectorActive =   sortReverseDateClass + ", " +
-					   sortNormalNameClass + ", " +
-					   sortNormalDateClass;
-			$(sortReverseNameClass).attr("title", "");
-		}
-		if (! currentAlbum[reverseNameSort] && currentAlbum[nameSort]) {
-			selectorInactive = sortNormalNameClass;
-			selectorActive =   sortNormalDateClass + "," +
-					   sortReverseNameClass + ", " +
-					   sortReverseDateClass;
-			$(sortNormalNameClass).attr("title", "");
-		}
-		if (currentAlbum[reverseDateSort] && ! currentAlbum[nameSort]) {
-			selectorInactive = sortReverseDateClass;
-			selectorActive =   sortReverseNameClass + ", " +
-					   sortNormalDateClass + ", " +
-					   sortNormalNameClass;
-			$(sortReverseDateClass).attr("title", "");
-		}
-		if (! currentAlbum[reverseDateSort] && ! currentAlbum[nameSort]) {
-			selectorInactive = sortNormalDateClass;
-			selectorActive =   sortNormalNameClass + ", " +
-					   sortReverseDateClass + ", " +
-					   sortReverseNameClass;
-			$(sortNormalDateClass).attr("title", "");
-		}
+		$(sortReverseNameClass).attr("title", _t(sort) + _t(".by-name") + _t(".sort-reverse"));
+		$(sortReverseDateClass).attr("title", _t(sort) + _t(".by-date") + _t(".sort-reverse"));
+		$(sortNormalNameClass).attr("title", _t(sort) + _t(".by-name"));
+		$(sortNormalDateClass).attr("title", _t(sort) + _t(".by-date"));
 		
-		$(selectorInactive).addClass("opaque");
-		$(selectorActive).removeClass("opaque");
+		if (currentAlbum[nameSort]) {
+			currentSort += _t(".by-name");
+			if (currentAlbum[reverseNameSort]) {
+				currentSort += _t(".sort-reverse");
+				selectorInactive = sortReverseNameClass;
+				selectorActive = sortNormalNameClass;
+			} else {
+				selectorInactive = sortNormalNameClass;
+				selectorActive = sortReverseNameClass;
+			}
+			if (currentAlbum[reverseDateSort]) {
+				selectorInactive += ", " + sortReverseDateClass;
+				selectorActive += ", " + sortNormalDateClass;
+			} else {
+				selectorInactive += ", " + sortNormalDateClass;
+				selectorActive += ", " + sortReverseDateClass;
+			}
+		} else {
+			currentSort += _t(".by-date");
+			if (currentAlbum[reverseDateSort]) {
+				currentSort += _t(".sort-reverse");
+				selectorInactive = sortReverseDateClass;
+				selectorActive = sortNormalDateClass;
+			} else {
+				selectorInactive = sortNormalDateClass;
+				selectorActive = sortReverseDateClass;
+			}
+			if (currentAlbum[reverseNameSort]) {
+				selectorInactive += ", " + sortReverseNameClass;
+				selectorActive += ", " + sortNormalNameClass;
+			} else {
+				selectorInactive += ", " + sortNormalNameClass;
+				selectorActive += ", " + sortReverseNameClass;
+			}
+		}
+		currentSort += ", ";
+		$(selectorInactive).hide();
+		$(selectorActive).show();
+		arrayActiveSelectors = selectorActive.split(", ");
+		for (var sel in arrayActiveSelectors) {
+			$(arrayActiveSelectors[sel]).attr("title", currentSort + $(arrayActiveSelectors[sel]).attr("title"));
+		}
 	}
 	
 	function setTitle() {
@@ -552,13 +566,13 @@ $(document).ready(function() {
 				"<span class=\"sort\">";
 			if (currentAlbum.albums.length > 1) {
 				title +=
-					"<img class=\"album-sort album-sort-date album-sort-normal \" title=\"" + _t(".album-sort-date") + "\" height=\"15px\" src=\"img/folder_sort_date.png\">";
+					"<img class=\"album-sort album-sort-date album-sort-normal \" title=\"" + _t(".album-sort") + _t(".by-date") + "\" height=\"15px\" src=\"img/folder_sort_date.png\">";
 				title +=
-					"<img class=\"album-sort album-sort-date album-sort-reverse \" title=\"" + _t(".album-sort-date") + " " + _t(".sort-reverse") + "\" height=\"15px\" src=\"img/folder_sort_date_reverse.png\">";
+					"<img class=\"album-sort album-sort-date album-sort-reverse \" title=\"" + _t(".album-sort") + _t(".by-date") + _t(".sort-reverse") + "\" height=\"15px\" src=\"img/folder_sort_date_reverse.png\">";
 				title +=
-					"<img class=\"album-sort album-sort-name album-sort-normal \" title=\"" + _t(".album-sort-name") + "\" height=\"15px\" src=\"img/folder_sort_name.png\">";
+					"<img class=\"album-sort album-sort-name album-sort-normal \" title=\"" + _t(".album-sort") + _t(".by-name") + "\" height=\"15px\" src=\"img/folder_sort_name.png\">";
 				title +=
-					"<img class=\"album-sort album-sort-name album-sort-reverse \" title=\"" + _t(".album-sort-name") + " " + _t(".sort-reverse") + "\" height=\"15px\" src=\"img/folder_sort_name_reverse.png\">";
+					"<img class=\"album-sort album-sort-name album-sort-reverse \" title=\"" + _t(".album-sort") + _t(".by-name") + _t(".sort-reverse") + "\" height=\"15px\" src=\"img/folder_sort_name_reverse.png\">";
 			}
 			if (currentAlbum.media.length > 1) {
 				title +=

@@ -411,7 +411,10 @@ a.title-anchor.mobile {
 }
 
 .sort img.opaque {
+/*
 	opacity: 0.25;
+*/
+	display: none;
 	cursor: default;
 }
 
