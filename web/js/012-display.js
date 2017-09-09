@@ -102,14 +102,12 @@ $(document).ready(function() {
 			swipe_det.sY = t.screenY;
 		};
 		touchMove = function(e){
-			//~ e.preventDefault();
+			e.preventDefault();
 			var t = e.touches[0];
 			swipe_det.eX = t.screenX;
 			swipe_det.eY = t.screenY;
 		};
 		touchEnd = function(e){
-			//~ if ((swipe_det.eX - swipe_det.sX > min_x || swipe_det.eX - swipe_det.sX < - min_x) && 
-				//~ swipe_det.eX > 0
 			//horizontal detection
 			if (
 				(swipe_det.eX - min_x > swipe_det.sX || swipe_det.eX + min_x < swipe_det.sX) &&
@@ -151,7 +149,6 @@ $(document).ready(function() {
 		max_y = 60;  //max y difference for horizontal swipe
 		direc = "";
 		ele = document.getElementById(el);
-		//~ ele = window;
 		ele.addEventListener('touchstart', touchStart, false);
 		ele.addEventListener('touchmove', touchMove, false);
 		ele.addEventListener('touchend', touchEnd, false);  
@@ -285,19 +282,6 @@ $(document).ready(function() {
 		
 		// initialize social buttons (http://socialsharekit.com/)
 		SocialShareKit.init({
-			//~ selector: '.custom-parent .ssk',
-			//~ url: myShareUrl,
-			//~ text: myShareText,
-			//~ twitter: {
-				//~ url: location.href,
-				//~ text: myShareText,
-				//~ via: 'twitter-screen-name',
-				//~ countCallback: function(shareUrl, onCountReady) {
-					//~ // Get count somewhere manually and call onCountReady() whenever you got the count.
-					//~ var count = 5;
-					//~ return onCountReady(count);
-				//~ }
-			//~ }
 		});
 		if (! Modernizr.flexbox && bottomSocialButtons()) {
 			var numSocial = 5;
@@ -327,6 +311,7 @@ $(document).ready(function() {
 		var sortNormalNameClass = sortNameClass + sortNormalClass;
 		var sortNormalDateClass = sortDateClass + sortNormalClass;
 		var currentSort = _t(".current-sort");
+		var arrayActiveSelectors;
 		
 		$(sortReverseNameClass).attr("title", _t(sort) + _t(".by-name") + _t(".sort-reverse"));
 		$(sortReverseDateClass).attr("title", _t(sort) + _t(".by-date") + _t(".sort-reverse"));
@@ -373,13 +358,14 @@ $(document).ready(function() {
 		$(selectorActive).show();
 		arrayActiveSelectors = selectorActive.split(", ");
 		for (var sel in arrayActiveSelectors) {
-			$(arrayActiveSelectors[sel]).attr("title", currentSort + $(arrayActiveSelectors[sel]).attr("title"));
+			if (arrayActiveSelectors.hasOwnProperty(sel))
+				$(arrayActiveSelectors[sel]).attr("title", currentSort + $(arrayActiveSelectors[sel]).attr("title"));
 		}
 	}
 	
 	function setTitle() {
 		var title = "", documentTitle = "", components, i, dateTitle, originalTitle;
-		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, sortButtons;
+		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, sortButtons, index, m;
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
 		else
@@ -396,20 +382,20 @@ $(document).ready(function() {
 				PhotoFloat.firstAlbumPopulation = false;
 			
 			if (needAlbumHtmlNameSort()) {
-				currentAlbum.albums = sortByPath(currentAlbum.albums)
+				currentAlbum.albums = sortByPath(currentAlbum.albums);
 				currentAlbum.albumNameSort = true;
 				if (getBooleanCookie("albumNameReverseSortStatus")) {
 					currentAlbum.albums = currentAlbum.albums.reverse();
 					currentAlbum.albumNameReverseSort = true;
 				}
 			} else if (needAlbumHtmlDateSort()) {
-				currentAlbum.albums = sortByDate(currentAlbum.albums)
+				currentAlbum.albums = sortByDate(currentAlbum.albums);
 				currentAlbum.albumNameSort = false;
 				if (getBooleanCookie("albumDateReverseSortStatus")) {
 					currentAlbum.albums = currentAlbum.albums.reverse();
 					currentAlbum.albumDateReverseSort = true;
 				}
-			} else if (needAlbumHtmlNameReverseSort() || needAlbumHtmlNameReverseSort()) {
+			} else if (needAlbumHtmlNameReverseSort() || needAlbumHtmlDateReverseSort()) {
 				currentAlbum.albums = currentAlbum.albums.reverse();
 				if (needAlbumHtmlNameReverseSort())
 					currentAlbum.albumNameReverseSort = true;
@@ -424,8 +410,8 @@ $(document).ready(function() {
 					currentAlbum.mediaNameReverseSort = true;
 				}
 				if (currentMedia !== null) {
-					var index = 0;
-					for (var m in currentAlbum.media) {
+					index = 0;
+					for (m in currentAlbum.media) {
 						if (m.cacheBase == currentMedia.cacheBase && m.foldersCacheBase == currentMedia.foldersCacheBase) {
 							currentMediaIndex = index;
 							break;
@@ -439,8 +425,8 @@ $(document).ready(function() {
 					currentAlbum.mediaDateReverseSort = true;
 				}
 				if (currentMedia !== null) {
-					var index = 0;
-					for (var m in currentAlbum.media) {
+					index = 0;
+					for (m in currentAlbum.media) {
 						if (m.cacheBase == currentMedia.cacheBase && m.foldersCacheBase == currentMedia.foldersCacheBase) {
 							currentMediaIndex = index;
 							break;
@@ -648,10 +634,8 @@ $(document).ready(function() {
 			if (currentAlbum.albums.length > 1) {
 				$(".album-sort-date.album-sort-reverse").unbind('click');
 				$(".album-sort-date.album-sort-reverse").click(function() {
-					//~ setBooleanCookie("albumNameSortStatus", false);
-					//~ setBooleanCookie("albumDateReverseSortStatus", true);
 					if (currentAlbum.albumNameSort) {
-						currentAlbum.albums = sortByDate(currentAlbum.albums)
+						currentAlbum.albums = sortByDate(currentAlbum.albums);
 						currentAlbum.albumNameSort = false;
 						currentAlbum.albums = currentAlbum.albums.reverse();
 						currentAlbum.albumDateReverseSort = true;
@@ -667,10 +651,8 @@ $(document).ready(function() {
 				
 				$(".album-sort-name.album-sort-reverse").unbind('click');
 				$(".album-sort-name.album-sort-reverse").click(function() {
-					//~ setBooleanCookie("albumNameSortStatus", true);
-					//~ setBooleanCookie("albumNameReverseSortStatus", true);
 					if (! currentAlbum.albumNameSort) {
-						currentAlbum.albums = sortByPath(currentAlbum.albums)
+						currentAlbum.albums = sortByPath(currentAlbum.albums);
 						currentAlbum.albumNameSort = true;
 						currentAlbum.albums = currentAlbum.albums.reverse();
 						currentAlbum.albumNameReverseSort = true;
@@ -686,10 +668,8 @@ $(document).ready(function() {
 				
 				$(".album-sort-date.album-sort-normal").unbind('click');
 				$(".album-sort-date.album-sort-normal").click(function() {
-					//~ setBooleanCookie("albumNameSortStatus", false);
-					//~ setBooleanCookie("albumDateReverseSortStatus", false);
 					if (currentAlbum.albumNameSort) {
-						currentAlbum.albums = sortByDate(currentAlbum.albums)
+						currentAlbum.albums = sortByDate(currentAlbum.albums);
 						currentAlbum.albumNameSort = false;
 						currentAlbum.albumDateReverseSort = false;
 					} else if (currentAlbum.albumDateReverseSort) {
@@ -704,7 +684,7 @@ $(document).ready(function() {
 				$(".album-sort-name.album-sort-normal").unbind('click');
 				$(".album-sort-name.album-sort-normal").click(function() {
 					if (! currentAlbum.albumNameSort) {
-						currentAlbum.albums = sortByPath(currentAlbum.albums)
+						currentAlbum.albums = sortByPath(currentAlbum.albums);
 						currentAlbum.albumNameSort = true;
 						currentAlbum.albumNameReverseSort = false;
 						
@@ -721,10 +701,8 @@ $(document).ready(function() {
 			if (currentAlbum.media.length > 1) {
 				$(".media-sort-date.media-sort-reverse").unbind('click');
 				$(".media-sort-date.media-sort-reverse").click(function() {
-					//~ setBooleanCookie("mediaNameSortStatus", false);
-					//~ setBooleanCookie("mediaDateReverseSortStatus", true);
 					if (currentAlbum.mediaNameSort) {
-						currentAlbum.media = sortByDate(currentAlbum.media)
+						currentAlbum.media = sortByDate(currentAlbum.media);
 						currentAlbum.mediaNameSort = false;
 						currentAlbum.media = currentAlbum.media.reverse();
 						currentAlbum.mediaDateReverseSort = true;
@@ -740,10 +718,8 @@ $(document).ready(function() {
 				
 				$(".media-sort-name.media-sort-reverse").unbind('click');
 				$(".media-sort-name.media-sort-reverse").click(function() {
-					//~ setBooleanCookie("mediaNameSortStatus", true);
-					//~ setBooleanCookie("mediaNameReverseSortStatus", true);
 					if (! currentAlbum.mediaNameSort) {
-						currentAlbum.media = sortByName(currentAlbum.media)
+						currentAlbum.media = sortByName(currentAlbum.media);
 						currentAlbum.mediaNameSort = true;
 						currentAlbum.media = currentAlbum.media.reverse();
 						currentAlbum.mediaNameReverseSort = true;
@@ -759,10 +735,8 @@ $(document).ready(function() {
 				
 				$(".media-sort-date.media-sort-normal").unbind('click');
 				$(".media-sort-date.media-sort-normal").click(function() {
-					//~ setBooleanCookie("mediaNameSortStatus", false);
-					//~ setBooleanCookie("mediaDateReverseSortStatus", false);
 					if (currentAlbum.mediaNameSort) {
-						currentAlbum.media = sortByDate(currentAlbum.media)
+						currentAlbum.media = sortByDate(currentAlbum.media);
 						currentAlbum.mediaNameSort = false;
 						currentAlbum.mediaDateReverseSort = false;
 					} else if (currentAlbum.mediaDateReverseSort) {
@@ -777,7 +751,7 @@ $(document).ready(function() {
 				$(".media-sort-name.media-sort-normal").unbind('click');
 				$(".media-sort-name.media-sort-normal").click(function() {
 					if (! currentAlbum.mediaNameSort) {
-						currentAlbum.media = sortByName(currentAlbum.media)
+						currentAlbum.media = sortByName(currentAlbum.media);
 						currentAlbum.mediaNameSort = true;
 						currentAlbum.mediaNameReverseSort = false;
 					} else if (currentAlbum.mediaNameReverseSort) {
@@ -900,10 +874,6 @@ $(document).ready(function() {
 						currentAlbum.media[i].completeName =
 							PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
 						thumbHash =
-							//~ PhotoFloat.pathJoin([
-								//~ PhotoFloat.cacheBase(currentAlbum.media[i].completeName
-									//~ .substring(0, currentAlbum.media[i].completeName.length - currentAlbum.media[i].name.length - 1)),
-								//~ PhotoFloat.cacheBase(currentAlbum.media[i].name)]);
 							currentAlbum.cacheBase + Options.cache_folder_separator + currentAlbum.media[i].cacheBase;
 					}
 					
@@ -985,7 +955,6 @@ $(document).ready(function() {
 					if (currentAlbum.media.length)
 						mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[0]);
 					else
-						//~ mediaLink = "#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum));
 						mediaLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 					firstEscKey = true;
 				}
@@ -1016,7 +985,6 @@ $(document).ready(function() {
 						margin = Math.round(correctedAlbumThumbSize * 0.05);
 					
 					for (i = 0; i < currentAlbum.albums.length; ++i) {
-						//~ link = $("<a href=\"#!/" + encodeURIComponent(photoFloat.albumHash(currentAlbum.albums[i])) + "\"></a>");
 						link = $("<a href=\"#!/" + encodeURIComponent(currentAlbum.albums[i].cacheBase) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
@@ -1136,7 +1104,6 @@ $(document).ready(function() {
 								
 								html = "<div class=\"album-caption\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
-										//~ "font-size: " + Math.round((captionHeight / 4)) + "px; " +
 										"font-size: " + captionFontSize + "px; " +
 										"height: " + captionHeight + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
@@ -1327,7 +1294,6 @@ $(document).ready(function() {
 			}
 		}
 		
-		//~ $("#media-bar").css("bottom", mediaBarBottom + "px");
 		$("#media-bar").css("bottom", 0);
 		
 		media.show();
@@ -1374,7 +1340,6 @@ $(document).ready(function() {
 					mediaRatio > containerRatio && reducedWidth < container.width() ||
 					mediaRatio < containerRatio && reducedHeight < container.height()
 				)
-				//~ if (reducedWidth < container.width() && reducedHeight < container.height())
 					break;
 			}
 			chosenMedia = photoFloat.mediaPath(currentAlbum, media, Options.reduced_sizes[i]);
@@ -1390,7 +1355,6 @@ $(document).ready(function() {
 	function showMedia(album) {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
 		var prevMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
-		//~ var windowWidth = $(window).width(), windowHeight = $(window).height();
 		var nextReducedPhoto, prevReducedPhoto;
 		
 		mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentMedia);
