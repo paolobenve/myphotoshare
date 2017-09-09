@@ -1237,7 +1237,7 @@ $(document).ready(function() {
 		var containerHeight = $(window).innerHeight(), containerWidth = $(window).innerWidth(), mediaBarBottom = 0;
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1], ratio = width / height;
 		
-		if (fullScreenStatus)
+		if (fullScreenStatus && Modernizr.fullscreen)
 			container = $(window);
 		else {
 			container = $("#media-view");
@@ -1246,8 +1246,10 @@ $(document).ready(function() {
 			else if (bottomSocialButtons() && containerBottom < $(".ssk").outerHeight())
 				// correct container bottom when social buttons are on the bottom
 				containerBottom = $(".ssk").outerHeight();
-			containerTop = $("#title-container").outerHeight();
-			containerHeight -= containerBottom + $("#title-container").outerHeight();
+			containerTop = 0;
+			if ($("#title-container").is(":visible"))
+				containerTop = $("#title-container").outerHeight();
+			containerHeight -= containerBottom + containerTop;
 			container.css("top", containerTop + "px");
 			container.css("bottom", containerBottom + "px");
 		}
@@ -1886,7 +1888,9 @@ $(document).ready(function() {
 			return false;
 		} else if ((e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//               esc            arrow up             page up
-			if (albumLink) {
+			if (e.keyCode === 27 && fullScreenStatus && ! Modernizr.fullscreen)
+				goFullscreenSimulated(e);
+			else if (albumLink) {
 				fromEscKey = true;
 				swipeDown(albumLink);
 				return false;
@@ -1898,10 +1902,14 @@ $(document).ready(function() {
 			else
 				swipeLeft(nextLink);
 			return false;
-		} else if (e.keyCode === 70 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey && Modernizr.fullscreen) {
+		} else if (e.keyCode === 70 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//               f
-			if (currentMedia !== null)
-				goFullscreen(e);
+			if (currentMedia !== null) {
+				if (Modernizr.fullscreen)
+					goFullscreen(e);
+				else
+					goFullscreenSimulated(e);
+			}
 			return false;
 		} else if (e.keyCode === 77 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//               m
@@ -1959,10 +1967,32 @@ $(document).ready(function() {
 			}
 		});
 	}
+	function goFullscreenSimulated(e) {
+		e.preventDefault();
+		$("#media").off("loadstart").unbind("load");
+		if (! fullScreenStatus) {
+			$("#title-container").hide();
+			$("#album-view").hide();
+			$("#enter-fullscreen").toggle();
+			$("#exit-fullscreen").toggle();
+			fullScreenStatus = true;
+		} else {
+			$("#title-container").show();
+			$("#album-view").show();
+			$("#enter-fullscreen").toggle();
+			$("#exit-fullscreen").toggle();
+			fullScreenStatus = false;
+		}
+		showMedia(currentAlbum);
+	}
 	if (Modernizr.fullscreen) {
 		$("#fullscreen").show();
 		$("#fullscreen").click(goFullscreen);
+	} else {
+		$("#fullscreen").show();
+		$("#fullscreen").click(goFullscreenSimulated);
 	}
+	
 	$("#metadata-show").click(showMetadata);
 	$("#metadata-hide").click(showMetadata);
 	
