@@ -344,11 +344,11 @@ $(document).ready(function() {
 				selectorActive = sortReverseNameClass;
 			}
 			if (currentAlbum[reverseDateSort]) {
-				selectorInactive += ", " + sortReverseDateClass;
-				selectorActive += ", " + sortNormalDateClass;
-			} else {
 				selectorInactive += ", " + sortNormalDateClass;
 				selectorActive += ", " + sortReverseDateClass;
+			} else {
+				selectorInactive += ", " + sortReverseDateClass;
+				selectorActive += ", " + sortNormalDateClass;
 			}
 		} else {
 			currentSort += _t(".by-date");
@@ -361,11 +361,11 @@ $(document).ready(function() {
 				selectorActive = sortReverseDateClass;
 			}
 			if (currentAlbum[reverseNameSort]) {
-				selectorInactive += ", " + sortReverseNameClass;
-				selectorActive += ", " + sortNormalNameClass;
-			} else {
 				selectorInactive += ", " + sortNormalNameClass;
 				selectorActive += ", " + sortReverseNameClass;
+			} else {
+				selectorInactive += ", " + sortReverseNameClass;
+				selectorActive += ", " + sortNormalNameClass;
 			}
 		}
 		currentSort += ", ";
@@ -450,7 +450,7 @@ $(document).ready(function() {
 			}
 			if (needMediaDateHtmlReverseSort() || needMediaNameHtmlReverseSort()) {
 				currentAlbum.media = currentAlbum.media.reverse();
-				if (needMediaHtmlNameReverseSort())
+				if (needMediaNameHtmlReverseSort())
 					currentAlbum.mediaNameReverseSort = true;
 				else
 					currentAlbum.mediaDateReverseSort = true;
@@ -514,13 +514,13 @@ $(document).ready(function() {
 								title += _t("#title-in-date-album");
 						} else {
 							if (currentAlbum.media.length) {
-								title += currentAlbum.numMediaInSubTree + " ";
+								title += currentAlbum.media.length + " ";
 								title += _t(".title-media") + " ";
 								title += _t("#title-in-album");
 								if (currentAlbum.albums.length)
 									title += ", ";
 							}
-							if (currentAlbum.albums.length) {
+							if (currentAlbum.numMediaInSubTree) {
 								title += currentAlbum.numMediaInSubTree + " ";
 								title += _t(".title-media") + " ";
 								title += _t("#title-in-tree");
