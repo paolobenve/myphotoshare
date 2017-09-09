@@ -298,7 +298,7 @@ a.title-anchor.mobile {
 #metadata tr {
 	height: 14px;
 }
-#fullscreen, #exit-fullscreen {
+#exit-fullscreen {
 	display: none;
 }
 #enter-fullscreen, #fullscreen-divider {

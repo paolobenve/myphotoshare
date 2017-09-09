@@ -270,6 +270,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ### version 2.7 (September 10, 2017):
 
+* implemented fullscreen simulation for devices not admitting fullscreen api
 * added sorting by name of subalbums and media
 * modified default reverse sorting options, and now they only apply to date sorting (name default sorting is always normal)
 * - default_album_reverse_sort -> default_album_date_reverse_sort

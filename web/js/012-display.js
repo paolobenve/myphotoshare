@@ -1889,7 +1889,7 @@ $(document).ready(function() {
 		} else if ((e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//               esc            arrow up             page up
 			if (e.keyCode === 27 && fullScreenStatus && ! Modernizr.fullscreen)
-				goFullscreenSimulated(e);
+				goFullscreen(e);
 			else if (albumLink) {
 				fromEscKey = true;
 				swipeDown(albumLink);
@@ -1905,10 +1905,7 @@ $(document).ready(function() {
 		} else if (e.keyCode === 70 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//               f
 			if (currentMedia !== null) {
-				if (Modernizr.fullscreen)
-					goFullscreen(e);
-				else
-					goFullscreenSimulated(e);
+				goFullscreen(e);
 			}
 			return false;
 		} else if (e.keyCode === 77 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
@@ -1956,42 +1953,36 @@ $(document).ready(function() {
 		$(this).stop().fadeTo("fast", 0.4);
 	});
 	function goFullscreen(e) {
-		e.preventDefault();
 		$("#media").off("loadstart").unbind("load");
-		$("#media-box").fullScreen({
-			callback: function(isFullscreen) {
-				fullScreenStatus = isFullscreen;
+		if (Modernizr.fullscreen) {
+			e.preventDefault();
+			$("#media-box").fullScreen({
+				callback: function(isFullscreen) {
+					fullScreenStatus = isFullscreen;
+					$("#enter-fullscreen").toggle();
+					$("#exit-fullscreen").toggle();
+					showMedia(currentAlbum);
+				}
+			});
+		} else {
+			$("#media").off("loadstart").unbind("load");
+			if (! fullScreenStatus) {
+				$("#title-container").hide();
+				$("#album-view").hide();
 				$("#enter-fullscreen").toggle();
 				$("#exit-fullscreen").toggle();
-				showMedia(currentAlbum);
+				fullScreenStatus = true;
+			} else {
+				$("#title-container").show();
+				$("#album-view").show();
+				$("#enter-fullscreen").toggle();
+				$("#exit-fullscreen").toggle();
+				fullScreenStatus = false;
 			}
-		});
-	}
-	function goFullscreenSimulated(e) {
-		e.preventDefault();
-		$("#media").off("loadstart").unbind("load");
-		if (! fullScreenStatus) {
-			$("#title-container").hide();
-			$("#album-view").hide();
-			$("#enter-fullscreen").toggle();
-			$("#exit-fullscreen").toggle();
-			fullScreenStatus = true;
-		} else {
-			$("#title-container").show();
-			$("#album-view").show();
-			$("#enter-fullscreen").toggle();
-			$("#exit-fullscreen").toggle();
-			fullScreenStatus = false;
+			showMedia(currentAlbum);
 		}
-		showMedia(currentAlbum);
 	}
-	if (Modernizr.fullscreen) {
-		$("#fullscreen").show();
-		$("#fullscreen").click(goFullscreen);
-	} else {
-		$("#fullscreen").show();
-		$("#fullscreen").click(goFullscreenSimulated);
-	}
+	$("#fullscreen").click(goFullscreen);
 	
 	$("#metadata-show").click(showMetadata);
 	$("#metadata-hide").click(showMetadata);
