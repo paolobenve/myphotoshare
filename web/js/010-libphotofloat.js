@@ -16,7 +16,6 @@
 		if (Object.prototype.toString.call(subalbum).slice(8, -1) === "String")
 			cacheKey = subalbum;
 		else
-			//~ cacheKey = PhotoFloat.cacheBase(PhotoFloat.pathJoin([subalbum.parent.path, subalbum.path]));
 			cacheKey = subalbum.cacheBase;
 		
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
@@ -68,7 +67,6 @@
 		var nextAlbum, self;
 		self = this;
 		nextAlbum = function(album) {
-			//~ var index = Math.floor(Math.random() * (album.media.length + album.albums.length));
 			var index = Math.floor(Math.random() * (album.numMediaInSubTree));
 			if (index >= album.media.length) {
 				index -= album.media.length;
@@ -94,7 +92,6 @@
 		hash = PhotoFloat.cleanHash(hash);
 		// count the number of slashes in hash, by date hashes have 2, folders ones 1
 		if (! hash.length) {
-			//~ albumHash = PhotoFloat.cacheBase(Options.folders_string);
 			albumHash = Options.folders_string;
 			mediaHash = null;
 		} else {
@@ -126,7 +123,6 @@
 			var i = -1;
 			if (mediaHash !== null) {
 				for (i = 0; i < theAlbum.media.length; ++i) {
-					//~ if (PhotoFloat.cacheBase(theAlbum.media[i].name) === mediaHash) {
 					if (
 						theAlbum.media[i].cacheBase === mediaHash &&
 						(foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash)
@@ -163,52 +159,19 @@
 		$.ajax(ajaxOptions);
 	};
 	
-	/* static functions */
-	//~ PhotoFloat.cacheBase = function(path) {
-		//~ // this function is now used only for date albums
-		//~ if (path === "")
-			//~ return "root";
-		//~ if (path.charAt(0) === "/")
-			//~ path = path.substring(1);
-		//~ path = path
-			//~ .replace(/ /g, "_")
-			//~ .replace(/\+/g, "_")
-			//~ .replace(/\//g, Options.cache_folder_separator)
-			//~ .replace(/\(/g, "")
-			//~ .replace(/\)/g, "")
-			//~ .replace(/#/g, "")
-			//~ .replace(/&/g, "")
-			//~ .replace(/,/g, "")
-			//~ .replace(/\[/g, "")
-			//~ .replace(/\]/g, "")
-			//~ .replace(/"/g, "")
-			//~ .replace(/'/g, "")
-			//~ .replace(/_-_/g, "-")
-			//~ .toLowerCase();
-		//~ while (path.indexOf("--") !== -1)
-			//~ path = path.replace(/--/g, "-");
-		//~ while (path.indexOf("__") !== -1)
-			//~ path = path.replace(/__/g, "_");
-		//~ return path;
-	//~ };
 	PhotoFloat.mediaHash = function(album, media) {
-		//~ return PhotoFloat.pathJoin([PhotoFloat.albumHash(album), PhotoFloat.cacheBase(media.name)]);
 		return media.cacheBase;
 	};
 	PhotoFloat.mediaHashURIEncoded = function(album, media) {
 		var hash, bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		if (album.cacheBase.indexOf(bydateStringWithTrailingSeparator) === 0)
 			hash = PhotoFloat.pathJoin([
-				//~ encodeURIComponent(PhotoFloat.albumHash(album)),
-				//~ encodeURIComponent(PhotoFloat.cacheBase(media.name))
 				encodeURIComponent(album.cacheBase),
 				encodeURIComponent(media.foldersCacheBase),
 				encodeURIComponent(media.cacheBase)
 			]);
 		else
 			hash = PhotoFloat.pathJoin([
-				//~ encodeURIComponent(PhotoFloat.albumHash(album)),
-				//~ encodeURIComponent(PhotoFloat.cacheBase(media.name))
 				encodeURIComponent(album.cacheBase),
 				encodeURIComponent(media.cacheBase)
 			]);
@@ -216,11 +179,9 @@
 	};
 	PhotoFloat.mediaHashFolder = function(album, media) {
 		var hash, bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
-		//~ hash = PhotoFloat.mediaHash(album, media);
 		hash = media.cacheBase;
 		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
 			media.completeName = PhotoFloat.pathJoin([media.foldersAlbum, media.name]);
-			//~ hash = PhotoFloat.pathJoin([PhotoFloat.cacheBase(media.foldersAlbum), PhotoFloat.cacheBase(media.name)]);
 			hash = PhotoFloat.pathJoin([media.foldersAlbum.cacheBase, media.cacheBase]);
 		}
 		return hash;
@@ -263,8 +224,7 @@
 		} else if (media.mediaType == "video") {
 			suffix += "transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 		}
-		//~ hash = PhotoFloat.cacheBase(PhotoFloat.mediaHashFolder(album, media) + suffix);
-		//~ hash = album.cacheBase + Options.cache_folder_separator + media.cacheBase + suffix;
+		
 		hash = media.foldersCacheBase + Options.cache_folder_separator + media.cacheBase + suffix;
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
@@ -312,7 +272,6 @@
 	PhotoFloat.prototype.mediaHashURIEncoded = PhotoFloat.mediaHashURIEncoded;
 	PhotoFloat.prototype.mediaHashFolder = PhotoFloat.mediaHashFolder;
 	PhotoFloat.prototype.pathJoin = PhotoFloat.pathJoin;
-	//~ PhotoFloat.prototype.albumHash = PhotoFloat.albumHash;
 	PhotoFloat.prototype.mediaPath = PhotoFloat.mediaPath;
 	PhotoFloat.prototype.originalMediaPath = PhotoFloat.originalMediaPath;
 	PhotoFloat.prototype.trimExtension = PhotoFloat.trimExtension;

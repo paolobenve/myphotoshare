@@ -298,7 +298,7 @@ a.title-anchor.mobile {
 #metadata tr {
 	height: 14px;
 }
-#fullscreen, #exit-fullscreen {
+#exit-fullscreen {
 	display: none;
 }
 #enter-fullscreen, #fullscreen-divider {
@@ -405,9 +405,24 @@ a.title-anchor.mobile {
 	text-decoration: none;
 }
 
-.arrows img {
-	padding: 0 1em;
+.sort img {
+	padding: 0 .5em;
+	cursor: pointer;
+}
+
+.sort img.opaque {
+/*
+	opacity: 0.25;
+*/
 	display: none;
+	cursor: default;
+}
+
+.sort {
+	display: none;
+/*
+	white-space: nowrap;
+*/
 }
 
 #social, #social:hover {
