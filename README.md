@@ -1,4 +1,4 @@
-# myphotoshare v. 2.6.4
+# myphotoshare v. 2.7
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -31,7 +31,7 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Many customization through config file
 * Cache folder can be managed with subdirs (useful for large repositories)
 * Albums and cache server folders can be anywhere on the server
-* Images and folders can be sorted ascending/descending (via a cookie)
+* Images and folders can be sorted ascending/descending by date or by name (via a cookie)
 * Thumbnails can be square (cropped) or full-content
 * Single `index.php` file (crawlers and social media do not execute javascript); `php` does a bit of work:
 * - inserts link tag in <head></head> in order to let social media see the shared content
@@ -267,6 +267,10 @@ Note that the `internal-*` paths must match that of `app.cfg`. This makes use of
 Both the scanner and the webpage have a `make deploy` target, and the scanner has a `make scan` target, to automatically deploy assets to a remote server and run the scanner. For use, customize `deployment-config.mk` in the root of the project, and carefully read the `Makefile`s to learn what's happening.
 
 ## Changelog
+
+### version 2.7.1 (September 11, 2017):
+
+* fixed php bug in album sharing
 
 ### version 2.7 (September 10, 2017):
 
