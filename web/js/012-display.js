@@ -489,17 +489,19 @@ $(document).ready(function() {
 							else
 								title += _t("#title-in-date-album");
 						} else {
+							var numMediaInSubAlbums = currentAlbum.numMediaInSubTree - currentAlbum.media.length;
 							if (currentAlbum.media.length) {
 								title += currentAlbum.media.length + " ";
 								title += _t(".title-media") + " ";
 								title += _t("#title-in-album");
-								if (currentAlbum.albums.length)
+								if (numMediaInSubAlbums)
 									title += ", ";
 							}
-							if (currentAlbum.numMediaInSubTree) {
-								title += currentAlbum.numMediaInSubTree + " ";
-								title += _t(".title-media") + " ";
-								title += _t("#title-in-tree");
+							if (numMediaInSubAlbums) {
+								title += numMediaInSubAlbums + " ";
+								if (! currentAlbum.media.length)
+									title += _t(".title-media") + " ";
+								title += _t("#title-in-subalbums");
 							}
 						}
 						title += ")</span>";
