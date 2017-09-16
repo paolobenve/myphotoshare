@@ -1856,11 +1856,11 @@ $(document).ready(function() {
 	
 	
 	$(document).keydown(function(e){
-		if ((e.keyCode === 39) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+		if (e.keyCode === 39 && currentMedia !== null && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			// arrow right
 			swipeLeft(nextLink);
 			return false;
-		} else if ((e.keyCode === 37) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+		} else if (e.keyCode === 37 && currentMedia !== null && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//        arrow left
 			swipeRight(prevLink);
 			return false;
@@ -1869,17 +1869,25 @@ $(document).ready(function() {
 			if (e.keyCode === 27 && fullScreenStatus && ! Modernizr.fullscreen)
 				goFullscreen(e);
 			else if (albumLink) {
-				fromEscKey = true;
-				swipeDown(albumLink);
-				return false;
+				if (e.keyCode === 38 && currentMedia === null)
+					return true;
+				else {
+					fromEscKey = true;
+					swipeDown(albumLink);
+					return false;
+				}
 			}
 		} else if ((e.keyCode === 40 || e.keyCode === 34) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//        arrow down           page down
-			if (currentMedia === null)
-				swipeUp(mediaLink);
-			else
-				swipeLeft(nextLink);
-			return false;
+			if (e.keyCode === 40 && currentMedia === null)
+				return true;
+			else {
+				if (currentMedia === null)
+					swipeUp(mediaLink);
+				else
+					swipeLeft(nextLink);
+				return false;
+			}
 		} else if (e.keyCode === 70 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			//               f
 			if (currentMedia !== null) {
