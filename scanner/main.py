@@ -203,12 +203,12 @@ def main():
 			sys.exit(-97)
 	
 	# create the directory where php will put album composite images
-	albumCacheDir = os.path.join(Options.config['cache_path'], 'album')
+	albumCacheDir = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
 	try:
 		os.stat(albumCacheDir)
 	except:
 		try:
-			message("creating cache directory for php", albumCacheDir, 4)
+			message("creating cache directory for composite images", albumCacheDir, 4)
 			os.mkdir(albumCacheDir)
 			os.chmod(albumCacheDir, 0777)
 		except OSError:
