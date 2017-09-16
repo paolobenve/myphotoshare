@@ -75,6 +75,14 @@ As an example, the command to delete thumbnails of `mp4` videos is:
 
 Repeat the same command for other video extensions, like `avi`.
 
+#### ffmpeg/avconv version
+
+Old `ffmpeg/avconv` could not be able to transcode some video. Be sure you have the last version installed
+
+#### Video date and time
+
+The scanner gets modification date-time for video date-time. Be sure you do not modify it; or, if you modified it, touch it to desidered date-time.
+
 ## Community
 
 Github platform permits you to report bugs.
