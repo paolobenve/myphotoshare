@@ -668,10 +668,10 @@ class TreeWalker:
 			else:
 				# only delete json's, transcoded videos, reduced images and thumbnails
 				next_level()
-				message("deciding whether to keep a cache file...", "", 6)
+				message("deciding whether to keep a cache file...", "", 7)
 				match = re.search(deletable_files_suffixes_re, cache_file)
 				next_level()
-				message("decided whether to keep a cache file", cache_file, 5)
+				message("decided whether to keep a cache file", cache_file, 6)
 				back_level()
 				if match:
 					try:
