@@ -618,8 +618,9 @@ class TreeWalker:
 		message("saved json options file", "", 5)
 		back_level()
 		
-	def remove_stale(self, subdir = "", cache_list = {}):
+	def remove_stale(self, subdir = ""):
 		if not subdir:
+			next_level()
 			message("cleaning up, be patient...", "", 3)
 			next_level()
 			message("building stale list...", "", 4)
@@ -637,7 +638,9 @@ class TreeWalker:
 			next_level()
 			message("built stale list", "", 5)
 			back_level()
-		if subdir:
+			info = "in cache path"
+			deletable_files_suffixes_re ="\.json$"
+		else:
 			info = "in subdir " + subdir
 			# reduced sizes, thumbnails, old style thumbnails
 			if subdir == Options.config['cache_album_subdir']:
@@ -648,32 +651,27 @@ class TreeWalker:
 			else:
 				deletable_files_suffixes_re = "_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
 				deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
-		else:
-			info = "in cache path"
-			deletable_files_suffixes_re ="\.json$"
 		message("searching for stale cache files", info, 4)
-		
-		next_level()
 		
 		for cache_file in sorted(os.listdir(os.path.join(Options.config['cache_path'], subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache_file)):
-				next_level()
 				self.remove_stale(cache_file)
 				if not os.listdir(os.path.join(Options.config['cache_path'], cache_file)):
+					next_level()
 					message("empty subdir, deleting...", "", 4)
 					file_to_delete = os.path.join(Options.config['cache_path'], cache_file)
-					os.rmdir(os.path.join(Options.config['cache_path'], file_to_delete))
 					next_level()
+					os.rmdir(os.path.join(Options.config['cache_path'], file_to_delete))
 					message("empty subdir, deleted", "", 5)
 					back_level()
-				back_level()
+					back_level()
 			else:
 				# only delete json's, transcoded videos, reduced images and thumbnails
-				message
-				message("deciding whether to keep a cache file...", cache_file, 6)
+				next_level()
+				message("deciding whether to keep a cache file...", "", 6)
 				match = re.search(deletable_files_suffixes_re, cache_file)
 				next_level()
-				message("decided whether to keep a cache file", "", 6)
+				message("decided whether to keep a cache file", cache_file, 5)
 				back_level()
 				if match:
 					try:
@@ -697,9 +695,12 @@ class TreeWalker:
 						message("removed stale cache file", "", 5)
 						back_level()
 				else:
+					next_level()
 					message("not a stale cache file, keeping it", cache_file, 2)
+					back_level()
 					continue
-				
+				back_level()
 		if not subdir:
+			message("cleaned", "", 5)
 			back_level()
-		back_level()
+			back_level()
