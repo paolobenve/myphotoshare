@@ -1,4 +1,4 @@
-# myphotoshare v. 2.7
+# myphotoshare v. 2.7.2
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -275,6 +275,10 @@ Note that the `internal-*` paths must match that of `app.cfg`. This makes use of
 Both the scanner and the webpage have a `make deploy` target, and the scanner has a `make scan` target, to automatically deploy assets to a remote server and run the scanner. For use, customize `deployment-config.mk` in the root of the project, and carefully read the `Makefile`s to learn what's happening.
 
 ## Changelog
+
+### version 2.7.2 (September 16, 2017):
+
+* various bugs fixed
 
 ### version 2.7.1 (September 11, 2017):
 
