@@ -1003,7 +1003,6 @@ class Media(object):
 					os.unlink(transcode_path)
 				except OSError:
 					pass
-				return
 			back_level()
 
 		if self.is_valid:
