@@ -365,7 +365,7 @@ $(document).ready(function() {
 	
 	function setTitle() {
 		var title = "", documentTitle = "", components, i, dateTitle, originalTitle;
-		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, sortButtons, index, m;
+		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, sortButtons, m;
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
 		else
@@ -385,7 +385,8 @@ $(document).ready(function() {
 				currentAlbum.albums = currentAlbum.albums.reverse();
 				currentAlbum.albumDateReverseSort = true;
 			}
-		} else if (needAlbumNameReverseSort() || needAlbumDateReverseSort()) {
+		}
+		if (needAlbumNameReverseSort() || needAlbumDateReverseSort()) {
 			currentAlbum.albums = currentAlbum.albums.reverse();
 			if (needAlbumNameReverseSort())
 				currentAlbum.albumNameReverseSort = ! currentAlbum.albumNameReverseSort;
@@ -401,10 +402,9 @@ $(document).ready(function() {
 				currentAlbum.mediaNameReverseSort = true;
 			}
 			if (currentMedia !== null) {
-				index = 0;
-				for (m in currentAlbum.media) {
-					if (m.cacheBase == currentMedia.cacheBase && m.foldersCacheBase == currentMedia.foldersCacheBase) {
-						currentMediaIndex = index;
+				for (m = 0; m < currentAlbum.media.length; m ++) {
+					if (currentAlbum.media[m].cacheBase == currentMedia.cacheBase && currentAlbum.media[m].foldersCacheBase == currentMedia.foldersCacheBase) {
+						currentMediaIndex = m;
 						break;
 					}
 				}
@@ -417,15 +417,15 @@ $(document).ready(function() {
 				currentAlbum.mediaDateReverseSort = true;
 			}
 			if (currentMedia !== null) {
-				index = 0;
-				for (m in currentAlbum.media) {
-					if (m.cacheBase == currentMedia.cacheBase && m.foldersCacheBase == currentMedia.foldersCacheBase) {
-						currentMediaIndex = index;
+				for (m = 0; m < currentAlbum.media.length; m ++) {
+					if (currentAlbum.media[m].cacheBase == currentMedia.cacheBase && currentAlbum.media[m].foldersCacheBase == currentMedia.foldersCacheBase) {
+						currentMediaIndex = m;
 						break;
 					}
 				}
 			}
-		} else if (needMediaDateReverseSort() || needMediaNameReverseSort()) {
+		}
+		if (needMediaDateReverseSort() || needMediaNameReverseSort()) {
 			currentAlbum.media = currentAlbum.media.reverse();
 			if (needMediaNameReverseSort())
 				currentAlbum.mediaNameReverseSort = ! currentAlbum.mediaNameReverseSort;
@@ -1631,41 +1631,29 @@ $(document).ready(function() {
 	
 	// this function refer to the need that the html showed be sorted
 	function needAlbumNameSort() {
-		return ! currentAlbum.albumNameSort && getBooleanCookie("albumNameSortRequested");
+		return ! ! currentAlbum.albums.length && ! currentAlbum.albumNameSort && getBooleanCookie("albumNameSortRequested");
 	}
 	function needAlbumDateSort() {
-		return currentAlbum.albumNameSort && ! getBooleanCookie("albumNameSortRequested");
+		return ! ! currentAlbum.albums.length && currentAlbum.albumNameSort && ! getBooleanCookie("albumNameSortRequested");
 	}
 	function needAlbumDateReverseSort() {
-		return ! currentAlbum.albumNameSort && (
-				! currentAlbum.albumDateReverseSort && getBooleanCookie("albumDateReverseSortRequested") ||
-				currentAlbum.albumDateReverseSort && ! getBooleanCookie("albumDateReverseSortRequested")
-			);
+		return ! ! currentAlbum.albums.length && ! currentAlbum.albumNameSort && currentAlbum.albumDateReverseSort !== getBooleanCookie("albumDateReverseSortRequested");
 	}
 	function needAlbumNameReverseSort() {
-		return currentAlbum.albumNameSort && (
-				! currentAlbum.albumNameReverseSort && getBooleanCookie("albumNameReverseSortRequested") ||
-				currentAlbum.albumNameReverseSort && ! getBooleanCookie("albumNameReverseSortRequested")
-			);
+		return ! ! currentAlbum.albums.length && currentAlbum.albumNameSort && currentAlbum.albumNameReverseSort !== getBooleanCookie("albumNameReverseSortRequested");
 	}
 	
 	function needMediaNameSort() {
-		return ! currentAlbum.mediaNameSort && getBooleanCookie("mediaNameSortRequested");
+		return ! ! currentAlbum.media.length && ! currentAlbum.mediaNameSort && getBooleanCookie("mediaNameSortRequested");
 	}
 	function needMediaDateSort() {
-		return currentAlbum.mediaNameSort && ! getBooleanCookie("mediaNameSortRequested");
+		return ! ! currentAlbum.media.length && currentAlbum.mediaNameSort && ! getBooleanCookie("mediaNameSortRequested");
 	}
 	function needMediaDateReverseSort() {
-		return ! currentAlbum.mediaNameSort && (
-				! currentAlbum.mediaDateReverseSort && getBooleanCookie("mediaDateReverseSortRequested") ||
-				currentAlbum.mediaDateReverseSort && ! getBooleanCookie("mediaDateReverseSortRequested")
-			);
+		return ! ! currentAlbum.media.length && ! currentAlbum.mediaNameSort && currentAlbum.mediaDateReverseSort !== getBooleanCookie("mediaDateReverseSortRequested");
 	}
 	function needMediaNameReverseSort() {
-		return currentAlbum.mediaNameSort && (
-				! currentAlbum.mediaNameReverseSort && getBooleanCookie("mediaNameReverseSortRequested") ||
-				currentAlbum.mediaNameReverseSort && ! getBooleanCookie("mediaNameReverseSortRequested")
-			);
+		return ! ! currentAlbum.media.length && currentAlbum.mediaNameSort && currentAlbum.mediaNameReverseSort !== getBooleanCookie("mediaNameReverseSortRequested");
 	}
 
 	/* Error displays */
