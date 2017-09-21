@@ -1855,53 +1855,41 @@ $(document).ready(function() {
 	$(window).hashchange();
 	
 	
-	$(document).keydown(function(e){
-		if (e.keyCode === 39 && currentMedia !== null && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			// arrow right
-			swipeLeft(nextLink);
-			return false;
-		} else if (e.keyCode === 37 && currentMedia !== null && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			//        arrow left
-			swipeRight(prevLink);
-			return false;
-		} else if ((e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			//               esc            arrow up             page up
-			if (e.keyCode === 27 && fullScreenStatus && ! Modernizr.fullscreen)
-				goFullscreen(e);
-			else if (albumLink) {
-				if (e.keyCode === 38 && currentMedia === null)
-					return true;
-				else {
-					fromEscKey = true;
-					swipeDown(albumLink);
-					return false;
-				}
-			}
-		} else if ((e.keyCode === 40 || e.keyCode === 34) && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			//        arrow down           page down
-			if (e.keyCode === 40 && currentMedia === null)
-				return true;
-			else {
-				if (currentMedia === null)
-					swipeUp(mediaLink);
-				else
-					swipeLeft(nextLink);
+	$(document).keydown(function(e) {
+		if (! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+			if (nextLink && e.keyCode === 39 && currentMedia !== null) {
+				// arrow right
+				swipeLeft(nextLink);
 				return false;
-			}
-		} else if (e.keyCode === 70 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			//               f
-			if (currentMedia !== null) {
+			} else if (prevLink && e.keyCode === 37 && currentMedia !== null) {
+				//        arrow left
+				swipeRight(prevLink);
+				return false;
+			} else if (e.keyCode === 27 && ! Modernizr.fullscreen && fullScreenStatus) {
+				//               esc
 				goFullscreen(e);
-			}
-			return false;
-		} else if (e.keyCode === 77 && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			//               m
-			if (currentMedia !== null) {
+				return false;
+			} else if (albumLink && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
+				//                            esc            arrow up             page up
+				fromEscKey = true;
+				swipeDown(albumLink);
+				return false;
+			} else if (mediaLink && currentMedia === null && (e.keyCode === 40 || e.keyCode === 34)) {
+				//                                              arrow down           page down
+				swipeUp(mediaLink);
+				return false;
+			} else if (currentMedia !== null && e.keyCode === 70) {
+				//                                        f
+				goFullscreen(e);
+				return false;
+			} else if (currentMedia !== null && e.keyCode === 77) {
+				//                                        m
 				showMetadata(e);
-			return false;
-			}
-		}
-		return true;
+				return false;
+			} else
+				return true;
+		} else
+			return true;
 	});
 	$(document).mousewheel(function(event, delta) {
 		
