@@ -1551,10 +1551,10 @@ $(document).ready(function() {
 		$("#day-folders-view-link").attr("href", changeViewLink);
 		
 		text = "<table>";
+		if (typeof currentMedia.metadata.dateTime !== "undefined") text += "<tr><td id=\"metadata-data-date\">Time Taken</td><td>" + currentMedia.metadata.dateTime + "</td></tr>";
+		if (typeof currentMedia.metadata.size !== "undefined") text += "<tr><td id=\"metadata-data-size\">Resolution</td><td>" + currentMedia.metadata.size[0] + " x " + currentMedia.metadata.size[1] + "</td></tr>";
 		if (typeof currentMedia.metadata.make !== "undefined") text += "<tr><td id=\"metadata-data-make\">Camera Maker</td><td>" + currentMedia.metadata.make + "</td></tr>";
 		if (typeof currentMedia.metadata.model !== "undefined") text += "<tr><td id=\"metadata-data-model\">Camera Model</td><td>" + currentMedia.metadata.model + "</td></tr>";
-		if (typeof currentMedia.metadata.date !== "undefined") text += "<tr><td id=\"metadata-data-date\">Time Taken</td><td>" + currentMedia.metadata.date + "</td></tr>";
-		if (typeof currentMedia.metadata.size !== "undefined") text += "<tr><td id=\"metadata-data-size\">Resolution</td><td>" + currentMedia.metadata.size[0] + " x " + currentMedia.metadata.size[1] + "</td></tr>";
 		if (typeof currentMedia.metadata.aperture !== "undefined") text += "<tr><td id=\"metadata-data-aperture\">Aperture</td><td> f/" + getDecimal(currentMedia.metadata.aperture) + "</td></tr>";
 		if (typeof currentMedia.metadata.focalLength !== "undefined") text += "<tr><td id=\"metadata-data-focalLength\">Focal Length</td><td>" + getDecimal(currentMedia.metadata.focalLength) + " mm</td></tr>";
 		if (typeof currentMedia.metadata.subjectDistanceRange !== "undefined") text += "<tr><td id=\"metadata-data-subjectDistanceRange\">Subject Distance Range</td><td>" + currentMedia.metadata.subjectDistanceRange + "</td></tr>";

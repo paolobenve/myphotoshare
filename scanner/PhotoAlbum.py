@@ -404,13 +404,13 @@ class Media(object):
 			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureBiasValue"]
 		if "DateTimeOriginal" in exif:
 			try:
-				self._attributes["metadata"]["dateTimeOriginal"] = datetime.strptime(exif["DateTimeOriginal"], Options.exif_date_time_format)
+				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTimeOriginal"], Options.exif_date_time_format)
 			except KeyboardInterrupt:
 				raise
 			except ValueError:
 				# value isn't usable, forget it
 				pass
-		if "DateTime" in exif:
+		elif "DateTime" in exif:
 			try:
 				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], Options.exif_date_time_format)
 			except KeyboardInterrupt:
