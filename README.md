@@ -276,6 +276,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 2.7.3 (September 21, 2017):
+
+* various bugs fixed
+
 ### version 2.7.2 (September 16, 2017):
 
 * various bugs fixed
