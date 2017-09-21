@@ -136,26 +136,22 @@ class TreeWalker:
 							by_date_max_file_date = single_media_date
 					self.all_albums.append(day_album)
 					json_file = os.path.join(Options.config['cache_path'], day_album.json_file)
-					if not day_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < day_max_file_date):
-						day_album.cache()
+					day_album.cache()
 					next_level()
 					message("day album elaborated", media[0].year + "-" + media[0].month + "-" + media[0].day, 4)
 					back_level()
 					self.generate_composite_image(day_album, day_max_file_date)
 				self.all_albums.append(month_album)
 				json_file = os.path.join(Options.config['cache_path'], month_album.json_file)
-				if not month_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < month_max_file_date):
-					month_album.cache()
+				month_album.cache()
 				self.generate_composite_image(month_album, month_max_file_date)
 			self.all_albums.append(year_album)
 			json_file = os.path.join(Options.config['cache_path'], year_album.json_file)
-			if not year_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < year_max_file_date):
-				year_album.cache()
+			year_album.cache()
 			self.generate_composite_image(year_album, year_max_file_date)
 		self.all_albums.append(by_date_album)
 		json_file = os.path.join(Options.config['cache_path'], by_date_album.json_file)
-		if not by_date_album.empty and (not os.path.exists(json_file) or file_mtime(json_file) < by_date_max_file_date):
-			by_date_album.cache()
+		by_date_album.cache()
 		self.generate_composite_image(by_date_album, by_date_max_file_date)
 		back_level()
 		return by_date_album
