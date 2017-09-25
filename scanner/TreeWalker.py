@@ -48,10 +48,10 @@ class TreeWalker:
 		origin_album.cache_base = cache_base(Options.config['album_path'])
 		album_cache_base = Options.config['folders_string']
 		[folders_album, num, max_file_date] = self.walk(Options.config['album_path'], album_cache_base, origin_album)
-		folders_album.num_media_in_sub_tree = num
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
 		else:
+			folders_album.num_media_in_sub_tree = num
 			self.all_cache_entries.append("all_media.json")
 			self.all_cache_entries.append(Options.config['folders_string'] + ".json")
 			message("saving all media json file...", "", 4)
@@ -60,7 +60,7 @@ class TreeWalker:
 			message("saved all media json file", "", 5)
 			back_level()
 			message("generating date albums...", "", 4)
-			by_date_album = self.generate_date_album(origin_album)
+			by_date_album = self.generate_date_albums(origin_album)
 			next_level()
 			message("generated date albums", "", 5)
 			back_level()
@@ -73,7 +73,7 @@ class TreeWalker:
 				origin_album.cache()
 		self.remove_stale()
 		message("complete", "", 4)
-	def generate_date_album(self, origin_album):
+	def generate_date_albums(self, origin_album):
 		next_level()
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
@@ -152,7 +152,8 @@ class TreeWalker:
 		self.all_albums.append(by_date_album)
 		json_file = os.path.join(Options.config['cache_path'], by_date_album.json_file)
 		by_date_album.cache()
-		self.generate_composite_image(by_date_album, by_date_max_file_date)
+		if by_date_album.num_media_in_sub_tree > 0:
+			self.generate_composite_image(by_date_album, by_date_max_file_date)
 		back_level()
 		return by_date_album
 	
