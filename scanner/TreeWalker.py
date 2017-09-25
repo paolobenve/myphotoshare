@@ -534,19 +534,14 @@ class TreeWalker:
 				if i == num_random_thumbnails:
 					break
 			else:
-				print "unexistent " + thumbnail + ", i=", i, "good=", good_media_number
+				message("unexistent thumbnail " + thumbnail + ", i=" + i, "good=", good_media_number, 5)
 				bad_list.append(thumbnail)
 				good_media_number -= 1
 		
 		if len(random_thumbnails) < max_thumbnail_number:
 			# add the missing images: repeat the present ones
-			index = 0
 			for i in range(max_thumbnail_number - len(random_thumbnails)):
-				random_thumbnails.append(random_thumbnails[index])
-				if index == len(random_thumbnails):
-					index = 0
-				else:
-					index += 1
+				random_thumbnails.append(random_thumbnails[i])
 		
 		# generate the composite image
 		# following code inspired from
