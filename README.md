@@ -1,4 +1,4 @@
-# myphotoshare v. 2.7.3
+# myphotoshare v. 2.7.4
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -57,10 +57,6 @@ As a term of comparizon, on my medium-sized pc, with the images on a nfs mounted
 
 ### Known issues:
 
-#### Fullscreen not working on apple products
-
-Fullscreen capabilities aren't detected on iphone/ipad
-
 #### Issues related to previous scanner versions
 
 The scanner had bug in the past, so thumbnail generated with previous versions of the scanner could have some defect or lack something:
@@ -77,7 +73,7 @@ Repeat the same command for other video extensions, like `avi`.
 
 #### ffmpeg/avconv version
 
-Old `ffmpeg/avconv` could not be able to transcode some video. Be sure you have the last version installed
+Old `ffmpeg/avconv` could not be able to transcode some video. Be sure you have the last version installed.
 
 #### Video date and time
 
@@ -275,6 +271,10 @@ Note that the `internal-*` paths must match that of `app.cfg`. This makes use of
 Both the scanner and the webpage have a `make deploy` target, and the scanner has a `make scan` target, to automatically deploy assets to a remote server and run the scanner. For use, customize `deployment-config.mk` in the root of the project, and carefully read the `Makefile`s to learn what's happening.
 
 ## Changelog
+
+### version 2.7.4 (September 29, 2017):
+
+* various bugs fixed
 
 ### version 2.7.3 (September 21, 2017):
 
