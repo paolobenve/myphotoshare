@@ -14,10 +14,11 @@
 			echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
+<!--
 	<link href="css/styles.min.css" rel="stylesheet" type="text/css" /> 
 	<script type="text/javascript" src="js/scripts.min.js"></script> 
+-->
 
-<!--
 	<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 	<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 	<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
@@ -32,7 +33,6 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
--->
 	
 	<?php
 		//~ ini_set('display_errors', 1);
@@ -87,7 +87,7 @@
 				});
 			});
 		</script>
-		<noscript><p><img src="//cathopedia.org:8080/piwik/piwik.php?idsite=15" style="border:0;" alt="" /></p></noscript>
+		<noscript><p><img src="<?php echo $options['piwik_server'] . 'piwik.php?idsite=' . $options['piwik_id']; ?>" style="border:0;" alt="" /></p></noscript>
 		<!-- End Piwik Code -->
 	<?php } ?>  
 	
@@ -158,7 +158,8 @@
 				<div id="links">
 					<a id="metadata-show" href="javascript:void(0)"></a>
 					<a id="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
-					<a id="original-link" target="_blank"></a>
+					<a id="original-link"></a> |
+					<a id="download-link"></a>
 					<a id="fullscreen" href="javascript:void(0)">
 						<span id="fullscreen-divider"> | </span>
 						<span id="enter-fullscreen"></span>

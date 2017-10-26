@@ -1533,6 +1533,7 @@ $(document).ready(function() {
 			});
 		}
 		$("#original-link").attr("target", "_blank").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia)));
+		$("#download-link").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia))).attr("download", "");
 		
 		if (currentAlbum.path.indexOf(Options.by_date_string) === 0)
 			// by date album: change to folder view

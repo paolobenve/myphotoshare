@@ -3,7 +3,8 @@ var translations =
 		'en': {
 			"#metadata-show": "show metadata",
 			"#metadata-hide": "hide metadata",
-			"#original-link": "download original",
+			"#original-link": "view original",
+			"#download-link": "download original",
 			"#enter-fullscreen": "fullscreen",
 			"#exit-fullscreen": "exit",
 			"#date-view": "by date",
@@ -54,7 +55,8 @@ var translations =
 		'it': {
 			"#metadata-show": "metadati",
 			"#metadata-hide": "nascondi",
-			"#original-link": "scarica originale",
+			"#original-link": "vedi originale",
+			"#download-link": "scarica originale",
 			"#enter-fullscreen": "schermo intero",
 			"#exit-fullscreen": "esci",
 			"#date-view": "per data",
@@ -105,7 +107,8 @@ var translations =
 		'es': {
 			"#metadata-show": "metadatos",
 			"#metadata-hide": "esconde metadatos",
-			"#original-link": "descarga original",
+			"#original-link": "ve original",
+			"#download-link": "descarga original",
 			"#enter-fullscreen": "pantalla completa",
 			"#exit-fullscreen": "salir",
 			"#date-view": "por fecha",
