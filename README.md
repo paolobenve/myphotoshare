@@ -1,4 +1,4 @@
-# myphotoshare v. 2.7.4
+# myphotoshare v. 2.7.5
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -16,8 +16,9 @@ Content (albums, media files) can be shared over some popular social plaforms.
 
 * Fullscreen mode
 * Metadata display
-* Link to original images
 * Manages images and videos
+* Link to original media
+* Link for direct download
 * Animations to make the interface feel nice
 * Separate album view and photo view
 * Album metadata pre-fetching
@@ -271,6 +272,11 @@ Note that the `internal-*` paths must match that of `app.cfg`. This makes use of
 Both the scanner and the webpage have a `make deploy` target, and the scanner has a `make scan` target, to automatically deploy assets to a remote server and run the scanner. For use, customize `deployment-config.mk` in the root of the project, and carefully read the `Makefile`s to learn what's happening.
 
 ## Changelog
+
+### version 2.7.5 (October 26, 2017):
+
+* added link for direct download of media
+* piwik bug fixed
 
 ### version 2.7.4 (September 29, 2017):
 
