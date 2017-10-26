@@ -141,7 +141,7 @@ $(document).ready(function() {
 			swipe_det.sX = 0;
 			swipe_det.eX = 0;
 		};
-		swipe_det = new Object();
+		swipe_det = {};
 		swipe_det.sX = 0; swipe_det.eX = 0;
 		min_x = 30;  //min x swipe for horizontal swipe
 		max_x = 30;  //max x difference for vertical swipe

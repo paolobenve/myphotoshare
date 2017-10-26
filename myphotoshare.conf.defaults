@@ -197,8 +197,9 @@ min_album_thumbnail = 3
 # it has the form UA-XXXXXXX-1
 google_analytics_id = 
 
-# piwik analytics server...
+# piwik analytics server, in the form [http(s):]//server.com/[directory/]
+# must end with slash
 piwik_server = 
-# ... and site id (an integer)
+# piwik site id (an integer)
 # this parameter must come after piwik_server
 piwik_id =
