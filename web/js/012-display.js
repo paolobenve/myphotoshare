@@ -19,6 +19,8 @@ var isMobile = {
 		return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
 	}
 };
+// this variable permits to take into account the real mobile device pixels when deciding the size of reduced size image which is going to be loaded
+var screenRatio = window.devicePixelRatio || 1;
 
 $(document).ready(function() {
 	
@@ -1350,8 +1352,8 @@ $(document).ready(function() {
 				}
 				
 				if (
-					mediaRatio > containerRatio && reducedWidth < container.width() ||
-					mediaRatio < containerRatio && reducedHeight < container.height()
+					mediaRatio > containerRatio && reducedWidth < container.width() * screenRatio ||
+					mediaRatio < containerRatio && reducedHeight < container.height() * screenRatio
 				)
 					break;
 			}
