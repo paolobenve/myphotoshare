@@ -474,7 +474,7 @@ class TreeWalker:
 		composite_image_name = album.cache_base + ".jpg"
 		self.all_album_composite_images.append(composite_image_name)
 		composite_image_path = os.path.join(self.album_cache_path, composite_image_name)
-		if os.path.exists(composite_image_path) and file_mtime(composite_image_path) > max_file_date:
+		if os.path.exists(composite_image_path) and file_mtime(composite_image_path) > max_file_date and file_mtime(os.path.join(Options.config['cache_path'], album.json_file)) < file_mtime(composite_image_path):
 			message("composite image OK", "", 5)
 			with open(composite_image_path, 'a'):
 				os.utime(composite_image_path, None)
