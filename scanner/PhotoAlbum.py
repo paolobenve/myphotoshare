@@ -46,7 +46,7 @@ class Album(object):
 		self.num_media_in_sub_tree = 0
 		self.num_media_in_album = 0
 		self.parent = None
-		
+
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
 			(
@@ -63,7 +63,7 @@ class Album(object):
 					self._subdir = path[path.rfind("/") + 1:][:2].replace(" ", "_")
 					if len(self._subdir) == 1:
 						self._subdir += "_"
-	
+
 	@property
 	def media(self):
 		return self.media_list
@@ -122,7 +122,7 @@ class Album(object):
 			if not album.empty:
 				return False
 		return True
-		
+
 	def cache(self):
 		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
@@ -172,7 +172,7 @@ class Album(object):
 			for subalbum in dictionary["albums"]:
 				album.add_album(Album.from_dict(subalbum, cripple))
 		album.sort_subalbums_and_media()
-		
+
 		return album
 	def to_dict(self, cripple=True):
 		self.sort_subalbums_and_media()
@@ -183,7 +183,7 @@ class Album(object):
 					path_to_dict = trim_base_custom(sub.path, self.baseless_path)
 					if path_to_dict == "":
 						path_to_dict = Options.config['folders_string']
-					
+
 					subalbums.append({
 						"path": path_to_dict,
 						"cacheBase": sub.cache_base,
@@ -195,16 +195,16 @@ class Album(object):
 			for sub in self.albums_list:
 				if not sub.empty:
 					subalbums.append(sub)
-		
+
 		path_without_folders_marker = remove_folders_marker(self.path)
-		
+
 		path_to_dict = self.path
 		folder_position = path_to_dict.find(Options.config['folders_string'])
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
 		if path_to_dict and by_date_position == -1 and self.cache_base != "root" and folder_position != 0:
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
-		
-		
+
+
 		ancestors_cache_base = list()
 		_parent = self
 		while True:
@@ -213,7 +213,7 @@ class Album(object):
 				break
 			_parent = _parent.parent
 		ancestors_cache_base.reverse()
-		
+
 		dictionary = {
 			"path": path_to_dict,
 			"absolutePath": self.absolute_path,
@@ -244,9 +244,9 @@ class Media(object):
 		dirname = os.path.dirname(media_path)
 		self.folders = remove_album_path(dirname)
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
-		
+
 		self.is_valid = True
-		
+
 		image = None
 		try:
 			mtime = file_mtime(media_path)
@@ -259,7 +259,7 @@ class Media(object):
 			back_level()
 			self.is_valid = False
 			return
-		
+
 		if attributes is not None and attributes["dateTimeFile"] >= mtime:
 			self._attributes = attributes
 			self._attributes["dateTimeDir"] = dir_mtime
@@ -271,7 +271,7 @@ class Media(object):
 		self._attributes["dateTimeDir"] = dir_mtime
 		self._attributes["mediaType"] = "photo"
 		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
-		
+
 		# let's avoid that different media names have the same cache base
 		distinguish_suffix = 0
 		while True:
@@ -284,7 +284,7 @@ class Media(object):
 			else:
 				self.cache_base = _cache_base
 				break
-			
+
 		try:
 			image = Image.open(media_path)
 		except KeyboardInterrupt:
@@ -299,7 +299,7 @@ class Media(object):
 			next_level()
 			message("ValueError when Image.open(), could be a video", media_path, 5)
 			back_level()
-		
+
 		if self.is_valid:
 			if isinstance(image, Image.Image):
 				self._photo_metadata(image)
@@ -317,7 +317,7 @@ class Media(object):
 					back_level()
 					self.is_valid = False
 					return
-		
+
 	def _photo_metadata(self, image):
 		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
@@ -327,10 +327,10 @@ class Media(object):
 			raise
 		except:
 			return
-		
+
 		if not info:
 			return
-		
+
 		exif = {}
 		for tag, value in info.items():
 			decoded = TAGS.get(tag, tag)
@@ -347,7 +347,7 @@ class Media(object):
 					#~ except ValueError:
 						#~ pass
 			exif[decoded] = value
-		
+
 		if "Orientation" in exif:
 			self._orientation = exif["Orientation"];
 			if self._orientation in range(5, 9):
@@ -483,13 +483,14 @@ class Media(object):
 			# https://github.com/paolobenve/myphotoshare/issues/46 : some image make raise this exception
 			message("WARNING: Photo couldn't be trasposed", photo_path, 2)
 			pass
-		
+
 		if (Options.config['thumbnail_generation_mode'] == "parallel"):
 			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
 		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
 			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
 		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
 			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
+
 	def thumbnail_size_is_smaller_then_size_of_(self, image, thumb_size, thumb_type = ""):
 		image_width = image.size[0]
 		image_height = image.size[1]
@@ -506,7 +507,7 @@ class Media(object):
 		else:
 			veredict = (thumb_size < max_image_size)
 		return veredict
-	
+
 	def _photo_thumbnails_parallel(self, start_image, photo_path, thumbs_path):
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
@@ -548,7 +549,7 @@ class Media(object):
 			pool.terminate()
 		pool.close()
 		pool.join()
-	
+
 	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
 		thumb_size = Options.config['reduced_sizes'][0]
 		thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size)
@@ -562,8 +563,8 @@ class Media(object):
 		for thumb_size in Options.config['reduced_sizes']:
 			thumb = self.reduce_size_or_make_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
 		smallest_reduced_size_image = thumb
-		
-		# album size: square thumbnail are generated anyway, because they are needed by the php code that permits sharing albums
+
+		# album size: square thumbnail are generated anyway, because they are needed by the code that generates composite images for sharing albums
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
 		for i in range(2):
 			if thumb_type == "fit" or self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
@@ -576,6 +577,7 @@ class Media(object):
 					break
 				elif thumb_type == "fit":
 					thumb_type = "square"
+
 		# media size
 		# at this point thumb is always square
 		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
@@ -613,7 +615,7 @@ class Media(object):
 			back_level()
 			back_level()
 			return start_image
-		
+
 		next_level()
 		message("reduction/thumbnail not OK, creating", thumbs_path_with_subdir, 5)
 		next_level()
@@ -631,7 +633,7 @@ class Media(object):
 		message("calculations...", "", 5)
 		original_thumb_size = thumb_size
 		info_string = str(original_thumb_size)
-		if thumb_type == "square": 
+		if thumb_type == "square":
 			info_string += ", square"
 		if thumb_size == Options.config['album_thumb_size'] and thumb_type == "fit":
 			info_string += ", fit size"
@@ -711,7 +713,7 @@ class Media(object):
 				message("small image, no thumbing for album", info_string, 4)
 			else:
 				message("small image, no thumbing for media", info_string, 4)
-		
+
 		try:
 			message("making copy...", "", 5)
 			start_image_copy = start_image.copy()
@@ -723,11 +725,11 @@ class Media(object):
 		except:
 			# we try again to work around PIL bug
 			message("making copy (2nd try)...", info_string, 5)
-			start_image_copy = start_image.copy() 
+			start_image_copy = start_image.copy()
 			next_level()
 			message("copy made (2nd try)", info_string, 5)
 			back_level()
-			
+
 		# both width and height of thumbnail are less then width and height of start_image, no blurring will happen
 		# we can resize, but first crop to square if needed
 		if must_crop:
@@ -736,7 +738,7 @@ class Media(object):
 			next_level()
 			message("cropped (" + str(original_thumb_size) + ")", "", 5)
 			back_level()
-		
+
 		if must_resize:
 			# resizing
 			if original_thumb_size > Options.config['album_thumb_size']:
@@ -754,7 +756,7 @@ class Media(object):
 			else:
 				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
 			back_level()
-		
+
 		# the subdir hadn't been created when creating the album in order to avoid creation of empty directories
 		if not os.path.exists(thumbs_path_with_subdir):
 			message("creating unexistent subdir", "", 5)
@@ -762,11 +764,11 @@ class Media(object):
 			next_level()
 			message("unexistent subdir created", thumbs_path_with_subdir, 4)
 			back_level()
-		
+
 		if os.path.exists(thumb_path) and not os.access(thumb_path, os.W_OK):
 			message("FATAL ERROR", thumb_path + " not writable, quitting")
 			sys.exit(-97)
-		
+
 		if self._attributes["mediaType"] == "video":
 			message("adding video transparency...", "", 5)
 			start_image_copy_for_saving = start_image_copy.copy()
@@ -780,7 +782,7 @@ class Media(object):
 			back_level()
 		else:
 			start_image_copy_for_saving = start_image_copy
-		
+
 		message("saving...", info_string, 5)
 		try:
 			start_image_copy_for_saving.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
@@ -832,7 +834,7 @@ class Media(object):
 			back_level()
 			back_level()
 			return start_image
-	
+
 	def _video_thumbnails(self, thumbs_path, original_path):
 		(tfd, tfn) = tempfile.mkstemp();
 		p = VideoTranscodeWrapper().call(
@@ -884,7 +886,7 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_180)
 			elif self._attributes["metadata"]["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
-		
+
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
 		self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		if thumb_type == "fit":
@@ -893,7 +895,7 @@ class Media(object):
 			self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
 		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
 		self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
-		
+
 		try:
 			os.unlink(tfn)
 		except OSError:
@@ -903,7 +905,7 @@ class Media(object):
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
 		if album_prefix == Options.config["cache_folder_separator"]:
 			album_prefix = ""
-		
+
 		album_cache_path = os.path.join(transcode_path, self.album.subdir)
 		if os.path.exists(album_cache_path):
 			if not os.access(album_cache_path, os.W_OK):
@@ -915,7 +917,7 @@ class Media(object):
 			next_level()
 			message("created still unexistent subdir", album_cache_path, 4)
 			back_level()
-		
+
 		transcode_path = os.path.join(album_cache_path, album_prefix + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
 		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
@@ -962,7 +964,7 @@ class Media(object):
 		if len(filters):
 			transcode_cmd.append('-vf')
 			transcode_cmd.append(','.join(filters))
-		
+
 		next_level()
 		message("transcoding...", info_string, 5)
 		tmp_transcode_cmd = transcode_cmd[:]
@@ -975,7 +977,7 @@ class Media(object):
 				back_level()
 		except KeyboardInterrupt:
 			raise
-		
+
 		if p == False:
 			# add another option, try transcoding again
 			# done to avoid this error;
@@ -993,7 +995,7 @@ class Media(object):
 					back_level()
 			except KeyboardInterrupt:
 				raise
-			
+
 			if p == False:
 				next_level()
 				message("transcoding failure", os.path.basename(original_path), 1)
@@ -1122,7 +1124,7 @@ class Media(object):
 	def from_dict(album, dictionary, basepath):
 		del dictionary["date"]
 		media_path = os.path.join(basepath, dictionary["name"])
-		
+
 		del dictionary["name"]
 		for key, value in dictionary.items():
 			if key.startswith("dateTime"):
@@ -1146,7 +1148,7 @@ class Media(object):
 		foldersAlbum = Options.config['folders_string']
 		if (self.folders):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
-		
+
 		media = self.attributes
 		media["name"]			= self.name
 		media["cacheBase"]		= self.cache_base
@@ -1155,13 +1157,13 @@ class Media(object):
 		media["monthAlbum"]		= self.month_album_path
 		media["dayAlbum"]		= self.day_album_path
 		media["dayAlbumCacheBase"]	= cache_base(self.day_album_path, True)
-		
+
 		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
 		media["albumName"]		= self.album_path
 		media["foldersAlbum"]		= foldersAlbum
 		media["foldersCacheBase"]	= self.album.cache_base
 		media["cacheSubdir"]		= self.album.subdir
-		
+
 		return media
 
 class PhotoAlbumEncoder(json.JSONEncoder):
@@ -1171,4 +1173,3 @@ class PhotoAlbumEncoder(json.JSONEncoder):
 		if isinstance(obj, Album) or isinstance(obj, Media):
 			return obj.to_dict()
 		return json.JSONEncoder.default(self, obj)
-

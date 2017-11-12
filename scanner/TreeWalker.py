@@ -25,7 +25,7 @@ class TreeWalker:
 			message("method", "mixed thumbnail generation", 4)
 		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
 			message("method", "cascade thumbnail generation", 4)
-			# be sure reduced_sizes array is correctly sorted 
+			# be sure reduced_sizes array is correctly sorted
 			Options.config['reduced_sizes'].sort(reverse = True)
 		message("Browsing", "start!", 3)
 		self.all_albums = list()
@@ -156,7 +156,7 @@ class TreeWalker:
 			self.generate_composite_image(by_date_album, by_date_max_file_date)
 		back_level()
 		return by_date_album
-	
+
 	def add_media_to_tree_by_date(self, media):
 		# add the given media to a temporary structure where media are organazide by year, month, date
 		if not media.year in self.tree_by_date.keys():
@@ -171,9 +171,9 @@ class TreeWalker:
 	def listdir_sorted_by_time(self, path):
 		# this function returns the directory listing sorted by mtime
 		# it takes into account the fact that the file is a symlink to an unexistent file
-		mtime = lambda f: os.path.exists(os.path.join(path, f)) and os.stat(os.path.join(path, f)).st_mtime or time.mktime(datetime.now().timetuple()) 
+		mtime = lambda f: os.path.exists(os.path.join(path, f)) and os.stat(os.path.join(path, f)).st_mtime or time.mktime(datetime.now().timetuple())
 		return list(sorted(os.listdir(path), key=mtime))
-	
+
 	def walk(self, absolute_path, album_cache_base, parent_album = None):
 		#~ trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 		#~ absolute_path_with_marker = os.path.join(Options.config['album_path'], Options.config['folders_string'])
@@ -249,7 +249,7 @@ class TreeWalker:
 		#~ except (ValueError, AttributeError, KeyError) as e:
 			#~ message(" json file invalid", json_message, 4)
 			#~ cached_album = None
-		
+
 		if not json_cache_OK:
 			message("generating album...", absolute_path, 5)
 			album = Album(absolute_path)
@@ -259,9 +259,9 @@ class TreeWalker:
 		if parent_album is not None:
 			album.parent = parent_album
 		album.cache_base = album_cache_base
-		
+
 		message("subdir for cache files", " " + album.subdir, 3)
-		
+
 		#~ for entry in sorted(os.listdir(absolute_path)):
 		message("reading directory...", absolute_path, 5)
 		for entry in self.listdir_sorted_by_time(absolute_path):
@@ -274,11 +274,11 @@ class TreeWalker:
 				message("unicode error", entry.decode(sys.getfilesystemencoding(), "replace"), 1)
 				back_level()
 				continue
-			
+
 			if entry[0] == '.':
 				# skip hidden files and directories
 				continue
-			
+
 			entry_with_path = os.path.join(absolute_path, entry)
 			if not os.path.exists(entry_with_path):
 				next_level()
@@ -353,9 +353,9 @@ class TreeWalker:
 										message("deleted, re-creating fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 3)
 									except OSError:
 										message("error deleting fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 1)
-							
+
 							if (
-								not os.path.exists(absolute_cache_file) or 
+								not os.path.exists(absolute_cache_file) or
 								json_cache_OK and (
 									file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"] or
 									file_mtime(absolute_cache_file) > file_mtime(json_cache_file)
@@ -388,14 +388,14 @@ class TreeWalker:
 									message("reduction/thumbnail older than cached media", absolute_cache_file, 4)
 								elif file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
 									message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
-					
+
 					if Options.config['recreate_reduced_photos']:
 						message("reduced photo recreation requested", "", 4)
 					if Options.config['recreate_thumbnails']:
 						message("thumbnail recreation requested", "", 4)
 					back_level()
 					media = Media(album, entry_with_path, Options.config['cache_path'])
-				
+
 				if media.is_valid:
 					album.num_media_in_sub_tree += 1
 					album.num_media_in_album += 1
@@ -445,19 +445,19 @@ class TreeWalker:
 			back_level()
 		else:
 			message("VOID: no media in this directory", os.path.basename(absolute_path), 4)
-		
+
 		if album.num_media_in_sub_tree:
 			# generate the album composite image for sharing
 			self.generate_composite_image(album, max_file_date)
 		back_level()
-		
+
 		return [album, album.num_media_in_sub_tree, max_file_date]
-	
+
 	def index_to_coords(self, index, tile_width, px_between_tiles, side_off_set, linear_number_of_tiles):
 		x = side_off_set + (index % linear_number_of_tiles) * (tile_width + px_between_tiles)
 		y = side_off_set + int(index / linear_number_of_tiles) * (tile_width + px_between_tiles)
 		return [x, y]
-	
+
 	def pick_random_image(self, album, random_number):
 		if random_number < len(album.media_list):
 			return [album.media_list[random_number], random_number]
@@ -482,12 +482,12 @@ class TreeWalker:
 			message("composite image OK, touched", composite_image_path, 4)
 			back_level()
 			return
-		
+
 		message("generating composite image...", composite_image_path, 5)
-		
+
 		# pick a maximum of Options.max_album_share_thumbnails_number random images in album and subalbums
 		# and generate a square composite image
-		
+
 		# determine the number of images to use
 		if album.num_media_in_sub_tree == 1 or Options.config['max_album_share_thumbnails_number'] == 1:
 			max_thumbnail_number = 1
@@ -501,7 +501,7 @@ class TreeWalker:
 			max_thumbnail_number = 25
 		else:
 			max_thumbnail_number = Options.config['max_album_share_thumbnails_number']
-		
+
 		# pick max_thumbnail_number random square album thumbnails
 		random_thumbnails = list()
 		random_list = list()
@@ -538,29 +538,29 @@ class TreeWalker:
 				message("unexistent thumbnail " + thumbnail + ", i=" + i, "good=", good_media_number, 5)
 				bad_list.append(thumbnail)
 				good_media_number -= 1
-		
+
 		if len(random_thumbnails) < max_thumbnail_number:
 			# add the missing images: repeat the present ones
 			for i in range(max_thumbnail_number - len(random_thumbnails)):
 				random_thumbnails.append(random_thumbnails[i])
-		
+
 		# generate the composite image
 		# following code inspired from
 		# https://stackoverflow.com/questions/30429383/combine-16-images-into-1-big-image-with-php#30429557
 		# thanks to Adarsh Vardhan who wrote it!
-		
+
 		tile_width = Options.config['album_thumb_size']
 		tile_height = Options.config['album_thumb_size']
-		
+
 		# INIT BASE IMAGE FILLED WITH BACKGROUND COLOR
 		linear_number_of_tiles = int(math.sqrt(max_thumbnail_number))
 		px_between_tiles = 1
 		side_off_set = 1
-				 
+
 		map_width = side_off_set + (tile_width + px_between_tiles) * linear_number_of_tiles - px_between_tiles + side_off_set;
 		map_height = side_off_set + (tile_width + px_between_tiles) * linear_number_of_tiles - px_between_tiles + side_off_set;
 		img = Image.new( 'RGB', (map_width, map_height), "white")
-		 
+
 		# PUT SRC IMAGES ON BASE IMAGE
 		index = -1
 		for thumbnail in random_thumbnails:
@@ -574,13 +574,13 @@ class TreeWalker:
 			if tile_img_height < tile_width:
 				y += int(float(tile_width - tile_img_height) / 2)
 			img.paste(tile, (x, y))
-		
+
 		# save the composite image
 		img.save(composite_image_path, "JPEG", quality=Options.config['jpeg_quality'])
 		next_level()
 		message("generated composite image", "", 5)
 		back_level()
-	
+
 	def save_all_media_json(self):
 		media_list = []
 		message("sorting media list...", "", 5)
@@ -614,7 +614,7 @@ class TreeWalker:
 		next_level()
 		message("saved json options file", "", 5)
 		back_level()
-		
+
 	def remove_stale(self, subdir = ""):
 		if not subdir:
 			next_level()
@@ -643,13 +643,13 @@ class TreeWalker:
 			if subdir == Options.config['cache_album_subdir']:
 				self.all_cache_entries_by_subdir[subdir] = list()
 				for path in self.all_album_composite_images:
-					self.all_cache_entries_by_subdir[subdir].append(path) 
+					self.all_cache_entries_by_subdir[subdir].append(path)
 				deletable_files_suffixes_re = "\.jpg$"
 			else:
 				deletable_files_suffixes_re = "_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
 				deletable_files_suffixes_re += "|_[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
 		message("searching for stale cache files", info, 4)
-		
+
 		for cache_file in sorted(os.listdir(os.path.join(Options.config['cache_path'], subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache_file)):
 				self.remove_stale(cache_file)

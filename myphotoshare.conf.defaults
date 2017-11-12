@@ -27,13 +27,13 @@
 max_verbose = 3
 
 # absolute path of the folder where index.html resides, by default album_path is "albums" inside it and cache_path is "cache" inside it
-index_html_path = 
+index_html_path =
 
-# albums folder absolute path, for use in python 
-album_path = 
+# albums folder absolute path, for use in python
+album_path =
 
-# cache folder absolute path, for use in python 
-cache_path = 
+# cache folder absolute path, for use in python
+cache_path =
 
 # cache subfolder: where the album composite images will be saved
 cache_album_subdir = cache_album
@@ -128,7 +128,7 @@ server_cache_path = cache
 # the language for the web page
 # if not set, the browser language is used
 # if set, it overrides the browser language
-language = 
+language =
 
 # the title of the collections of photos/albums
 page_title = My photos
@@ -195,11 +195,11 @@ min_album_thumbnail = 3
 
 # Google analytics id
 # it has the form UA-XXXXXXX-1
-google_analytics_id = 
+google_analytics_id =
 
 # piwik analytics server, in the form [http(s):]//server.com/[directory/]
 # must end with slash
-piwik_server = 
+piwik_server =
 # piwik site id (an integer)
 # this parameter must come after piwik_server
 piwik_id =

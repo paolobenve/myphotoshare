@@ -57,11 +57,11 @@ def report_times():
 			_time = str(int(round(time / 1000))) + "    ms"
 		else:
 			_time = str(int(round(time / 1000000))) + "       s "
-		
+
 		total_time += time
-		
+
 		counter = str(Options.elapsed_times_counter[category]) + " times"
-		
+
 		average_time = int(Options.elapsed_times[category] / Options.elapsed_times_counter[category])
 		if average_time == 0:
 			_average_time = ""
@@ -142,7 +142,7 @@ def photo_cache_name(photo, size, thumb_type = ""):
 			photo_suffix += "f"
 	photo_suffix += ".jpg"
 	result = photo.cache_base + photo_suffix
-	
+
 	return result
 def video_cache_name(video):
 	return video.cache_base + "_transcoded_" + Options.config['video_transcode_bitrate'] + "_" + str(Options.config['video_crf']) + ".mp4"

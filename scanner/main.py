@@ -15,7 +15,7 @@ def main():
 	if len(sys.argv) != 3 and len(sys.argv) != 2:
 		print "usage: %s ALBUM_PATH CACHE_PATH - or %s CONFIG_FILE" % (sys.argv[0], sys.argv[0])
 		return
-	
+
 	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")
 	default_config_file = os.path.join(project_dir, "myphotoshare.conf.defaults")
 	default_config = ConfigParser.ConfigParser()
@@ -24,7 +24,7 @@ def main():
 	usr_config.add_section("options")
 	for option in default_config.options('options'):
 		usr_config.set("options", option, default_config.get("options", option))
-	
+
 	if len(sys.argv) == 2:
 		# 1 arguments: the config files
 		# which modifies the default options
@@ -82,7 +82,7 @@ def main():
 			Options.config[option] = eval(usr_config.get('options', option))
 		else:
 			Options.config[option] = usr_config.get('options', option)
-		
+
 		option_value = str(Options.config[option])
 		option_length = len(option_value)
 		max_length = 40
@@ -92,7 +92,7 @@ def main():
 		max_spaces = ""
 		for i in range(max_length):
 			max_spaces += " "
-		
+
 		default_option_value = str(default_config.get('options', option))
 		default_option_length = len(default_option_value)
 		default_spaces = ""
@@ -102,24 +102,24 @@ def main():
 			option_value = "  " + option_value + spaces + "[DEFAULT" + max_spaces + "]"
 		else:
 			option_value = "* " + option_value + spaces + "[DEFAULT: " + default_option_value + default_spaces + "]"
-		
-		
-		
+
+
+
 		message(option, option_value)
-	
+
 	# all cache names are lower case => bit rate must be lower case too
 	Options.config['video_transcode_bitrate'] = Options.config['video_transcode_bitrate'].lower()
 
 	# values that have type != string
 	back_level()
-	
+
 	if Options.config['index_html_path']:
 		Options.config['index_html_path'] = os.path.abspath(Options.config['index_html_path']).decode(sys.getfilesystemencoding())
 	if Options.config['album_path']:
 		Options.config['album_path'] = os.path.abspath(Options.config['album_path']).decode(sys.getfilesystemencoding())
 	if Options.config['cache_path']:
 		Options.config['cache_path'] = os.path.abspath(Options.config['cache_path']).decode(sys.getfilesystemencoding())
-	
+
 	# try to guess value not given
 	guessed_index_dir = False
 	guessed_album_dir = False
@@ -167,7 +167,7 @@ def main():
 	):
 		message("options", "you must define at least some of index_html_path, album_path and cache_path, and correctly; quitting")
 		sys.exit(-97)
-	
+
 	if guessed_index_dir or guessed_album_dir or guessed_cache_dir:
 		message("options", "guessed value(s):")
 		next_level()
@@ -178,14 +178,14 @@ def main():
 		if guessed_cache_dir:
 			message('cache_path', Options.config['cache_path'])
 		back_level()
-	
+
 	# the album directory must exist and be readable
 	try:
 		os.stat(Options.config['album_path'])
 	except:
 		message("FATAL ERROR", Options.config['album_path'] + " doesn't exist or unreadable, quitting")
 		sys.exit(-97)
-		
+
 	# the cache directory must exist and be writable, or we'll try to create it
 	try:
 		os.stat(Options.config['cache_path'])
@@ -201,7 +201,7 @@ def main():
 		except:
 			message("FATAL ERROR", Options.config['cache_path'] + " inexistent and couldn't be created, quitting")
 			sys.exit(-97)
-	
+
 	# create the directory where php will put album composite images
 	albumCacheDir = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
 	try:
@@ -214,7 +214,7 @@ def main():
 		except OSError:
 			message("FATAL ERROR", Options.config['cache_path'] + " not writable, quitting")
 			sys.exit(-97)
-	
+
 	json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
 	try:
 		with open(json_options_file) as old_options_file:
@@ -226,7 +226,7 @@ def main():
 				old_options = json.load(old_options_file)
 		except IOError:
 			old_options = Options.config
-	
+
 	Options.config['recreate_reduced_photos'] = False
 	try:
 		if (
@@ -246,7 +246,7 @@ def main():
 			Options.config['recreate_thumbnails'] = True
 	except KeyError:
 		Options.config['recreate_thumbnails'] = True
-	
+
 	try:
 		os.umask(002)
 		TreeWalker()
@@ -254,7 +254,7 @@ def main():
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)
-	
+
 
 if __name__ == "__main__":
 	main()
