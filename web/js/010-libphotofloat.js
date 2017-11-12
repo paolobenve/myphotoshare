@@ -4,11 +4,11 @@
 		this.albumCache = [];
 		PhotoFloat.firstAlbumPopulation = true;
 	}
-	
+
 	/* public member functions */
 	PhotoFloat.prototype.getAlbum = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
-		
+
 		if (typeof subalbum.media !== "undefined" && subalbum.media !== null) {
 			callback(subalbum);
 			return;
@@ -17,7 +17,7 @@
 			cacheKey = subalbum;
 		else
 			cacheKey = subalbum.cacheBase;
-		
+
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
 			return;
@@ -35,17 +35,17 @@
 				for (i = 0; i < album.media.length; ++i)
 					album.media[i].parent = album;
 				self.albumCache[cacheKey] = album;
-				
+
 				callback(album);
 			}
 		};
 		if (typeof error !== "undefined" && error !== null) {
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
 				var rootHash = "!/" + Options.folders_string;
-				
+
 				$("#album-view").fadeOut(200);
 				$("#media-view").fadeOut(200);
-				
+
 				if (window.location.hash == "#" + rootHash) {
 					$("#loading").hide();
 					$("#error-text-folder").stop();
@@ -62,7 +62,7 @@
 		}
 		$.ajax(ajaxOptions);
 	};
-	
+
 	PhotoFloat.prototype.pickRandomMedia = function(subalbum, container, callback, error) {
 		var nextAlbum, self;
 		self = this;
@@ -85,7 +85,7 @@
 		else
 			this.getAlbum(subalbum, nextAlbum, error);
 	};
-	
+
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		var hashParts, lastSlashPosition, slashNumber, albumHash, mediaHash = null, foldersHash = null, media = null;
 		$("#error-too-many-images").hide();
@@ -158,7 +158,7 @@
 		};
 		$.ajax(ajaxOptions);
 	};
-	
+
 	PhotoFloat.mediaHash = function(album, media) {
 		return media.cacheBase;
 	};
@@ -224,7 +224,7 @@
 		} else if (media.mediaType == "video") {
 			suffix += "transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 		}
-		
+
 		hash = media.foldersCacheBase + Options.cache_folder_separator + media.cacheBase + suffix;
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
@@ -265,7 +265,7 @@
 		}
 		return hash;
 	};
-	
+
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cacheBase = PhotoFloat.cacheBase;
 	PhotoFloat.prototype.mediaHash = PhotoFloat.mediaHash;
