@@ -205,7 +205,15 @@
 			media.mediaType == "photo" ||
 			media.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1
 		) {
-			suffix += size.toString();
+			actualSize = size;
+			albumThumbSize = Options.album_thumb_size;
+			mediaThumbSize = Options.media_thumb_size;
+			if (isMobile.any()) {
+				actualSize = Math.round(actualSize * Options.mobile_thumbnail_factor);
+				albumThumbSize = Math.round(albumThumbSize * Options.mobile_thumbnail_factor);
+				mediaThumbSize = Math.round(mediaThumbSize * Options.mobile_thumbnail_factor);
+		  }
+			suffix += actualSize.toString();
 			if (size == Options.album_thumb_size) {
 				suffix += "a";
 				if (Options.album_thumb_type == "square")
