@@ -918,14 +918,21 @@ class Media(object):
 			elif self._attributes["metadata"]["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
 
-		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-		self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
-		if thumb_type == "fit":
-			# square thumbnail is needed too
-			thumb_type = "square"
-			self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
-		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-		self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type)
+		mobile_bigger = False
+		for n in range(2):
+			(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
+			self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
+			if thumb_type == "fit":
+				# square thumbnail is needed too for albums
+				thumb_type = "square"
+				self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
+
+			(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
+			self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
+
+			if Options.config['mobile_thumbnail_factor'] == 1:
+				break
+			mobile_bigger = True
 
 		try:
 			os.unlink(tfn)
