@@ -208,7 +208,7 @@
 			actualSize = size;
 			albumThumbSize = Options.album_thumb_size;
 			mediaThumbSize = Options.media_thumb_size;
-			if (isMobile.any()) {
+			if ((size == albumThumbSize || size == mediaThumbSize) && isMobile.any()) {
 				actualSize = Math.round(actualSize * Options.mobile_thumbnail_factor);
 				albumThumbSize = Math.round(albumThumbSize * Options.mobile_thumbnail_factor);
 				mediaThumbSize = Math.round(mediaThumbSize * Options.mobile_thumbnail_factor);
