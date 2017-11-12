@@ -496,8 +496,8 @@ class Media(object):
 		image_height = image.size[1]
 		max_image_size = max(image_width, image_height)
 		if (
-			thumb_size == Options.config['media_thumb_size'] and
 			thumb_type == "fixed_height" and
+			(thumb_size == Options.config['media_thumb_size'] or thumb_size == int(round(Options.config['media_thumb_size'] * Options.config['mobile_thumbnail_factor']))) and
 			image_width > image_height
 		):
 			veredict = (thumb_size < image_height)
@@ -566,6 +566,15 @@ class Media(object):
 
 		# album size: square thumbnail are generated anyway, because they are needed by the code that generates composite images for sharing albums
 		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
+
+		# if requested, generate the bigger thumbnail for mobile
+		if Options.config['mobile_thumbnail_factor'] > 1:
+			mobile_thumb_size = int(round(thumb_size * Options.config['mobile_thumbnail_factor']))
+			if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
+				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, True)
+			else:
+				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type, True)
+
 		for i in range(2):
 			if thumb_type == "fit" or self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
 				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
@@ -581,20 +590,39 @@ class Media(object):
 		# media size
 		# at this point thumb is always square
 		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
+
+		# if requested, generate the bigger thumbnail for mobile
+		if Options.config['mobile_thumbnail_factor'] > 1:
+			if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
+				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, True)
+			else:
+				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type, True)
+
 		if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
 			thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
 		else:
 			thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
-	
-	def reduce_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = ""):
+
+	def is_thumbnail(self, thumb_size, thumb_type):
+		_is_thumbnail = (thumb_type != "")
+		return _is_thumbnail
+
+	def reduce_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = "", mobile_bigger = False):
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
 		if album_prefix == Options.config["cache_folder_separator"]:
 			album_prefix = ""
 		thumbs_path_with_subdir = os.path.join(thumbs_path, self.album.subdir)
-		thumb_path = os.path.join(thumbs_path_with_subdir, album_prefix + photo_cache_name(self, thumb_size, thumb_type))
+		actual_thumb_size = thumb_size
+		media_thumb_size = Options.config['media_thumb_size']
+		album_thumb_size = Options.config['album_thumb_size']
+		if mobile_bigger:
+			actual_thumb_size = int(round(actual_thumb_size * Options.config['mobile_thumbnail_factor']))
+			media_thumb_size = int(round(media_thumb_size * Options.config['mobile_thumbnail_factor']))
+			album_thumb_size = int(round(album_thumb_size * Options.config['mobile_thumbnail_factor']))
+		thumb_path = os.path.join(thumbs_path_with_subdir, album_prefix + photo_cache_name(self, thumb_size, thumb_type, mobile_bigger))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_file = os.path.join(thumbs_path, self.album.json_file)
-		is_thumbnail = (thumb_size == Options.config['album_thumb_size'] or thumb_size == Options.config['media_thumb_size'])
+		_is_thumbnail = self.is_thumbnail(thumb_size, thumb_type)
 		is_video = self._attributes["mediaType"] == "video"
 		next_level()
 		message("checking reduction/thumbnail", thumb_path, 5)
@@ -606,8 +634,8 @@ class Media(object):
 				not os.path.exists(json_file) or file_mtime(thumb_path) < file_mtime(json_file)
 			) and
 			(
-				not is_thumbnail and not Options.config['recreate_reduced_photos'] or
-				is_thumbnail and not Options.config['recreate_thumbnails']
+				not _is_thumbnail and not Options.config['recreate_reduced_photos'] or
+				_is_thumbnail and not Options.config['recreate_thumbnails']
 			)
 		):
 			next_level()
@@ -631,7 +659,7 @@ class Media(object):
 			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
 		back_level()
 		message("calculations...", "", 5)
-		original_thumb_size = thumb_size
+		original_thumb_size = actual_thumb_size
 		info_string = str(original_thumb_size)
 		if thumb_type == "square":
 			info_string += ", square"
@@ -639,12 +667,14 @@ class Media(object):
 			info_string += ", fit size"
 		elif thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height":
 			info_string += ", fixed height"
-		
+		if mobile_bigger:
+			info_string += " (mobile)"
+
 		start_image_width = start_image.size[0]
 		start_image_height = start_image.size[1]
 		if thumb_type == "square":
 			# image is to be cropped: calculate the cropping values
-			if min(start_image_width, start_image_height) >= thumb_size:
+			if min(start_image_width, start_image_height) >= actual_thumb_size:
 				# image is bigger than the square which will result from cropping
 				if start_image_width > start_image_height:
 					left = (start_image_width - start_image_height) / 2
@@ -656,26 +686,26 @@ class Media(object):
 					top = (start_image_height - start_image_width) / 2
 					right = start_image_width
 					bottom = start_image_height - top
-				thumbnail_width = thumb_size
-				thumbnail_height = thumb_size
+				thumbnail_width = actual_thumb_size
+				thumbnail_height = actual_thumb_size
 				must_crop = True
-			elif max(start_image_width, start_image_height) >= thumb_size:
+			elif max(start_image_width, start_image_height) >= actual_thumb_size:
 				# image smallest size is smaller than the square which would result from cropping
 				# cropped image will not be square
 				if start_image_width > start_image_height:
-					left = (start_image_width - thumb_size) / 2
+					left = (start_image_width - actual_thumb_size) / 2
 					top = 0
 					right = start_image_width - left
 					bottom = start_image_height
-					thumbnail_width = thumb_size
+					thumbnail_width = actual_thumb_size
 					thumbnail_height = start_image_height
 				else:
 					left = 0
-					top = (start_image_height - thumb_size) / 2
+					top = (start_image_height - actual_thumb_size) / 2
 					right = start_image_width
 					bottom = start_image_height - top
 					thumbnail_width = start_image_width
-					thumbnail_height = thumb_size
+					thumbnail_height = actual_thumb_size
 				must_crop = True
 			else:
 				# image is smaller than the square thumbnail, don't crop it
@@ -685,31 +715,32 @@ class Media(object):
 		else:
 			must_crop = False
 			if (
-				original_thumb_size == Options.config['media_thumb_size'] and thumb_type == "fixed_height" and
+				original_thumb_size == media_thumb_size and
+				thumb_type == "fixed_height" and
 				start_image_width > start_image_height
 			):
 				# the thumbnail size will not be thumb_size, the image will be greater
 				thumbnail_height = original_thumb_size
 				thumbnail_width = int(round(original_thumb_size * start_image_width / float(start_image_height)))
-				thumb_size = thumbnail_width
+				actual_thumb_size = thumbnail_width
 			elif start_image_width > start_image_height:
-				thumbnail_width = thumb_size
-				thumbnail_height = int(round(thumb_size * start_image_height / float(start_image_width)))
+				thumbnail_width = actual_thumb_size
+				thumbnail_height = int(round(actual_thumb_size * start_image_height / float(start_image_width)))
 			else:
-				thumbnail_width = int(round(thumb_size * start_image_width / float(start_image_height)))
-				thumbnail_height = thumb_size
-		
+				thumbnail_width = int(round(actual_thumb_size * start_image_width / float(start_image_height)))
+				thumbnail_height = actual_thumb_size
+
 		# now thumbnail_width and thumbnail_height are the values the thumbnail will get,
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
-		
+
 		must_resize = True
-		if max(start_image_width, start_image_height) <= thumb_size:
+		if max(start_image_width, start_image_height) <= actual_thumb_size:
 			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
 			# simply copy the start image to the thumbnail
 			must_resize = False
-			if original_thumb_size > Options.config['album_thumb_size']:
+			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
 				message("small image, no reduction", info_string, 4)
-			elif original_thumb_size == Options.config['album_thumb_size']:
+			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
 				message("small image, no thumbing for album", info_string, 4)
 			else:
 				message("small image, no thumbing for media", info_string, 4)
@@ -747,11 +778,11 @@ class Media(object):
 				message("thumbing for albums...", info_string, 5)
 			else:
 				message("thumbing for media...", info_string, 5)
-			start_image_copy.thumbnail((thumb_size, thumb_size), Image.ANTIALIAS)
+			start_image_copy.thumbnail((actual_thumb_size, actual_thumb_size), Image.ANTIALIAS)
 			next_level()
-			if original_thumb_size > Options.config['album_thumb_size']:
+			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
 				message("reduced size (" + str(original_thumb_size) + ")", "", 4)
-			elif original_thumb_size == Options.config['album_thumb_size']:
+			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
 				message("thumbed for albums (" + str(original_thumb_size) + ")", "", 4)
 			else:
 				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
@@ -1038,39 +1069,47 @@ class Media(object):
 					)
 				)
 		# album thumbnail path
-		caches.append(
-			os.path.join(
-				self.album.subdir,
-				album_prefix + photo_cache_name(
-					self,
-					Options.config['album_thumb_size'],
-					Options.config['album_thumb_type']
-				)
-			)
-		)
-		if Options.config['album_thumb_type'] == "fit":
-			# album square thumbnail path (it's generated always)
+		mobile_bigger = False
+		for n in range(2):
 			caches.append(
 				os.path.join(
 					self.album.subdir,
 					album_prefix + photo_cache_name(
 						self,
 						Options.config['album_thumb_size'],
-						"square"
+						Options.config['album_thumb_type'],
+						mobile_bigger
 					)
 				)
 			)
-		# media thumbnail path
-		caches.append(
-			os.path.join(
-				self.album.subdir,
-				album_prefix + photo_cache_name(
-					self,
-					Options.config['media_thumb_size'],
-					Options.config['media_thumb_type']
+			if Options.config['album_thumb_type'] == "fit":
+				# album square thumbnail path (it's generated always)
+				caches.append(
+					os.path.join(
+						self.album.subdir,
+						album_prefix + photo_cache_name(
+							self,
+							Options.config['album_thumb_size'],
+							"square",
+							mobile_bigger
+						)
+					)
+				)
+			# media thumbnail path
+			caches.append(
+				os.path.join(
+					self.album.subdir,
+					album_prefix + photo_cache_name(
+						self,
+						Options.config['media_thumb_size'],
+						Options.config['media_thumb_type'],
+						mobile_bigger
+					)
 				)
 			)
-		)
+			if Options.config['mobile_thumbnail_factor'] == 1:
+				break
+			mobile_bigger = True
 		return caches
 	@property
 	def date(self):

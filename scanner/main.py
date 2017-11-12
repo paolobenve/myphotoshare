@@ -80,6 +80,10 @@ def main():
 				Options.config[option] = default_config.getboolean('options', option)
 		elif option in ('reduced_sizes'):
 			Options.config[option] = eval(usr_config.get('options', option))
+		elif option in ('mobile_thumbnail_factor'):
+			Options.config[option] = usr_config.getfloat('options', option)
+			if Options.config[option] < 1:
+				Options.config[option] = 1
 		else:
 			Options.config[option] = usr_config.get('options', option)
 

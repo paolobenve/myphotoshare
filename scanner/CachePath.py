@@ -124,10 +124,13 @@ def cache_base(path, filepath=False):
 	return path
 #~ def json_name(path):
 	#~ return cache_base(path) + ".json"
-def photo_cache_name(photo, size, thumb_type = ""):
+def photo_cache_name(photo, size, thumb_type = "", mobile_bigger = False):
 	# this function is used for video thumbnails too
 	photo_suffix = "_"
-	photo_suffix += str(size)
+	actual_size = size
+	if mobile_bigger:
+		actual_size = int(actual_size * Options.config['mobile_thumbnail_factor'])
+	photo_suffix += str(actual_size)
 	if size == Options.config['album_thumb_size']:
 		photo_suffix += "a"
 		if thumb_type == "square":
