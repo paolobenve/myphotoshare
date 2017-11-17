@@ -26,13 +26,14 @@
 
 max_verbose = 3
 
-# absolute path of the folder where index.html resides, by default album_path is "albums" inside it and cache_path is "cache" inside it
+# absolute path of the folder where index.html resides; normally album_path will be its "albums" subfolder, and cache_path its "cache" subfolder
 index_html_path =
 
 # albums folder absolute path, for use in python
 album_path =
 
 # cache folder absolute path, for use in python
+# WARNING: javascript code will always use 'cache' subfolder of web site, so assure yourself that this folder corresponds to or is moved to the correct web site path
 cache_path =
 
 # cache subfolder: where the album composite images will be saved
@@ -121,12 +122,8 @@ cache_folder_separator = -
 # js options
 ###########################################################
 
-# Where will js search the photo/video albums
+# the server path where js will search the photo/video albums
 server_album_path = albums
-
-# Where will js search the cache files
-server_cache_path = cache
-
 
 ###########################################################
 # user interface options

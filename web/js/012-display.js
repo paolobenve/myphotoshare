@@ -1821,11 +1821,11 @@ $(document).ready(function() {
 		fromEscKey = false;
 	}
 
-	function getOptions(cacheSubDir, callback) {
+	function getOptions(callback) {
 		if (Object.keys(Options).length > 0)
 			callback(location.hash, hashParsed, die);
 		else {
-			var optionsFile = PhotoFloat.pathJoin([cacheSubDir, "options.json"]);
+			var optionsFile = PhotoFloat.pathJoin(["cache/options.json"]);
 			var ajaxOptions = {
 				type: "GET",
 				dataType: "json",
@@ -1835,6 +1835,9 @@ $(document).ready(function() {
 						if (data.hasOwnProperty(key))
 							Options[key] = data[key];
 					translate();
+					// server_cache_path actually is a constant: it cannot be passed as an option, because getOptions need to know it before reading the options
+					// options.json is in this directory
+					Options.server_cache_path = 'cache';
 
 					byDateRegex = "^" + Options.by_date_string + "\/[1-2][0-9]{1,3}";
 
@@ -1843,9 +1846,7 @@ $(document).ready(function() {
 					callback(location.hash, hashParsed, die);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					if (errorThrown == "Not Found" && ! cacheSubDir)
-						getOptions(Options.server_cache_path, callback);
-					else {
+					if (errorThrown == "Not Found") {
 						$("#album-view").fadeOut(200);
 						$("#media-view").fadeOut(200);
 						$("#album-view").fadeIn(3500);
@@ -1855,12 +1856,6 @@ $(document).ready(function() {
 					}
 				}
 			};
-			if (typeof error !== "undefined" && error !== null) {
-				ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-					$("#error-options-file").fadeIn(2000);
-					$("#error-options-file, #error-overlay, #auth-text").fadeOut(1000);
-				};
-			}
 			$.ajax(ajaxOptions);
 		}
 	}
@@ -1876,7 +1871,7 @@ $(document).ready(function() {
 		$("#loading").show();
 		$("link[rel=image_src]").remove();
 		$("link[rel=video_src]").remove();
-		getOptions("", parseHash);
+		getOptions(parseHash);
 	});
 	$(window).hashchange();
 

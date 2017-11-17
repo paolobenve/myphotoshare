@@ -600,17 +600,10 @@ class TreeWalker:
 		message("cached all media path list", "", 5)
 		fp.close()
 	def save_json_options(self):
-		try:
-			json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
-			message("saving json options file...", json_options_file, 4)
-			with open(json_options_file, 'w') as fp:
-				json.dump(Options.config, fp)
-		except IOError:
-			json_options_file_old = json_options_file
-			json_options_file = os.path.join(Options.config['cache_path'], 'options.json')
-			message("saving json options file", json_options_file + " (couldn not save " + json_options_file_old + ")", 4)
-			with open(json_options_file, 'w') as fp:
-				json.dump(Options.config, fp)
+		json_options_file = os.path.join(Options.config['cache_path'], 'options.json')
+		message("saving json options file...", json_options_file, 4)
+		with open(json_options_file, 'w') as fp:
+			json.dump(Options.config, fp)
 		next_level()
 		message("saved json options file", "", 5)
 		back_level()

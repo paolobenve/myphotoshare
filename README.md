@@ -31,12 +31,12 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Media can be browsed by folder or by date
 * Many customization through config file
 * Cache folder can be managed with subdirs (useful for large repositories)
-* Albums and cache server folders can be anywhere on the server
+* Albums server folder can be anywhere on the server
 * Images and folders can be sorted ascending/descending by date or by name (via a cookie)
 * Thumbnails can be square (cropped) or full-content
 * Single `index.php` file (crawlers and social media do not execute javascript); `php` does a bit of work:
 * - inserts link tag in <head></head> in order to let social media see the shared content
-* - applies basic options to home page 
+* - applies basic options to home page
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
 * Verbosity levels in scanner
@@ -221,7 +221,7 @@ FloatApp makes use of `X-Accel-Buffering` and `X-Accel-Redirect` to force the se
                     index index.html;
                     root /var/www/htdocs/photos.jasondonenfeld.com;
             }
-    
+
             include uwsgi_params;
             location /albums/ {
                     uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
@@ -238,7 +238,7 @@ FloatApp makes use of `X-Accel-Buffering` and `X-Accel-Redirect` to force the se
             location /photos {
                     uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
             }
-    
+
             location /internal-cache/ {
                     internal;
                     alias /var/www/uwsgi/myphotoshare/cache/;
@@ -251,7 +251,7 @@ FloatApp makes use of `X-Accel-Buffering` and `X-Accel-Redirect` to force the se
 
 Note that the `internal-*` paths must match that of `app.cfg`. This makes use of uwsgi for execution:
 
-    metheny ~ # cat /etc/uwsgi.d/myphotoshare.ini 
+    metheny ~ # cat /etc/uwsgi.d/myphotoshare.ini
     [uwsgi]
     chdir = /var/www/uwsgi/%n
     master = true
@@ -367,7 +367,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ### version 2.2 (July 15, 2017):
 
-* translations are now managed via a separate js file: enthusiasts and followers are encouraged to provide the translation for their language 
+* translations are now managed via a separate js file: enthusiasts and followers are encouraged to provide the translation for their language
 * better managing of errors
 * separated albums and media sorting
 * - default_album_reverse_sort (boolean) sets default sorting for albums

@@ -15,8 +15,8 @@
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
 <!--
-	<link href="css/styles.min.css" rel="stylesheet" type="text/css" /> 
-	<script type="text/javascript" src="js/scripts.min.js"></script> 
+	<link href="css/styles.min.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="js/scripts.min.js"></script>
 -->
 
 	<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
@@ -33,7 +33,7 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
-	
+
 	<?php
 		//~ ini_set('display_errors', 1);
 		//~ error_reporting(E_ALL);
@@ -41,15 +41,15 @@
 		function url_exist($url) {
 			if (@fopen($url,"r"))
 				return true;
-			else 
+			else
 				return false;
 		}
-		
+
 		// put the <link rel=".."> tag in <head> for letting facebook/google+ load the image/video when sharing
 		if (isset($_GET['m']) && $_GET['m']) {
 			// Prevent directory traversal security vulnerability
 			$realPath = realpath($_GET['m']);
-			if (strpos($realPath, realpath($options['server_cache_path'])) === 0  && url_exist($realPath)) {
+			if (strpos($realPath, realpath('cache')) === 0  && url_exist($realPath)) {
 				$linkTag = '<link rel="';
 				$videoEnd = ".mp4";
 				if (substr($_GET['m'], - strlen($videoEnd)) === strlen($videoEnd))
@@ -64,7 +64,7 @@
 			}
 		}
 	?>
-	
+
 	<?php if ($options['piwik_server'] && $options['piwik_id']) { ?>
 		<!-- Piwik -->
 		<script type="text/javascript">
@@ -89,8 +89,8 @@
 		</script>
 		<noscript><p><img src="<?php echo $options['piwik_server'] . 'piwik.php?idsite=' . $options['piwik_id']; ?>" style="border:0;" alt="" /></p></noscript>
 		<!-- End Piwik Code -->
-	<?php } ?>  
-	
+	<?php } ?>
+
 	<?php if (isset($options['google_analitics_id'])) { ?>
 		<!-- google analytics -->
 		<script type="text/javascript">
@@ -112,7 +112,7 @@
 			});
 		</script>
 		<!-- End google analitics code -->
-	<?php } ?>  
+	<?php } ?>
 </head>
 <body>
 	<?php
@@ -169,7 +169,7 @@
 				<div id="metadata"></div>
 			</div>
 		</div>
-		
+
 		<a id="prev">&lsaquo;</a>
 		<a id="next">&rsaquo;</a>
 	</div>
@@ -184,7 +184,7 @@
 			<a href="https://github.com/paolobenve/myphotoshare" target="_blank">MyPhotoShare</a>
 		</div>
 	</div>
-	
+
 	<div id="error-overlay"></div>
 	<div id="error-options-file"></div>
 	<div id="error-text-folder"></div>
