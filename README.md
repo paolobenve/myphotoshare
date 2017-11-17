@@ -1,4 +1,4 @@
-# myphotoshare v. 2.7.5
+# myphotoshare v. 2.8
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -272,6 +272,12 @@ Note that the `internal-*` paths must match that of `app.cfg`. This makes use of
 Both the scanner and the webpage have a `make deploy` target, and the scanner has a `make scan` target, to automatically deploy assets to a remote server and run the scanner. For use, customize `deployment-config.mk` in the root of the project, and carefully read the `Makefile`s to learn what's happening.
 
 ## Changelog
+
+### version 2.8 (November 18, 2017):
+
+* better user experience on mobile: show sharper images
+* removed option server_cache_path (closes #54), server cache folder is now always "cache":
+  if it was previously set to a different value in custom option file, please move it on your server and change web server settings in order to avoid recreation of all the thumbnails
 
 ### version 2.7.5 (October 26, 2017):
 
