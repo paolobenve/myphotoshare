@@ -639,7 +639,7 @@ class Media(object):
 			)
 		):
 			next_level()
-			message("reduction/thumbnail OK, skipping", thumb_path, 5)
+			message("reduction/thumbnail OK, skipping", "", 5)
 			back_level()
 			back_level()
 			return start_image
