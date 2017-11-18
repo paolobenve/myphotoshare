@@ -14,11 +14,10 @@
 			echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
-<!--
 	<link href="css/styles.min.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="js/scripts.min.js"></script>
--->
 
+	<!--
 	<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 	<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 	<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
@@ -33,6 +32,7 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
+-->
 
 	<?php
 		//~ ini_set('display_errors', 1);
