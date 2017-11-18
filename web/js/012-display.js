@@ -572,7 +572,7 @@ $(document).ready(function() {
 		$("#title-string").html(title);
 
 		$("#dots").off();
-		$("#dots").on('click', function() {
+		$("#dots").on('click', function(ev) {
 			if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 				$("#dots").hide();
 				$("#hidden-title").show();
