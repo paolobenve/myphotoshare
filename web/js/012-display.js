@@ -1379,9 +1379,6 @@ $(document).ready(function() {
 		if (currentAlbum.media.length == 1) {
 			$("#next").hide();
 			$("#prev").hide();
-			$("#next-media").removeAttr("href");
-			$("#next").removeAttr("href");
-			$("#prev").removeAttr("href");
 			$("#media-view").addClass("no-bottom-space");
 			$("#album-view").addClass("no-bottom-space");
 			$("#thumbs").hide();
@@ -1507,6 +1504,7 @@ $(document).ready(function() {
 		}
 
 		$("#media-view").off('contextmenu click mousewheel');
+		$("#media-bar").off();
 		$('#next').off();
 		$('#prev').off();
 
@@ -1556,6 +1554,11 @@ $(document).ready(function() {
 						//~ return true;
 					//~ swipeOnWheel(ev, delta)
 				//~ });
+				$("#media-bar").on('click', function(ev) {
+	   			ev.stopPropagation();
+				}).on('contextmenu', function(ev) {
+	   			ev.stopPropagation();
+				});
 			$('#next').on('click', function(ev) {
 				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 					swipeLeft(nextLink);
@@ -1569,6 +1572,7 @@ $(document).ready(function() {
 				}
 			});
 		}
+
 		$("#original-link").attr("target", "_blank").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia)));
 		$("#download-link").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia))).attr("download", "");
 
@@ -1950,6 +1954,12 @@ $(document).ready(function() {
 		$(this).stop().fadeTo("fast", 0.4);
 	});
 
+	$("#metadata-show").on('click', showMetadataFromMouse);
+	$("#metadata-hide").on('click', showMetadataFromMouse);
+	$("#metadata").on('click', showMetadataFromMouse);
+
+	$("#fullscreen").on('click', goFullscreenFromMouse);
+
 	function goFullscreen(e) {
 		$("#media").off();
 		if (Modernizr.fullscreen) {
@@ -1981,33 +1991,20 @@ $(document).ready(function() {
 		}
 	}
 
-	$("#fullscreen").on('click', function(ev) {
-				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-					goFullscreen(ev);
-					return false;
-				}
-	});
+	function goFullscreenFromMouse(ev) {
+		if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+			goFullscreen(ev);
+			return false;
+		}
+	}
 
-
-	$("#metadata-show").on('click', function(ev) {
-				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-					showMetadata();
-					return false;
-				}
-	});
-	$("#metadata-hide").on('click', function(ev) {
-				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-					showMetadata();
-					return false;
-				}
-	});
-
-	$("#metadata table").on('click', function(ev) {
-				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-					showMetadata();
-					return false;
-				}
-	});
+	function showMetadataFromMouse(ev) {
+		if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+			ev.stopPropagation();
+			showMetadata();
+			return false;
+		}
+	}
 
 	function showMetadata() {
 		if ($("#metadata").css("display") == "none") {
