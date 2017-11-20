@@ -246,9 +246,9 @@ class TreeWalker:
 			next_level()
 			message("json file unexistent", json_message, 4)
 			back_level()
-		#~ except (ValueError, AttributeError, KeyError) as e:
-			#~ message(" json file invalid", json_message, 4)
-			#~ cached_album = None
+		except (ValueError, AttributeError, KeyError) as e:
+			message(" json file invalid", json_message, 4)
+			cached_album = None
 
 		if not json_cache_OK:
 			message("generating album...", absolute_path, 5)
