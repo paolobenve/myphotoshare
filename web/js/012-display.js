@@ -628,7 +628,7 @@ $(document).ready(function() {
 
 			if (currentAlbum.albums.length > 1) {
 				$(".album-sort-date.album-sort-reverse").unbind('click');
-				$(".album-sort-date.album-sort-reverse").click(function(ev) {
+				$(".album-sort-date.album-sort-reverse").on('click', function(ev) {
 					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						if (currentAlbum.albumNameSort) {
 							currentAlbum.albums = sortByDate(currentAlbum.albums);
@@ -648,7 +648,7 @@ $(document).ready(function() {
 				});
 
 				$(".album-sort-name.album-sort-reverse").unbind('click');
-				$(".album-sort-name.album-sort-reverse").click(function(ev) {
+				$(".album-sort-name.album-sort-reverse").on('click', function(ev) {
 					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						if (! currentAlbum.albumNameSort) {
 							currentAlbum.albums = sortByPath(currentAlbum.albums);
@@ -668,7 +668,7 @@ $(document).ready(function() {
 				});
 
 				$(".album-sort-date.album-sort-normal").unbind('click');
-				$(".album-sort-date.album-sort-normal").click(function(ev) {
+				$(".album-sort-date.album-sort-normal").on('click', function(ev) {
 					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						if (currentAlbum.albumNameSort) {
 							currentAlbum.albums = sortByDate(currentAlbum.albums);
@@ -687,7 +687,7 @@ $(document).ready(function() {
 				});
 
 				$(".album-sort-name.album-sort-normal").unbind('click');
-				$(".album-sort-name.album-sort-normal").click(function(ev) {
+				$(".album-sort-name.album-sort-normal").on('click', function(ev) {
 					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						if (! currentAlbum.albumNameSort) {
 							currentAlbum.albums = sortByPath(currentAlbum.albums);
@@ -708,7 +708,7 @@ $(document).ready(function() {
 
 			if (currentAlbum.media.length > 1) {
 				$(".media-sort-date.media-sort-reverse").unbind('click');
-				$(".media-sort-date.media-sort-reverse").click(function(ev) {
+				$(".media-sort-date.media-sort-reverse").on('click', function(ev) {
 					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						if (currentAlbum.mediaNameSort) {
 							currentAlbum.media = sortByDate(currentAlbum.media);
@@ -728,7 +728,7 @@ $(document).ready(function() {
 				});
 
 				$(".media-sort-name.media-sort-reverse").unbind('click');
-				$(".media-sort-name.media-sort-reverse").click(function(ev) {
+				$(".media-sort-name.media-sort-reverse").on('click', function(ev) {
 					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						if (! currentAlbum.mediaNameSort) {
 							currentAlbum.media = sortByName(currentAlbum.media);
@@ -748,7 +748,7 @@ $(document).ready(function() {
 				});
 
 				$(".media-sort-date.media-sort-normal").unbind('click');
-				$(".media-sort-date.media-sort-normal").click(function(ev) {
+				$(".media-sort-date.media-sort-normal").on('click', function(ev) {
 					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						if (currentAlbum.mediaNameSort) {
 							currentAlbum.media = sortByDate(currentAlbum.media);
@@ -767,7 +767,7 @@ $(document).ready(function() {
 				});
 
 				$(".media-sort-name.media-sort-normal").unbind('click');
-				$(".media-sort-name.media-sort-normal").click(function(ev) {
+				$(".media-sort-name.media-sort-normal").on('click', function(ev) {
 					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						if (! currentAlbum.mediaNameSort) {
 							currentAlbum.media = sortByName(currentAlbum.media);
@@ -1556,13 +1556,13 @@ $(document).ready(function() {
 						//~ return true;
 					//~ swipeOnWheel(ev, delta)
 				//~ });
-			$('#next').click(function(ev) {
+			$('#next').on('click', function(ev) {
 				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 					swipeLeft(nextLink);
 					return false;
 				}
 			});
-			$('#prev').click(function(ev) {
+			$('#prev').on('click', function(ev) {
 				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 					swipeRight(prevLink);
 					return false;
