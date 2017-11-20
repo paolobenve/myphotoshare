@@ -2002,6 +2002,13 @@ $(document).ready(function() {
 				}
 	});
 
+	$("#metadata table").on('click', function(ev) {
+				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+					showMetadata();
+					return false;
+				}
+	});
+
 	function showMetadata() {
 		if ($("#metadata").css("display") == "none") {
 			$("#metadata-show").hide();
