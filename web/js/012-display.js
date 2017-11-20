@@ -1526,7 +1526,7 @@ $(document).ready(function() {
 			$("#next").show();
 			$("#prev").show();
 			$("#media-view")
-				.css('cursor', 'ew-resize')
+				//.css('cursor', 'ew-resize')
 				.on('contextmenu', function(ev) {
 					if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						ev.preventDefault();

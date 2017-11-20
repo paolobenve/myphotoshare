@@ -209,6 +209,7 @@ a.title-anchor.mobile {
 	text-align: center;
 	z-index: -1;
 	width: 100%;
+	cursor: ew-resize;
 }
 
 #media-view.no-bottom-space {
@@ -294,10 +295,20 @@ a.title-anchor.mobile {
 #metadata table {
 	margin: auto auto;
 	text-align: left;
+	cursor: s-resize;
 }
 #metadata tr {
 	height: 14px;
 }
+
+#metadata-show {
+	cursor: n-resize;
+}
+
+#metadata-hide {
+	cursor: s-resize;
+}
+
 #exit-fullscreen {
 	display: none;
 }
