@@ -1945,9 +1945,11 @@ $(document).ready(function() {
 	$("#next, #prev").on('mouseenter', function() {
 		$(this).stop().fadeTo("fast", 1);
 	});
+
 	$("#next, #prev").on('mouseleave', function() {
 		$(this).stop().fadeTo("fast", 0.4);
 	});
+
 	function goFullscreen(e) {
 		$("#media").off();
 		if (Modernizr.fullscreen) {
@@ -1979,7 +1981,7 @@ $(document).ready(function() {
 		}
 	}
 
-	$("#fullscreen").click(function(ev) {
+	$("#fullscreen").on('click', function(ev) {
 				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 					goFullscreen(ev);
 					return false;
@@ -1987,13 +1989,13 @@ $(document).ready(function() {
 	});
 
 
-	$("#metadata-show").click(function(ev) {
+	$("#metadata-show").on('click', function(ev) {
 				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 					showMetadata();
 					return false;
 				}
 	});
-	$("#metadata-hide").click(function(ev) {
+	$("#metadata-hide").on('click', function(ev) {
 				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 					showMetadata();
 					return false;
