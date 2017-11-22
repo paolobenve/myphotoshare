@@ -1611,6 +1611,8 @@ $(document).ready(function() {
 		if (typeof currentMedia.metadata.flash !== "undefined") text += "<tr><td id=\"metadata-data-flash\">Flash</td><td>" + currentMedia.metadata.flash + "</td></tr>";
 		if (typeof currentMedia.metadata.orientation !== "undefined") text += "<tr><td id=\"metadata-data-orientation\">Orientation</td><td>" + currentMedia.metadata.orientation + "</td></tr>";
 		if (typeof currentMedia.metadata.duration !== "undefined") text += "<tr><td id=\"metadata-data-duration\">Duration</td><td>" + currentMedia.metadata.duration + " sec</td></tr>";
+		if (typeof currentMedia.metadata.latitude !== "undefined") text += "<tr><td id=\"metadata-data-latitude\">Latitude</td><td>" + currentMedia.metadata.latitude + " </td></tr>";
+		if (typeof currentMedia.metadata.longitude !== "undefined") text += "<tr><td id=\"metadata-data-longitude\">Longitude</td><td>" + currentMedia.metadata.longitude + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
 		translate();

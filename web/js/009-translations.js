@@ -51,6 +51,8 @@ var translations =
 			"#metadata-data-flash": "Flash",
 			"#metadata-data-orientation": "Orientation",
 			"#metadata-data-duration": "Duration",
+			"#metadata-data-latitude": "Latitude",
+			"#metadata-data-longitude": "Longitude",
 		},
 		'it': {
 			"#metadata-show": "metadati",
@@ -103,6 +105,8 @@ var translations =
 			"#metadata-data-flash": "Flash",
 			"#metadata-data-orientation": "Orientazione",
 			"#metadata-data-duration": "Durata",
+			"#metadata-data-latitude": "Latitudine",
+			"#metadata-data-longitude": "Longitudine",
 		},
 		'es': {
 			"#metadata-show": "metadatos",
@@ -155,5 +159,7 @@ var translations =
 			"#metadata-data-flash": "Flash",
 			"#metadata-data-orientation": "Orientación",
 			"#metadata-data-duration": "Duración",
+			"#metadata-data-latitude": "Latitud",
+			"#metadata-data-longitude": "Longitud",
 		}
 	};
