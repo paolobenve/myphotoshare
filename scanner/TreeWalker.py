@@ -376,7 +376,7 @@ class TreeWalker:
 					message("processing file", entry_with_path, 4)
 					next_level()
 					if not json_cache_OK:
-						message("json file not OK", "", 4)
+						message("json file not OK", "  " + json_message, 4)
 					else:
 						if cached_media is None:
 							message("media not cached", "", 4)
