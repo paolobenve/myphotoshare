@@ -1,3 +1,5 @@
+# gps code got from https://gist.github.com/erans/983821
+
 import locale
 locale.setlocale(locale.LC_ALL, '')
 from CachePath import *
@@ -6,7 +8,7 @@ import json
 import os
 import os.path
 from PIL import Image
-from PIL.ExifTags import TAGS
+from PIL.ExifTags import TAGS, GPSTAGS
 from multiprocessing import Pool
 import gc
 import tempfile
@@ -346,7 +348,15 @@ class Media(object):
 						#~ raise
 					#~ except ValueError:
 						#~ pass
-			exif[decoded] = value
+
+			if decoded == "GPSInfo":
+				gps_data = {}
+				for t in value:
+					sub_decoded = GPSTAGS.get(t, t)
+					gps_data[sub_decoded] = value[t]
+					exif[decoded] = gps_data
+			else:
+				exif[decoded] = value
 
 		if "Orientation" in exif:
 			self._orientation = exif["Orientation"];
@@ -418,6 +428,40 @@ class Media(object):
 			except ValueError:
 				# value isn't usable, forget it
 				pass
+
+		if "GPSInfo" in exif:
+			gps_latitude = self._get_if_exist(exif["GPSInfo"], "GPSLatitude")
+			gps_latitude_ref = self._get_if_exist(exif["GPSInfo"], 'GPSLatitudeRef')
+			gps_longitude = self._get_if_exist(exif["GPSInfo"], 'GPSLongitude')
+			gps_longitude_ref = self._get_if_exist(exif["GPSInfo"], 'GPSLongitudeRef')
+			if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
+				self._attributes["metadata"]["latitude"] = self._convert_to_degrees(gps_latitude)
+				if gps_latitude_ref != "N":
+					self._attributes["metadata"]["latitude"] = 0 - self._attributes["metadata"]["latitude"]
+				self._attributes["metadata"]["longitude"] = self._convert_to_degrees(gps_longitude)
+				if gps_longitude_ref != "E":
+					self._attributes["metadata"]["longitude"] = 0 - self._attributes["metadata"]["longitude"]
+		print self._attributes["metadata"]
+
+	def _get_if_exist(self, data, key):
+		data.get(key, None)
+
+	def _convert_to_degress(self, value):
+	    #Helper function to convert the GPS coordinates stored in the EXIF to degress in float format
+	    d0 = value[0][0]
+	    d1 = value[0][1]
+	    d = float(d0) / float(d1)
+
+	    m0 = value[1][0]
+	    m1 = value[1][1]
+	    m = float(m0) / float(m1)
+
+	    s0 = value[2][0]
+	    s1 = value[2][1]
+	    s = float(s0) / float(s1)
+
+	    return d + (m / 60.0) + (s / 3600.0)
+
 
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
 	_photo_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
