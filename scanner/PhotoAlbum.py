@@ -154,7 +154,10 @@ class Album(object):
 		message("converting album to dictionary...", "", 5)
 		dictionary = Album.from_dict(dictionary, album_cache_base)
 		next_level()
-		message("converted album to dictionary", "", 4)
+		if dictionary is not None:
+			message("converted album to dictionary", "", 4)
+		else:
+			message("json file version unexistent or different from current one", "", 4)
 		back_level()
 		return dictionary
 	@staticmethod
@@ -163,6 +166,8 @@ class Album(object):
 			path = dictionary["physicalPath"]
 		else:
 			path = dictionary["path"]
+		if not "jsonVersion" in dictionary or int(dictionary.jsonVersion) != Options.json_version:
+			return None
 		album = Album(os.path.join(Options.config['album_path'], path))
 		album.cache_base = album_cache_base
 		for media in dictionary["media"]:
@@ -227,7 +232,8 @@ class Album(object):
 			"ancestorsCacheBase": ancestors_cache_base,
 			"physicalPath": path_without_folders_marker,
 			"numMediaInSubTree": self.num_media_in_sub_tree,
-			"numMediaInAlbum": self.num_media_in_album
+			"numMediaInAlbum": self.num_media_in_album,
+			"jsonVersion": Options.json_version
 		}
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base

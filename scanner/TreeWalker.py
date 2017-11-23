@@ -219,6 +219,7 @@ class TreeWalker:
 					back_level()
 					if (
 						file_mtime(absolute_path) <= file_mtime(json_cache_file) and
+						cached_album is not None and
 						hasattr(cached_album, "absolute_path") and
 						cached_album.absolute_path == absolute_path
 					):

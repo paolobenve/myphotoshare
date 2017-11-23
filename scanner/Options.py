@@ -11,3 +11,5 @@ num_photo = 0
 num_photo_processed = 0
 num_video = 0
 num_video_processed = 0
+# set this variable to a new integer number whenever the json files structure changes
+json_version = 1
