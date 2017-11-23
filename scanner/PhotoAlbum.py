@@ -166,7 +166,7 @@ class Album(object):
 			path = dictionary["physicalPath"]
 		else:
 			path = dictionary["path"]
-		if not "jsonVersion" in dictionary or int(dictionary.jsonVersion) != Options.json_version:
+		if not "jsonVersion" in dictionary or int(dictionary["jsonVersion"]) != Options.json_version:
 			return None
 		album = Album(os.path.join(Options.config['album_path'], path))
 		album.cache_base = album_cache_base
@@ -327,6 +327,9 @@ class Media(object):
 					return
 
 	def _photo_metadata(self, image):
+		next_level()
+		message("extracting metadata...", "", 5)
+		back_level()
 		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
 		try:
@@ -436,10 +439,10 @@ class Media(object):
 				pass
 
 		if "GPSInfo" in exif:
-			gps_latitude = self._get_if_exist(exif["GPSInfo"], "GPSLatitude")
-			gps_latitude_ref = self._get_if_exist(exif["GPSInfo"], 'GPSLatitudeRef')
-			gps_longitude = self._get_if_exist(exif["GPSInfo"], 'GPSLongitude')
-			gps_longitude_ref = self._get_if_exist(exif["GPSInfo"], 'GPSLongitudeRef')
+			gps_latitude = exif["GPSInfo"].get("GPSLatitude", None)
+			gps_latitude_ref = exif["GPSInfo"].get('GPSLatitudeRef', None)
+			gps_longitude = exif["GPSInfo"].get('GPSLongitude', None)
+			gps_longitude_ref = exif["GPSInfo"].get('GPSLongitudeRef', None)
 			if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
 				self._attributes["metadata"]["latitude"] = self._convert_to_degrees(gps_latitude)
 				if gps_latitude_ref != "N":
@@ -447,12 +450,11 @@ class Media(object):
 				self._attributes["metadata"]["longitude"] = self._convert_to_degrees(gps_longitude)
 				if gps_longitude_ref != "E":
 					self._attributes["metadata"]["longitude"] = 0 - self._attributes["metadata"]["longitude"]
-		print self._attributes["metadata"]
+		next_level()
+		message("extracted", "", 5)
+		back_level()
 
-	def _get_if_exist(self, data, key):
-		data.get(key, None)
-
-	def _convert_to_degress(self, value):
+	def _convert_to_degrees(self, value):
 	    #Helper function to convert the GPS coordinates stored in the EXIF to degress in float format
 	    d0 = value[0][0]
 	    d1 = value[0][1]
