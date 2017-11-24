@@ -157,7 +157,7 @@ class Album(object):
 		if dictionary is not None:
 			message("converted album to dictionary", "", 4)
 		else:
-			message("json file version unexistent or different from current one", "", 4)
+			message("json version unexistent or old", "", 4)
 		back_level()
 		return dictionary
 	@staticmethod
