@@ -446,31 +446,60 @@ class Media(object):
 			gps_longitude = exif["GPSInfo"].get('GPSLongitude', None)
 			gps_longitude_ref = exif["GPSInfo"].get('GPSLongitudeRef', None)
 			if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
-				self._attributes["metadata"]["latitude"] = self._convert_to_degrees(gps_latitude)
-				if gps_latitude_ref != "N":
-					self._attributes["metadata"]["latitude"] = 0 - self._attributes["metadata"]["latitude"]
-				self._attributes["metadata"]["longitude"] = self._convert_to_degrees(gps_longitude)
-				if gps_longitude_ref != "E":
-					self._attributes["metadata"]["longitude"] = 0 - self._attributes["metadata"]["longitude"]
+				# the following number is in order not to have more decimal digits than needed
+				six_zeros = 1000000.0
+				self._attributes["metadata"]["latitude"] = int(self._convert_to_degrees_decimal(gps_latitude, gps_latitude_ref) * six_zeros) / six_zeros
+				self._attributes["metadata"]["latitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+				self._attributes["metadata"]["longitude"] = int(self._convert_to_degrees_decimal(gps_longitude, gps_longitude_ref) * six_zeros) / six_zeros
+				self._attributes["metadata"]["longitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 		next_level()
 		message("extracted", "", 5)
 		back_level()
 
-	def _convert_to_degrees(self, value):
-	    #Helper function to convert the GPS coordinates stored in the EXIF to degress in float format
-	    d0 = value[0][0]
-	    d1 = value[0][1]
-	    d = float(d0) / float(d1)
+	def _convert_to_degrees_minutes_seconds(self, value, ref):
+		# Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds
+		# Since the result is
 
-	    m0 = value[1][0]
-	    m1 = value[1][1]
-	    m = float(m0) / float(m1)
+		# Degrees
+		d0 = value[0][0]
+		d1 = value[0][1]
+		d = int(float(d0) / float(d1))
+		# Minutes
+		m0 = value[1][0]
+		m1 = value[1][1]
+		m = int(float(m0) / float(m1))
+		# Seconds
+		s0 = value[2][0]
+		s1 = value[2][1]
+		s = int((float(s0) / float(s1)) * 1000) / 1000.0
 
-	    s0 = value[2][0]
-	    s1 = value[2][1]
-	    s = float(s0) / float(s1)
+		result = ''
+		if ref == "S" or ref == "W":
+			result = '-'
 
-	    return d + (m / 60.0) + (s / 3600.0)
+		result += str(d) + 'º ' + str(m) + '\' ' + str(s) + '"'
+
+		return result
+
+	def _convert_to_degrees_decimal(self, value, ref):
+		#Helper function to convert the GPS coordinates stored in the EXIF to degress in float format
+		# Degrees
+		d0 = value[0][0]
+		d1 = value[0][1]
+		d = float(d0) / float(d1)
+		# Minutes
+		m0 = value[1][0]
+		m1 = value[1][1]
+		m = float(m0) / float(m1)
+		# Seconds
+		s0 = value[2][0]
+		s1 = value[2][1]
+		s = float(s0) / float(s1)
+
+		result = d + (m / 60.0) + (s / 3600.0)
+		if ref == "S" or ref == "W":
+			result = - result
+		return result
 
 
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
