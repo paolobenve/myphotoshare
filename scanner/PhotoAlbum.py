@@ -103,7 +103,6 @@ class Album(object):
 			return 1
 	def add_media(self, media):
 		if not any(media.media_file_name == _media.media_file_name for _media in self.media_list):
-		#~ if not media in self.media_list:
 			self.media_list.append(media)
 			self.media_list_is_sorted = False
 	def add_album(self, album):
@@ -446,11 +445,9 @@ class Media(object):
 			gps_longitude = exif["GPSInfo"].get('GPSLongitude', None)
 			gps_longitude_ref = exif["GPSInfo"].get('GPSLongitudeRef', None)
 			if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
-				# the following number is in order not to have more decimal digits than needed
-				six_zeros = 1000000.0
-				self._attributes["metadata"]["latitude"] = int(self._convert_to_degrees_decimal(gps_latitude, gps_latitude_ref) * six_zeros) / six_zeros
+				self._attributes["metadata"]["latitude"] = self._convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
 				self._attributes["metadata"]["latitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
-				self._attributes["metadata"]["longitude"] = int(self._convert_to_degrees_decimal(gps_longitude, gps_longitude_ref) * six_zeros) / six_zeros
+				self._attributes["metadata"]["longitude"] = self._convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
 				self._attributes["metadata"]["longitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 		next_level()
 		message("extracted", "", 5)
@@ -497,6 +494,9 @@ class Media(object):
 		s = float(s0) / float(s1)
 
 		result = d + (m / 60.0) + (s / 3600.0)
+		# limit decimal digits to what is needed by openstreetmap
+		six_zeros = 1000000.0
+		result = int(result * six_zeros) / six_zeros
 		if ref == "S" or ref == "W":
 			result = - result
 		return result
