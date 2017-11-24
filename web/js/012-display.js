@@ -1593,26 +1593,46 @@ $(document).ready(function() {
 		$("#day-folders-view-link").attr("href", changeViewLink);
 
 		text = "<table>";
-		if (typeof currentMedia.date !== "undefined") text += "<tr><td id=\"metadata-data-date\">Time Taken</td><td>" + currentMedia.date + "</td></tr>";
-		if (typeof currentMedia.metadata.size !== "undefined") text += "<tr><td id=\"metadata-data-size\">Resolution</td><td>" + currentMedia.metadata.size[0] + " x " + currentMedia.metadata.size[1] + "</td></tr>";
-		if (typeof currentMedia.metadata.make !== "undefined") text += "<tr><td id=\"metadata-data-make\">Camera Maker</td><td>" + currentMedia.metadata.make + "</td></tr>";
-		if (typeof currentMedia.metadata.model !== "undefined") text += "<tr><td id=\"metadata-data-model\">Camera Model</td><td>" + currentMedia.metadata.model + "</td></tr>";
-		if (typeof currentMedia.metadata.aperture !== "undefined") text += "<tr><td id=\"metadata-data-aperture\">Aperture</td><td> f/" + getDecimal(currentMedia.metadata.aperture) + "</td></tr>";
-		if (typeof currentMedia.metadata.focalLength !== "undefined") text += "<tr><td id=\"metadata-data-focalLength\">Focal Length</td><td>" + getDecimal(currentMedia.metadata.focalLength) + " mm</td></tr>";
-		if (typeof currentMedia.metadata.subjectDistanceRange !== "undefined") text += "<tr><td id=\"metadata-data-subjectDistanceRange\">Subject Distance Range</td><td>" + currentMedia.metadata.subjectDistanceRange + "</td></tr>";
-		if (typeof currentMedia.metadata.iso !== "undefined") text += "<tr><td id=\"metadata-data-iso\">ISO</td><td>" + currentMedia.metadata.iso + "</td></tr>";
-		if (typeof currentMedia.metadata.sceneCaptureType !== "undefined") text += "<tr><td id=\"metadata-data-sceneCaptureType\">Scene Capture Type</td><td>" + currentMedia.metadata.sceneCaptureType + "</td></tr>";
-		if (typeof currentMedia.metadata.exposureTime !== "undefined") text += "<tr><td id=\"metadata-data-exposureTime\">Exposure Time</td><td>" + getDecimal(currentMedia.metadata.exposureTime) + " sec</td></tr>";
-		if (typeof currentMedia.metadata.exposureProgram !== "undefined") text += "<tr><td id=\"metadata-data-exposureProgram\">Exposure Program</td><td>" + currentMedia.metadata.exposureProgram + "</td></tr>";
-		if (typeof currentMedia.metadata.exposureCompensation !== "undefined") text += "<tr><td id=\"metadata-data-exposureCompensation\">Exposure Compensation</td><td>" + getDecimal(currentMedia.metadata.exposureCompensation) + "</td></tr>";
-		if (typeof currentMedia.metadata.spectralSensitivity !== "undefined") text += "<tr><td id=\"metadata-data-spectralSensitivity\">Spectral Sensitivity</td><td>" + currentMedia.metadata.spectralSensitivity + "</td></tr>";
-		if (typeof currentMedia.metadata.sensingMethod !== "undefined") text += "<tr><td id=\"metadata-data-sensingMethod\">Sensing Method</td><td>" + currentMedia.metadata.sensingMethod + "</td></tr>";
-		if (typeof currentMedia.metadata.lightSource !== "undefined") text += "<tr><td id=\"metadata-data-lightSource\">Light Source</td><td>" + currentMedia.metadata.lightSource + "</td></tr>";
-		if (typeof currentMedia.metadata.flash !== "undefined") text += "<tr><td id=\"metadata-data-flash\">Flash</td><td>" + currentMedia.metadata.flash + "</td></tr>";
-		if (typeof currentMedia.metadata.orientation !== "undefined") text += "<tr><td id=\"metadata-data-orientation\">Orientation</td><td>" + currentMedia.metadata.orientation + "</td></tr>";
-		if (typeof currentMedia.metadata.duration !== "undefined") text += "<tr><td id=\"metadata-data-duration\">Duration</td><td>" + currentMedia.metadata.duration + " sec</td></tr>";
-		if (typeof currentMedia.metadata.latitude !== "undefined") text += "<tr><td id=\"metadata-data-latitude\">Latitude</td><td>" + currentMedia.metadata.latitude + " </td></tr>";
-		if (typeof currentMedia.metadata.longitude !== "undefined") text += "<tr><td id=\"metadata-data-longitude\">Longitude</td><td>" + currentMedia.metadata.longitude + " </td></tr>";
+		if (typeof currentMedia.date !== "undefined")
+			text += "<tr><td id=\"metadata-data-date\"></td><td>" + currentMedia.date + "</td></tr>";
+		if (typeof currentMedia.metadata.size !== "undefined")
+			text += "<tr><td id=\"metadata-data-size\"></td><td>" + currentMedia.metadata.size[0] + " x " + currentMedia.metadata.size[1] + "</td></tr>";
+		if (typeof currentMedia.metadata.make !== "undefined")
+			text += "<tr><td id=\"metadata-data-make\"></td><td>" + currentMedia.metadata.make + "</td></tr>";
+		if (typeof currentMedia.metadata.model !== "undefined")
+			text += "<tr><td id=\"metadata-data-model\"></td><td>" + currentMedia.metadata.model + "</td></tr>";
+		if (typeof currentMedia.metadata.aperture !== "undefined")
+			text += "<tr><td id=\"metadata-data-aperture\"></td><td> f/" + getDecimal(currentMedia.metadata.aperture) + "</td></tr>";
+		if (typeof currentMedia.metadata.focalLength !== "undefined")
+			text += "<tr><td id=\"metadata-data-focalLength\"></td><td>" + getDecimal(currentMedia.metadata.focalLength) + " mm</td></tr>";
+		if (typeof currentMedia.metadata.subjectDistanceRange !== "undefined")
+			text += "<tr><td id=\"metadata-data-subjectDistanceRange\"></td><td>" + currentMedia.metadata.subjectDistanceRange + "</td></tr>";
+		if (typeof currentMedia.metadata.iso !== "undefined")
+			text += "<tr><td id=\"metadata-data-iso\"></td><td>" + currentMedia.metadata.iso + "</td></tr>";
+		if (typeof currentMedia.metadata.sceneCaptureType !== "undefined")
+			text += "<tr><td id=\"metadata-data-sceneCaptureType\"></td><td>" + currentMedia.metadata.sceneCaptureType + "</td></tr>";
+		if (typeof currentMedia.metadata.exposureTime !== "undefined")
+			text += "<tr><td id=\"metadata-data-exposureTime\"></td><td>" + getDecimal(currentMedia.metadata.exposureTime) + " sec</td></tr>";
+		if (typeof currentMedia.metadata.exposureProgram !== "undefined")
+			text += "<tr><td id=\"metadata-data-exposureProgram\"></td><td>" + currentMedia.metadata.exposureProgram + "</td></tr>";
+		if (typeof currentMedia.metadata.exposureCompensation !== "undefined")
+			text += "<tr><td id=\"metadata-data-exposureCompensation\"></td><td>" + getDecimal(currentMedia.metadata.exposureCompensation) + "</td></tr>";
+		if (typeof currentMedia.metadata.spectralSensitivity !== "undefined")
+			text += "<tr><td id=\"metadata-data-spectralSensitivity\"></td><td>" + currentMedia.metadata.spectralSensitivity + "</td></tr>";
+		if (typeof currentMedia.metadata.sensingMethod !== "undefined")
+			text += "<tr><td id=\"metadata-data-sensingMethod\"></td><td>" + currentMedia.metadata.sensingMethod + "</td></tr>";
+		if (typeof currentMedia.metadata.lightSource !== "undefined")
+			text += "<tr><td id=\"metadata-data-lightSource\"></td><td>" + currentMedia.metadata.lightSource + "</td></tr>";
+		if (typeof currentMedia.metadata.flash !== "undefined")
+			text += "<tr><td id=\"metadata-data-flash\"></td><td>" + currentMedia.metadata.flash + "</td></tr>";
+		if (typeof currentMedia.metadata.orientation !== "undefined")
+			text += "<tr><td id=\"metadata-data-orientation\"></td><td>" + currentMedia.metadata.orientation + "</td></tr>";
+		if (typeof currentMedia.metadata.duration !== "undefined")
+			text += "<tr><td id=\"metadata-data-duration\"></td><td>" + currentMedia.metadata.duration + " sec</td></tr>";
+		if (typeof currentMedia.metadata.latitude !== "undefined")
+			text += "<tr class='gps'><td id=\"metadata-data-latitude\"></td><td>" + currentMedia.metadata.latitudeMS + " </td></tr>";
+		if (typeof currentMedia.metadata.longitude !== "undefined")
+			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
 		translate();
