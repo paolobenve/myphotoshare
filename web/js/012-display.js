@@ -1592,6 +1592,7 @@ $(document).ready(function() {
 		}
 		$("#day-folders-view-link").attr("href", changeViewLink);
 
+		$('#metadata tr.gps').off('click');
 		text = "<table>";
 		if (typeof currentMedia.date !== "undefined")
 			text += "<tr><td id=\"metadata-data-date\"></td><td>" + currentMedia.date + "</td></tr>";
@@ -1635,6 +1636,11 @@ $(document).ready(function() {
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
+		$('#metadata tr.gps').on('click', function(ev) {
+			ev.stopPropagation();
+			window.open('http://www.openstreetmap.org/#map=14/' + currentMedia.metadata.latitude + '/' + currentMedia.metadata.longitude, '_blank');
+		});
+
 		translate();
 
 		$("#subalbums").hide();
