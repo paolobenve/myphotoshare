@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # gps code got from https://gist.github.com/erans/983821
 
 import locale
