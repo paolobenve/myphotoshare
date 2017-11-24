@@ -71,21 +71,26 @@ class Album(object):
 	@property
 	def media(self):
 		return self.media_list
+
 	@property
 	def albums(self):
 		return self.albums_list
+
 	@property
 	def path(self):
 		return self.baseless_path
 	def __str__(self):
 		return self.path
+
 	@property
 	def json_file(self):
 		#~ return json_name(self.path)
 		return self.cache_base + ".json"
+
 	@property
 	def subdir(self):
 		return self._subdir
+
 	@property
 	def date(self):
 		self.sort_subalbums_and_media()
@@ -96,11 +101,13 @@ class Album(object):
 		elif len(self.albums_list) == 0:
 			return self.media_list[-1].date
 		return max(self.media_list[-1].date, self.albums_list[-1].date)
+
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
 		except TypeError:
 			return 1
+
 	def add_media(self, media):
 		if not any(media.media_file_name == _media.media_file_name for _media in self.media_list):
 			self.media_list.append(media)
@@ -108,6 +115,7 @@ class Album(object):
 	def add_album(self, album):
 		self.albums_list.append(album)
 		self.albums_list_is_sorted = False
+
 	def sort_subalbums_and_media(self):
 		if not self.media_list_is_sorted:
 			self.media_list.sort()
@@ -115,6 +123,7 @@ class Album(object):
 		if not self.albums_list_is_sorted:
 			self.albums_list.sort()
 			self.albums_list_is_sorted = True
+
 	@property
 	def empty(self):
 		if len(self.media_list) != 0:
@@ -142,6 +151,7 @@ class Album(object):
 		next_level()
 		message("saved album", json_file_with_path, 3)
 		back_level()
+
 	@staticmethod
 	def from_cache(path, album_cache_base):
 		message("reading album...", "", 5)
@@ -161,6 +171,7 @@ class Album(object):
 			message("json version unexistent or old", "", 4)
 		back_level()
 		return dictionary
+
 	@staticmethod
 	def from_dict(dictionary, album_cache_base, cripple=True):
 		if "physicalPath" in dictionary:
@@ -182,6 +193,7 @@ class Album(object):
 		album.sort_subalbums_and_media()
 
 		return album
+
 	def to_dict(self, cripple=True):
 		self.sort_subalbums_and_media()
 		subalbums = []
@@ -211,7 +223,6 @@ class Album(object):
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
 		if path_to_dict and by_date_position == -1 and self.cache_base != "root" and folder_position != 0:
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
-
 
 		ancestors_cache_base = list()
 		_parent = self
@@ -1137,9 +1148,11 @@ class Media(object):
 		return os.path.basename(self.media_file_name)
 	def __str__(self):
 		return self.name
+
 	@property
 	def path(self):
 		return self.media_file_name
+
 	@property
 	def image_caches(self):
 		caches = []
@@ -1201,6 +1214,7 @@ class Media(object):
 				break
 			mobile_bigger = True
 		return caches
+
 	@property
 	def date(self):
 		correct_date = None;
@@ -1213,6 +1227,7 @@ class Media(object):
 		else:
 			correct_date = self._attributes["dateTimeFile"]
 		return correct_date
+
 	@property
 	def year(self):
 		return str(self.date.year)
@@ -1220,6 +1235,7 @@ class Media(object):
 	def month(self):
 		#~ return self.date.strftime("%B").capitalize() + " " + self.year
 		return self.date.strftime("%m")
+
 	@property
 	def day(self):
 		return str(self.date.day).zfill(2)
@@ -1229,15 +1245,19 @@ class Media(object):
 	#~ @property
 	#~ def year_month_day(self):
 		#~ return self.year_month + " " + self.day
+
 	@property
 	def year_album_path(self):
 		return Options.config['by_date_string'] + "/" + self.year
+
 	@property
 	def month_album_path(self):
 		return self.year_album_path + "/" + self.month
+
 	@property
 	def day_album_path(self):
 		return self.month_album_path + "/" + self.day
+
 	def __cmp__(self, other):
 		try:
 			date_compare = cmp(self.date, other.date)
@@ -1246,9 +1266,11 @@ class Media(object):
 		if date_compare == 0:
 			return cmp(self.name, other.name)
 		return date_compare
+
 	@property
 	def attributes(self):
 		return self._attributes
+
 	@staticmethod
 	def from_dict(album, dictionary, basepath):
 		del dictionary["date"]
@@ -1273,6 +1295,7 @@ class Media(object):
 						except ValueError:
 							pass
 		return Media(album, media_path, None, dictionary)
+
 	def to_dict(self):
 		foldersAlbum = Options.config['folders_string']
 		if (self.folders):
@@ -1292,7 +1315,6 @@ class Media(object):
 		media["foldersAlbum"]		= foldersAlbum
 		media["foldersCacheBase"]	= self.album.cache_base
 		media["cacheSubdir"]		= self.album.subdir
-
 		return media
 
 class PhotoAlbumEncoder(json.JSONEncoder):
