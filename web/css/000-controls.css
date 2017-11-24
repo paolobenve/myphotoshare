@@ -301,6 +301,10 @@ a.title-anchor.mobile {
 	height: 14px;
 }
 
+#metadata tr.gps {
+	cursor: pointer;
+}
+
 #metadata-show {
 	cursor: n-resize;
 }
