@@ -2,7 +2,6 @@
 	/* constructor */
 	function PhotoFloat() {
 		this.albumCache = [];
-		PhotoFloat.firstAlbumPopulation = true;
 	}
 
 	/* public member functions */
