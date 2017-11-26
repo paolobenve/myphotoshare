@@ -59,6 +59,7 @@ class TreeWalker:
 			next_level()
 			message("saved all media json file", "", 5)
 			back_level()
+
 			message("generating date albums...", "", 4)
 			by_date_album = self.generate_date_albums(origin_album)
 			next_level()

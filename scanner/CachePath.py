@@ -7,6 +7,7 @@ import hashlib
 import Options
 
 max_verbose = 0
+
 def message(category, text, verbose = 0):
 	# verbosity levels:
 	# 0 = fatal errors only
@@ -122,8 +123,7 @@ def cache_base(path, filepath=False):
 	else:
 		path = "root"
 	return path
-#~ def json_name(path):
-	#~ return cache_base(path) + ".json"
+
 def photo_cache_name(photo, size, thumb_type = "", mobile_bigger = False):
 	# this function is used for video thumbnails too
 	photo_suffix = "_"
@@ -147,7 +147,9 @@ def photo_cache_name(photo, size, thumb_type = "", mobile_bigger = False):
 	result = photo.cache_base + photo_suffix
 
 	return result
+
 def video_cache_name(video):
 	return video.cache_base + "_transcoded_" + Options.config['video_transcode_bitrate'] + "_" + str(Options.config['video_crf']) + ".mp4"
+
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))

@@ -466,7 +466,6 @@ class Media(object):
 
 	def _convert_to_degrees_minutes_seconds(self, value, ref):
 		# Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds
-		# Since the result is
 
 		# Degrees
 		d0 = value[0][0]
@@ -491,6 +490,7 @@ class Media(object):
 
 	def _convert_to_degrees_decimal(self, value, ref):
 		#Helper function to convert the GPS coordinates stored in the EXIF to degress in float format
+
 		# Degrees
 		d0 = value[0][0]
 		d1 = value[0][1]
