@@ -112,9 +112,14 @@ media_thumb_type = fixed_height
 # Disable this feature setting it to 1; values < 1 will be considered equivalent to 1
 mobile_thumbnail_factor = 2
 
+# the list of distance (in meters) for generating photos clusters
+# must be sorted upward, from little to big
+clustering_distances = [20, 1000, 50000]
+
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _f
 by_date_string = _bd
+by_gps_string = _bg
 cache_folder_separator = -
 
 

@@ -30,6 +30,7 @@ class TreeWalker:
 		message("Browsing", "start!", 3)
 		self.all_albums = list()
 		self.tree_by_date = {}
+		self.gps_cluster_list = list()
 		self.all_media = list()
 		self.all_album_composite_images = list()
 		self.album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
@@ -65,15 +66,98 @@ class TreeWalker:
 			next_level()
 			message("generated date albums", "", 5)
 			back_level()
+
+			# pprint.pprint(self.gps_cluster_list, width=200)
+			message("generating gps tree...", "", 4)
+			gps_tree = self.generate_gps_tree()
+			pprint.pprint(gps_tree, width=200)
+			next_level()
+			message("generated gps tree", "", 5)
+			back_level()
+			message("generating gps albums...", "", 4)
+			by_gps_album = self.generate_gps_albums(origin_album, gps_tree, Options.config['by_gps_string'])
+			# pprint.pprint(by_gps_album, width=200)
+			next_level()
+			message("generated gps albums", "", 5)
+			back_level()
 			origin_album.add_album(folders_album)
 			self.all_albums.append(origin_album)
 			if by_date_album is not None and not by_date_album.empty:
 				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
 				origin_album.add_album(by_date_album)
-			if not origin_album.empty:
-				origin_album.cache()
+			if by_gps_album is not None and not by_gps_album.empty:
+				self.all_cache_entries.append(Options.config['by_gps_string'] + ".json")
+				origin_album.add_album(by_gps_album)
+			self.all_albums_to_json_file(origin_album)
 		self.remove_stale()
 		message("complete", "", 4)
+
+	def all_albums_to_json_file(self, album):
+		for sub_album in album.albums_list:
+			self.all_albums_to_json_file(sub_album)
+		album.to_json_file()
+
+	def generate_gps_albums(self, up_album, cluster_list, gps_path):
+		next_level()
+		# reads the list of media with gps data and generates the corresponding set of albums
+		# works recursively on clustering_distances
+
+		print
+		print "up album", str(up_album)
+		pprint.pprint(cluster_list, width=100)
+		print "---> gps_path", gps_path
+
+		path = os.path.join(Options.config['album_path'], gps_path)
+		# print "---> path", path
+		album = Album(path)
+		album.parent = up_album
+		album.cache_base = cache_base(path)
+
+		smallest_cluster = False
+		max_file_date = None
+		if not isinstance(cluster_list, list):
+			cluster_list = [cluster_list]
+			smallest_cluster = True
+		for cluster in cluster_list:
+			_coordinates_path = coordinates_path(cluster['center']['latitude'], cluster['center']['longitude'])
+			sub_path = os.path.join(gps_path, _coordinates_path)
+			if not smallest_cluster:
+				if 'cluster_list' in cluster:
+					# print "aaaaaa"
+					# pprint.pprint(cluster['cluster_list'])
+					# print "$ $ $ $ $ $ $ $ $ $ $   ", sub_path
+					sub_album = self.generate_gps_albums(album, cluster['cluster_list'], sub_path)
+				else:
+					# we are at the smallest distance cluster level:
+					# cluster_list is a list of one object with only "center" and "media_list" attributes
+					# we call the generation function with that object instead of a list
+					sub_album = self.generate_gps_albums(album, cluster, sub_path)
+					# sub_album.num_media_in_album += len(cluster['media_list'])
+				# sub_album.cache_base = cache_base(sub_path)
+				# sub_album.cache_base = cache_base(sub_path)
+				album.add_album(sub_album)
+				album.num_media_in_sub_tree += len(cluster['media_list'])
+
+			for media in cluster['media_list']:
+				if not 'cluster_list' in cluster:
+					media.gps_path = sub_path
+				# print media
+				album.add_media(media)
+				media_date = max(media._attributes["dateTimeFile"], media._attributes["dateTimeDir"])
+				if max_file_date:
+					max_file_date = max(max_file_date, media_date)
+				else:
+					max_file_date = media_date
+
+		# album.cache_base = cache_base(path)
+		# print "-> cache_base:   ", album.cache_base
+		self.all_albums.append(album)
+		if album.num_media_in_sub_tree > 0:
+			self.generate_composite_image(album, max_file_date)
+		back_level()
+		return album
+
+
 	def generate_date_albums(self, origin_album):
 		next_level()
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
@@ -133,23 +217,15 @@ class TreeWalker:
 						else:
 							by_date_max_file_date = single_media_date
 					self.all_albums.append(day_album)
-					json_file = os.path.join(Options.config['cache_path'], day_album.json_file)
-					day_album.cache()
 					next_level()
 					message("day album elaborated", media[0].year + "-" + media[0].month + "-" + media[0].day, 4)
 					back_level()
 					self.generate_composite_image(day_album, day_max_file_date)
 				self.all_albums.append(month_album)
-				json_file = os.path.join(Options.config['cache_path'], month_album.json_file)
-				month_album.cache()
 				self.generate_composite_image(month_album, month_max_file_date)
 			self.all_albums.append(year_album)
-			json_file = os.path.join(Options.config['cache_path'], year_album.json_file)
-			year_album.cache()
 			self.generate_composite_image(year_album, year_max_file_date)
 		self.all_albums.append(by_date_album)
-		json_file = os.path.join(Options.config['cache_path'], by_date_album.json_file)
-		by_date_album.cache()
 		if by_date_album.num_media_in_sub_tree > 0:
 			self.generate_composite_image(by_date_album, by_date_max_file_date)
 		back_level()
@@ -167,6 +243,91 @@ class TreeWalker:
 		if not any(media.media_file_name == _media.media_file_name for _media in self.tree_by_date[media.year][media.month][media.day]):
 		#~ if not media in self.tree_by_date[media.year][media.month][media.day]:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
+
+	def add_media_to_gps_cluster_list(self, media):
+		# add the given media to a temporary structure where media are organized by gps according to various clustering radiuses
+
+		if media.has_gps_data:
+			found_cluster = False
+			smallest_distance = Options.config['clustering_distances'][0]
+			for cluster in self.gps_cluster_list:
+				if any(self.distance(media, _media) < smallest_distance for _media in cluster['media_list']):
+					# add media to this cluster
+					cluster['center']['latitude'] = self.recalculate_mean(cluster['center']['latitude'], len(cluster['media_list']), media.latitude)
+					cluster['center']['longitude'] = self.recalculate_mean(cluster['center']['longitude'], len(cluster['media_list']), media.longitude)
+					cluster['media_list'].append(media)
+					found_cluster = True
+					break
+			if not found_cluster:
+				# make a new cluster
+				new_cluster = {}
+				new_cluster['center'] = {}
+				new_cluster['center']['latitude'] = media.latitude
+				new_cluster['center']['longitude'] = media.longitude
+				new_cluster['media_list'] = list()
+				new_cluster['media_list'].append(media)
+				self.gps_cluster_list.append(new_cluster)
+
+	def generate_gps_tree(self):
+		# converts the gps_cluster_list to a tree of lists (like the date one, but date one is a tree of objects)
+
+		# first, starting from the smallest distance clusters, the clusters for the second smallest distance are to be generated, and so on
+		cluster_list = self.gps_cluster_list[:]
+		for _distance in Options.config['clustering_distances']:
+			if _distance == Options.config['clustering_distances'][0]:
+				continue
+			fathers = list()
+			for cluster in cluster_list:
+				if any(self.distance_from_coordinates(cluster['center']['latitude'], cluster['center']['longitude'], father['center']['latitude'], father['center']['longitude']) < _distance
+							for father in fathers):
+					# add cluster to this father
+					father['center']['latitude'] = self.recalculate_mean(father['center']['latitude'], len(father['media_list']), cluster['center']['latitude'], len(cluster['media_list']))
+					father['center']['longitude'] = self.recalculate_mean(father['center']['longitude'], len(father['media_list']), cluster['center']['longitude'], len(cluster['media_list']))
+					father['media_list'].extend(cluster['media_list'])
+					father['cluster_list'].append(cluster)
+				else:
+					# make a new cluster
+					father = {}
+					father['cluster_list'] = list()
+					father['center'] = {}
+					father['center']['latitude'] = cluster['center']['latitude']
+					father['center']['longitude'] = cluster['center']['longitude']
+					father['media_list'] = cluster['media_list'][:]
+					father['cluster_list'].append(cluster)
+					fathers.append(father)
+
+			# prepare for next distance
+			cluster_list = fathers[:]
+
+		return fathers
+
+	def recalculate_mean(self, old_mean, old_len, new_value, new_len = 1):
+		return (old_mean * old_len + new_value * new_len) / (old_len + new_len)
+
+
+	def distance(self, media1, media2):
+		# calculate the distance between the media gps coordinates
+		lat1 = media1.latitude
+		lon1 = media1.longitude
+		lat2 = media2.latitude
+		lon2 = media2.longitude
+
+		return self.distance_from_coordinates(lat1, lon1, lat2, lon2)
+
+	def distance_from_coordinates(self, lat1, lon1, lat2, lon2):
+		# https://gis.stackexchange.com/questions/61924/python-gdal-degrees-to-meters-without-reprojecting
+		# Calculate the great circle distance between two points on the earth (specified in decimal degrees)
+
+		# convert decimal degrees to radians
+		lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+		# haversine formula
+		dlon = lon2 - lon1
+		dlat = lat2 - lat1
+		a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+		c = 2 * math.asin(math.sqrt(a))
+		km = 6371 * c
+		return km * 1000
+
 	def listdir_sorted_by_time(self, path):
 		# this function returns the directory listing sorted by mtime
 		# it takes into account the fact that the file is a symlink to an unexistent file
@@ -232,6 +393,7 @@ class TreeWalker:
 							if not any(media.media_file_name == _media.media_file_name for _media in album.media):
 								self.all_media.append(media)
 								self.add_media_to_tree_by_date(media)
+								self.add_media_to_gps_cluster_list(media)
 						next_level()
 						message("added media to big lists", "", 5)
 						back_level()
@@ -425,6 +587,13 @@ class TreeWalker:
 					next_level()
 					message("added media to by date tree", "", 5)
 					back_level()
+
+					# the following function has a check on media already present
+					message("adding media to gps tree...", "", 5)
+					self.add_media_to_gps_cluster_list(media)
+					next_level()
+					message("added media to gps tree", "", 5)
+					back_level()
 				elif not media.is_valid:
 					next_level()
 					message("not image nor video", entry_with_path, 1)
@@ -432,12 +601,6 @@ class TreeWalker:
 				back_level()
 		if not album.empty:
 			next_level()
-			json_file = os.path.join(Options.config['cache_path'], album.json_file)
-			message("saving json file for album", "", 5)
-			album.cache()
-			next_level()
-			message("saved json file for album", os.path.basename(absolute_path), 4)
-			back_level()
 			message("adding album to big list...", "", 5)
 			self.all_albums.append(album)
 			next_level()

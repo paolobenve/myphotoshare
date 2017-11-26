@@ -43,9 +43,11 @@ class Album(object):
 		self.absolute_path = path
 		self.baseless_path = remove_album_path(path)
 		self.media_list = list()
+		self.media_with_gps_data_list = list()
 		self.albums_list = list()
 		self.media_list_is_sorted = True
 		self.albums_list_is_sorted = True
+		self.media_with_gps_data_list_is_sorted = True
 		self._subdir = ""
 		self.num_media_in_sub_tree = 0
 		self.num_media_in_album = 0
@@ -112,6 +114,10 @@ class Album(object):
 		if not any(media.media_file_name == _media.media_file_name for _media in self.media_list):
 			self.media_list.append(media)
 			self.media_list_is_sorted = False
+			if media.has_gps_data:
+				self.media_with_gps_data_list.append(media)
+				self.media_with_gps_data_list_is_sorted = False
+
 	def add_album(self, album):
 		self.albums_list.append(album)
 		self.albums_list_is_sorted = False
@@ -120,6 +126,9 @@ class Album(object):
 		if not self.media_list_is_sorted:
 			self.media_list.sort()
 			self.media_list_is_sorted = True
+		if not self.media_with_gps_data_list_is_sorted:
+			self.media_with_gps_data_list.sort(key=lambda _m: _m.latitude + _m.longitude)
+			self.media_with_gps_data_list_is_sorted = True
 		if not self.albums_list_is_sorted:
 			self.albums_list.sort()
 			self.albums_list_is_sorted = True
@@ -135,7 +144,7 @@ class Album(object):
 				return False
 		return True
 
-	def cache(self):
+	def to_json_file(self):
 		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
 			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
@@ -1231,6 +1240,19 @@ class Media(object):
 	@property
 	def year(self):
 		return str(self.date.year)
+
+	@property
+	def has_gps_data(self):
+		return "latitude" in self._attributes["metadata"]
+
+	@property
+	def latitude(self):
+		return self._attributes["metadata"]["latitude"]
+
+	@property
+	def longitude(self):
+		return self._attributes["metadata"]["longitude"]
+
 	@property
 	def month(self):
 		#~ return self.date.strftime("%B").capitalize() + " " + self.year
@@ -1257,6 +1279,13 @@ class Media(object):
 	@property
 	def day_album_path(self):
 		return self.month_album_path + "/" + self.day
+
+	@property
+	def gps_album_path(self):
+		if hasattr(self, "gps_path"):
+			return self.gps_path
+		else:
+			return ""
 
 	def __cmp__(self, other):
 		try:
@@ -1309,6 +1338,8 @@ class Media(object):
 		# media["monthAlbum"]		= self.month_album_path
 		media["dayAlbum"]          = self.day_album_path
 		media["dayAlbumCacheBase"] = cache_base(self.day_album_path, True)
+		media["gpsAlbum"]          = self.gps_album_path
+		media["gpsAlbumCacheBase"] = cache_base(self.gps_album_path, True)
 
 		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
 		media["albumName"]         = self.album_path
