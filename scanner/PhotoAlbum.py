@@ -1302,19 +1302,19 @@ class Media(object):
 			foldersAlbum = os.path.join(foldersAlbum, self.folders)
 
 		media = self.attributes
-		media["name"]			= self.name
-		media["cacheBase"]		= self.cache_base
-		media["date"]			= self.date
-		media["yearAlbum"]		= self.year_album_path
-		media["monthAlbum"]		= self.month_album_path
-		media["dayAlbum"]		= self.day_album_path
-		media["dayAlbumCacheBase"]	= cache_base(self.day_album_path, True)
+		media["name"]              = self.name
+		media["cacheBase"]         = self.cache_base
+		media["date"]              = self.date
+		# media["yearAlbum"]		= self.year_album_path
+		# media["monthAlbum"]		= self.month_album_path
+		media["dayAlbum"]          = self.day_album_path
+		media["dayAlbumCacheBase"] = cache_base(self.day_album_path, True)
 
 		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
-		media["albumName"]		= self.album_path
-		media["foldersAlbum"]		= foldersAlbum
-		media["foldersCacheBase"]	= self.album.cache_base
-		media["cacheSubdir"]		= self.album.subdir
+		media["albumName"]         = self.album_path
+		media["foldersAlbum"]      = foldersAlbum
+		media["foldersCacheBase"]  = self.album.cache_base
+		media["cacheSubdir"]       = self.album.subdir
 		return media
 
 class PhotoAlbumEncoder(json.JSONEncoder):

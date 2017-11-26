@@ -76,18 +76,17 @@ class TreeWalker:
 	def generate_date_albums(self, origin_album):
 		next_level()
 		# convert the temporary structure where media are organized by year, month, date to a set of albums
+
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		by_date_album.parent = origin_album
 		by_date_album.cache_base = cache_base(by_date_path)
-		#~ by_date_json_file_with_path = os.path.join(Options.config['cache_path'], by_date_album.json_file)
 		by_date_max_file_date = None
 		for year, months in self.tree_by_date.iteritems():
 			year_path = os.path.join(by_date_path, str(year))
 			year_album = Album(year_path)
 			year_album.parent = by_date_album
 			year_album.cache_base = cache_base(year_path)
-			#~ year_json_file_with_path = os.path.join(Options.config['cache_path'], year_album.json_file)
 			year_max_file_date = None
 			by_date_album.add_album(year_album)
 			for month, days in self.tree_by_date[year].iteritems():
@@ -95,7 +94,6 @@ class TreeWalker:
 				month_album = Album(month_path)
 				month_album.parent = year_album
 				month_album.cache_base = cache_base(month_path)
-				#~ month_json_file_with_path = os.path.join(Options.config['cache_path'], month_album.json_file)
 				month_max_file_date = None
 				year_album.add_album(month_album)
 				for day, media in self.tree_by_date[year][month].iteritems():
@@ -104,7 +102,6 @@ class TreeWalker:
 					day_album = Album(day_path)
 					day_album.parent = month_album
 					day_album.cache_base = cache_base(day_path)
-					#~ day_json_file_with_path = os.path.join(Options.config['cache_path'], day_album.json_file)
 					day_max_file_date = None
 					month_album.add_album(day_album)
 					for single_media in media:
@@ -158,7 +155,8 @@ class TreeWalker:
 		return by_date_album
 
 	def add_media_to_tree_by_date(self, media):
-		# add the given media to a temporary structure where media are organazide by year, month, date
+		# add the given media to a temporary structure where media are organized by year, month, date
+
 		if not media.year in self.tree_by_date.keys():
 			self.tree_by_date[media.year] = {}
 		if not media.month in self.tree_by_date[media.year].keys():
@@ -419,7 +417,8 @@ class TreeWalker:
 					next_level()
 					message("added media to big list", "", 5)
 					back_level()
-					# following function has a check on media already present
+
+					# the following function has a check on media already present
 					message("adding media to by date tree...", "", 5)
 					self.add_media_to_tree_by_date(media)
 					next_level()
@@ -471,6 +470,7 @@ class TreeWalker:
 						return [picked_image, random_number]
 				random_number -= subalbum.num_media_in_sub_tree
 		return [None, random_number]
+
 	def generate_composite_image(self, album, max_file_date):
 		composite_image_name = album.cache_base + ".jpg"
 		self.all_album_composite_images.append(composite_image_name)
