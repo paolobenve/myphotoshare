@@ -838,8 +838,7 @@ $(document).ready(function() {
 		if (currentMedia !== null) {
 			var scroller = $("#album-view");
 			scroller.stop().animate(
-				{ scrollLeft: thumb.parent().position().left + scroller.scrollLeft() - scroller.width() / 2 + thumb.width() / 2 },
-				"slow"
+				{ scrollLeft: thumb.parent().position().left + scroller.scrollLeft() - scroller.width() / 2 + thumb.width() / 2 }, "slow"
 			);
 		} else
 			$("html, body").stop().animate({ scrollTop: thumb.offset().top - $(window).height() / 2 + thumb.height() }, "slow");
