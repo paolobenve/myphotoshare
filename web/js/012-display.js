@@ -1980,16 +1980,16 @@ $(document).ready(function() {
 
 	$(document).on('keydown', function(e) {
 		if (! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			if (nextLink && e.keyCode === 39 && currentMedia !== null) {
-				// arrow right
+			if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
+				//            arrow right                  n
 				swipeLeft(nextLink);
 				return false;
-			} else if (prevLink && e.keyCode === 37 && currentMedia !== null) {
-				//        arrow left
+			} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80) && currentMedia !== null) {
+				//                   arrow left                   p
 				swipeRight(prevLink);
 				return false;
 			} else if (e.keyCode === 27 && ! Modernizr.fullscreen && fullScreenStatus) {
-				//               esc
+				//             esc
 				goFullscreen(e);
 				return false;
 			} else if (albumLink && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
@@ -2013,17 +2013,9 @@ $(document).ready(function() {
 				//                                        m
 				showMetadata(e);
 				return false;
-			} else if (currentMedia !== null && e.keyCode === 78) {
-				//                                        n
-				$("#next")[0].click();
-				return false;
 			} else if (currentMedia !== null && e.keyCode === 79) {
 				//                                        o
 				$("#original-link")[0].click();
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 80) {
-				//                                        p
-				$("#prev")[0].click();
 				return false;
 			} else if (currentMedia !== null && e.keyCode === 83) {
 				//                                        s
