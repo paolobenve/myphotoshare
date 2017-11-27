@@ -11,7 +11,8 @@ import time
 import random
 import math
 from PIL import Image
-#~ from pprint import pprint
+from pprint import pprint
+import pprint
 
 class TreeWalker:
 	def __init__(self):
@@ -67,16 +68,13 @@ class TreeWalker:
 			message("generated date albums", "", 5)
 			back_level()
 
-			# pprint.pprint(self.gps_cluster_list, width=200)
 			message("generating gps tree...", "", 4)
 			gps_tree = self.generate_gps_tree()
-			pprint.pprint(gps_tree, width=200)
 			next_level()
 			message("generated gps tree", "", 5)
 			back_level()
 			message("generating gps albums...", "", 4)
 			by_gps_album = self.generate_gps_albums(origin_album, gps_tree, Options.config['by_gps_string'])
-			# pprint.pprint(by_gps_album, width=200)
 			next_level()
 			message("generated gps albums", "", 5)
 			back_level()
@@ -102,13 +100,7 @@ class TreeWalker:
 		# reads the list of media with gps data and generates the corresponding set of albums
 		# works recursively on clustering_distances
 
-		print
-		print "up album", str(up_album)
-		pprint.pprint(cluster_list, width=100)
-		print "---> gps_path", gps_path
-
 		path = os.path.join(Options.config['album_path'], gps_path)
-		# print "---> path", path
 		album = Album(path)
 		album.parent = up_album
 		album.cache_base = cache_base(path)
@@ -123,9 +115,6 @@ class TreeWalker:
 			sub_path = os.path.join(gps_path, _coordinates_path)
 			if not smallest_cluster:
 				if 'cluster_list' in cluster:
-					# print "aaaaaa"
-					# pprint.pprint(cluster['cluster_list'])
-					# print "$ $ $ $ $ $ $ $ $ $ $   ", sub_path
 					sub_album = self.generate_gps_albums(album, cluster['cluster_list'], sub_path)
 				else:
 					# we are at the smallest distance cluster level:
@@ -133,15 +122,12 @@ class TreeWalker:
 					# we call the generation function with that object instead of a list
 					sub_album = self.generate_gps_albums(album, cluster, sub_path)
 					# sub_album.num_media_in_album += len(cluster['media_list'])
-				# sub_album.cache_base = cache_base(sub_path)
-				# sub_album.cache_base = cache_base(sub_path)
 				album.add_album(sub_album)
 				album.num_media_in_sub_tree += len(cluster['media_list'])
 
 			for media in cluster['media_list']:
 				if not 'cluster_list' in cluster:
 					media.gps_path = sub_path
-				# print media
 				album.add_media(media)
 				media_date = max(media._attributes["dateTimeFile"], media._attributes["dateTimeDir"])
 				if max_file_date:
@@ -149,8 +135,6 @@ class TreeWalker:
 				else:
 					max_file_date = media_date
 
-		# album.cache_base = cache_base(path)
-		# print "-> cache_base:   ", album.cache_base
 		self.all_albums.append(album)
 		if album.num_media_in_sub_tree > 0:
 			self.generate_composite_image(album, max_file_date)

@@ -19,7 +19,7 @@ import math
 import Options
 import hashlib
 import sys
-#~ from pprint import pprint
+from pprint import pprint
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -87,7 +87,6 @@ class Album(object):
 
 	@property
 	def json_file(self):
-		#~ return json_name(self.path)
 		return self.cache_base + ".json"
 
 	@property
