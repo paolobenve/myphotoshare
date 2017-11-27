@@ -376,6 +376,7 @@ a.title-anchor.mobile {
 }
 
 #media-name {
+	padding: 0 .5em;
 	margin: 0 0 0 0;
 	color: lime;
 	font-weight: bold;
