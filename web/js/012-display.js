@@ -367,7 +367,7 @@ $(document).ready(function() {
 	}
 
 	function setTitle() {
-		var title = "", documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle;
+		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, sortButtons, m;
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
@@ -461,10 +461,14 @@ $(document).ready(function() {
 			if (i != 1 || components[i] != Options.folders_string) {
 				if (i < components.length - 1 || currentMedia !== null) {
 					if (i != 0 || ! (dateTitle || gpsTitle)) {
-						if (i == 1 && (dateTitle || gpsTitle))
-							title = "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "\">" + title;
-						else
-							title += "<a class='" + titleAnchorClasses + "' href=\"#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "\">";
+						if (i == 1 && (dateTitle || gpsTitle)) {
+							title = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>" + title;
+						} else {
+							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
+							if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
+								titleAdd += " title='" + _t("#place-title") + Options.clustering_distances[4 - i] + _t("#place-title-end") + "[" +components[i].replace('_', ', ') + "]'";
+							title += titleAdd + ">";
+						}
 					}
 				} else {
 					title += "<span class='title-no-anchor'>";
@@ -473,8 +477,18 @@ $(document).ready(function() {
 					title += "(" + _t("#by-date") + ")";
 				else if (i == 1 && gpsTitle)
 					title += "(" + _t("#by-gps") + ")";
-				else
-					title += textComponents[i];
+				else {
+					if (gpsTitle && i == 2) {
+						title += _t("#place-2");
+					}
+					else if (gpsTitle && i == 3) {
+						title += _t("#place-1");
+					}
+					else if (gpsTitle && i == 4) {
+						title += _t("#place-0");
+					} else
+						title += textComponents[i];
+				}
 
 				if (i < components.length - 1 || currentMedia !== null) {
 					if (! (i == 0 && (dateTitle || gpsTitle)))
