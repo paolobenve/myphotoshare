@@ -90,20 +90,25 @@ def report_times():
 	print "Videos: total = ", (7 - len(_num_video)) * " ", _num_video, ", processed = ", (7 - len(_num_video_processed)) * " ", _num_video_processed
 
 message.level = 0
+
 def next_level(verbose = 0):
 	if (verbose <= max_verbose):
 		message.level += 1
+
 def back_level(verbose = 0):
 	if (verbose <= max_verbose):
 		message.level -= 1
+
 def trim_base_custom(path, base):
 	if path.startswith(base):
 		path = path[len(base):]
 	if path.startswith('/'):
 		path = path[1:]
 	return path
+
 def remove_album_path(path):
 	return trim_base_custom(path, Options.config['album_path'])
+
 def remove_folders_marker(path):
 	marker_position = path.find(Options.config['folders_string'])
 	if marker_position == 0:

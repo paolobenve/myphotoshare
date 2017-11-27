@@ -42,6 +42,7 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Verbosity levels in scanner
 * Reads and manages gps data
 
+
 ### Usability:
 
 * Swipe gestures for mobile

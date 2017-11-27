@@ -477,6 +477,7 @@ $(document).ready(function() {
 					title += "(" + _t("#by-date") + ")";
 				else
 					title += textComponents[i];
+
 				if (i < components.length - 1 || currentMedia !== null) {
 					if (! (i == 0 && dateTitle))
 						title += "</a>";
@@ -817,6 +818,7 @@ $(document).ready(function() {
 	function scrollToThumb() {
 		var media, thumb;
 		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
+
 
 		media = currentMedia;
 		if (media === null) {
@@ -1821,7 +1823,6 @@ $(document).ready(function() {
 			showMedia(currentAlbum);
 		}
 		else {
-
 			$("#day-folders-view-container").hide();
 		}
 		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
