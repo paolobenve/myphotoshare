@@ -28,7 +28,7 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Consistent hash url format
 * Optional Google Analytics and Piwik integration
 * Optional server-side authentication support
-* Media can be browsed by folder or by date
+* Media can be browsed by folder or by date or by gps data
 * Many customization through config file
 * Cache folder can be managed with subdirs (useful for large repositories)
 * Albums server folder can be anywhere on the server
@@ -37,10 +37,10 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Single `index.php` file (crawlers and social media do not execute javascript); `php` does a bit of work:
 * - inserts link tag in <head></head> in order to let social media see the shared content
 * - applies basic options to home page
+* - insert proper parameters for analytics tracking
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
 * Verbosity levels in scanner
-* Reads and manages gps data
 
 
 ### Usability:
@@ -284,6 +284,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 ### version 2.9 (Decembre .., 2017):
 
 * Manages photos gps data
+* new option `clustering_distances`: an ascending list of distances for clustering geotagged photos
 
 ### version 2.8 (November 18, 2017):
 

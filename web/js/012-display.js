@@ -452,6 +452,7 @@ $(document).ready(function() {
 		var textComponents = [];
 		for (i = 0; i < components.length; ++i)
 			textComponents[i] = components[i];
+
 		if (dateTitle) {
 			if (components.length >= 4) {
 				textComponents[3] = components[3].replace(components[2], '').trim();
@@ -460,6 +461,7 @@ $(document).ready(function() {
 				}
 			}
 		}
+
 		// generate the title in the page top
 		titleAnchorClasses = 'title-anchor';
 		if (isMobile.any())
