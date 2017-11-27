@@ -56,7 +56,8 @@ class Album(object):
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
 			(
-				self.baseless_path.find(Options.config['by_date_string']) != 0
+				self.baseless_path.find(Options.config['by_date_string']) != 0 or
+				self.baseless_path.find(Options.config['by_gps_string']) != 0
 				#~ and self.baseless_path != ""
 			)
 		):
@@ -230,7 +231,8 @@ class Album(object):
 		path_to_dict = self.path
 		folder_position = path_to_dict.find(Options.config['folders_string'])
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
-		if path_to_dict and by_date_position == -1 and self.cache_base != "root" and folder_position != 0:
+		by_gps_position = path_to_dict.find(Options.config['by_gps_string'])
+		if path_to_dict and by_date_position == -1 and by_gps_position == -1 and self.cache_base != "root" and folder_position != 0:
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
 
 		ancestors_cache_base = list()
