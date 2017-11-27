@@ -13,7 +13,7 @@ a:hover {
 	color: #FFAD27;
 }
 
-#title, #title:hover, #day-folders-view-container{
+#title, #title:hover, #day-gps-folders-view-container{
 	font-weight: bold;
 	font-size: medium;
 }
@@ -47,17 +47,18 @@ a.title-anchor.mobile {
 	color: orange !important;
 }
 
-#day-folders-view-container {
+/*#day-gps-folders-view-container,*/
+#folders-view-container, #by-date-view-container, #by-gps-view-container {
 	font-variant: small-caps;
 	text-align: center;
 	border-radius: .5em;
-	padding: .5em;
 	opacity: 0.5;
-}
-
-#date-view, #folders-view {
 	color: inherit;
 	display: none;
+}
+
+#folders-view, #by-date-view, #by-gps-view {
+	padding: .5em;
 }
 
 #loading {

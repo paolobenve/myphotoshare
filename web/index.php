@@ -138,12 +138,23 @@
 	</div>
 	<div id="title-container">
 		<div id="buttons-container">
-			<a id="day-folders-view-link" href="javascript:void(0)">
-				<div id="day-folders-view-container">
-					<span id="date-view"></span>
-					<span id="folders-view"></span>
-				</div>
-			</a>
+			<span id="day-gps-folders-view-container">
+				<span id="folders-view-container">
+					<a id="folders-view-link" href="javascript:void(0)">
+						<span id="folders-view"></span>
+					</a>
+				</span>
+				<span id="by-date-view-container">
+					<a id="by-date-view-link" href="javascript:void(0)">
+						<span id="by-date-view"></span>
+					</a>
+				</span>
+				<span id="by-gps-view-container">
+					<a id="by-gps-view-link" href="javascript:void(0)">
+						<span id="by-gps-view"></span>
+					</a>
+				</span>
+			</span>
 		</div>
 		<div id="title">
 			<span id="title-string"></span>

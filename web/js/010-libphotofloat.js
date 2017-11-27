@@ -86,6 +86,11 @@
 	};
 
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
+		// this vars are defined here and not at the beginning of the file because the options must have been read
+		PhotoFloat.foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
+		PhotoFloat.dayStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
+		PhotoFloat.byGpsStringWithTrailingSeparator = Options.by_gps_string + Options.cache_folder_separator;
+
 		var hashParts, lastSlashPosition, slashNumber, albumHash, mediaHash = null, foldersHash = null, media = null;
 		$("#error-too-many-images").hide();
 		hash = PhotoFloat.cleanHash(hash);
@@ -162,8 +167,8 @@
 		return media.cacheBase;
 	};
 	PhotoFloat.mediaHashURIEncoded = function(album, media) {
-		var hash, bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
-		if (album.cacheBase.indexOf(bydateStringWithTrailingSeparator) === 0)
+		var hash;
+		if (album.cacheBase.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 || album.cacheBase.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0)
 			hash = PhotoFloat.pathJoin([
 				encodeURIComponent(album.cacheBase),
 				encodeURIComponent(media.foldersCacheBase),
@@ -177,9 +182,9 @@
 		return hash;
 	};
 	PhotoFloat.mediaHashFolder = function(album, media) {
-		var hash, bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
+		var hash;
 		hash = media.cacheBase;
-		if (hash.indexOf(bydateStringWithTrailingSeparator) === 0) {
+		if (hash.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 || hash.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0) {
 			media.completeName = PhotoFloat.pathJoin([media.foldersAlbum, media.name]);
 			hash = PhotoFloat.pathJoin([media.foldersAlbum.cacheBase, media.cacheBase]);
 		}
@@ -198,8 +203,6 @@
 	};
 	PhotoFloat.mediaPath = function(album, media, size) {
 		var suffix = "_", hash, rootString = "root-";
-		var bydateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
-		var foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
 		if (
 			media.mediaType == "photo" ||
 			media.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1
@@ -236,10 +239,12 @@
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
-			if (hash.indexOf(foldersStringWithTrailingSeparator) === 0)
-				hash = hash.substring(foldersStringWithTrailingSeparator.length);
-			else if (hash.indexOf(bydateStringWithTrailingSeparator) === 0)
-				hash = hash.substring(bydateStringWithTrailingSeparator.length);
+			if (hash.indexOf(PhotoFloat.foldersStringWithTrailingSeparator) === 0)
+				hash = hash.substring(PhotoFloat.foldersStringWithTrailingSeparator.length);
+			else if (hash.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0)
+				hash = hash.substring(PhotoFloat.byDateStringWithTrailingSeparator.length);
+			else if (hash.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0)
+				hash = hash.substring(PhotoFloat.byGpsStringWithTrailingSeparator.length);
 		}
 		if (media.cacheSubdir)
 			return PhotoFloat.pathJoin([Options.server_cache_path, media.cacheSubdir, hash]);
