@@ -534,7 +534,7 @@ $(document).ready(function() {
 		}
 
 		// leave only the last link on mobile, the last two otherwise
-		linksToLeave = 2;
+		linksToLeave = 4;
 		if (isMobile.any())
 			linksToLeave = 1;
 		numLinks = title.split("<a ").length - 1;
