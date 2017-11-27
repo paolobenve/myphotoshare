@@ -1676,7 +1676,7 @@ $(document).ready(function() {
 		if (typeof currentMedia.metadata.duration !== "undefined")
 			text += "<tr><td id=\"metadata-data-duration\"></td><td>" + currentMedia.metadata.duration + " sec</td></tr>";
 		if (typeof currentMedia.metadata.latitude !== "undefined")
-			text += "<tr class='gps'><td id=\"metadata-data-latitude\"></td><td>" + currentMedia.metadata.latitudeMS + " </td></tr>";
+			text += "<tr id='map-link' class='gps'><td id=\"metadata-data-latitude\"></td><td>" + currentMedia.metadata.latitudeMS + " </td></tr>";
 		if (typeof currentMedia.metadata.longitude !== "undefined")
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
@@ -2001,6 +2001,10 @@ $(document).ready(function() {
 				//                                              arrow down           page down
 				swipeUp(mediaLink);
 				return false;
+			} else if (currentMedia !== null && e.keyCode === 68) {
+				//                                        d
+				$("#download-link")[0].click();
+				return false;
 			} else if (currentMedia !== null && e.keyCode === 70) {
 				//                                        f
 				goFullscreen(e);
@@ -2008,6 +2012,22 @@ $(document).ready(function() {
 			} else if (currentMedia !== null && e.keyCode === 77) {
 				//                                        m
 				showMetadata(e);
+				return false;
+			} else if (currentMedia !== null && e.keyCode === 78) {
+				//                                        n
+				$("#next")[0].click();
+				return false;
+			} else if (currentMedia !== null && e.keyCode === 79) {
+				//                                        o
+				$("#original-link")[0].click();
+				return false;
+			} else if (currentMedia !== null && e.keyCode === 80) {
+				//                                        p
+				$("#prev")[0].click();
+				return false;
+			} else if (currentMedia !== null && e.keyCode === 83) {
+				//                                        s
+					$("#map-link")[0].click();
 				return false;
 			} else
 				return true;
@@ -2057,6 +2077,8 @@ $(document).ready(function() {
 	$("#metadata").on('click', showMetadataFromMouse);
 
 	$("#fullscreen").on('click', goFullscreenFromMouse);
+	$("#next").attr("title", _t("#next-media-title"));
+	$("#prev").attr("title", _t("#prev-media-title"));
 
 	function goFullscreen(e) {
 		$("#media").off();
