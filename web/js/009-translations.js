@@ -57,6 +57,7 @@ var translations =
 			"#metadata-data-duration": "Duration",
 			"#metadata-data-latitude": "Latitude",
 			"#metadata-data-longitude": "Longitude",
+			"#show-map": "Show the place where the photo was taken using ",
 		},
 		'it': {
 			"#metadata-show": "metadati",
@@ -115,6 +116,7 @@ var translations =
 			"#metadata-data-duration": "Durata",
 			"#metadata-data-latitude": "Latitudine",
 			"#metadata-data-longitude": "Longitudine",
+			"#show-map": "Mostra il luogo in cui fu scattata la foto usando ",
 		},
 		'es': {
 			"#metadata-show": "metadatos",
@@ -173,5 +175,6 @@ var translations =
 			"#metadata-data-duration": "Duración",
 			"#metadata-data-latitude": "Latitud",
 			"#metadata-data-longitude": "Longitud",
+			"#show-map": "Muestra el lugar donde la foto fue tomada usando ",
 		}
 	};

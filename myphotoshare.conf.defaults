@@ -130,6 +130,13 @@ cache_folder_separator = -
 # the server path where js will search the photo/video albums
 server_album_path = albums
 
+# the service to use for geotag maps:
+# available values: openstreetmap, googlemaps
+map_service = openstreetmap
+
+# the zoom value to show the map without
+map_zoom = 20
+
 ###########################################################
 # user interface options
 ###########################################################

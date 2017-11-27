@@ -1386,6 +1386,7 @@ $(document).ready(function() {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
 		var prevMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
 		var nextReducedPhoto, prevReducedPhoto;
+		var link, linkTitle;
 
 		mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentMedia);
 		firstEscKey = true;
@@ -1680,9 +1681,16 @@ $(document).ready(function() {
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
-		$('#metadata tr.gps').on('click', function(ev) {
+		linkTitle = _t('#show-map') + Options.map_service
+		$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
 			ev.stopPropagation();
-			window.open('http://www.openstreetmap.org/#map=14/' + currentMedia.metadata.latitude + '/' + currentMedia.metadata.longitude, '_blank');
+			if (Options.map_service == 'openstreetmap') {
+				link = 'http://www.openstreetmap.org/#map=' + Options.map_zoom + '/' + currentMedia.metadata.latitude + '/' + currentMedia.metadata.longitude;
+			}
+			else if (Options.map_service == 'googlemaps') {
+				link = 'https://www.google.com/maps/@' + currentMedia.metadata.latitude + ',' + currentMedia.metadata.longitude + ',' + Options.map_zoom + 'z';
+			}
+			window.open(link, '_blank');
 		});
 
 		translate();
