@@ -453,15 +453,6 @@ $(document).ready(function() {
 		for (i = 0; i < components.length; ++i)
 			textComponents[i] = components[i];
 
-		// if (dateTitle) {
-		// 	if (components.length >= 4) {
-		// 		textComponents[3] = components[3].replace(components[2], '').trim();
-		// 		if (components.length >= 5) {
-		// 			textComponents[4] = components[4].replace(textComponents[3], '').replace(textComponents[2], '').trim();
-		// 		}
-		// 	}
-		// }
-
 		// generate the title in the page top
 		titleAnchorClasses = 'title-anchor';
 		if (isMobile.any())
