@@ -60,7 +60,7 @@ $(document).ready(function() {
 	var fromEscKey = false;
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
-	var mapZooms = []
+	var mapZooms = [];
 
 	/* Displays */
 
@@ -456,6 +456,7 @@ $(document).ready(function() {
 			textComponents[i] = components[i];
 
 		// generate the title in the page top
+		var anchorOpened = false, spanOpened = false;
 		titleAnchorClasses = 'title-anchor';
 		if (isMobile.any())
 			titleAnchorClasses += ' mobile';
@@ -465,15 +466,18 @@ $(document).ready(function() {
 					if (i != 0 || ! (dateTitle || gpsTitle)) {
 						if (i == 1 && (dateTitle || gpsTitle)) {
 							title = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>" + title;
+							anchorOpened = true;
 						} else {
 							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
 							if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
 								titleAdd += " title='" + _t("#place-title") + Options.clustering_distances[4 - i] + _t("#place-title-end") + "[" +components[i].replace('_', ', ') + "]'";
 							title += titleAdd + ">";
+							anchorOpened = true;
 						}
 					}
 				} else {
 					title += "<span class='title-no-anchor'>";
+					spanOpened = true;
 				}
 				if (i == 1 && dateTitle)
 					title += "(" + _t("#by-date") + ")";
@@ -482,7 +486,7 @@ $(document).ready(function() {
 				else {
 					if (gpsTitle && i >= 2 && i <= 4) {
 						// i == 2 corresponds to level 2 (town), i == 4 to level 0 (place),
-						title += _t("#place-" + (4 - i).toString());
+						title += _t("#place-names")[4 - i].toString();
 						if (currentMedia !== null) {
 							latitude = currentMedia.metadata.latitude;
 							longitude = currentMedia.metadata.longitude;
@@ -491,16 +495,26 @@ $(document).ready(function() {
 							 latitude = arrayCoordinates[i - 2][0];
 							 longitude = arrayCoordinates[i - 2][1];
 						}
-						title += " <a href=" + mapLink(latitude, longitude, mapZooms[(4 - i)]) + " target='_blank'>" +
-											"<img title='" + _t("#place-" + (4 - i).toString() + "-world-title") + "' height='15px' src='img/world.png'>" +
-											"</a> ";
+						if (anchorOpened) {
+							title += "</a>";
+							anchorOpened = false;
+						} else if (spanOpened) {
+							title += "</span>";
+							spanOpened = false;
+						}
+						title += "<a href=" + mapLink(latitude, longitude, mapZooms[(4 - i)]) + " target='_blank'>" +
+											"<img class='title-img' title='" + _t("#place-icon-titles")[4 - i].toString() + "' height='15px' src='img/world.png'>" +
+											"</a>";
 					} else
 						title += textComponents[i];
 				}
 
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (! (i == 0 && (dateTitle || gpsTitle)))
-						title += "</a>";
+					if (! (i == 0 && (dateTitle || gpsTitle))) {
+						if (anchorOpened)
+							title += "</a>";
+						anchorOpened = false;
+					}
 				} else {
 					if (! isMobile.any()) {
 						title += " <span id=\"title-count\">(";
@@ -546,12 +560,10 @@ $(document).ready(function() {
 				title += "&raquo;";
 		}
 
-		// leave only the last link on mobile, the last two otherwise
-		linksToLeave = 4;
-		if (isMobile.any())
-			linksToLeave = 1;
-		numLinks = title.split("<a ").length - 1;
-		if (numLinks > linksToLeave) {
+		// leave only the last link on mobile
+		linksToLeave = 1;
+		numLinks = title.split("<a class=").length - 1;
+		if (isMobile.any() && numLinks > linksToLeave) {
 			for (i = 1; i <= numLinks - linksToLeave; i ++) {
 				beginLink = title.indexOf("<a class=", 3);
 				hiddenTitle += title.substring(0, beginLink);
@@ -904,6 +916,8 @@ $(document).ready(function() {
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, margin, imgTitle;
 
+		PhotoFloat.subalbumIndex = 0;
+
 		if (Options.albums_slide_style)
 			slideBorder = 3;
 
@@ -1066,6 +1080,7 @@ $(document).ready(function() {
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 
+								PhotoFloat.subalbumIndex ++;
 								mediaWidth = randomMedia.metadata.size[0];
 								mediaHeight = randomMedia.metadata.size[1];
 								if (Options.album_thumb_type == "fit") {
@@ -1133,6 +1148,14 @@ $(document).ready(function() {
 										folder += "-" + folderArray[2];
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
+								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
+									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator).slice(1);
+									arrayLatitudeLongitude = folderArray[folderArray.length - 1].split('_');
+									for (var i = 0; i < 2; i++)
+										arrayLatitudeLongitude[i] = parseFloat(arrayLatitudeLongitude[i]);
+									folder = "<span><a href='" + mapLink(arrayLatitudeLongitude[0], arrayLatitudeLongitude[1], mapZooms[(3 - folderArray.length)])+ "' target='_blank'>" +
+													_t("#place-names")[3 - folderArray.length] + " " + PhotoFloat.subalbumIndex +
+													"</a></span>";
 								}
 								else {
 									folder = subalbum.path;

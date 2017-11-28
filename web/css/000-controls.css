@@ -30,6 +30,10 @@ a:hover {
 	font-weight: bold;
 }
 
+img.title-img {
+	padding-right: .5em;
+}
+
 .title-anchor, .title-no-anchor {
 	padding: 0 .5em;
 }
@@ -107,6 +111,10 @@ a.title-anchor.mobile {
 .album-caption {
 	margin: 0 auto;
 	height: 3em;
+}
+
+.album-caption a {
+	color: inherit;
 }
 
 .album-caption-count {

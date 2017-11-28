@@ -1,4 +1,4 @@
-# myphotoshare v. 2.9
+# myphotoshare v. 3.0 beta
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -283,7 +283,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-### version 2.9 (Decembre .., 2017):
+### version 3.0 beta (December 1, 2017):
 
 * Manages photos gps data
 * new option `clustering_distances`: an ascending list of distances for clustering geotagged photos
