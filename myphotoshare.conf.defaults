@@ -131,11 +131,11 @@ cache_folder_separator = -
 server_album_path = albums
 
 # the service to use for geotag maps:
-# available values: openstreetmap, googlemaps
-map_service = openstreetmap
-
-# the zoom value to show the map without
-map_zoom = 20
+# available values:
+# - openstreetmap (no marker)
+# - googlemaps (no marker)
+# - osmtools (with marker)
+map_service = osmtools
 
 ###########################################################
 # user interface options

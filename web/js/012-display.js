@@ -60,6 +60,7 @@ $(document).ready(function() {
 	var fromEscKey = false;
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
+	var mapZooms = []
 
 	/* Displays */
 
@@ -315,6 +316,7 @@ $(document).ready(function() {
 		var sortNormalDateClass = sortDateClass + sortNormalClass;
 		var currentSort = _t(".current-sort");
 		var arrayActiveSelectors;
+		var latitude, longitude;
 
 		$(sortReverseNameClass).attr("title", _t(sort) + _t(".by-name") + _t(".sort-reverse"));
 		$(sortReverseDateClass).attr("title", _t(sort) + _t(".by-date") + _t(".sort-reverse"));
@@ -478,14 +480,20 @@ $(document).ready(function() {
 				else if (i == 1 && gpsTitle)
 					title += "(" + _t("#by-gps") + ")";
 				else {
-					if (gpsTitle && i == 2) {
-						title += _t("#place-2");
-					}
-					else if (gpsTitle && i == 3) {
-						title += _t("#place-1");
-					}
-					else if (gpsTitle && i == 4) {
-						title += _t("#place-0");
+					if (gpsTitle && i >= 2 && i <= 4) {
+						// i == 2 corresponds to level 2 (town), i == 4 to level 0 (place),
+						title += _t("#place-" + (4 - i).toString());
+						if (currentMedia !== null) {
+							latitude = currentMedia.metadata.latitude;
+							longitude = currentMedia.metadata.longitude;
+						} else {
+							 arrayCoordinates = cacheBaseToCoordinateArray(currentAlbum.ancestorsCacheBase[i]);
+							 latitude = arrayCoordinates[i - 2][0];
+							 longitude = arrayCoordinates[i - 2][1];
+						}
+						title += " <a href=" + mapLink(latitude, longitude, mapZooms[(4 - i)]) + " target='_blank'>" +
+											"<img title='" + _t("#place-" + (4 - i).toString() + "-world-title") + "' height='15px' src='img/world.png'>" +
+											"</a> ";
 					} else
 						title += textComponents[i];
 				}
@@ -810,6 +818,16 @@ $(document).ready(function() {
 			}
 			setOptions();
 		}
+	}
+
+	function cacheBaseToCoordinateArray(cacheBase) {
+		array = cacheBase.split(Options.cache_folder_separator).slice(1);
+		for (var i = 0; i < array.length; i++) {
+			array[i] = array[i].split('_');
+			for (var j = 0; j < 2; j++)
+					array[i][j] = parseFloat(array[i][j]);
+		}
+		return array;
 	}
 
 	// see https://stackoverflow.com/questions/1069666/sorting-javascript-object-by-property-value
@@ -1698,19 +1716,26 @@ $(document).ready(function() {
 		linkTitle = _t('#show-map') + Options.map_service
 		$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
 			ev.stopPropagation();
-			if (Options.map_service == 'openstreetmap') {
-				link = 'http://www.openstreetmap.org/#map=' + Options.map_zoom + '/' + currentMedia.metadata.latitude + '/' + currentMedia.metadata.longitude;
-			}
-			else if (Options.map_service == 'googlemaps') {
-				link = 'https://www.google.com/maps/@' + currentMedia.metadata.latitude + ',' + currentMedia.metadata.longitude + ',' + Options.map_zoom + 'z';
-			}
-			window.open(link, '_blank');
+			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, mapZooms[0]), '_blank');
 		});
 
 		translate();
 
 		$("#subalbums").hide();
 		$("#media-view").show();
+	}
+
+	function mapLink(latitude, longitude, zoom) {
+		if (Options.map_service == 'openstreetmap') {
+			link = 'http://www.openstreetmap.org/#map=' + zoom + '/' + latitude + '/' + longitude;
+		}
+		else if (Options.map_service == 'googlemaps') {
+			link = 'https://www.google.com/maps/@' + latitude + ',' + longitude + ',' + zoom + 'z';
+		}
+		else if (Options.map_service == 'osmtools') {
+			link = 'http://m.osmtools.de/index.php?mlon=' + longitude + '&mlat=' + latitude + '&icon=6&zoom=' + zoom;
+		}
+		return link;
 	}
 
 	function setOptions() {
@@ -1946,6 +1971,10 @@ $(document).ready(function() {
 				dataType: "json",
 				url: optionsFile,
 				success: function(data) {
+					// for map zoom levels, see http://wiki.openstreetmap.org/wiki/Zoom_levels
+					// levelZeroSpecificDistance is the specific distance (m/pixel) for zoom level 0
+					var levelZeroSpecificDistance = 156412;
+
 					for (var key in data)
 						if (data.hasOwnProperty(key))
 							Options[key] = data[key];
@@ -1958,6 +1987,11 @@ $(document).ready(function() {
 					byGpsRegex = "^" + Options.by_gps_string + "\/";
 
 					maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
+
+					for (var i = 0; i < Options.clustering_distances.length; i ++) {
+						// the formula assures that 100px == 2 * clustering distance
+						mapZooms[i] = Math.floor(Math.log2(50 * levelZeroSpecificDistance / Options.clustering_distances[i]))
+					}
 
 					callback(location.hash, hashParsed, die);
 				},

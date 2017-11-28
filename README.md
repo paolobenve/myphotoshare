@@ -287,7 +287,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 * Manages photos gps data
 * new option `clustering_distances`: an ascending list of distances for clustering geotagged photos
-* new options `map_service` (can be "openstreetmap" or "googlemaps") and `map_zoom`
+* new options `map_service`: can be "openstreetmap", "googlemaps", or osmtools; the last allow a marker on the map
 
 ### version 2.8 (November 18, 2017):
 
