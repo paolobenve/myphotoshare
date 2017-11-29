@@ -419,6 +419,10 @@ a.title-anchor.mobile {
 	white-space: normal;
 }
 
+.media-caption-coordinates {
+	font-size: 70%;
+}
+
 .album-caption {
 	font-size: inherit;
 	height: 3em;
