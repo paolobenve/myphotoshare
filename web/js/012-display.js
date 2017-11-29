@@ -1153,8 +1153,9 @@ $(document).ready(function() {
 									arrayLatitudeLongitude = folderArray[folderArray.length - 1].split('_');
 									for (var i = 0; i < 2; i++)
 										arrayLatitudeLongitude[i] = parseFloat(arrayLatitudeLongitude[i]);
-									folder = "<span><a href='" + mapLink(arrayLatitudeLongitude[0], arrayLatitudeLongitude[1], mapZooms[(3 - folderArray.length)])+ "' target='_blank'>" +
-													_t("#place-names")[3 - folderArray.length] + " " + PhotoFloat.subalbumIndex +
+									var folderTitle = _t("#place-icon-titles")[3 - folderArray.length].toString();
+									folder = "<span class='gps-folder'><a href='" + mapLink(arrayLatitudeLongitude[0], arrayLatitudeLongitude[1], mapZooms[(3 - folderArray.length)])+ "' title='" + folderTitle + "' target='_blank'>" +
+													_t("#place-names")[3 - folderArray.length] + " " + PhotoFloat.subalbumIndex + "<img class='title-img' title='" + folderTitle + "' height='15px' src='img/world.png'>"
 													"</a></span>";
 								}
 								else {
