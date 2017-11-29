@@ -490,11 +490,11 @@ class Media(object):
 		s1 = value[2][1]
 		s = int((float(s0) / float(s1)) * 1000) / 1000.0
 
-		result = ''
-		if ref == "S" or ref == "W":
-			result = '-'
+		# result = ''
+		# if ref == "S" or ref == "W":
+		# 	result = '-'
 
-		result += str(d) + 'º ' + str(m) + '\' ' + str(s) + '"'
+		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
 
 		return result
 
