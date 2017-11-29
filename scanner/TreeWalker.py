@@ -526,7 +526,7 @@ class TreeWalker:
 					else:
 						if cached_media is None:
 							message("media not cached", "", 4)
-						else:
+						elif cache_hit:
 							if not os.path.exists(absolute_cache_file):
 								message("unexistent reduction/thumbnail", absolute_cache_file, 4)
 							else:
