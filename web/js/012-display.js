@@ -992,8 +992,15 @@ $(document).ready(function() {
 									"/>" +
 								"</div>" +
 								"<div class=\"media-caption\">" +
-								currentAlbum.media[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">") +
-								"</div>" +
+								currentAlbum.media[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">");
+					if (currentAlbum.path.indexOf(Options.by_gps_string) === 0) {
+						var latitude = currentAlbum.media[i].metadata.latitudeMS;
+						var longitude = currentAlbum.media[i].metadata.longitudeMS;
+						imageString += "<br /><span class='media-caption-coordinates'>" +
+							"(" + latitude + ", " + longitude + ")" +
+							"</span>";
+					}
+					imageString += "</div>" +
 							"</div>";
 					image = $(imageString);
 
