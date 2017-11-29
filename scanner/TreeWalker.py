@@ -359,7 +359,7 @@ class TreeWalker:
 					# the following is the instruction which could raise the error
 					cached_album = Album.from_cache(json_file, album_cache_base)
 					next_level()
-					message("read json file", "", 5)
+					message("json file read", "", 5)
 					back_level()
 					if (
 						file_mtime(absolute_path) <= file_mtime(json_file) and
@@ -475,7 +475,7 @@ class TreeWalker:
 					message("reading cache media from cached album...", "", 5)
 					cached_media = cached_album.media_from_path(entry_with_path)
 					next_level()
-					message("read cache media", "", 5)
+					message("cache media read", "", 5)
 					back_level()
 					if (
 						cached_media and
