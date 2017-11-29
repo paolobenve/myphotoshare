@@ -234,8 +234,9 @@ class TreeWalker:
 		if media.has_gps_data:
 			found_cluster = False
 			smallest_distance = Options.config['clustering_distances'][0]
+			# check if media falls short with any of media in already generated clusters
 			for cluster in self.gps_cluster_list:
-				if any(self.distance(media, _media) < smallest_distance for _media in cluster['media_list']):
+				if any(self.distance_between_media(media, _media) < smallest_distance for _media in cluster['media_list']):
 					# add media to this cluster
 					cluster['center']['latitude'] = self.recalculate_mean(cluster['center']['latitude'], len(cluster['media_list']), media.latitude)
 					cluster['center']['longitude'] = self.recalculate_mean(cluster['center']['longitude'], len(cluster['media_list']), media.longitude)
@@ -262,7 +263,8 @@ class TreeWalker:
 				continue
 			fathers = list()
 			for cluster in cluster_list:
-				if any(self.distance_from_coordinates(cluster['center']['latitude'], cluster['center']['longitude'], father['center']['latitude'], father['center']['longitude']) < _distance
+				for father in fathers
+				if any(self.distance_between_coordinates(cluster['center']['latitude'], cluster['center']['longitude'], father['center']['latitude'], father['center']['longitude']) < _distance
 							for father in fathers):
 					# add cluster to this father
 					father['center']['latitude'] = self.recalculate_mean(father['center']['latitude'], len(father['media_list']), cluster['center']['latitude'], len(cluster['media_list']))
@@ -289,16 +291,16 @@ class TreeWalker:
 		return (old_mean * old_len + new_value * new_len) / (old_len + new_len)
 
 
-	def distance(self, media1, media2):
+	def distance_between_media(self, media1, media2):
 		# calculate the distance between the media gps coordinates
 		lat1 = media1.latitude
 		lon1 = media1.longitude
 		lat2 = media2.latitude
 		lon2 = media2.longitude
 
-		return self.distance_from_coordinates(lat1, lon1, lat2, lon2)
+		return self.distance_between_coordinates(lat1, lon1, lat2, lon2)
 
-	def distance_from_coordinates(self, lat1, lon1, lat2, lon2):
+	def distance_between_coordinates(self, lat1, lon1, lat2, lon2):
 		# https://gis.stackexchange.com/questions/61924/python-gdal-degrees-to-meters-without-reprojecting
 		# Calculate the great circle distance between two points on the earth (specified in decimal degrees)
 
