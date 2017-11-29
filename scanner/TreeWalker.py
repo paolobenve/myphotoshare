@@ -344,25 +344,25 @@ class TreeWalker:
 			message("files excluded by marker file", Options.config['exclude_files_marker'], 4)
 			skip_files = True
 			back_level()
-		json_cache_file = os.path.join(Options.config['cache_path'], album_cache_base) + ".json"
-		json_cache_OK = False
+		json_file = os.path.join(Options.config['cache_path'], album_cache_base) + ".json"
+		json_file_OK = False
 		cached_album = None
-		json_message = json_cache_file + " (path: " + os.path.basename(absolute_path) + ")"
+		json_message = json_file + " (path: " + os.path.basename(absolute_path) + ")"
 		try:
-			if os.path.exists(json_cache_file):
-				if not os.access(json_cache_file, os.R_OK):
-					message("json file unreadable", json_cache_file, 1)
-				elif not os.access(json_cache_file, os.W_OK):
-					message("json file unwritable", json_cache_file, 1)
+			if os.path.exists(json_file):
+				if not os.access(json_file, os.R_OK):
+					message("json file unreadable", json_file, 1)
+				elif not os.access(json_file, os.W_OK):
+					message("json file unwritable", json_file, 1)
 				else:
-					message("reading json file to import album...", json_cache_file, 5)
+					message("reading json file to import album...", json_file, 5)
 					# the following is the instruction which could raise the error
-					cached_album = Album.from_cache(json_cache_file, album_cache_base)
+					cached_album = Album.from_cache(json_file, album_cache_base)
 					next_level()
 					message("read json file", "", 5)
 					back_level()
 					if (
-						file_mtime(absolute_path) <= file_mtime(json_cache_file) and
+						file_mtime(absolute_path) <= file_mtime(json_file) and
 						cached_album is not None and
 						hasattr(cached_album, "absolute_path") and
 						cached_album.absolute_path == absolute_path
@@ -370,7 +370,7 @@ class TreeWalker:
 						next_level()
 						message("json file is OK", "  " + json_message, 4)
 						back_level()
-						json_cache_OK = True
+						json_file_OK = True
 						album = cached_album
 						message("adding media in album to big lists...", "", 5)
 						for media in album.media:
@@ -396,7 +396,7 @@ class TreeWalker:
 			message(" json file invalid", json_message, 4)
 			cached_album = None
 
-		if not json_cache_OK:
+		if not json_file_OK:
 			message("generating album...", absolute_path, 5)
 			album = Album(absolute_path)
 			next_level()
@@ -488,7 +488,7 @@ class TreeWalker:
 							absolute_cache_file = os.path.join(Options.config['cache_path'], cache_file)
 							if (
 								Options.config['recreate_fixed_height_thumbnails'] and
-								os.path.exists(absolute_cache_file) and file_mtime(absolute_cache_file) < file_mtime(json_cache_file)
+								os.path.exists(absolute_cache_file) and file_mtime(absolute_cache_file) < file_mtime(json_file)
 							):
 								# remove wide images, in order not to have blurred thumbnails
 								fixed_height_thumbnail_re = "_" + str(Options.config['media_thumb_size']) + "tf\.jpg$"
@@ -502,9 +502,9 @@ class TreeWalker:
 
 							if (
 								not os.path.exists(absolute_cache_file) or
-								json_cache_OK and (
+								json_file_OK and (
 									file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"] or
-									file_mtime(absolute_cache_file) > file_mtime(json_cache_file)
+									file_mtime(absolute_cache_file) > file_mtime(json_file)
 								) or
 								(Options.config['recreate_reduced_photos'] or Options.config['recreate_thumbnails'])
 							):
@@ -521,7 +521,7 @@ class TreeWalker:
 				if not cache_hit:
 					message("processing file", entry_with_path, 4)
 					next_level()
-					if not json_cache_OK:
+					if not json_file_OK:
 						message("json file not OK", "  " + json_message, 4)
 					else:
 						if cached_media is None:
@@ -532,7 +532,7 @@ class TreeWalker:
 							else:
 								if file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
 									message("reduction/thumbnail older than cached media", absolute_cache_file, 4)
-								elif file_mtime(absolute_cache_file) > file_mtime(json_cache_file):
+								elif file_mtime(absolute_cache_file) > file_mtime(json_file):
 									message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
 
 					if Options.config['recreate_reduced_photos']:
