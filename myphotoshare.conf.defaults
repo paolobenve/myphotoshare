@@ -114,7 +114,7 @@ mobile_thumbnail_factor = 2
 
 # the list of distance (in meters) for generating photos clusters
 # must be sorted upward, from little to big
-clustering_distances = [20, 1000, 50000]
+clustering_distances = [20, 1000, 10000]
 
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _f
