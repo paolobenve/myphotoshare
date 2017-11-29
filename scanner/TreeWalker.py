@@ -305,14 +305,15 @@ class TreeWalker:
 		# Calculate the great circle distance between two points on the earth (specified in decimal degrees)
 
 		# convert decimal degrees to radians
-		lon1, lat1, lon2, lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
 		# haversine formula
-		dlon = lon2 - lon1
-		dlat = lat2 - lat1
-		a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-		c = 2 * math.asin(math.sqrt(a))
-		km = 6371 * c
-		return km * 1000
+		d_r_lon = r_lon2 - r_lon1
+		d_r_lat = r_lat2 - r_lat1
+		a = math.sin(d_r_lat / 2.0) ** 2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(d_r_lon / 2.0) ** 2
+		c = 2.0 * math.asin(math.sqrt(a))
+		m = 6371.0 * c * 1000.0
+		print lat1, lon1, lat2, lon2, "m =", m
+		return m
 
 	def listdir_sorted_by_time(self, path):
 		# this function returns the directory listing sorted by mtime
