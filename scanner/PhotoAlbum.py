@@ -114,9 +114,6 @@ class Album(object):
 		if not any(media.media_file_name == _media.media_file_name for _media in self.media_list):
 			self.media_list.append(media)
 			self.media_list_is_sorted = False
-			if media.has_gps_data:
-				self.media_with_gps_data_list.append(media)
-				self.media_with_gps_data_list_is_sorted = False
 
 	def add_album(self, album):
 		self.albums_list.append(album)
@@ -126,9 +123,6 @@ class Album(object):
 		if not self.media_list_is_sorted:
 			self.media_list.sort()
 			self.media_list_is_sorted = True
-		if not self.media_with_gps_data_list_is_sorted:
-			self.media_with_gps_data_list.sort(key=lambda _m: _m.latitude + _m.longitude)
-			self.media_with_gps_data_list_is_sorted = True
 		if not self.albums_list_is_sorted:
 			self.albums_list.sort()
 			self.albums_list_is_sorted = True

@@ -31,6 +31,7 @@ class TreeWalker:
 		message("Browsing", "start!", 3)
 		self.all_albums = list()
 		self.tree_by_date = {}
+		self.media_with_gps_data_list = list()
 		self.gps_cluster_list = list()
 		self.all_media = list()
 		self.all_album_composite_images = list()
@@ -68,6 +69,17 @@ class TreeWalker:
 			message("generated date albums", "", 5)
 			back_level()
 
+			message("sorting gps list...", "", 4)
+			self.sort_media_with_gps_data_list()
+			next_level()
+			message("gps tree sorted", "", 5)
+			back_level()
+			message("generating gps clusters...", "", 4)
+			for media in self.media_with_gps_data_list:
+				self.add_media_to_gps_cluster_list(media)
+			next_level()
+			message("gps clusters generated", "", 5)
+			back_level()
 			message("generating gps tree...", "", 4)
 			gps_tree = self.generate_gps_tree()
 			next_level()
@@ -94,6 +106,18 @@ class TreeWalker:
 		for sub_album in album.albums_list:
 			self.all_albums_to_json_file(sub_album)
 		album.to_json_file()
+
+	def add_media_to_gps_data_list(self, media):
+		if media.has_gps_data and not any(media.media_file_name == _media.media_file_name for _media in self.media_with_gps_data_list):
+			self.media_with_gps_data_list.append(media)
+			self.media_with_gps_data_list_is_sorted = False
+
+
+	def sort_media_with_gps_data_list(self):
+		if not self.media_with_gps_data_list_is_sorted:
+			self.media_with_gps_data_list.sort(key=lambda _m: _m.latitude + _m.longitude)
+			self.media_with_gps_data_list_is_sorted = True
+
 
 	def generate_gps_albums(self, up_album, cluster_list, gps_path):
 		next_level()
@@ -263,7 +287,6 @@ class TreeWalker:
 				continue
 			fathers = list()
 			for cluster in cluster_list:
-				for father in fathers
 				if any(self.distance_between_coordinates(cluster['center']['latitude'], cluster['center']['longitude'], father['center']['latitude'], father['center']['longitude']) < _distance
 							for father in fathers):
 					# add cluster to this father
@@ -561,6 +584,11 @@ class TreeWalker:
 					next_level()
 					message("added media to album", "", 5)
 					back_level()
+					message("adding media to gps list...", "", 5)
+					self.add_media_to_gps_data_list(media)
+					next_level()
+					message("added media to gps list", "", 5)
+					back_level()
 					message("adding media to big list...", "", 5)
 					if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
 						self.all_media.append(media)
@@ -576,11 +604,6 @@ class TreeWalker:
 					back_level()
 
 					# the following function has a check on media already present
-					message("adding media to gps tree...", "", 5)
-					self.add_media_to_gps_cluster_list(media)
-					next_level()
-					message("added media to gps tree", "", 5)
-					back_level()
 				elif not media.is_valid:
 					next_level()
 					message("not image nor video", entry_with_path, 1)
