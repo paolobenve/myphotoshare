@@ -72,7 +72,7 @@ class TreeWalker:
 			message("sorting gps list...", "", 4)
 			self.sort_media_with_gps_data_list()
 			next_level()
-			message("gps tree sorted", "", 5)
+			message("gps list sorted", "", 5)
 			back_level()
 			message("generating gps clusters...", "", 4)
 			for media in self.media_with_gps_data_list:
@@ -391,7 +391,8 @@ class TreeWalker:
 						file_mtime(absolute_path) <= file_mtime(json_file) and
 						cached_album is not None and
 						hasattr(cached_album, "absolute_path") and
-						cached_album.absolute_path == absolute_path
+						cached_album.absolute_path == absolute_path and
+						hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
 					):
 						next_level()
 						message("json file is OK", "  " + json_message, 4)
@@ -403,7 +404,7 @@ class TreeWalker:
 							if not any(media.media_file_name == _media.media_file_name for _media in album.media):
 								self.all_media.append(media)
 								self.add_media_to_tree_by_date(media)
-								self.add_media_to_gps_cluster_list(media)
+								self.add_media_to_gps_data_list(media)
 						next_level()
 						message("added media to big lists", "", 5)
 						back_level()
@@ -426,7 +427,7 @@ class TreeWalker:
 			message("generating album...", absolute_path, 5)
 			album = Album(absolute_path)
 			next_level()
-			message("generated album", "", 5)
+			message("album generated", "", 5)
 			back_level()
 		if parent_album is not None:
 			album.parent = parent_album

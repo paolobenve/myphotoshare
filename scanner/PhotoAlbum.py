@@ -47,7 +47,6 @@ class Album(object):
 		self.albums_list = list()
 		self.media_list_is_sorted = True
 		self.albums_list_is_sorted = True
-		self.media_with_gps_data_list_is_sorted = True
 		self._subdir = ""
 		self.num_media_in_sub_tree = 0
 		self.num_media_in_album = 0
@@ -181,10 +180,11 @@ class Album(object):
 			path = dictionary["physicalPath"]
 		else:
 			path = dictionary["path"]
-		if not "jsonVersion" in dictionary or int(dictionary["jsonVersion"]) != Options.json_version:
+		if not "jsonVersion" in dictionary or float(dictionary["jsonVersion"]) != Options.json_version:
 			return None
 		album = Album(os.path.join(Options.config['album_path'], path))
 		album.cache_base = album_cache_base
+		album.json_version= dictionary["jsonVersion"]
 		for media in dictionary["media"]:
 			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], remove_folders_marker(album.baseless_path)))
 			if new_media.is_valid:
