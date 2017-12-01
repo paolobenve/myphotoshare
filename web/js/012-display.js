@@ -1667,16 +1667,19 @@ $(document).ready(function() {
 		$("#original-link").attr("target", "_blank").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia)));
 		$("#download-link").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia))).attr("download", "");
 
-		$("#folders-view-link").attr("href", "#!/" + PhotoFloat.pathJoin([
+		$("#folders-view-link").attr("href", "#!/" +
+					PhotoFloat.pathJoin([
 						encodeURIComponent(currentMedia.foldersCacheBase),
 						encodeURIComponent(currentMedia.cacheBase)
 					]));
-		$("#by-date-view-link").attr("href", "#!/" + PhotoFloat.pathJoin([
+		$("#by-date-view-link").attr("href", "#!/" +
+					PhotoFloat.pathJoin([
 						encodeURIComponent(currentMedia.dayAlbumCacheBase),
 						encodeURIComponent(currentMedia.foldersCacheBase),
 						encodeURIComponent(currentMedia.cacheBase)
 					]));
-		$("#by-gps-view-link").attr("href", "#!/" + PhotoFloat.pathJoin([
+		$("#by-gps-view-link").attr("href", "#!/" +
+		 			PhotoFloat.pathJoin([
 						encodeURIComponent(currentMedia.gpsAlbumCacheBase),
 						encodeURIComponent(currentMedia.foldersCacheBase),
 						encodeURIComponent(currentMedia.cacheBase)
