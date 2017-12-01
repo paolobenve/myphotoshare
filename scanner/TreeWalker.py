@@ -356,7 +356,6 @@ class TreeWalker:
 		a = math.sin(d_r_lat / 2.0) ** 2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(d_r_lon / 2.0) ** 2
 		c = 2.0 * math.asin(math.sqrt(a))
 		m = 6371.0 * c * 1000.0
-		print lat1, lon1, lat2, lon2, "m =", m
 		return m
 
 	def listdir_sorted_by_time(self, path):
