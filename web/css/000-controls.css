@@ -34,6 +34,10 @@ img.title-img {
 	padding-right: .5em;
 }
 
+img.thumbnail-img {
+	padding-left: .5em;
+}
+
 .title-anchor, .title-no-anchor, .gps-folder img {
 	padding: 0 .5em;
 }

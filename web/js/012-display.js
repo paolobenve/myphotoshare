@@ -994,11 +994,11 @@ $(document).ready(function() {
 								"<div class=\"media-caption\">" +
 								currentAlbum.media[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">");
 					if (currentAlbum.path.indexOf(Options.by_gps_string) === 0) {
-						var latitude = currentAlbum.media[i].metadata.latitudeMS;
-						var longitude = currentAlbum.media[i].metadata.longitudeMS;
-						imageString += "<br /><span class='media-caption-coordinates'>" +
-							"(" + latitude + ", " + longitude + ")" +
-							"</span>";
+						var latitude = currentAlbum.media[i].metadata.latitude;
+						var longitude = currentAlbum.media[i].metadata.longitude;
+						imageString += "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
+													"<img class='thumbnail-img' title='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world.png'>" +
+													"</a>";
 					}
 					imageString += "</div>" +
 							"</div>";
