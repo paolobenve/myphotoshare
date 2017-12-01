@@ -167,9 +167,11 @@ class TreeWalker:
 				album.num_media_in_sub_tree += len(cluster['media_list'])
 				sub_album.num_media_in_album = len(cluster['media_list'])
 
-			for media in cluster['media_list']:
+			for i, current_media in enumerate(cluster['media_list']):
 				if not 'cluster_list' in cluster:
-					media.gps_path = sub_path
+					# print "--- ", current_media, sub_path
+					cluster['media_list'][i].gps_path = current_path
+					# pprint.pprint(current_media)
 				album.add_media(current_media)
 				current_media_date = max(current_media._attributes["dateTimeFile"], current_media._attributes["dateTimeDir"])
 				if max_file_date:
