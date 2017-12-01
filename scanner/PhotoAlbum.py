@@ -43,7 +43,6 @@ class Album(object):
 		self.absolute_path = path
 		self.baseless_path = remove_album_path(path)
 		self.media_list = list()
-		self.media_with_gps_data_list = list()
 		self.albums_list = list()
 		self.media_list_is_sorted = True
 		self.albums_list_is_sorted = True

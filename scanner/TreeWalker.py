@@ -32,6 +32,7 @@ class TreeWalker:
 		self.all_albums = list()
 		self.tree_by_date = {}
 		self.media_with_gps_data_list = list()
+		self.media_with_gps_data_list_is_sorted = True
 		self.gps_cluster_list = list()
 		self.all_media = list()
 		self.all_album_composite_images = list()
