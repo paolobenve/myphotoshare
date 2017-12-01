@@ -76,22 +76,31 @@ class TreeWalker:
 				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
 				self.origin_album.add_album(by_date_album)
 
+			# gps albums cannot be generated like date albums, because we must determine media clustering and upper levels clusterings
+			# so the work flow is:
+			# - sort media so that clustering is more predictable
+			# - group media into clusters according to smaller distances
+			# - group first level clusters into cluster for following level distance, and so on
+
 			message("sorting gps list...", "", 4)
 			self.sort_media_with_gps_data_list()
 			next_level()
 			message("gps list sorted", "", 5)
 			back_level()
+
 			message("generating gps clusters...", "", 4)
 			for media in self.media_with_gps_data_list:
 				self.add_media_to_gps_cluster_list(media)
 			next_level()
 			message("gps clusters generated", "", 5)
 			back_level()
+
 			message("generating gps tree...", "", 4)
 			gps_tree = self.generate_gps_tree()
 			next_level()
 			message("generated gps tree", "", 5)
 			back_level()
+
 			message("generating gps albums...", "", 4)
 			by_gps_album = self.generate_gps_albums(self.origin_album, gps_tree, Options.config['by_gps_string'])
 			next_level()
