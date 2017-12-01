@@ -117,17 +117,6 @@ def remove_folders_marker(path):
 			path = path[1:]
 	return path
 
-def coordinates_path(latitude, longitude):
-	# generate a path with gps coordinates
-	# negative latitude and longitude must not go into path, because minus sign is normally used as slash substitution
-	positive_latitude = latitude
-	if positive_latitude < 0:
-		positive_latitude += 360.0
-	positive_longitude = longitude
-	if positive_longitude < 0:
-		positive_longitude += 360.0
-	return str(positive_latitude) + '_' + str(positive_longitude)
-
 def cache_base(path, filepath=False):
 	if not filepath:
 		path = remove_album_path(path)
