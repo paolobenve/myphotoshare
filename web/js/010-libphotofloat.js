@@ -88,7 +88,7 @@
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		// this vars are defined here and not at the beginning of the file because the options must have been read
 		PhotoFloat.foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
-		PhotoFloat.dayStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
+		PhotoFloat.byDateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
 		PhotoFloat.byGpsStringWithTrailingSeparator = Options.by_gps_string + Options.cache_folder_separator;
 
 		var hashParts, lastSlashPosition, slashNumber, albumHash, mediaHash = null, foldersHash = null, media = null;
