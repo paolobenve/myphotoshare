@@ -503,7 +503,7 @@ $(document).ready(function() {
 							spanOpened = false;
 						}
 						title += "<a href=" + mapLink(latitude, longitude, mapZooms[(4 - i)]) + " target='_blank'>" +
-											"<img class='title-img' title='" + _t("#place-icon-titles")[4 - i] + "' height='15px' src='img/world.png'>" +
+											"<img class='title-img' title='" + _t("#place-icon-titles")[4 - i] + " [s]' alt='" + _t("#place-icon-titles")[4 - i] + "' height='15px' src='img/world.png'>" +
 											"</a>";
 					} else
 						title += textComponents[i];
@@ -572,8 +572,16 @@ $(document).ready(function() {
 			title = "<a id=\"dots\" href=\"javascript:void(0)\">... &raquo; </a><span id=\"hidden-title\">" + hiddenTitle + "</span> " + title;
 		}
 
-		if (currentMedia !== null)
+		if (currentMedia !== null) {
 			title += "<span id=\"media-name\">" + photoFloat.trimExtension(currentMedia.name) + "</span>";
+			if (hasGpsData(currentMedia)) {
+				latitude = currentMedia.metadata.latitude;
+				longitude = currentMedia.metadata.longitude;
+				title += "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
+										"<img class='title-img' title='" + _t("#place-icon-titles")[0] + " [s]' alt='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world.png'>" +
+										"</a>";
+			}
+		}
 
 		else if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
 			title += " &raquo; <span id=\"media-name\">" + photoFloat.trimExtension(currentAlbum.media[0].name) + "</span>";
@@ -915,6 +923,7 @@ $(document).ready(function() {
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, margin, imgTitle;
+		var mapLinkIcon;
 
 		PhotoFloat.subalbumIndex = 0;
 
@@ -975,6 +984,15 @@ $(document).ready(function() {
 					else
 						imgTitle = currentAlbum.media[i].name;
 
+					mapLinkIcon = "";
+					if (hasGpsData(currentAlbum.media[i])) {
+						var latitude = currentAlbum.media[i].metadata.latitude;
+						var longitude = currentAlbum.media[i].metadata.longitude;
+						mapLinkIcon = "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
+													"<img class='thumbnail-map-link' title='" + _t("#place-icon-titles")[0] + " [s]' alt='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world.png'>" +
+													"</a>";
+					}
+
 					imageString =	"<div class=\"thumb-and-caption-container\" style=\"" +
 										"width: " + calculatedWidth + "px;\"" +
 									">" +
@@ -982,6 +1000,7 @@ $(document).ready(function() {
 										"width: " + calculatedWidth + "px; " +
 										"height: " + Options.media_thumb_size + "px;" +
 									"\">" +
+									mapLinkIcon +
 									"<span class=\"helper\"></span>" +
 									"<img title=\"" + imgTitle + "\"" +
 										"alt=\"" + photoFloat.trimExtension(currentAlbum.media[i].name) + "\"" +
@@ -992,14 +1011,9 @@ $(document).ready(function() {
 									"/>" +
 								"</div>" +
 								"<div class=\"media-caption\">" +
-								currentAlbum.media[i].name.replace(/ /g, "</span> <span style=\"white-space: nowrap;\">");
-					if (currentAlbum.path.indexOf(Options.by_gps_string) === 0) {
-						var latitude = currentAlbum.media[i].metadata.latitude;
-						var longitude = currentAlbum.media[i].metadata.longitude;
-						imageString += "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
-													"<img class='thumbnail-img' title='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world.png'>" +
-													"</a>";
-					}
+								"<span>" +
+								currentAlbum.media[i].name.replace(/ /g, "</span> <span style='white-space: nowrap;'>") +
+								"</span>";
 					imageString += "</div>" +
 							"</div>";
 					image = $(imageString);
@@ -1157,14 +1171,14 @@ $(document).ready(function() {
 										folder += "-" + folderArray[3];
 								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
 									var level = 4 - subalbum.cacheBase.split(Options.cache_folder_separator).length;
-									var folderTitle = _t("#place-icon-titles")[level];
+									var folderTitle = _t("#place-icon-titles")[level] + '[s]';
 									folder = "<span class='gps-folder'>" +
 														_t("#place-names")[level] + " " + PhotoFloat.subalbumIndex +
 														"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, mapZooms[level]) +
 																		"' title='" + folderTitle +
 																		"' target='_blank'" +
 																">" +
-															"<img class='title-img' title='" + folderTitle + "' height='15px' src='img/world.png' />" +
+															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/world.png' />" +
 														"</a>" +
 													"</span>";
 								}

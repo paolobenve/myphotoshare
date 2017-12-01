@@ -174,15 +174,26 @@ a.title-anchor.mobile {
 	vertical-align: middle;
 }
 
-.album-button-random-media-link {
+.album-button-random-media-link, .thumbnail-map-link {
 	position: absolute;
+	filter: alpha(opacity=30); /* For IE8 and earlier */
 	top: 0px;
 	right: 0px;
-	opacity: .3;
-	filter: alpha(opacity=30); /* For IE8 and earlier */
 }
 
-.album-button-random-media-link:hover {
+.album-button-random-media-link {
+	opacity: .3;
+	top: 0px;
+	right: 0px;
+}
+
+.thumbnail-map-link {
+	opacity: .8;
+	top: 5px;
+	right: 5px;
+}
+
+.album-button-random-media-link:hover, .thumbnail-map-link:hover {
 	opacity: 1;
 	filter: alpha(opacity=100); /* For IE8 and earlier */
 }
