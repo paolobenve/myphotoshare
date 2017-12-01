@@ -48,27 +48,33 @@ class TreeWalker:
 			message("created still unexistent subdir", "", 5)
 			back_level()
 
-		origin_album = Album(Options.config['album_path'])
-		origin_album.cache_base = cache_base(Options.config['album_path'])
+		self.origin_album = Album(Options.config['album_path'])
+		self.origin_album.cache_base = cache_base(Options.config['album_path'])
 		album_cache_base = Options.config['folders_string']
-		[folders_album, num, max_file_date] = self.walk(Options.config['album_path'], album_cache_base, origin_album)
+		[folders_album, num, max_file_date] = self.walk(Options.config['album_path'], album_cache_base, self.origin_album)
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
 		else:
-			folders_album.num_media_in_sub_tree = num
-			self.all_cache_entries.append("all_media.json")
-			self.all_cache_entries.append(Options.config['folders_string'] + ".json")
 			message("saving all media json file...", "", 4)
 			self.save_all_media_json()
 			next_level()
 			message("saved all media json file", "", 5)
 			back_level()
 
+			self.all_cache_entries.append("all_media.json")
+
+			folders_album.num_media_in_sub_tree = num
+			self.origin_album.add_album(folders_album)
+			self.all_cache_entries.append(Options.config['folders_string'] + ".json")
+
 			message("generating date albums...", "", 4)
-			by_date_album = self.generate_date_albums(origin_album)
+			by_date_album = self.generate_date_albums(self.origin_album)
 			next_level()
 			message("generated date albums", "", 5)
 			back_level()
+			if by_date_album is not None and not by_date_album.empty:
+				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
+				self.origin_album.add_album(by_date_album)
 
 			message("sorting gps list...", "", 4)
 			self.sort_media_with_gps_data_list()
@@ -87,19 +93,17 @@ class TreeWalker:
 			message("generated gps tree", "", 5)
 			back_level()
 			message("generating gps albums...", "", 4)
-			by_gps_album = self.generate_gps_albums(origin_album, gps_tree, Options.config['by_gps_string'])
+			by_gps_album = self.generate_gps_albums(self.origin_album, gps_tree, Options.config['by_gps_string'])
 			next_level()
 			message("**** generated gps albums", "", 5)
 			back_level()
-			origin_album.add_album(folders_album)
-			self.all_albums.append(origin_album)
-			if by_date_album is not None and not by_date_album.empty:
-				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
-				origin_album.add_album(by_date_album)
+
+			self.all_albums.append(self.origin_album)
 			if by_gps_album is not None and not by_gps_album.empty:
 				self.all_cache_entries.append(Options.config['by_gps_string'] + ".json")
-				origin_album.add_album(by_gps_album)
-			self.all_albums_to_json_file(origin_album)
+				self.origin_album.add_album(by_gps_album)
+
+			self.all_albums_to_json_file(self.origin_album)
 		self.remove_stale()
 		message("complete", "", 4)
 
@@ -119,13 +123,12 @@ class TreeWalker:
 			self.media_with_gps_data_list.sort(key=lambda _m: _m.latitude + _m.longitude)
 			self.media_with_gps_data_list_is_sorted = True
 
-
-	def generate_gps_albums(self, up_album, cluster_list, gps_path):
+	def generate_gps_albums(self, up_album, cluster_list, current_path):
 		next_level()
 		# reads the list of media with gps data and generates the corresponding set of albums
 		# works recursively on clustering_distances
 
-		path = os.path.join(Options.config['album_path'], gps_path)
+		path = os.path.join(Options.config['album_path'], current_path)
 		album = Album(path)
 		album.parent = up_album
 		album.cache_base = cache_base(path)
@@ -153,12 +156,12 @@ class TreeWalker:
 			for media in cluster['media_list']:
 				if not 'cluster_list' in cluster:
 					media.gps_path = sub_path
-				album.add_media(media)
-				media_date = max(media._attributes["dateTimeFile"], media._attributes["dateTimeDir"])
+				album.add_media(current_media)
+				current_media_date = max(current_media._attributes["dateTimeFile"], current_media._attributes["dateTimeDir"])
 				if max_file_date:
-					max_file_date = max(max_file_date, media_date)
+					max_file_date = max(max_file_date, current_media_date)
 				else:
-					max_file_date = media_date
+					max_file_date = current_media_date
 
 		self.all_albums.append(album)
 		if album.num_media_in_sub_tree > 0:
