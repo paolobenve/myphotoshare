@@ -274,29 +274,28 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
 
 	def add_media_to_gps_cluster_list(self, media):
-		# add the given media to a temporary structure where media are organized by gps according to various clustering radiuses
+		# adds the given media to a temporary structure where media are organized by gps according to various clustering distances
 
-		if media.has_gps_data:
-			found_cluster = False
-			smallest_distance = Options.config['clustering_distances'][0]
-			# check if media falls short with any of media in already generated clusters
-			for cluster in self.gps_cluster_list:
-				if any(self.distance_between_media(media, _media) < smallest_distance for _media in cluster['media_list']):
-					# add media to this cluster
-					cluster['center']['latitude'] = self.recalculate_mean(cluster['center']['latitude'], len(cluster['media_list']), media.latitude)
-					cluster['center']['longitude'] = self.recalculate_mean(cluster['center']['longitude'], len(cluster['media_list']), media.longitude)
-					cluster['media_list'].append(media)
-					found_cluster = True
-					break
-			if not found_cluster:
-				# make a new cluster
-				new_cluster = {}
-				new_cluster['center'] = {}
-				new_cluster['center']['latitude'] = media.latitude
-				new_cluster['center']['longitude'] = media.longitude
-				new_cluster['media_list'] = list()
-				new_cluster['media_list'].append(media)
-				self.gps_cluster_list.append(new_cluster)
+		found_cluster = False
+		smallest_distance = Options.config['clustering_distances'][0]
+		# check if media falls short with any of media in already generated clusters
+		for cluster in self.gps_cluster_list:
+			if any(self.distance_between_media(media, _media) < smallest_distance for _media in cluster['media_list']):
+				# add media to this cluster
+				cluster['center']['latitude'] = self.recalculate_mean(cluster['center']['latitude'], len(cluster['media_list']), media.latitude)
+				cluster['center']['longitude'] = self.recalculate_mean(cluster['center']['longitude'], len(cluster['media_list']), media.longitude)
+				cluster['media_list'].append(media)
+				found_cluster = True
+				break
+		if not found_cluster:
+			# make a new cluster
+			new_cluster = {}
+			new_cluster['center'] = {}
+			new_cluster['center']['latitude'] = media.latitude
+			new_cluster['center']['longitude'] = media.longitude
+			new_cluster['media_list'] = list()
+			new_cluster['media_list'].append(media)
+			self.gps_cluster_list.append(new_cluster)
 
 	def generate_gps_tree(self):
 		# converts the gps_cluster_list to a tree of lists (like the date one, but date one is a tree of objects)
