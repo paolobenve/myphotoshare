@@ -937,13 +937,13 @@ $(document).ready(function() {
 
 			populateMedia = populate;
 			if (populateMedia === true && (!! currentAlbum.path.match(byDateRegex) || !! currentAlbum.path.match(byGpsRegex)))
-				populateMedia = populateMedia && (currentAlbum.media.length < Options.big_date_folders_threshold);
+				populateMedia = populateMedia && (currentAlbum.media.length < Options.big_virtual_folders_threshold);
 
-			if (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 && currentAlbum.media.length > Options.big_date_folders_threshold) {
+			if ((currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
 				$("#thumbs").empty();
 				$("#error-too-many-images").html(
 					"<span id=\"too-many-images\">" + _t('#too-many-images') + "</span>: " + currentAlbum.media.length +
-					" (<span id=\"too-many-images-limit-is\">" + _t('#too-many-images-limit-is') + "</span> " + Options.big_date_folders_threshold +  ")</span>"
+					" (<span id=\"too-many-images-limit-is\">" + _t('#too-many-images-limit-is') + "</span> " + Options.big_virtual_folders_threshold +  ")</span>"
 				).show();
 			} else if (
 				populateMedia === true ||
@@ -989,7 +989,7 @@ $(document).ready(function() {
 						var latitude = currentAlbum.media[i].metadata.latitude;
 						var longitude = currentAlbum.media[i].metadata.longitude;
 						mapLinkIcon = "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
-													"<img class='thumbnail-map-link' title='" + _t("#place-icon-titles")[0] + " [s]' alt='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world.png'>" +
+													"<img class='thumbnail-map-link' title='" + _t("#place-icon-titles")[0] + " [s]' alt='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world-map-with-pointer.png'>" +
 													"</a>";
 					}
 

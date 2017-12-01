@@ -43,7 +43,7 @@ def main():
 				'thumb_spacing',
 				'album_thumb_size',
 				'media_thumb_size',
-				'big_date_folders_threshold',
+				'big_virtual_folders_threshold',
 				'respected_processors',
 				'max_album_share_thumbnails_number',
 				'min_album_thumbnail',

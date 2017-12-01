@@ -197,8 +197,8 @@ default_media_name_sort = false
 default_album_date_reverse_sort = false
 default_media_date_reverse_sort = false
 
-# When should a year album be considered big?
-big_date_folders_threshold = 999
+# When should a virtual (date, gps) album be considered big?
+big_virtual_folders_threshold = 999
 
 # How many thumbnails should we put at most in the image that php generates for sharing albums?
 # it must be an integer, and a square: 4, 9, 16,..
