@@ -503,7 +503,7 @@ $(document).ready(function() {
 							spanOpened = false;
 						}
 						title += "<a href=" + mapLink(latitude, longitude, mapZooms[(4 - i)]) + " target='_blank'>" +
-											"<img class='title-img' title='" + _t("#place-icon-titles")[4 - i] + " [s]' alt='" + _t("#place-icon-titles")[4 - i] + "' height='15px' src='img/world.png'>" +
+											"<img class='title-img' title='" + _t("#place-icon-titles")[4 - i] + " [s]' alt='" + _t("#place-icon-titles")[4 - i] + "' height='15px' src='img/world-map-with-pointer.png'>" +
 											"</a>";
 					} else
 						title += textComponents[i];
@@ -578,7 +578,7 @@ $(document).ready(function() {
 				latitude = currentMedia.metadata.latitude;
 				longitude = currentMedia.metadata.longitude;
 				title += "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
-										"<img class='title-img' title='" + _t("#place-icon-titles")[0] + " [s]' alt='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world.png'>" +
+										"<img class='title-img' title='" + _t("#place-icon-titles")[0] + " [s]' alt='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world-map-with-pointer.png'>" +
 										"</a>";
 			}
 		}
