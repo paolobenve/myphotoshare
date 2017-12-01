@@ -20,6 +20,7 @@ import Options
 import hashlib
 import sys
 from pprint import pprint
+import pprint
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
