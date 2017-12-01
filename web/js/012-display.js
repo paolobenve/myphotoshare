@@ -1680,7 +1680,8 @@ $(document).ready(function() {
 						encodeURIComponent(currentMedia.foldersCacheBase),
 						encodeURIComponent(currentMedia.cacheBase)
 					]));
-		$("#by-gps-view-link").attr("href", "#!/" +
+		if (hasGpsData(currentMedia))
+			$("#by-gps-view-link").attr("href", "#!/" +
 		 			PhotoFloat.pathJoin([
 						encodeURIComponent(currentMedia.gpsAlbumCacheBase),
 						encodeURIComponent(currentMedia.foldersCacheBase),
@@ -1692,12 +1693,14 @@ $(document).ready(function() {
 			// folder album: change to by date or by gps view
 			$("#folders-view-container").hide();
 			$("#by-date-view-container").show();
-			$("#by-gps-view-container").show();
+			if (hasGpsData(currentMedia))
+				$("#by-gps-view-container").show();
 		} else if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
 			// by date album: change to folder or by gps view
 			$("#folders-view-container").show();
 			$("#by-date-view-container").hide();
-			$("#by-gps-view-container").show();
+			if (hasGpsData(currentMedia))
+				$("#by-gps-view-container").show();
 		} else if (currentAlbum.path.indexOf(Options.by_gps_string) === 0) {
 			// by gps album: change to folder or by day view
 			$("#folders-view-container").show();
@@ -1759,6 +1762,10 @@ $(document).ready(function() {
 
 		$("#subalbums").hide();
 		$("#media-view").show();
+	}
+
+	function hasGpsData(media) {
+		return media.mediaType == "photo" && typeof media.metadata.latitude !== "undefined";
 	}
 
 	function mapLink(latitude, longitude, zoom) {
