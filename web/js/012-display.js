@@ -1159,13 +1159,13 @@ $(document).ready(function() {
 									var level = 4 - subalbum.cacheBase.split(Options.cache_folder_separator).length;
 									var folderTitle = _t("#place-icon-titles")[level];
 									folder = "<span class='gps-folder'>" +
-													"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, mapZooms[level]) +
-																	"' title='" + folderTitle +
-																	"' target='_blank'" +
-															">" +
 														_t("#place-names")[level] + " " + PhotoFloat.subalbumIndex +
-														"<img class='title-img' title='" + folderTitle + "' height='15px' src='img/world.png' />" +
-													"</a>" +
+														"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, mapZooms[level]) +
+																		"' title='" + folderTitle +
+																		"' target='_blank'" +
+																">" +
+															"<img class='title-img' title='" + folderTitle + "' height='15px' src='img/world.png' />" +
+														"</a>" +
 													"</span>";
 								}
 								else {
