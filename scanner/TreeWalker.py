@@ -147,9 +147,10 @@ class TreeWalker:
 		if not isinstance(cluster_list, list):
 			cluster_list = [cluster_list]
 			smallest_cluster = True
+
+		album_index = 0
 		for cluster in cluster_list:
-			_coordinates_path = coordinates_path(cluster['center']['latitude'], cluster['center']['longitude'])
-			sub_path = os.path.join(gps_path, _coordinates_path)
+			sub_path = os.path.join(current_path, str(album_index))
 			if not smallest_cluster:
 				if 'cluster_list' in cluster:
 					sub_album = self.generate_gps_albums(album, cluster['cluster_list'], sub_path)
@@ -160,7 +161,11 @@ class TreeWalker:
 					sub_album = self.generate_gps_albums(album, cluster, sub_path)
 					# sub_album.num_media_in_album += len(cluster['media_list'])
 				album.add_album(sub_album)
+				album.center = {}
+				album.center['latitude'] = cluster['center']['latitude']
+				album.center['longitude'] = cluster['center']['longitude']
 				album.num_media_in_sub_tree += len(cluster['media_list'])
+				sub_album.num_media_in_album = len(cluster['media_list'])
 
 			for media in cluster['media_list']:
 				if not 'cluster_list' in cluster:
@@ -171,6 +176,7 @@ class TreeWalker:
 					max_file_date = max(max_file_date, current_media_date)
 				else:
 					max_file_date = current_media_date
+			album_index += 1
 
 		self.all_albums.append(album)
 		if album.num_media_in_sub_tree > 0:
