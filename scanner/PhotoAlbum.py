@@ -207,12 +207,16 @@ class Album(object):
 					if path_to_dict == "":
 						path_to_dict = Options.config['folders_string']
 
-					subalbums.append({
+					sub_dict = {
 						"path": path_to_dict,
 						"cacheBase": sub.cache_base,
 						"date": sub.date,
 						"numMediaInSubTree": sub.num_media_in_sub_tree
-					})
+					}
+					if hasattr(sub, "center"):
+						sub_dict["center"] = sub.center
+					subalbums.append(sub_dict)
+
 		else:
 			# it looks like the following code is never executed
 			for sub in self.albums_list:
@@ -251,6 +255,9 @@ class Album(object):
 			"numMediaInAlbum": self.num_media_in_album,
 			"jsonVersion": Options.json_version
 		}
+		if hasattr(self, "center"):
+			dictionary["center"] = self.center
+
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base
 		return dictionary

@@ -1156,14 +1156,17 @@ $(document).ready(function() {
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
 								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
-									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator).slice(1);
-									arrayLatitudeLongitude = folderArray[folderArray.length - 1].split('_');
-									for (var i = 0; i < 2; i++)
-										arrayLatitudeLongitude[i] = parseFloat(arrayLatitudeLongitude[i]);
-									var folderTitle = _t("#place-icon-titles")[3 - folderArray.length].toString();
-									folder = "<span class='gps-folder'><a href='" + mapLink(arrayLatitudeLongitude[0], arrayLatitudeLongitude[1], mapZooms[(3 - folderArray.length)])+ "' title='" + folderTitle + "' target='_blank'>" +
-													_t("#place-names")[3 - folderArray.length] + " " + PhotoFloat.subalbumIndex + "<img class='title-img' title='" + folderTitle + "' height='15px' src='img/world.png'>"
-													"</a></span>";
+									var level = 3 - subalbum.cacheBase.split(Options.cache_folder_separator).length;
+									var folderTitle = _t("#place-icon-titles")[level];
+									folder = "<span class='gps-folder'>" +
+													"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, mapZooms[level]) +
+																	"' title='" + folderTitle +
+																	"' target='_blank'" +
+															">" +
+														_t("#place-names")[level] + " " + PhotoFloat.subalbumIndex +
+														"<img class='title-img' title='" + folderTitle + "' height='15px' src='img/world.png' />" +
+													"</a>" +
+													"</span>";
 								}
 								else {
 									folder = subalbum.path;
