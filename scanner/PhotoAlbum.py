@@ -1332,8 +1332,9 @@ class Media(object):
 		# media["monthAlbum"]		= self.month_album_path
 		media["dayAlbum"]          = self.day_album_path
 		media["dayAlbumCacheBase"] = cache_base(self.day_album_path, True)
-		media["gpsAlbum"]          = self.gps_album_path
-		media["gpsAlbumCacheBase"] = cache_base(self.gps_album_path, True)
+		if self.gps_album_path:
+			media["gpsAlbum"]          = self.gps_album_path
+			media["gpsAlbumCacheBase"] = cache_base(self.gps_album_path, True)
 
 		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
 		media["albumName"]         = self.album_path
