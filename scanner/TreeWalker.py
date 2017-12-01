@@ -161,11 +161,12 @@ class TreeWalker:
 					sub_album = self.generate_gps_albums(album, cluster, sub_path)
 					# sub_album.num_media_in_album += len(cluster['media_list'])
 				album.add_album(sub_album)
-				album.center = {}
-				album.center['latitude'] = cluster['center']['latitude']
-				album.center['longitude'] = cluster['center']['longitude']
 				album.num_media_in_sub_tree += len(cluster['media_list'])
 				sub_album.num_media_in_album = len(cluster['media_list'])
+			album.center = {}
+			album.center['latitude'] = cluster['center']['latitude']
+			album.center['longitude'] = cluster['center']['longitude']
+
 
 			for i, current_media in enumerate(cluster['media_list']):
 				if not 'cluster_list' in cluster:

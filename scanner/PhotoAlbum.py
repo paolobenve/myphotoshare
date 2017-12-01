@@ -233,13 +233,19 @@ class Album(object):
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
 
 		ancestors_cache_base = list()
+		ancestors_center = list()
 		_parent = self
 		while True:
 			ancestors_cache_base.append(_parent.cache_base)
+			if hasattr(_parent, "center"):
+				ancestors_center.append(_parent.center)
+			else:
+				ancestors_center.append("")
 			if _parent.parent is None:
 				break
 			_parent = _parent.parent
 		ancestors_cache_base.reverse()
+		ancestors_center.reverse()
 
 		dictionary = {
 			"path": path_to_dict,
@@ -250,6 +256,7 @@ class Album(object):
 			"media": self.media_list,
 			"cacheBase": self.cache_base,
 			"ancestorsCacheBase": ancestors_cache_base,
+			"ancestorsCenter": ancestors_center,
 			"physicalPath": path_without_folders_marker,
 			"numMediaInSubTree": self.num_media_in_sub_tree,
 			"numMediaInAlbum": self.num_media_in_album,

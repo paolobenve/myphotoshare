@@ -491,9 +491,9 @@ $(document).ready(function() {
 							latitude = currentMedia.metadata.latitude;
 							longitude = currentMedia.metadata.longitude;
 						} else {
-							 arrayCoordinates = cacheBaseToCoordinateArray(currentAlbum.ancestorsCacheBase[i]);
-							 latitude = arrayCoordinates[i - 2][0];
-							 longitude = arrayCoordinates[i - 2][1];
+							 arrayCoordinates = currentAlbum.ancestorsCenter[i];
+							 latitude = arrayCoordinates["latitude"];
+							 longitude = arrayCoordinates["longitude"];
 						}
 						if (anchorOpened) {
 							title += "</a>";
@@ -503,7 +503,7 @@ $(document).ready(function() {
 							spanOpened = false;
 						}
 						title += "<a href=" + mapLink(latitude, longitude, mapZooms[(4 - i)]) + " target='_blank'>" +
-											"<img class='title-img' title='" + _t("#place-icon-titles")[4 - i].toString() + "' height='15px' src='img/world.png'>" +
+											"<img class='title-img' title='" + _t("#place-icon-titles")[4 - i] + "' height='15px' src='img/world.png'>" +
 											"</a>";
 					} else
 						title += textComponents[i];
@@ -1156,7 +1156,7 @@ $(document).ready(function() {
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
 								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
-									var level = 3 - subalbum.cacheBase.split(Options.cache_folder_separator).length;
+									var level = 4 - subalbum.cacheBase.split(Options.cache_folder_separator).length;
 									var folderTitle = _t("#place-icon-titles")[level];
 									folder = "<span class='gps-folder'>" +
 													"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, mapZooms[level]) +
