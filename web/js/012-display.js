@@ -1752,7 +1752,7 @@ $(document).ready(function() {
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
-		linkTitle = _t('#show-map') + Options.map_service
+		linkTitle = _t('#show-map') + Options.map_service;
 		$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
 			ev.stopPropagation();
 			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, mapZooms[0]), '_blank');
