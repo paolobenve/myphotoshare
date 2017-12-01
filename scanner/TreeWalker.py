@@ -88,7 +88,7 @@ class TreeWalker:
 			message("generating gps albums...", "", 4)
 			by_gps_album = self.generate_gps_albums(origin_album, gps_tree, Options.config['by_gps_string'])
 			next_level()
-			message("generated gps albums", "", 5)
+			message("**** generated gps albums", "", 5)
 			back_level()
 			origin_album.add_album(folders_album)
 			self.all_albums.append(origin_album)

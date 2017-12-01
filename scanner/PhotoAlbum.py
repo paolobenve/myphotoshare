@@ -145,7 +145,7 @@ class Album(object):
 		message("sorting album...", "", 5)
 		self.sort_subalbums_and_media()
 		next_level()
-		message("sorted album", self.absolute_path, 4)
+		message("album sorted", self.absolute_path, 4)
 		back_level()
 		message("saving album...", "", 5)
 		with open(json_file_with_path, 'w') as fp:
