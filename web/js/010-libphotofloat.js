@@ -41,23 +41,7 @@
 		};
 		if (typeof error !== "undefined" && error !== null) {
 			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-				var rootHash = "!/" + Options.folders_string;
-
-				$("#album-view").fadeOut(200);
-				$("#media-view").fadeOut(200);
-
-				if (window.location.hash == "#" + rootHash) {
-					$("#loading").hide();
-					$("#error-text-folder").stop();
-					$("#error-root-folder").fadeIn(2000);
-					$("#powered-by").show();
-				} else {
-					$("#error-text-folder").fadeIn(200);
-					$("#error-text-folder, #error-overlay, #auth-text").fadeOut(2500);
-					$("#album-view").fadeIn(3500);
-					$("#media-view").fadeIn(3500);
-					window.location.hash = rootHash;
-				}
+				error(jqXHR.status);
 			};
 		}
 		$.ajax(ajaxOptions);

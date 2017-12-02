@@ -1902,8 +1902,28 @@ $(document).ready(function() {
 		if (error == 403) {
 			$("#auth-text").fadeIn(1000);
 			$("#password").focus();
-		} else
-			$("#error-text").fadeIn(2500);
+		} else {
+			// Jason's code only had the following line
+			//$("#error-text").fadeIn(2500);
+
+			var rootHash = "!/" + Options.folders_string;
+
+			$("#album-view").fadeOut(200);
+			$("#media-view").fadeOut(200);
+
+			if (window.location.hash == "#" + rootHash) {
+				$("#loading").hide();
+				$("#error-text-folder").stop();
+				$("#error-root-folder").fadeIn(2000);
+				$("#powered-by").show();
+			} else {
+				$("#error-text-folder").fadeIn(200);
+				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(2500);
+				$("#album-view").fadeIn(3500);
+				$("#media-view").fadeIn(3500);
+				window.location.hash = rootHash;
+			}
+		}
 		$("#error-overlay").fadeTo(500, 0.8);
 		$("body, html").css("overflow", "hidden");
 	}
