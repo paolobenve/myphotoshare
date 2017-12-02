@@ -2,6 +2,7 @@
 	/* constructor */
 	function PhotoFloat() {
 		this.albumCache = [];
+		this.geotaggedPhotosFound = null;
 	}
 
 	/* public member functions */
@@ -61,6 +62,27 @@
 		}
 		$.ajax(ajaxOptions);
 	};
+
+	PhotoFloat.prototype.showByGpsButton = function() {
+		// this function returns true if the root album has the by gps subalbum
+		if (this.geotaggedPhotosFound !== null) {
+			if (this.geotaggedPhotosFound) {
+				$("#by-gps-view-container").show();
+			}
+		} else {
+			self = this;
+			this.getAlbum(
+				Options.by_gps_string,
+				function() {
+					self.geotaggedPhotosFound = true;
+					$("#by-gps-view-container").show();
+				},
+				function() {
+					self.geotaggedPhotosFound = false;
+				}
+			);
+		}
+	}
 
 	PhotoFloat.prototype.pickRandomMedia = function(subalbum, container, callback, error) {
 		var nextAlbum, self;

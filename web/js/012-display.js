@@ -1270,11 +1270,11 @@ $(document).ready(function() {
 			if (currentAlbum.cacheBase == Options.folders_string) {
 				$("#folders-view-container").hide();
 				$("#by-date-view-container").show();
-				$("#by-gps-view-container").show();
+				photoFloat.showByGpsButton();
 			} else if (currentAlbum.cacheBase == Options.by_date_string) {
 				$("#folders-view-container").show();
 				$("#by-date-view-container").hide();
-				$("#by-gps-view-container").show();
+				photoFloat.showByGpsButton();
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
 					$("#folders-view-container").show();
 					$("#by-date-view-container").show();
