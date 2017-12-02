@@ -145,30 +145,34 @@
 			mediaHash = decodeURI(mediaHash);
 		if (foldersHash)
 			foldersHash = decodeURI(foldersHash);
-		this.getAlbum(albumHash, function(theAlbum) {
-			var i = -1;
-			if (mediaHash !== null) {
-				for (i = 0; i < theAlbum.media.length; ++i) {
-					if (
-						theAlbum.media[i].cacheBase === mediaHash &&
-						(foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash)
-					) {
-						media = theAlbum.media[i];
-						break;
+		this.getAlbum(
+			albumHash,
+			function(theAlbum) {
+				var i = -1;
+				if (mediaHash !== null) {
+					for (i = 0; i < theAlbum.media.length; ++i) {
+						if (
+							theAlbum.media[i].cacheBase === mediaHash &&
+							(foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash)
+						) {
+							media = theAlbum.media[i];
+							break;
+						}
+					}
+					if (i >= theAlbum.media.length) {
+						$("#album-view").fadeOut(200);
+						$("#media-view").fadeOut(200);
+						$("#album-view").fadeIn(3500);
+						$("#error-text-image").fadeIn(200);
+						$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
+						window.location.hash = theAlbum;
+						i = -1;
 					}
 				}
-				if (i >= theAlbum.media.length) {
-					$("#album-view").fadeOut(200);
-					$("#media-view").fadeOut(200);
-					$("#album-view").fadeIn(3500);
-					$("#error-text-image").fadeIn(200);
-					$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
-					window.location.hash = theAlbum;
-					i = -1;
-				}
-			}
-			callback(theAlbum, media, i);
-		}, error);
+				callback(theAlbum, media, i);
+			},
+			error
+		);
 	};
 	PhotoFloat.prototype.authenticate = function(password, result) {
 		var ajaxOptions = {
