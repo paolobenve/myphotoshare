@@ -1239,7 +1239,7 @@ $(document).ready(function() {
 								theLink.remove();
 								subalbums.splice(subalbums.indexOf(theLink), 1);
 							});
-							i++;i--;
+							i++; i--;
 						})(currentAlbum, currentAlbum.albums[i], image, link);
 
 					}
@@ -1297,6 +1297,7 @@ $(document).ready(function() {
 
 		setTimeout(scrollToThumb, 1);
 	}
+
 	function getDecimal(fraction) {
 		if (fraction[0] < fraction[1])
 			return fraction[0] + "/" + fraction[1];
