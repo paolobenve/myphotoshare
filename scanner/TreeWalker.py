@@ -82,33 +82,33 @@ class TreeWalker:
 			# - group media into clusters according to smaller distances
 			# - group first level clusters into cluster for following level distance, and so on
 
-			message("sorting gps list...", "", 4)
-			self.sort_media_with_gps_data_list()
-			next_level()
-			message("gps list sorted", "", 5)
-			back_level()
+			if self.media_with_gps_data_list:
+				message("sorting gps list...", "", 4)
+				self.sort_media_with_gps_data_list()
+				next_level()
+				message("gps list sorted", "", 5)
+				back_level()
 
-			message("generating gps clusters...", "", 4)
-			for media in self.media_with_gps_data_list:
-				self.add_media_to_gps_cluster_list(media)
-			next_level()
-			message("gps clusters generated", "", 5)
-			back_level()
+				message("generating gps clusters...", "", 4)
+				for media in self.media_with_gps_data_list:
+					self.add_media_to_gps_cluster_list(media)
+				next_level()
+				message("gps clusters generated", "", 5)
+				back_level()
 
-			message("generating gps tree...", "", 4)
-			gps_tree = self.generate_gps_tree()
-			next_level()
-			message("generated gps tree", "", 5)
-			back_level()
+				message("generating gps tree...", "", 4)
+				gps_tree = self.generate_gps_tree()
+				next_level()
+				message("generated gps tree", "", 5)
+				back_level()
 
-			message("generating gps albums...", "", 4)
-			by_gps_album = self.generate_gps_albums(self.origin_album, gps_tree, Options.config['by_gps_string'])
-			next_level()
-			message("**** generated gps albums", "", 5)
-			back_level()
+				message("generating gps albums...", "", 4)
+				by_gps_album = self.generate_gps_albums(self.origin_album, gps_tree, Options.config['by_gps_string'])
+				next_level()
+				message("gps albums generated", "", 5)
+				back_level()
 
-			self.all_albums.append(self.origin_album)
-			if by_gps_album is not None and not by_gps_album.empty:
+				self.all_albums.append(self.origin_album)
 				self.all_cache_entries.append(Options.config['by_gps_string'] + ".json")
 				self.origin_album.add_album(by_gps_album)
 
