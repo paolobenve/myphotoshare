@@ -2271,6 +2271,7 @@ $(document).ready(function() {
 				});
 		}
 	}
+
 	$("#auth-form").submit(function() {
 		var password = $("#password");
 		password.css("background-color", "rgb(128, 128, 200)");
