@@ -149,7 +149,7 @@
 						$("#album-view").fadeIn(3500);
 						$("#error-text-image").fadeIn(200);
 						$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
-						window.location.hash = theAlbum;
+						window.location.hash = theAlbum.cacheBase;
 						i = -1;
 					}
 				}
