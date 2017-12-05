@@ -83,12 +83,12 @@ class Geonames(object):
 								country_name=geoname['countryName'],
 								country_code=geoname['countryCode'],
 								admin_name_1=geoname['adminName1'],
-								admin_code_1=geoname['adminCode1']
+								admin_code_1=geoname['adminCode1'],
 								name=geoname['name'],
 								geoname_id=geoname['geonameId'],
 								latitude=geoname['lat'],
 								longitude=geoname['lng'],
-								distance=geoname['distance'],
+								distance=geoname['distance']
 						)
 				return result
 
