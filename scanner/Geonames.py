@@ -1,5 +1,8 @@
+# original from https://gist.github.com/Markbnj/e1541d15699c4d2d8c98
+
 import requests
 import json
+import Options
 
 
 # For information on endpoints and arguments see the geonames
@@ -13,7 +16,7 @@ class Geonames(object):
 		API.
 		"""
 
-		GEONAMES_USER = "<A geonames.org user>"
+		GEONAMES_USER = Options.config['geonames_user']
 		GEONAMES_API = "http://api.geonames.org/"
 		_base_feature_url = "{}getJSON?geonameId={{}}&username={}&style=full".format(GEONAMES_API, GEONAMES_USER)
 		_base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&cities=cities5000&username={}".format(GEONAMES_API, GEONAMES_USER)

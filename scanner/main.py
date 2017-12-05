@@ -109,12 +109,22 @@ def main():
 		else:
 			option_value = "* " + option_value + spaces + "[DEFAULT: " + default_option_value + default_spaces + "]"
 
-
-
 		message(option, option_value)
 
 	# all cache names are lower case => bit rate must be lower case too
 	Options.config['video_transcode_bitrate'] = Options.config['video_transcode_bitrate'].lower()
+
+	# set default values
+	if Options.config['geonames_language'] == '':
+		if Options.config['language'] != '':
+			Options.config['geonames_language'] = Options.config['language']
+			message("geonames_language option unset", "using language value: " + Options.config['language'])
+		else:
+			Options.config['geonames_language'] = os.getenv('LANG')[:2]
+			message("geonames_language and language options unset", "using system language (" + Options.config['geonames_language'] + ") for geonames_language option)
+	# warn if using demo geonames user
+	if Options.config['geonames_user'] == str(default_config.get('options', 'geonames_user')):
+		message("WARNING!", "You are using the myphotoshare demo geonames user, get and use your own user as soon as possible")
 
 	# values that have type != string
 	back_level()

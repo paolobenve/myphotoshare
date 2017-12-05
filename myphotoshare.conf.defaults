@@ -116,6 +116,22 @@ mobile_thumbnail_factor = 2
 # must be sorted upward, from little to big
 clustering_distances = [20, 1000, 10000]
 
+# geoname user for geonames.org requests
+# The value here ('myphotoshare') is like a demo
+# you can use it in testing phase, but you must generate a new user for production installs:
+# simply go to http://www.geonames.org/login and use the "create a new user account" dialog
+# you'll receive an address confirmation email
+# After confirming your email address, you must enable your account for web services:
+# when you are logged in, go to your account options pages and enable web services
+# That's all!
+geonames_user = myphotoshare
+
+# The language you want to get the geonames features
+# must be a 2 character code, like 'en' (without quotes)
+# If not set, it defaults to the 'language' options (if set)
+# If 'language' is not set, it defaults to the system language
+geonames_language =
+
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _f
 by_date_string = _bd
