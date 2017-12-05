@@ -1247,10 +1247,6 @@ class Media(object):
 		return correct_date
 
 	@property
-	def year(self):
-		return str(self.date.year)
-
-	@property
 	def has_gps_data(self):
 		return "latitude" in self._attributes["metadata"]
 
@@ -1261,6 +1257,10 @@ class Media(object):
 	@property
 	def longitude(self):
 		return self._attributes["metadata"]["longitude"]
+
+	@property
+	def year(self):
+		return str(self.date.year)
 
 	@property
 	def month(self):
