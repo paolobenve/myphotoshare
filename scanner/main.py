@@ -121,7 +121,7 @@ def main():
 			message("geonames_language option unset", "using language value: " + Options.config['language'])
 		else:
 			Options.config['geonames_language'] = os.getenv('LANG')[:2]
-			message("geonames_language and language options unset", "using system language (" + Options.config['geonames_language'] + ") for geonames_language option)
+			message("geonames_language and language options unset", "using system language (" + Options.config['geonames_language'] + ") for geonames_language option")
 	# warn if using demo geonames user
 	if Options.config['geonames_user'] == str(default_config.get('options', 'geonames_user')):
 		message("WARNING!", "You are using the myphotoshare demo geonames user, get and use your own user as soon as possible")
