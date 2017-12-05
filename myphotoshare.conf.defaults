@@ -112,7 +112,7 @@ media_thumb_type = fixed_height
 # Disable this feature setting it to 1; values < 1 will be considered equivalent to 1
 mobile_thumbnail_factor = 2
 
-# the list of distance (in meters) for generating photos clusters
+# the list of distance (in meters) for generating photo clusters
 # must be sorted upward, from little to big
 clustering_distances = [20, 1000, 10000]
 
@@ -157,9 +157,9 @@ map_service = osmtools
 # user interface options
 ###########################################################
 
-# the language for the web page
-# if not set, the browser language is used
-# if set, it overrides the browser language
+# the language for the web page, a two character code like 'en' (without quotes)
+# If not set, the browser language is used
+# If set, it overrides the browser language
 language =
 
 # the title of the collections of photos/albums
