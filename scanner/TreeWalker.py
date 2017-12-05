@@ -169,7 +169,14 @@ class TreeWalker:
 			album.center['longitude'] = cluster['center']['longitude']
 			geoname = Geonames()
 			album.geonames = geoname.lookup_nearby_place(album.center['latitude'], album.center['longitude'])
-
+			# album.geonames is a dictionary with this data:
+			#  'country_name': the country name in given language
+			#  'country_code': the ISO country code
+			#  'admin_name_1': the administrative name (the region in normal states, the state in federative states) in given language
+			#  'admin_code_1': the corresponding geonames code
+			#  'name': the nearby place name
+			#  'geoname_id': the nearby place geonames id
+			#  'distance': the distance between given coordinates and nearby place geonames coordinates
 
 			for i, current_media in enumerate(cluster['media_list']):
 				if not 'cluster_list' in cluster:

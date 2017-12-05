@@ -66,7 +66,8 @@ class Geonames(object):
 
 				url = self._base_nearby_url.format(latitude, longitude, feature_filter)
 				response = requests.get(url)
-				return self._decode_nearby_place(response.text)
+				result = self._decode_nearby_place(response.text)
+				return result
 
 		def _decode_nearby_place(self, response_text):
 				"""
@@ -79,15 +80,15 @@ class Geonames(object):
 				if 'status' not in raw_result and len(raw_result['geonames']) > 0:
 						geoname = raw_result['geonames'][0]
 						result = dict(
-								distance=geoname['distance'],
-								geoname_id=geoname['geonameId'],
 								country_name=geoname['countryName'],
 								country_code=geoname['countryCode'],
 								admin_name_1=geoname['adminName1'],
-								admin_code_1=geoname['adminCode1'],
+								admin_code_1=geoname['adminCode1']
 								name=geoname['name'],
+								geoname_id=geoname['geonameId'],
 								latitude=geoname['lat'],
-								longitude=geoname['lng']
+								longitude=geoname['lng'],
+								distance=geoname['distance'],
 						)
 				return result
 
