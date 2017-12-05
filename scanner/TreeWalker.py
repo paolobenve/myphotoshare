@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from CachePath import *
+from Geonames import *
 import json
 import Options
 import re
@@ -166,6 +167,8 @@ class TreeWalker:
 			album.center = {}
 			album.center['latitude'] = cluster['center']['latitude']
 			album.center['longitude'] = cluster['center']['longitude']
+			geoname = Geonames()
+			album.geonames = geoname.lookup_nearby_place(album.center['latitude'], album.center['longitude'])
 
 
 			for i, current_media in enumerate(cluster['media_list']):

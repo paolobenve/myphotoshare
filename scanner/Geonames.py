@@ -15,12 +15,14 @@ class Geonames(object):
 		This class provides a client to call certain entrypoints of the geonames
 		API.
 		"""
-
-		GEONAMES_USER = Options.config['geonames_user']
 		GEONAMES_API = "http://api.geonames.org/"
-		_base_feature_url = "{}getJSON?geonameId={{}}&username={}&style=full".format(GEONAMES_API, GEONAMES_USER)
-		_base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&cities=cities5000&username={}".format(GEONAMES_API, GEONAMES_USER)
-		_base_neighbourhood_url = "{}neighbourhoodJSON?lat={{}}&lng={{}}&username={}".format(GEONAMES_USER, GEONAMES_USER)
+
+		def __init__(self):
+			GEONAMES_USER = Options.config['geonames_user']
+			GEONAMES_LANGUAGE = Options.config['geonames_language']
+			self._base_feature_url = "{}getJSON?geonameId={{}}&username={}&style=full&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
+			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&cities=cities5000&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
+			self._base_neighbourhood_url = "{}neighbourhoodJSON?lat={{}}&lng={{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
 
 		def lookup_feature(self, geoname_id):
 				"""
@@ -43,14 +45,11 @@ class Geonames(object):
 				result = dict(
 						geoname_id=raw_result['geonameId'],
 						name=raw_result['name'],
-						admin_name_1=raw_result['adminName1'],
-						admin_code_1=raw_result['adminCode1'],
-						time_zone=raw_result['timezone']['timeZoneId'],
-						gmt_offset=raw_result['timezone']['gmtOffset'],
 						country_name=raw_result['countryName'],
 						country_code=raw_result['countryCode'],
-						latitude=raw_result['lat'],
-						longitude=raw_result['lng']
+						admin_name_1=raw_result['adminName1'],
+						admin_code_1=raw_result['adminCode1'],
+						toponym_name=raw_result['toponymName']
 				)
 				return result
 
