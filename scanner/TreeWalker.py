@@ -282,63 +282,63 @@ class TreeWalker:
 		by_geonames_album.cache_base = cache_base(by_geonames_path)
 		by_geonames_max_file_date = None
 		for country_code, region_codes in self.tree_by_geonames.iteritems():
-			country_code_path = os.path.join(by_geonames_path, str(country_code))
-			country_code_album = Album(country_code_path)
-			country_code_album.parent = by_geonames_album
-			country_code_album.cache_base = cache_base(country_code_path)
-			country_code_max_file_date = None
-			by_geonames_album.add_album(country_code_album)
+			country_path = os.path.join(by_geonames_path, str(country_code))
+			country_album = Album(country_path)
+			country_album.parent = by_geonames_album
+			country_album.cache_base = cache_base(country_path)
+			country_max_file_date = None
+			by_geonames_album.add_album(country_album)
 			for region_code, place_codes in self.tree_by_geonames[country_code].iteritems():
-				region_code_path = os.path.join(country_code_path, str(region_code))
-				region_code_album = Album(region_code_path)
-				region_code_album.parent = country_code_album
-				region_code_album.cache_base = cache_base(region_code_path)
-				region_code_max_file_date = None
-				country_code_album.add_album(region_code_album)
+				region_path = os.path.join(country_path, str(region_code))
+				region_album = Album(region_path)
+				region_album.parent = country_album
+				region_album.cache_base = cache_base(region_path)
+				region_max_file_date = None
+				country_album.add_album(region_album)
 				for place_code, media in self.tree_by_geonames[country_code][region_code].iteritems():
 					message("elaborating place_code album...", "", 5)
-					place_code_path = os.path.join(region_code_path, str(place_code))
-					place_code_album = Album(place_code_path)
-					place_code_album.parent = region_code_album
-					place_code_album.cache_base = cache_base(place_code_path)
-					place_code_max_file_date = None
-					region_code_album.add_album(place_code_album)
+					place_path = os.path.join(region_path, str(place_code))
+					place_album = Album(place_path)
+					place_album.parent = region_album
+					place_album.cache_base = cache_base(place_path)
+					place_max_file_date = None
+					region_album.add_album(place_album)
 					for single_media in media:
-						place_code_album.add_media(single_media)
-						place_code_album.num_media_in_sub_tree += 1
-						place_code_album.num_media_in_album += 1
-						region_code_album.add_media(single_media)
-						region_code_album.num_media_in_sub_tree += 1
-						country_code_album.add_media(single_media)
-						country_code_album.num_media_in_sub_tree += 1
+						place_album.add_media(single_media)
+						place_album.num_media_in_sub_tree += 1
+						place_album.num_media_in_album += 1
+						region_album.add_media(single_media)
+						region_album.num_media_in_sub_tree += 1
+						country_album.add_media(single_media)
+						country_album.num_media_in_sub_tree += 1
 						by_geonames_album.add_media(single_media)
 						by_geonames_album.num_media_in_sub_tree += 1
 						single_media_date = max(single_media._attributes["dateTimeFile"], single_media._attributes["dateTimeDir"])
-						if place_code_max_file_date:
-							place_code_max_file_date = max(place_code_max_file_date, single_media_date)
+						if place_max_file_date:
+							place_max_file_date = max(place_max_file_date, single_media_date)
 						else:
-							place_code_max_file_date = single_media_date
-						if region_code_max_file_date:
-							region_code_max_file_date = max(region_code_max_file_date, single_media_date)
+							place_max_file_date = single_media_date
+						if region_max_file_date:
+							region_max_file_date = max(region_max_file_date, single_media_date)
 						else:
-							region_code_max_file_date = single_media_date
-						if country_code_max_file_date:
-							country_code_max_file_date = max(country_code_max_file_date, single_media_date)
+							region_max_file_date = single_media_date
+						if country_max_file_date:
+							country_max_file_date = max(country_max_file_date, single_media_date)
 						else:
-							country_code_max_file_date = single_media_date
+							country_max_file_date = single_media_date
 						if by_geonames_max_file_date:
 							by_geonames_max_file_date = max(by_geonames_max_file_date, single_media_date)
 						else:
 							by_geonames_max_file_date = single_media_date
-					self.all_albums.append(place_code_album)
+					self.all_albums.append(place_album)
 					next_level()
 					message("place album elaborated", media[0].country_code + "-" + media[0].region_code + "-" + media[0].place_name, 4)
 					back_level()
-					self.generate_composite_image(place_code_album, place_code_max_file_date)
-				self.all_albums.append(region_code_album)
-				self.generate_composite_image(region_code_album, region_code_max_file_date)
-			self.all_albums.append(country_code_album)
-			self.generate_composite_image(country_code_album, country_code_max_file_date)
+					self.generate_composite_image(place_album, place_max_file_date)
+				self.all_albums.append(region_album)
+				self.generate_composite_image(region_album, region_max_file_date)
+			self.all_albums.append(country_album)
+			self.generate_composite_image(country_album, country_max_file_date)
 		self.all_albums.append(by_geonames_album)
 		if by_geonames_album.num_media_in_sub_tree > 0:
 			self.generate_composite_image(by_geonames_album, by_geonames_max_file_date)
