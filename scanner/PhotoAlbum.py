@@ -1270,12 +1270,6 @@ class Media(object):
 	@property
 	def day(self):
 		return str(self.date.day).zfill(2)
-	#~ @property
-	#~ def year_month(self):
-		#~ return self.year + " " + self.month
-	#~ @property
-	#~ def year_month_day(self):
-		#~ return self.year_month + " " + self.day
 
 	@property
 	def year_album_path(self):
