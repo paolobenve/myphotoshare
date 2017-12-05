@@ -6,6 +6,7 @@ import locale
 locale.setlocale(locale.LC_ALL, '')
 from CachePath import *
 from datetime import datetime
+from Geonames import *
 import json
 import os
 import os.path
@@ -342,6 +343,17 @@ class Media(object):
 			if isinstance(image, Image.Image):
 				self._photo_metadata(image)
 				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
+				if self.has_gps_data:
+					geoname = Geonames()
+					self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
+					# self._attributes["geoname"] is a dictionary with this data:
+					#  'country_name': the country name in given language
+					#  'country_code': the ISO country code
+					#  'admin_name_1': the administrative name (the region in normal states, the state in federative states) in given language
+					#  'admin_code_1': the corresponding geonames code
+					#  'name': the nearby place name
+					#  'geoname_id': the nearby place geonames id
+					#  'distance': the distance between given coordinates and nearby place geonames coordinates
 			else:
 				# try with video detection
 				self._video_metadata(media_path)
@@ -354,7 +366,7 @@ class Media(object):
 					message("error transcodind, not a video?", media_path, 5)
 					back_level()
 					self.is_valid = False
-					return
+		return
 
 	def _photo_metadata(self, image):
 		next_level()
@@ -1272,6 +1284,30 @@ class Media(object):
 		return str(self.date.day).zfill(2)
 
 	@property
+	def country_name(self):
+		return str(self._attributes["geoname"]["country_name"])
+
+	@property
+	def country_code(self):
+		return str(self._attributes["geoname"]["country_code"])
+
+	@property
+	def region_name(self):
+		return str(self._attributes["geoname"]["admin_name_1"])
+
+	@property
+	def region_code(self):
+		return str(self._attributes["geoname"]["admin_code_1"])
+
+	@property
+	def place_name(self):
+		return str(self._attributes["geoname"]["name"])
+
+	@property
+	def place_code(self):
+		return str(self._attributes["geoname"]["geoname_id"])
+
+	@property
 	def year_album_path(self):
 		return Options.config['by_date_string'] + "/" + self.year
 
@@ -1282,6 +1318,18 @@ class Media(object):
 	@property
 	def day_album_path(self):
 		return self.month_album_path + "/" + self.day
+
+	@property
+	def country_album_path(self):
+		return Options.config['by_gps_string'] + "/" + self.country_code
+
+	@property
+	def region_album_path(self):
+		return self.country_album_path + "/" + self.region_code
+
+	@property
+	def place_album_path(self):
+		return self.region_album_path + "/" + self.place_code
 
 	@property
 	def gps_album_path(self):
