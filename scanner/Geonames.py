@@ -47,8 +47,8 @@ class Geonames(object):
 						name=raw_result['name'],
 						country_name=raw_result['countryName'],
 						country_code=raw_result['countryCode'],
-						admin_name_1=raw_result['adminName1'],
-						admin_code_1=raw_result['adminCode1'],
+						region_name=raw_result['adminName1'],
+						region_code=raw_result['adminCode1'],
 						toponym_name=raw_result['toponymName']
 				)
 				return result
@@ -82,10 +82,10 @@ class Geonames(object):
 						result = dict(
 								country_name=geoname['countryName'],
 								country_code=geoname['countryCode'],
-								admin_name_1=geoname['adminName1'],
-								admin_code_1=geoname['adminCode1'],
-								name=geoname['name'],
-								geoname_id=geoname['geonameId'],
+								region_name=geoname['adminName1'],
+								region_code=geoname['adminCode1'],
+								place_name=geoname['name'],
+								place_code=geoname['geonameId'],
 								latitude=geoname['lat'],
 								longitude=geoname['lng'],
 								distance=geoname['distance']

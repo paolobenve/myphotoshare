@@ -449,6 +449,10 @@ $(document).ready(function() {
 
 		dateTitle = components.length > 1 && components[1] == Options.by_date_string;
 		gpsTitle = components.length > 1 && components[1] == Options.by_gps_string;
+		if (gpsTitle) {
+			var gpsName = '';
+			var mediaForNames = null;
+		}
 		gpsLength = Options.clustering_distances.length;
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
 		var textComponents = [];
@@ -461,6 +465,20 @@ $(document).ready(function() {
 		if (isMobile.any())
 			titleAnchorClasses += ' mobile';
 		for (i = 0; i < components.length; ++i) {
+			if (gpsTitle) {
+				if (currentMedia !== null)
+					mediaForNames = currentMedia;
+				else
+					mediaForNames = currentAlbum.media[0];
+				if (i == 2)
+					gpsName = mediaForNames.geoname.country_name;
+				else if (i == 3)
+					gpsName = mediaForNames.geoname.region_name;
+				else if (i == 4)
+					gpsName = mediaForNames.geoname.place_name;
+				var gpsHtmlTitle = _t("#place-icon-title") + " " + gpsName;
+			}
+
 			if (i != 1 || components[i] != Options.folders_string) {
 				if (i < components.length - 1 || currentMedia !== null) {
 					if (i != 0 || ! (dateTitle || gpsTitle)) {
@@ -486,7 +504,7 @@ $(document).ready(function() {
 				else {
 					if (gpsTitle && i >= 2 && i <= 4) {
 						// i == 2 corresponds to level 2 (town), i == 4 to level 0 (place),
-						title += _t("#place-names")[4 - i].toString();
+						title += gpsName;
 						if (currentMedia !== null) {
 							latitude = currentMedia.metadata.latitude;
 							longitude = currentMedia.metadata.longitude;
@@ -503,7 +521,7 @@ $(document).ready(function() {
 							spanOpened = false;
 						}
 						title += "<a href=" + mapLink(latitude, longitude, mapZooms[(4 - i)]) + " target='_blank'>" +
-											"<img class='title-img' title='" + _t("#place-icon-titles")[4 - i] + " [s]' alt='" + _t("#place-icon-titles")[4 - i] + "' height='15px' src='img/world-map-with-pointer.png'>" +
+											"<img class='title-img' title='" + gpsHtmlTitle + " [s]' alt='" + gpsHtmlTitle + "' height='15px' src='img/world-map-with-pointer.png'>" +
 											"</a>";
 					} else
 						title += textComponents[i];
@@ -578,7 +596,7 @@ $(document).ready(function() {
 				latitude = currentMedia.metadata.latitude;
 				longitude = currentMedia.metadata.longitude;
 				title += "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
-										"<img class='title-img' title='" + _t("#place-icon-titles")[0] + " [s]' alt='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world-map-with-pointer.png'>" +
+										"<img class='title-img' title='" + gpsHtmlTitle + " [s]' alt='" + gpsHtmlTitle + "' height='15px' src='img/world-map-with-pointer.png'>" +
 										"</a>";
 			}
 		}
@@ -989,7 +1007,7 @@ $(document).ready(function() {
 						var latitude = currentAlbum.media[i].metadata.latitude;
 						var longitude = currentAlbum.media[i].metadata.longitude;
 						mapLinkIcon = "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
-													"<img class='thumbnail-map-link' title='" + _t("#place-icon-titles")[0] + " [s]' alt='" + _t("#place-icon-titles")[0] + "' height='15px' src='img/world-map-with-pointer.png'>" +
+													"<img class='thumbnail-map-link' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='15px' src='img/world-map-with-pointer.png'>" +
 													"</a>";
 					}
 
@@ -1170,15 +1188,22 @@ $(document).ready(function() {
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
 								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
-									var level = 4 - subalbum.cacheBase.split(Options.cache_folder_separator).length;
-									var folderTitle = _t("#place-icon-titles")[level] + '[s]';
+									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 1;
+									var folderName = '';
+									if (level == 1)
+										folderName = randomAlbum.media[0].geoname.country_name;
+									else if (level == 2)
+										folderName = randomAlbum.media[0].geoname.region_name;
+									else if (level == 3)
+										folderName = randomAlbum.media[0].geoname.place_name;
+
 									folder = "<span class='gps-folder'>" +
-														_t("#place-names")[level] + " " + PhotoFloat.subalbumIndex +
+														folderName +
 														"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, mapZooms[level]) +
-																		"' title='" + folderTitle +
+																		"' title='" + folderName +
 																		"' target='_blank'" +
 																">" +
-															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/world.png' />" +
+															"<img class='title-img' title='" + folderName + "'  alt='" + folderName + "' height='15px' src='img/world.png' />" +
 														"</a>" +
 													"</span>";
 								}

@@ -1293,19 +1293,19 @@ class Media(object):
 
 	@property
 	def region_name(self):
-		return str(self._attributes["geoname"]["admin_name_1"])
+		return str(self._attributes["geoname"]["region_name"])
 
 	@property
 	def region_code(self):
-		return str(self._attributes["geoname"]["admin_code_1"])
+		return str(self._attributes["geoname"]["region_code"])
 
 	@property
 	def place_name(self):
-		return str(self._attributes["geoname"]["name"])
+		return str(self._attributes["geoname"]["place_name"])
 
 	@property
 	def place_code(self):
-		return str(self._attributes["geoname"]["geoname_id"])
+		return str(self._attributes["geoname"]["place_code"])
 
 	@property
 	def year_album_path(self):

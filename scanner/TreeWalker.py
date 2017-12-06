@@ -284,6 +284,7 @@ class TreeWalker:
 		for country_code, region_codes in self.tree_by_geonames.iteritems():
 			country_path = os.path.join(by_geonames_path, str(country_code))
 			country_album = Album(country_path)
+			country_album.center = {}
 			country_album.parent = by_geonames_album
 			country_album.cache_base = cache_base(country_path)
 			country_max_file_date = None
@@ -291,6 +292,7 @@ class TreeWalker:
 			for region_code, place_codes in self.tree_by_geonames[country_code].iteritems():
 				region_path = os.path.join(country_path, str(region_code))
 				region_album = Album(region_path)
+				region_album.center = {}
 				region_album.parent = country_album
 				region_album.cache_base = cache_base(region_path)
 				region_max_file_date = None
@@ -299,11 +301,13 @@ class TreeWalker:
 					message("elaborating place_code album...", "", 5)
 					place_path = os.path.join(region_path, str(place_code))
 					place_album = Album(place_path)
+					place_album.center = {}
 					place_album.parent = region_album
 					place_album.cache_base = cache_base(place_path)
 					place_max_file_date = None
 					region_album.add_album(place_album)
-					for single_media in media:
+					for i, single_media in enumerate(media):
+						media[i].gps_path = remove_album_path(place_path)
 						place_album.add_media(single_media)
 						place_album.num_media_in_sub_tree += 1
 						place_album.num_media_in_album += 1
@@ -313,6 +317,28 @@ class TreeWalker:
 						country_album.num_media_in_sub_tree += 1
 						by_geonames_album.add_media(single_media)
 						by_geonames_album.num_media_in_sub_tree += 1
+
+						if place_album.center == {}:
+							place_album.center['latitude'] = single_media.latitude
+							place_album.center['longitude'] = single_media.longitude
+						else:
+							place_album.center['latitude'] = self.recalculate_mean(place_album.center['latitude'], len(place_album.media_list), single_media.latitude)
+							place_album.center['longitude'] = self.recalculate_mean(place_album.center['longitude'], len(place_album.media_list), single_media.longitude)
+
+						if region_album.center == {}:
+							region_album.center['latitude'] = single_media.latitude
+							region_album.center['longitude'] = single_media.longitude
+						else:
+							region_album.center['latitude'] = self.recalculate_mean(region_album.center['latitude'], len(region_album.media_list), single_media.latitude)
+							region_album.center['longitude'] = self.recalculate_mean(region_album.center['longitude'], len(region_album.media_list), single_media.longitude)
+
+						if country_album.center == {}:
+							country_album.center['latitude'] = single_media.latitude
+							country_album.center['longitude'] = single_media.longitude
+						else:
+							country_album.center['latitude'] = self.recalculate_mean(country_album.center['latitude'], len(country_album.media_list), single_media.latitude)
+							country_album.center['longitude'] = self.recalculate_mean(country_album.center['longitude'], len(country_album.media_list), single_media.longitude)
+
 						single_media_date = max(single_media._attributes["dateTimeFile"], single_media._attributes["dateTimeDir"])
 						if place_max_file_date:
 							place_max_file_date = max(place_max_file_date, single_media_date)
