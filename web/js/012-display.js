@@ -1197,12 +1197,14 @@ $(document).ready(function() {
 								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
 									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
 									var folderName = '';
+									var folderTitle = '';
 									if (level == 0)
 										folderName = randomAlbum.media[0].geoname.country_name;
 									else if (level == 1)
 										folderName = randomAlbum.media[0].geoname.region_name;
 									else if (level == 2)
 										folderName = randomAlbum.media[0].geoname.place_name;
+									folderTitle = _t('#place-icon-title') + folderName;
 
 									folder = "<span class='gps-folder'>" +
 														folderName +
@@ -1210,7 +1212,7 @@ $(document).ready(function() {
 																		"' title='" + folderName +
 																		"' target='_blank'" +
 																">" +
-															"<img class='title-img' title='" + folderName + "'  alt='" + folderName + "' height='15px' src='img/world.png' />" +
+															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/world.png' />" +
 														"</a>" +
 													"</span>";
 								}
