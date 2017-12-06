@@ -112,10 +112,6 @@ media_thumb_type = fixed_height
 # Disable this feature setting it to 1; values < 1 will be considered equivalent to 1
 mobile_thumbnail_factor = 2
 
-# the list of distance (in meters) for generating photo clusters
-# must be sorted upward, from little to big
-clustering_distances = [20, 1000, 10000]
-
 # geoname user for geonames.org requests
 # The value here ('myphotoshare') is like a demo
 # you can use it in testing phase, but you must generate a new user for production installs:

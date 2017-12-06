@@ -60,7 +60,9 @@ $(document).ready(function() {
 	var fromEscKey = false;
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
-	var mapZooms = [];
+		// set the map zooms for country, region, place, and photo
+		// they have been chosen in order to fit to Europe distances
+	var mapZooms = [6, 9, 15, 16];
 
 	/* Displays */
 
@@ -481,7 +483,7 @@ $(document).ready(function() {
 					gpsName = mediaForNames.geoname.region_name;
 				else if (i == 4)
 					gpsName = mediaForNames.geoname.place_name;
-				gpsHtmlTitle = _t("#place-icon-title") + " " + gpsName;
+				gpsHtmlTitle = _t("#place-icon-title") + gpsName;
 			}
 
 			if (i != 1 || components[i] != Options.folders_string) {
@@ -493,7 +495,7 @@ $(document).ready(function() {
 						} else {
 							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
 							if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
-								titleAdd += " title='" + _t("#place-title") + Options.clustering_distances[4 - i] + _t("#place-title-end") + "[" +components[i].replace('_', ', ') + "]'";
+								titleAdd += " title='" + _t("#place-icon-title") + gpsName + _t("#place-icon-title-end") + "'";
 							title += titleAdd + ">";
 							anchorOpened = true;
 						}
@@ -508,7 +510,7 @@ $(document).ready(function() {
 					title += "(" + _t("#by-gps") + ")";
 				else {
 					if (gpsTitle && i >= 2 && i <= 4) {
-						// i == 2 corresponds to level 2 (town), i == 4 to level 0 (place),
+						// i == 2 corresponds to the country, i == 4 to the place,
 						title += gpsName;
 						if (currentMedia !== null) {
 							latitude = currentMedia.metadata.latitude;
@@ -525,8 +527,8 @@ $(document).ready(function() {
 							title += "</span>";
 							spanOpened = false;
 						}
-						title += "<a href=" + mapLink(latitude, longitude, mapZooms[(4 - i)]) + " target='_blank'>" +
-											"<img class='title-img' title='" + gpsHtmlTitle + " [s]' alt='" + gpsHtmlTitle + "' height='15px' src='img/world-map-with-pointer.png'>" +
+						title += "<a href=" + mapLink(latitude, longitude, mapZooms[(i - 2)]) + " target='_blank'>" +
+											"<img class='title-img' title='" + gpsHtmlTitle + "' alt='" + gpsHtmlTitle + "' height='15px' src='img/world-map-with-pointer.png'>" +
 											"</a>";
 					} else
 						title += textComponents[i];
@@ -600,8 +602,8 @@ $(document).ready(function() {
 			if (hasGpsData(currentMedia)) {
 				latitude = currentMedia.metadata.latitude;
 				longitude = currentMedia.metadata.longitude;
-				title += "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
-										"<img class='title-img' title='" + gpsHtmlTitle + " [s]' alt='" + gpsHtmlTitle + "' height='15px' src='img/world-map-with-pointer.png'>" +
+				title += "<a href=" + mapLink(latitude, longitude, mapZooms[3]) + " target='_blank'>" +
+										"<img class='title-img' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='15px' src='img/world-map-with-pointer.png'>" +
 										"</a>";
 			}
 		}
@@ -1193,13 +1195,13 @@ $(document).ready(function() {
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
 								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
-									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 1;
+									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
 									var folderName = '';
-									if (level == 1)
+									if (level == 0)
 										folderName = randomAlbum.media[0].geoname.country_name;
-									else if (level == 2)
+									else if (level == 1)
 										folderName = randomAlbum.media[0].geoname.region_name;
-									else if (level == 3)
+									else if (level == 2)
 										folderName = randomAlbum.media[0].geoname.place_name;
 
 									folder = "<span class='gps-folder'>" +
@@ -2098,11 +2100,6 @@ $(document).ready(function() {
 					byGpsRegex = "^" + Options.by_gps_string + "\/";
 
 					maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
-
-					for (var i = 0; i < Options.clustering_distances.length; i ++) {
-						// the formula assures that 100px == 2 * clustering distance
-						mapZooms[i] = Math.floor(Math.log2(50 * levelZeroSpecificDistance / Options.clustering_distances[i]))
-					}
 
 					callback(location.hash, hashParsed, die);
 				},
