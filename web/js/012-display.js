@@ -1749,12 +1749,16 @@ $(document).ready(function() {
 			$("#by-date-view-container").show();
 			if (hasGpsData(currentMedia))
 				$("#by-gps-view-container").show();
+			else
+				$("#by-gps-view-container").hide();
 		} else if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
 			// by date album: change to folder or by gps view
 			$("#folders-view-container").show();
 			$("#by-date-view-container").hide();
 			if (hasGpsData(currentMedia))
 				$("#by-gps-view-container").show();
+			else
+				$("#by-gps-view-container").hide();
 		} else if (currentAlbum.path.indexOf(Options.by_gps_string) === 0) {
 			// by gps album: change to folder or by day view
 			$("#folders-view-container").show();
