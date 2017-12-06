@@ -31,6 +31,7 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Optional Google Analytics and Piwik integration
 * Optional server-side authentication support
 * Media can be browsed by folder or by date or by gps data
+* Gps data view is organized by country, region/state, place
 * Many customization through config file
 * Cache folder can be managed with subdirs (useful for large repositories)
 * Albums server folder can be anywhere on the server
@@ -285,9 +286,8 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ### version 3.0 beta (December 1, 2017):
 
-* Manages photos gps data
-* new option `clustering_distances`: an ascending list of distances for clustering geotagged photos
-* new options `map_service`: can be "openstreetmap", "googlemaps", or osmtools; the last allow a marker on the map
+* Manages photo's gps data, retrieves map names from geonames.org web service
+* new options `map_service`: specify what service is used for showing maps; can be "openstreetmap", "googlemaps", or osmtools; the last allows a marker on the map
 
 ### version 2.8 (November 18, 2017):
 
