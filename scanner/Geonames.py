@@ -69,7 +69,7 @@ class Geonames(object):
 				response = requests.get(url)
 				result = self._decode_nearby_place(response.text)
 				# I had an idea of running another request in order to get the nearest city with population of 15000+ and use it as an intermediate level between region and places
-				# I'm not convinced it's a good thing...
+				# I'm not sure it's a good thing...
 				# url = self._base_nearby_city_url.format(latitude, longitude, feature_filter)
 				# print "looking up city", url
 				# response = requests.get(url)
@@ -107,5 +107,5 @@ class Geonames(object):
 								if index[-5:] == '_code':
 									result[index] = '000'
 								else:
-									result[index] = '_'
+									result[index] = '(?)'
 				return result
