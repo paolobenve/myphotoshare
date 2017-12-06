@@ -1013,7 +1013,7 @@ $(document).ready(function() {
 					if (hasGpsData(currentAlbum.media[i])) {
 						var latitude = currentAlbum.media[i].metadata.latitude;
 						var longitude = currentAlbum.media[i].metadata.longitude;
-						mapLinkIcon = "<a href=" + mapLink(latitude, longitude, mapZooms[0]) + " target='_blank'>" +
+						mapLinkIcon = "<a href=" + mapLink(latitude, longitude, mapZooms[3]) + " target='_blank'>" +
 													"<img class='thumbnail-map-link' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='15px' src='img/world-map-with-pointer.png'>" +
 													"</a>";
 					}
@@ -1310,9 +1310,9 @@ $(document).ready(function() {
 				$("#by-date-view-container").hide();
 				photoFloat.showByGpsButton();
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
-					$("#folders-view-container").show();
-					$("#by-date-view-container").show();
-					$("#by-gps-view-container").hide();
+				$("#folders-view-container").show();
+				$("#by-date-view-container").show();
+				$("#by-gps-view-container").hide();
 			} else {
 				$("#folders-view-container").hide();
 				$("#by-date-view-container").hide();
@@ -1724,7 +1724,7 @@ $(document).ready(function() {
 					]));
 		//$("#day-folders-view-link").attr("href", changeViewLink);
 
-		if (currentAlbum.path.indexOf(Options.folders_string) === 0) {
+		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
 			// folder album: change to by date or by gps view
 			$("#folders-view-container").hide();
 			$("#by-date-view-container").show();
@@ -1732,7 +1732,7 @@ $(document).ready(function() {
 				$("#by-gps-view-container").show();
 			else
 				$("#by-gps-view-container").hide();
-		} else if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
+		} else if (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0) {
 			// by date album: change to folder or by gps view
 			$("#folders-view-container").show();
 			$("#by-date-view-container").hide();
@@ -1740,7 +1740,7 @@ $(document).ready(function() {
 				$("#by-gps-view-container").show();
 			else
 				$("#by-gps-view-container").hide();
-		} else if (currentAlbum.path.indexOf(Options.by_gps_string) === 0) {
+		} else if (currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0) {
 			// by gps album: change to folder or by day view
 			$("#folders-view-container").show();
 			$("#by-date-view-container").show();
@@ -1794,7 +1794,7 @@ $(document).ready(function() {
 		linkTitle = _t('#show-map') + Options.map_service;
 		$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
 			ev.stopPropagation();
-			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, mapZooms[0]), '_blank');
+			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, mapZooms[3]), '_blank');
 		});
 
 		translate();
