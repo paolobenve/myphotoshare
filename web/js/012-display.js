@@ -371,6 +371,13 @@ $(document).ready(function() {
 	function setTitle() {
 		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, sortButtons, m;
+		// gpsLevelNumber is the number of levels for the by gps tree
+		// current levels are country, region, place => 3
+		var gpsLevelNumber = 3;
+		var gpsName = '';
+		var mediaForNames = null;
+		var gpsHtmlTitle;
+
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
 		else
@@ -450,10 +457,8 @@ $(document).ready(function() {
 		dateTitle = components.length > 1 && components[1] == Options.by_date_string;
 		gpsTitle = components.length > 1 && components[1] == Options.by_gps_string;
 		if (gpsTitle) {
-			var gpsName = '';
-			var mediaForNames = null;
 		}
-		gpsLength = Options.clustering_distances.length;
+
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
 		var textComponents = [];
 		for (i = 0; i < components.length; ++i)
@@ -476,7 +481,7 @@ $(document).ready(function() {
 					gpsName = mediaForNames.geoname.region_name;
 				else if (i == 4)
 					gpsName = mediaForNames.geoname.place_name;
-				var gpsHtmlTitle = _t("#place-icon-title") + " " + gpsName;
+				gpsHtmlTitle = _t("#place-icon-title") + " " + gpsName;
 			}
 
 			if (i != 1 || components[i] != Options.folders_string) {
@@ -540,7 +545,7 @@ $(document).ready(function() {
 							title += currentAlbum.media.length + " ";
 							title += _t(".title-media") + " ";
 							if (gpsTitle) {
-								if (components.length >= gpsLength + 2)
+								if (components.length >= gpsLevelNumber + 2)
 									title += _t("#title-in-gps-album");
 								else
 									title += _t("#title-in-gpss-album");

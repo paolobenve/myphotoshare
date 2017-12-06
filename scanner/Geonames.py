@@ -21,7 +21,7 @@ class Geonames(object):
 			GEONAMES_USER = Options.config['geonames_user']
 			GEONAMES_LANGUAGE = Options.config['geonames_language']
 			self._base_feature_url = "{}getJSON?geonameId={{}}&username={}&style=full&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
-			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&cities=cities5000&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
+			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
 			self._base_neighbourhood_url = "{}neighbourhoodJSON?lat={{}}&lng={{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
 
 		def lookup_feature(self, geoname_id):
@@ -64,6 +64,7 @@ class Geonames(object):
 				if feature_code:
 						feature_filter += "&featureCode={}".format(feature_code)
 
+				# get country, region (state for federal countries), and place
 				url = self._base_nearby_url.format(latitude, longitude, feature_filter)
 				response = requests.get(url)
 				result = self._decode_nearby_place(response.text)
@@ -75,43 +76,28 @@ class Geonames(object):
 				returns the properties in a dict.
 				"""
 				raw_result = json.loads(response_text)
-				result = None
+				result = {}
 
 				if 'status' not in raw_result and len(raw_result['geonames']) > 0:
 						geoname = raw_result['geonames'][0]
-						result = dict(
-								country_name=geoname['countryName'],
-								country_code=geoname['countryCode'],
-								region_name=geoname['adminName1'],
-								region_code=geoname['adminCode1'],
-								place_name=geoname['name'],
-								place_code=geoname['geonameId'],
-								latitude=geoname['lat'],
-								longitude=geoname['lng'],
-								distance=geoname['distance']
-						)
-				return result
-
-		def lookup_neighbourhood(self, latitude, longitude):
-				"""
-				Finds the neighborhood record for a specific geographic location.
-				"""
-				url = self._base_neighbourhood_url.format(latitude, longitude)
-				response = requests.get(url)
-				return self._decode_neighbourhood(response.text)
-
-		def _decode_neighbourhood(self, response_text):
-				raw_result = json.loads(response_text)
-				result = None
-
-				if 'status' not in raw_result:
-						result = dict(
-								country_name=raw_result['neighbourhood']['countryName'],
-								country_code=raw_result['neighbourhood']['countryCode'],
-								admin_name_1=raw_result['neighbourhood']['adminName1'],
-								admin_code_1=raw_result['neighbourhood']['adminCode1'],
-								admin_name_2=raw_result['neighbourhood']['adminName2'],
-								city=raw_result['neighbourhood']['city'],
-								name=raw_result['neighbourhood']['name']
-						)
+						correspondence = {
+							'country_name': 'countryName',
+							'country_code': 'countryCode',
+							'region_name': 'adminName1',
+							'region_code': 'adminCode1',
+							'place_name': 'name',
+							'place_code': 'geonameId',
+							'latitude': 'lat',
+							'longitude': 'lng',
+							'distance': 'distance'
+						}
+						for index in correspondence:
+							# vatican places don't have region fields, and perhaps others fields could not exist
+							if correspondence[index] in geoname:
+								result[index] = geoname[correspondence[index]]
+							else:
+								if index[-5:] == '_code':
+									result[index] = '000'
+								else:
+									result[index] = '_'
 				return result

@@ -349,10 +349,10 @@ class Media(object):
 					# self._attributes["geoname"] is a dictionary with this data:
 					#  'country_name': the country name in given language
 					#  'country_code': the ISO country code
-					#  'admin_name_1': the administrative name (the region in normal states, the state in federative states) in given language
-					#  'admin_code_1': the corresponding geonames code
-					#  'name': the nearby place name
-					#  'geoname_id': the nearby place geonames id
+					#  'region_name': the administrative name (the region in normal states, the state in federative states) in given language
+					#  'region_code': the corresponding geonames code
+					#  'place_name': the nearby place name
+					#  'place_code': the nearby place geonames id
 					#  'distance': the distance between given coordinates and nearby place geonames coordinates
 			else:
 				# try with video detection
