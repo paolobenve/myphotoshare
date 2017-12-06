@@ -1545,25 +1545,6 @@ $(document).ready(function() {
 		}
 
 		if (currentMedia.mediaType == "photo" || currentMedia.mediaType == "video" && videoOK) {
-			// if (currentAlbum.cacheBase.indexOf(Options.folders_string) == 0) {
-			// 	$("#folders-view-container").hide();
-			// 	$("#by-date-view-container").show();
-			// 	if (hasGpsData(currentMedia))
-			// 		$("#by-gps-view-container").show();
-			// 	else
-			// 		$("#by-gps-view-container").hide();
-			// } else if (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0) {
-			// 	$("#folders-view-container").show();
-			// 	$("#by-date-view-container").hide();
-			// 	if (hasGpsData(currentMedia))
-			// 		$("#by-gps-view-container").show();
-			// 	else
-			// 		$("#by-gps-view-container").hide();
-			// } else if (currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0) {
-			// 	$("#folders-view-container").show();
-			// 	$("#by-date-view-container").show();
-			// 	$("#by-gps-view-container").hide();
-			// }
 
 			if (currentMedia.mediaType == "video") {
 				if (fullScreenStatus && currentMedia.albumName.match(/\.avi$/) === null) {
