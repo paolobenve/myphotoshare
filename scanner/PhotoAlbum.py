@@ -344,6 +344,8 @@ class Media(object):
 				self._photo_metadata(image)
 				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
 				if self.has_gps_data:
+					next_level()
+					message("looking for geonames...", media_path, 5)
 					geoname = Geonames()
 					self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
 					# self._attributes["geoname"] is a dictionary with this data:
@@ -354,6 +356,7 @@ class Media(object):
 					#  'place_name': the nearby place name
 					#  'place_code': the nearby place geonames id
 					#  'distance': the distance between given coordinates and nearby place geonames coordinates
+					back_level()
 			else:
 				# try with video detection
 				self._video_metadata(media_path)

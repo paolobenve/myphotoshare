@@ -3,6 +3,7 @@
 import requests
 import json
 import Options
+from CachePath import *
 
 
 # For information on endpoints and arguments see the geonames
@@ -16,6 +17,8 @@ class Geonames(object):
 		API.
 		"""
 		GEONAMES_API = "http://api.geonames.org/"
+		# through this cache many calls to geonames web services are saved
+		geonames_cache = {}
 
 		def __init__(self):
 			GEONAMES_USER = Options.config['geonames_user']
@@ -29,6 +32,15 @@ class Geonames(object):
 				Looks up places near a specific geographic location, optionally
 				filtering for feature class and feature code.
 				"""
+
+				if (latitude, longitude, feature_class, feature_code) in Geonames.geonames_cache:
+					# get it from cache!
+					result = Geonames.geonames_cache[(latitude, longitude, feature_class, feature_code)]
+					next_level()
+					message("geoname got from cache", "", 5)
+					back_level()
+					return result
+
 				feature_filter = ''
 				if feature_class:
 						feature_filter += "&featureClass={}".format(feature_class)
@@ -39,6 +51,9 @@ class Geonames(object):
 				url = self._base_nearby_url.format(latitude, longitude, feature_filter)
 				response = requests.get(url)
 				result = self._decode_nearby_place(response.text)
+				next_level()
+				message("geoname got from geonames.org", "", 5)
+				back_level()
 				# I had an idea of running another request in order to get the nearest city with population of 15000+ and use it as an intermediate level between region and places
 				# I'm not sure it's a good thing...
 				# url = self._base_nearby_city_url.format(latitude, longitude, feature_filter)
@@ -47,6 +62,9 @@ class Geonames(object):
 				# result_city = self._decode_nearby_place(response.text)
 				# result['city_name'] = result_city['place_name']
 				# result['city_code'] = result_city['place_code']
+
+				Geonames.geonames_cache[(latitude, longitude, feature_class, feature_code)] = result
+
 				return result
 
 		def _decode_nearby_place(self, response_text):
