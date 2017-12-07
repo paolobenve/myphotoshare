@@ -1218,7 +1218,7 @@ class Media(object):
 					)
 				)
 			)
-			if Options.config['album_thumb_type'] == "fit":
+			if Options.config['album_thumb_type'] == "fit" and not mobile_bigger:
 				# album square thumbnail path (it's generated always)
 				caches.append(
 					os.path.join(
