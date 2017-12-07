@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from CachePath import *
+from Geonames import *
 import json
 import Options
 import re
