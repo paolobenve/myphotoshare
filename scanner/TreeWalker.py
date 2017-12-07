@@ -360,12 +360,11 @@ class TreeWalker:
 						album = cached_album
 						message("adding media in album to big lists...", "", 5)
 						for media in album.media:
-							if not any(media.media_file_name == _media.media_file_name for _media in album.media):
+							if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
 								self.all_media.append(media)
 								self.add_media_to_tree_by_date(media)
 								if media.has_gps_data:
 									self.add_media_to_tree_by_geonames(media)
-								self.add_media_to_gps_data_list(media)
 						next_level()
 						message("added media to big lists", "", 5)
 						back_level()
@@ -467,7 +466,7 @@ class TreeWalker:
 					back_level()
 					if (
 						cached_media and
-						mtime != cached_media.attributes["dateTimeFile"]
+						mtime == cached_media.attributes["dateTimeFile"]
 					):
 						cache_files = cached_media.image_caches
 						# check if the cache files actually exist and are not old
