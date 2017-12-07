@@ -24,35 +24,6 @@ class Geonames(object):
 			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
 			self._base_neighbourhood_url = "{}neighbourhoodJSON?lat={{}}&lng={{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
 
-		def lookup_feature(self, geoname_id):
-				"""
-				Looks up a feature based on its geonames id
-				"""
-				url = self._base_feature_url.format(geoname_id)
-				response = requests.get(url)
-				return self._decode_feature(response.text)
-
-		def _decode_feature(self, response_text):
-				"""
-				Decodes the response from geonames.org feature lookup and
-				returns the properties in a dict.
-				"""
-				raw_result = json.loads(response_text)
-
-				if 'status' in raw_result:
-						raise Exception("Geonames: call returned status {}".format(raw_result['status']['value']))
-
-				result = dict(
-						geoname_id=raw_result['geonameId'],
-						name=raw_result['name'],
-						country_name=raw_result['countryName'],
-						country_code=raw_result['countryCode'],
-						region_name=raw_result['adminName1'],
-						region_code=raw_result['adminCode1'],
-						toponym_name=raw_result['toponymName']
-				)
-				return result
-
 		def lookup_nearby_place(self, latitude, longitude, feature_class='P', feature_code=None):
 				"""
 				Looks up places near a specific geographic location, optionally
@@ -108,4 +79,33 @@ class Geonames(object):
 									result[index] = '000'
 								else:
 									result[index] = '(?)'
+				return result
+
+		def lookup_feature(self, geoname_id):
+				"""
+				Looks up a feature based on its geonames id
+				"""
+				url = self._base_feature_url.format(geoname_id)
+				response = requests.get(url)
+				return self._decode_feature(response.text)
+
+		def _decode_feature(self, response_text):
+				"""
+				Decodes the response from geonames.org feature lookup and
+				returns the properties in a dict.
+				"""
+				raw_result = json.loads(response_text)
+
+				if 'status' in raw_result:
+						raise Exception("Geonames: call returned status {}".format(raw_result['status']['value']))
+
+				result = dict(
+						geoname_id=raw_result['geonameId'],
+						name=raw_result['name'],
+						country_name=raw_result['countryName'],
+						country_code=raw_result['countryCode'],
+						region_name=raw_result['adminName1'],
+						region_code=raw_result['adminCode1'],
+						toponym_name=raw_result['toponymName']
+				)
 				return result
