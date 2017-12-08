@@ -378,9 +378,11 @@ class TreeWalker:
 		except IOError:
 			next_level()
 			message("json file unexistent", json_message, 4)
+			json_file_OK = False
 			back_level()
 		except (ValueError, AttributeError, KeyError) as e:
 			message(" json file invalid", json_message, 4)
+			json_file_OK = False
 			cached_album = None
 
 		if not json_file_OK:
