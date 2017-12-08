@@ -288,6 +288,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 * Manages photo's gps data, retrieves map names from geonames.org web service
 * new options `map_service`: specify what service is used for showing maps; can be "openstreetmap", "googlemaps", or osmtools; the last allows a marker on the map
+* new option `unspecified_geonames_code`: the code used in gps tree for unspecified admin names (there should be no need to change it)
 
 ### version 2.8 (November 18, 2017):
 

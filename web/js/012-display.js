@@ -481,6 +481,9 @@ $(document).ready(function() {
 					gpsName = mediaForNames.geoname.region_name;
 				else if (i == 4)
 					gpsName = mediaForNames.geoname.place_name;
+
+				if (gpsName == '')
+					gpsName = _t('.not-specified');
 				gpsHtmlTitle = _t("#place-icon-title") + gpsName;
 			}
 
@@ -1202,6 +1205,8 @@ $(document).ready(function() {
 										folderName = randomAlbum.media[0].geoname.region_name;
 									else if (level == 2)
 										folderName = randomAlbum.media[0].geoname.place_name;
+									if (folderName == '')
+										folderName = _t('.not-specified');
 									folderTitle = _t('#place-icon-title') + folderName;
 
 									folder = "<span class='gps-folder'>" +

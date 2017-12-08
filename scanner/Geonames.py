@@ -130,9 +130,9 @@ class Geonames(object):
 						result[index] = geoname[correspondence[index]]
 					else:
 						if index[-5:] == '_code':
-							result[index] = '000'
+							result[index] = Options.config['unspecified_geonames_code']
 						else:
-							result[index] = '(?)'
+							result[index] = ''
 		return result
 
 	def lookup_feature(self, geoname_id):

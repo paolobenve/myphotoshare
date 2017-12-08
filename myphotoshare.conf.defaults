@@ -128,6 +128,11 @@ geonames_user = myphotoshare
 # If 'language' is not set, it defaults to the system language
 geonames_language =
 
+# The code the scanner assigns to places with unspecified name and code
+# Usually the admin name may be undefined
+# The name is left as a 0-length string, and the translation js file gives a localized value for it
+unspecified_geonames_code = 000000
+
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _f
 by_date_string = _bd
