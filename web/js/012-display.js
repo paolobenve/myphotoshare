@@ -572,6 +572,11 @@ $(document).ready(function() {
 									title += _t(".title-media") + " ";
 								title += _t("#title-in-subalbums");
 							}
+							if (currentAlbum.media.length > 0 && numMediaInSubAlbums > 0) {
+								title += ", ";
+								title += _t("#title-total") + " ";
+								title += currentAlbum.media.length + numMediaInSubAlbums + " ";
+							}
 						}
 						title += ")</span>";
 					}
