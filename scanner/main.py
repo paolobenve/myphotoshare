@@ -38,6 +38,7 @@ def main():
 	# pass config values to a dict, because ConfigParser objects are not reliable
 	for option in default_config.options('options'):
 		if option in ('max_verbose',
+				'photo_map_zoom_level',
 				'jpeg_quality',
 				'video_crf',
 				'thumb_spacing',
@@ -78,7 +79,7 @@ def main():
 				message("WARNING: option " + option + " in user config file", "is not boolean, using default value")
 				back_level()
 				Options.config[option] = default_config.getboolean('options', option)
-		elif option in ('reduced_sizes'):
+		elif option in ('reduced_sizes', 'map_zoom_levels'):
 			Options.config[option] = eval(usr_config.get('options', option))
 		elif option in ('mobile_thumbnail_factor'):
 			Options.config[option] = usr_config.getfloat('options', option)

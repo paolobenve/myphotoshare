@@ -62,8 +62,7 @@ $(document).ready(function() {
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
 		// set the map zooms for country, region, place, and photo
 		// they have been chosen in order to fit to Europe distances
-	var mapZooms = [6, 9, 15, 16];
-
+	
 	/* Displays */
 
 	function _t(id) {
@@ -528,7 +527,7 @@ $(document).ready(function() {
 							title += "</span>";
 							spanOpened = false;
 						}
-						title += "<a href=" + mapLink(latitude, longitude, mapZooms[(i - 2)]) + " target='_blank'>" +
+						title += "<a href=" + mapLink(latitude, longitude, Options.map_zoom_levels[(i - 2)]) + " target='_blank'>" +
 											"<img class='title-img' title='" + gpsHtmlTitle + "' alt='" + gpsHtmlTitle + "' height='15px' src='img/world-map-with-pointer.png'>" +
 											"</a>";
 					} else
@@ -603,7 +602,7 @@ $(document).ready(function() {
 			if (hasGpsData(currentMedia)) {
 				latitude = currentMedia.metadata.latitude;
 				longitude = currentMedia.metadata.longitude;
-				title += "<a href=" + mapLink(latitude, longitude, mapZooms[3]) + " target='_blank'>" +
+				title += "<a href=" + mapLink(latitude, longitude, Options.photo_map_zoom_level) + " target='_blank'>" +
 										"<img class='title-img' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='15px' src='img/world-map-with-pointer.png'>" +
 										"</a>";
 			}
@@ -1014,7 +1013,7 @@ $(document).ready(function() {
 					if (hasGpsData(currentAlbum.media[i])) {
 						var latitude = currentAlbum.media[i].metadata.latitude;
 						var longitude = currentAlbum.media[i].metadata.longitude;
-						mapLinkIcon = "<a href=" + mapLink(latitude, longitude, mapZooms[3]) + " target='_blank'>" +
+						mapLinkIcon = "<a href=" + mapLink(latitude, longitude, Options.photo_map_zoom_level) + " target='_blank'>" +
 													"<img class='thumbnail-map-link' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='15px' src='img/world-map-with-pointer.png'>" +
 													"</a>";
 					}
@@ -1211,7 +1210,7 @@ $(document).ready(function() {
 
 									folder = "<span class='gps-folder'>" +
 														folderName +
-														"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, mapZooms[level]) +
+														"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, Options.map_zoom_levels[level]) +
 																		"' title='" + folderName +
 																		"' target='_blank'" +
 																">" +
@@ -1797,7 +1796,7 @@ $(document).ready(function() {
 		linkTitle = _t('#show-map') + Options.map_service;
 		$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
 			ev.stopPropagation();
-			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, mapZooms[3]), '_blank');
+			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, Options.photo_map_zoom_level), '_blank');
 		});
 
 		translate();

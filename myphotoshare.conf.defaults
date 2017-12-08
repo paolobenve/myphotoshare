@@ -133,6 +133,12 @@ geonames_language =
 # The name is left as a 0-length string, and the translation js file gives a localized value for it
 unspecified_geonames_code = 000000
 
+# A 3-values tuple specifying the zoom values to use respectively for country-, admin- and place-level maps
+map_zoom_levels = [6, 9, 15]
+
+# The zoom value to use for the map shown with the photo
+photo_map_zoom_level = 16
+
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _f
 by_date_string = _bd
