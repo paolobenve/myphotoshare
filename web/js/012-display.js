@@ -456,10 +456,8 @@ $(document).ready(function() {
 			components.unshift(originalTitle);
 		}
 
-		dateTitle = components.length > 1 && components[1] == Options.by_date_string;
-		gpsTitle = components.length > 1 && components[1] == Options.by_gps_string;
-		if (gpsTitle) {
-		}
+		dateTitle = (components.length > 1 && components[1] == Options.by_date_string);
+		gpsTitle = (components.length > 1 && components[1] == Options.by_gps_string);
 
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
 		var textComponents = [];
