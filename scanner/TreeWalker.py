@@ -458,6 +458,7 @@ class TreeWalker:
 				cache_hit = False
 				mtime = file_mtime(entry_with_path)
 				max_file_date = max(max_file_date, mtime)
+				cached_media = None
 				if cached_album:
 					message("reading cache media from cached album...", "", 5)
 					cached_media = cached_album.media_from_path(entry_with_path)
