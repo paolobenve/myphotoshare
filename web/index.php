@@ -170,7 +170,8 @@
 					<a id="metadata-show" href="javascript:void(0)"></a>
 					<a id="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
 					<a id="original-link"></a> |
-					<a id="download-link"></a>
+					<a id="download-link"></a> <a id="menu-map-divider">|</a>
+					<a id="menu-map-link"></a>
 					<a id="fullscreen" href="javascript:void(0)">
 						<span id="fullscreen-divider"> | </span>
 						<span id="enter-fullscreen"></span>

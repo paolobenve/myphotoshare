@@ -1705,6 +1705,15 @@ $(document).ready(function() {
 
 		$("#original-link").attr("target", "_blank").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia)));
 		$("#download-link").attr("href", encodeURI(photoFloat.originalMediaPath(currentMedia))).attr("download", "");
+		if (hasGpsData(currentMedia)) {
+			$("#menu-map-link").attr("target", "_blank").attr("href", encodeURI(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, Options.photo_map_zoom_level)));
+			$('#menu-map-link').show();
+			$('#menu-map-divider').show();
+		} else {
+			$("#menu-map-link").attr("href", "");
+			$('#menu-map-link').hide();
+			$('#menu-map-divider').hide();
+		}
 
 		$("#folders-view-link").attr("href", "#!/" +
 					PhotoFloat.pathJoin([
@@ -2164,8 +2173,8 @@ $(document).ready(function() {
 				//                                        o
 				$("#original-link")[0].click();
 				return false;
-			} else if (currentMedia !== null && e.keyCode === 83) {
-				//                                        s
+			} else if (currentMedia !== null && hasGpsData(currentMedia) && e.keyCode === 83) {
+				//                                                                    s
 					$("#map-link")[0].click();
 				return false;
 			} else
