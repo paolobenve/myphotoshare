@@ -62,7 +62,7 @@ $(document).ready(function() {
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
 		// set the map zooms for country, region, place, and photo
 		// they have been chosen in order to fit to Europe distances
-	
+
 	/* Displays */
 
 	function _t(id) {
@@ -1726,13 +1726,14 @@ $(document).ready(function() {
 						encodeURIComponent(currentMedia.foldersCacheBase),
 						encodeURIComponent(currentMedia.cacheBase)
 					]));
-		if (hasGpsData(currentMedia))
+		if (hasGpsData(currentMedia)) {
 			$("#by-gps-view-link").attr("href", "#!/" +
 		 			PhotoFloat.pathJoin([
 						encodeURIComponent(currentMedia.gpsAlbumCacheBase),
 						encodeURIComponent(currentMedia.foldersCacheBase),
 						encodeURIComponent(currentMedia.cacheBase)
 					]));
+		}
 		//$("#day-folders-view-link").attr("href", changeViewLink);
 
 		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
