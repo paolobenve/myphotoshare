@@ -82,6 +82,7 @@ class Album(object):
 	@property
 	def path(self):
 		return self.baseless_path
+
 	def __str__(self):
 		return self.path
 
@@ -681,6 +682,7 @@ class Media(object):
 		thumb_size = Options.config['reduced_sizes'][0]
 		thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size)
 		self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
+
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		# this function calls self.reduce_size_or_make_thumbnail() with the proper image self.reduce_size_or_make_thumbnail() needs
 		# so that the thumbnail doesn't get blurred

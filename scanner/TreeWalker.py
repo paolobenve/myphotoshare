@@ -737,10 +737,10 @@ class TreeWalker:
 
 	def save_all_media_json(self):
 		media_list = []
-		message("sorting media list...", "", 5)
+		message("sorting all media list...", "", 5)
 		self.all_media.sort()
 		next_level()
-		message("sorted media list", "", 5)
+		message("all media list sorted", "", 5)
 		back_level()
 		message("building media path list...", "", 5)
 		for media in self.all_media:
@@ -753,6 +753,7 @@ class TreeWalker:
 			json.dump(media_list, fp, cls=PhotoAlbumEncoder)
 		message("cached all media path list", "", 5)
 		fp.close()
+
 	def save_json_options(self):
 		json_options_file = os.path.join(Options.config['cache_path'], 'options.json')
 		message("saving json options file...", json_options_file, 4)

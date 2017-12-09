@@ -881,24 +881,24 @@ $(document).ready(function() {
 	}
 
 	// see https://stackoverflow.com/questions/1069666/sorting-javascript-object-by-property-value
-	function sortByName(mediaArray) {
-		return sortBy(mediaArray, 'name');
+	function sortByName(mediaList) {
+		return sortBy(mediaList, 'name');
 	}
 
 	function sortByPath(mediaArray) {
 		return sortBy(mediaArray, 'path');
 	}
 
-	function sortBy(mediaArray, field) {
-		return mediaArray.sort(function(a,b) {
+	function sortBy(albumOrMediaList, field) {
+		return albumOrMediaList.sort(function(a,b) {
 			var aValue = a[field];
 			var bValue = b[field];
 			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
 		});
 	}
 
-	function sortByDate(mediaArray) {
-		return mediaArray.sort(function(a,b) {
+	function sortByDate(albumOrMediaList) {
+		return albumOrMediaList.sort(function(a,b) {
 			var aValue = new Date(a.date);
 			var bValue = new Date(b.date);
 			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;

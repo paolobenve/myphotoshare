@@ -212,7 +212,7 @@ switch_button_color_hover = black
 # shoud metadata be shown persistently until they are closed?
 persistent_metadata = false
 
-# default sorting criterium: true = name, false = time
+# default sorting criterium: true = name, false = date/time
 default_album_name_sort = true
 default_media_name_sort = false
 
