@@ -2,23 +2,17 @@
 
 # minify all .js-files
 cd web/js
+unixseconds=$(date +%s)
 echo
 echo == Minifying js files in js directory ==
 echo
 rm -f *.min.js
 ls -1 *.js|grep -Ev "min.js$" | while read jsfile; do
 	newfile="${jsfile%.*}.min.js"
-	echo "$jsfile --> $newfile"
+
+	echo
+	echo "minifying $jsfile"
 	curl -X POST -s --data-urlencode "input@$jsfile" https://javascript-minifier.com/raw > $newfile
-	# following code is unuseful, it detects curl, not javascript errors
-	#~ if [ $? -ne 0 ]; then
-		#~ echo
-		#~ echo "*****************"
-		#~ echo "error minifying $jsfile"
-		#~ echo "stopping"
-		#~ echo "*****************"
-		#~ break
-	#~ fi
 done
 
 # merge all into one single file
@@ -34,7 +28,7 @@ echo
 rm -f *.min.css
 ls -1 *.css|grep -Ev "min.css$" | while read cssfile; do
 	newfile="${cssfile%.*}.min.css"
-	echo "$cssfile --> $newfile"
+	echo "minifying $cssfile"
 	curl -X POST -s --data-urlencode "input@$cssfile" https://cssminifier.com/raw > $newfile
 	#~ if [ $? -ne 0 ]; then
 		#~ echo
