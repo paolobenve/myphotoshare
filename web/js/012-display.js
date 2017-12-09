@@ -953,6 +953,7 @@ $(document).ready(function() {
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, margin, imgTitle;
+		var tooBig = false, virtualAlbum = false;
 		var mapLinkIcon;
 
 		PhotoFloat.subalbumIndex = 0;
@@ -966,10 +967,12 @@ $(document).ready(function() {
 			thumbnailSize = Options.media_thumb_size;
 
 			populateMedia = populate;
-			if (populateMedia === true && (!! currentAlbum.path.match(byDateRegex) || !! currentAlbum.path.match(byGpsRegex)))
-				populateMedia = populateMedia && (currentAlbum.media.length < Options.big_virtual_folders_threshold);
+			virtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0);
+			tooBig = currentAlbum.path.split("/").length < 4 && currentAlbum.media.length > Options.big_virtual_folders_threshold;
+			if (populateMedia === true && virtualAlbum)
+				populateMedia = populateMedia && ! tooBig;
 
-			if ((currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
+			if (virtualAlbum && tooBig) {
 				$("#thumbs").empty();
 				$("#error-too-many-images").html(
 					"<span id=\"too-many-images\">" + _t('#too-many-images') + "</span>: " + currentAlbum.media.length +
