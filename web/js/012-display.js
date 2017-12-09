@@ -885,8 +885,11 @@ $(document).ready(function() {
 		return sortBy(mediaList, 'name');
 	}
 
-	function sortByPath(mediaArray) {
-		return sortBy(mediaArray, 'path');
+	function sortByPath(albumList) {
+		if (albumList[0].cacheBase.indexOf(Options.by_gps_string) == 0)
+			return sortBy(albumList, 'name');
+		else
+			return sortBy(albumList, 'path');
 	}
 
 	function sortBy(albumOrMediaList, field) {

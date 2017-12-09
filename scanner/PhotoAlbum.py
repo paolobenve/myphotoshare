@@ -84,7 +84,10 @@ class Album(object):
 		return self.baseless_path
 
 	def __str__(self):
-		return self.path
+		if hasattr(self, name):
+			return self.name
+		else:
+			return self.path
 
 	@property
 	def json_file(self):
@@ -217,6 +220,8 @@ class Album(object):
 					}
 					if hasattr(sub, "center"):
 						sub_dict["center"] = sub.center
+					if hasattr(sub, "name"):
+						sub_dict["name"] = sub.name
 					subalbums.append(sub_dict)
 
 		else:
@@ -266,6 +271,8 @@ class Album(object):
 		}
 		if hasattr(self, "center"):
 			dictionary["center"] = self.center
+		if hasattr(self, "name"):
+			dictionary["name"] = self.name
 
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base

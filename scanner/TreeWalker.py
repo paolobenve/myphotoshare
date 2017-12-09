@@ -222,6 +222,7 @@ class TreeWalker:
 						if place_album.center == {}:
 							place_album.center['latitude'] = single_media.latitude
 							place_album.center['longitude'] = single_media.longitude
+							place_album.name = single_media._attributes["geoname"]["place_name"]
 						else:
 							place_album.center['latitude'] = geoname.recalculate_mean(place_album.center['latitude'], len(place_album.media_list), single_media.latitude)
 							place_album.center['longitude'] = geoname.recalculate_mean(place_album.center['longitude'], len(place_album.media_list), single_media.longitude)
@@ -229,6 +230,7 @@ class TreeWalker:
 						if region_album.center == {}:
 							region_album.center['latitude'] = single_media.latitude
 							region_album.center['longitude'] = single_media.longitude
+							region_album.name = single_media._attributes["geoname"]["region_name"]
 						else:
 							region_album.center['latitude'] = geoname.recalculate_mean(region_album.center['latitude'], len(region_album.media_list), single_media.latitude)
 							region_album.center['longitude'] = geoname.recalculate_mean(region_album.center['longitude'], len(region_album.media_list), single_media.longitude)
@@ -236,6 +238,7 @@ class TreeWalker:
 						if country_album.center == {}:
 							country_album.center['latitude'] = single_media.latitude
 							country_album.center['longitude'] = single_media.longitude
+							country_album.name = single_media._attributes["geoname"]["country_name"]
 						else:
 							country_album.center['latitude'] = geoname.recalculate_mean(country_album.center['latitude'], len(country_album.media_list), single_media.latitude)
 							country_album.center['longitude'] = geoname.recalculate_mean(country_album.center['longitude'], len(country_album.media_list), single_media.longitude)
