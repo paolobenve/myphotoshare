@@ -194,6 +194,7 @@ class Album(object):
 			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], remove_folders_marker(album.baseless_path)))
 			if new_media.is_valid:
 				album.add_media(new_media)
+
 		if not cripple:
 			# it looks like the following code is never executed
 			for subalbum in dictionary["albums"]:
