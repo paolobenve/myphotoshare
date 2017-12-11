@@ -887,7 +887,7 @@ $(document).ready(function() {
 
 	function sortByPath(albumList) {
 		if (albumList[0].cacheBase.indexOf(Options.by_gps_string) == 0)
-			return sortBy(albumList, 'name');
+			return sortBy(albumList, 'alt_name');
 		else
 			return sortBy(albumList, 'path');
 	}
@@ -1214,7 +1214,10 @@ $(document).ready(function() {
 									else if (level == 1)
 										folderName = randomAlbum.media[0].geoname.region_name;
 									else if (level == 2)
-										folderName = randomAlbum.media[0].geoname.place_name;
+										if (randomAlbum.media[0].geoname.alt_place_name !== undefined)
+											folderName = randomAlbum.media[0].geoname.alt_place_name;
+										else
+											folderName = randomAlbum.media[0].geoname.place_name;
 									if (folderName == '')
 										folderName = _t('.not-specified');
 									folderTitle = _t('#place-icon-title') + folderName;
