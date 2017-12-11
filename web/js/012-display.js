@@ -478,8 +478,12 @@ $(document).ready(function() {
 					gpsName = mediaForNames.geoname.country_name;
 				else if (i == 3)
 					gpsName = mediaForNames.geoname.region_name;
-				else if (i == 4)
-					gpsName = mediaForNames.geoname.place_name;
+				else if (i == 4) {
+				    if (mediaForNames.geoname.alt_place_name !== undefined)
+                        gpsName = mediaForNames.geoname.alt_place_name;
+                    else
+                        gpsName = mediaForNames.geoname.place_name;
+				}
 
 				if (gpsName == '')
 					gpsName = _t('.not-specified');
