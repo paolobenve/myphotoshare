@@ -1193,6 +1193,7 @@ class Media(object):
 	@property
 	def name(self):
 		return os.path.basename(self.media_file_name)
+
 	def __str__(self):
 		return self.name
 
@@ -1302,27 +1303,27 @@ class Media(object):
 
 	@property
 	def country_name(self):
-		return str(self._attributes["geoname"]["country_name"])
+		return self._attributes["geoname"]["country_name"]
 
 	@property
 	def country_code(self):
-		return str(self._attributes["geoname"]["country_code"])
+		return self._attributes["geoname"]["country_code"]
 
 	@property
 	def region_name(self):
-		return str(self._attributes["geoname"]["region_name"])
+		return self._attributes["geoname"]["region_name"]
 
 	@property
 	def region_code(self):
-		return str(self._attributes["geoname"]["region_code"])
+		return self._attributes["geoname"]["region_code"]
 
 	@property
 	def place_name(self):
-		return str(self._attributes["geoname"]["place_name"])
+		return self._attributes["geoname"]["place_name"]
 
 	@property
 	def place_code(self):
-		return str(self._attributes["geoname"]["place_code"])
+		return self._attributes["geoname"]["place_code"]
 
 	@property
 	def year_album_path(self):
