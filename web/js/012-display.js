@@ -373,6 +373,8 @@ $(document).ready(function() {
 		underscoreIndex = altPlaceName.lastIndexOf('_');
 		if (underscoreIndex != -1) {
 			number = altPlaceName.substring(underscoreIndex + 1);
+			while (number.indexOf('0') === 0)
+				number = number.substr(1);
 			base = altPlaceName.substring(0, underscoreIndex);
 			return base + ' (' + _t('.subalbum') + number + ')';
 		} else {
