@@ -227,7 +227,7 @@ class TreeWalker:
 					for i, cluster in enumerate(cluster_list):
 						if set_alt_place:
 							alt_place_code = place_code + "_" + str(i).zfill(num_digits)
-							alt_place_name = place_name + " (sottoalbum " + str(i).zfill(num_digits) + ")"
+							alt_place_name = place_name + "_" + str(i).zfill(num_digits)
 
 						place_path = os.path.join(region_path, str(alt_place_code))
 						place_album = Album(place_path)

@@ -369,6 +369,17 @@ $(document).ready(function() {
 		}
 	}
 
+	function transformAltPlaceName(altPlaceName) {
+		underscoreIndex = altPlaceName.lastIndexOf('_');
+		if (underscoreIndex != -1) {
+			number = altPlaceName.substring(underscoreIndex + 1);
+			base = altPlaceName.substring(0, underscoreIndex);
+			return base + ' (' + _t('.subalbum') + number + ')';
+		} else {
+			return altPlaceName;
+		}
+	}
+
 	function setTitle() {
 		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, sortButtons, m;
@@ -479,10 +490,10 @@ $(document).ready(function() {
 				else if (i == 3)
 					gpsName = mediaForNames.geoname.region_name;
 				else if (i == 4) {
-				    if (mediaForNames.geoname.alt_place_name !== undefined)
-                        gpsName = mediaForNames.geoname.alt_place_name;
-                    else
-                        gpsName = mediaForNames.geoname.place_name;
+					if (mediaForNames.geoname.alt_place_name !== undefined)
+						gpsName = transformAltPlaceName(mediaForNames.geoname.alt_place_name);
+					else
+						gpsName = mediaForNames.geoname.place_name;
 				}
 
 				if (gpsName == '')
@@ -1219,7 +1230,7 @@ $(document).ready(function() {
 										folderName = randomAlbum.media[0].geoname.region_name;
 									else if (level == 2)
 										if (randomAlbum.media[0].geoname.alt_place_name !== undefined)
-											folderName = randomAlbum.media[0].geoname.alt_place_name;
+											folderName = transformAltPlaceName(randomAlbum.media[0].geoname.alt_place_name);
 										else
 											folderName = randomAlbum.media[0].geoname.place_name;
 									if (folderName == '')
