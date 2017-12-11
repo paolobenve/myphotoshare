@@ -291,6 +291,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * new option `unspecified_geonames_code`: the code used in gps tree for unspecified admin names (there should be no need to change it)
 * new option `map_zoom_levels`: a 3-values tuple specifying the zoom values to use respectively for country-, admin- and place-level maps
 * new option `photo_map_zoom_level`: the value to use for the map shown with the photo
+* option `big_date_folders_threshold` renamed to `big_virtual_folders_threshold`
 
 ### version 2.8 (November 18, 2017):
 
