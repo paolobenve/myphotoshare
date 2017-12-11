@@ -221,12 +221,13 @@ class TreeWalker:
 
 					# now iterate on cluster_list
 					num_digits = len(str(len(cluster_list)))
+					alt_place_code = place_code
+					alt_place_name = place_name
+					set_alt_place = (len(cluster_list) > 1)
 					for i, cluster in enumerate(cluster_list):
-						alt_place_code = place_code
-						alt_place_name = place_name
-						if len(cluster_list) > 1:
-							alt_place_code += "_" + str(i).zfill(num_digits)
-							alt_place_name += " " + str(i).zfill(num_digits)
+						if set_alt_place:
+							alt_place_code = place_code + "_" + str(i).zfill(num_digits)
+							alt_place_name = place_name + " " + str(i).zfill(num_digits)
 
 						place_path = os.path.join(region_path, str(alt_place_code))
 						place_album = Album(place_path)
