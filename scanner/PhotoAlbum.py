@@ -223,6 +223,8 @@ class Album(object):
 						sub_dict["center"] = sub.center
 					if hasattr(sub, "name"):
 						sub_dict["name"] = sub.name
+					if hasattr(sub, "alt_name"):
+						sub_dict["alt_name"] = sub.alt_name
 					subalbums.append(sub_dict)
 
 		else:
@@ -274,6 +276,8 @@ class Album(object):
 			dictionary["center"] = self.center
 		if hasattr(self, "name"):
 			dictionary["name"] = self.name
+		if hasattr(self, "alt_name"):
+			dictionary["alt_name"] = self.alt_name
 
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base

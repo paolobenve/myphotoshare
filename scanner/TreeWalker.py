@@ -199,7 +199,9 @@ class TreeWalker:
 				region_max_file_date = None
 				country_album.add_album(region_album)
 				for place_code, media_list in self.tree_by_geonames[country_code][region_code].iteritems():
-					message("elaborating place_code album...", media_list[0].country_name + "-" + media_list[0].region_name + "-" + media_list[0].place_name, 4)
+					place_code = str(place_code)
+					place_name = media_list[0].place_name
+					message("elaborating place_code album...", media_list[0].country_name + "-" + media_list[0].region_name + "-" + place_name, 4)
 					next_level()
 					message("sorting media...", "", 5)
 					media_list.sort(key=lambda m: m.latitude + m.longitude)
@@ -209,59 +211,37 @@ class TreeWalker:
 					# check if there are too many media in album
 					# in case, "place" album will be split in "place 1", "place 2",..., separating the groups according to max_distance
 					# and, in case, reducing max_distance until a proper size is obtained
-					max_distance = 400
-					biggest_size = len(media_list)
 					# transform media_list in an element in a list, probably most times, we'll work with it
-					cluster_list = []
-					new_cluster = {}
-					new_cluster['media_list'] = media_list
-					cluster_list.append(new_cluster)
-					while max_distance > 1 and biggest_size > Options.config['big_virtual_folders_threshold']:
-						cluster_list = geoname.reduce_clusters_size(cluster_list, max_distance)
-						cluster_list = []
-						biggest_size = 0
-						for media in media_list:
-							found = False
-							for i, cluster in enumerate(cluster_list):
-								if geoname.distance_between_coordinates(media.latitude, media.longitude, cluster['center']['latitude'], cluster['center']['longitude']) < max_distance:
-									cluster_list[i]['center']['latitude'] = geoname.recalculate_mean(cluster['center']['latitude'], len(cluster['media_list']), media.latitude)
-									cluster_list[i]['center']['longitude'] = geoname.recalculate_mean(cluster['center']['longitude'], len(cluster['media_list']), media.longitude)
-									cluster_list[i]['media_list'].append(media)
-									if len(cluster['media_list']) > biggest_size:
-										biggest_size = len(cluster['media_list'])
-									found = True
-									break
-							if not found:
-								new_cluster = {}
-								new_cluster['center'] = {}
-								new_cluster['center']['latitude'] = media.latitude
-								new_cluster['center']['longitude'] = media.longitude
-								new_cluster['media_list'] = []
-								new_cluster['media_list'].append(media)
-								if 1 > biggest_size:
-									biggest_size = 1
-								cluster_list.append(new_cluster)
+					message("checking for big lists...", "", 5)
+					if len(media_list) > Options.config['big_virtual_folders_threshold']:
+						max_distance = 1000
+						cluster_list = geoname.reduce_clusters_size(media_list, max_distance)
+					else:
+						next_level()
+						message("no big list", "", 5)
+						back_level()
+						cluster_list = [media_list]
 
 					# now iterate on cluster_list
 					num_digits = len(str(len(cluster_list)))
 					for i, cluster in enumerate(cluster_list):
-						new_media_list = cluster['media_list']
-						new_place_code = place_code
-						new_place_name = new_media_list[0].place_name
+						alt_place_code = place_code
+						alt_place_name = place_name
 						if len(cluster_list) > 1:
-							new_place_code += "_" + str(i).zfill(num_digits)
-							new_place_name += " " + str(i).zfill(num_digits)
+							alt_place_code += "_" + str(i).zfill(num_digits)
+							alt_place_name += " " + str(i).zfill(num_digits)
 
-						place_path = os.path.join(region_path, str(new_place_code))
+						place_path = os.path.join(region_path, str(alt_place_code))
 						place_album = Album(place_path)
 						place_album.center = {}
 						place_album.parent = region_album
 						place_album.cache_base = cache_base(place_path)
 						place_max_file_date = None
 						region_album.add_album(place_album)
-						for i, single_media in enumerate(new_media_list):
-							new_media_list[i].gps_path = remove_album_path(place_path)
-							new_media_list[i]._attributes['geoname']['place_name'] = new_place_name
+						for j, single_media in enumerate(cluster):
+							cluster[j].gps_path = remove_album_path(place_path)
+							cluster[j]._attributes['geoname']['place_name'] = place_name
+							cluster[j]._attributes['geoname']['alt_place_name'] = alt_place_name
 							place_album.add_media(single_media)
 							place_album.num_media_in_sub_tree += 1
 							place_album.num_media_in_album += 1
@@ -275,7 +255,8 @@ class TreeWalker:
 							if place_album.center == {}:
 								place_album.center['latitude'] = single_media.latitude
 								place_album.center['longitude'] = single_media.longitude
-								place_album.name = new_place_name
+								place_album.name = place_name
+								place_album.alt_name = alt_place_name
 							else:
 								place_album.center['latitude'] = geoname.recalculate_mean(place_album.center['latitude'], len(place_album.media_list), single_media.latitude)
 								place_album.center['longitude'] = geoname.recalculate_mean(place_album.center['longitude'], len(place_album.media_list), single_media.longitude)
@@ -316,7 +297,7 @@ class TreeWalker:
 						self.all_albums.append(place_album)
 						back_level()
 						next_level()
-						message("place album elaborated", new_media_list[0].country_code + "-" + new_media_list[0].region_code + "-" + new_place_name, 4)
+						message("place album elaborated", cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
 						back_level()
 						self.generate_composite_image(place_album, place_max_file_date)
 				self.all_albums.append(region_album)
