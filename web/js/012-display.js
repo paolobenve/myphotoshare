@@ -605,6 +605,25 @@ $(document).ready(function() {
 			else if ((i < components.length - 1 || currentMedia !== null) &&
 				(i == components.length - 1 || components[i + 1] != Options.folders_string))
 				title += "&raquo;";
+
+			// build the html page title
+			if (i == 0) {
+				documentTitle += components[0];
+				if (components.length > 2 || currentMedia !== null)
+					documentTitle = " \u00ab " + documentTitle;
+			} else if (i == 1) {
+			 	if (dateTitle)
+					documentTitle += " (" + _t("#by-date") + ")";
+				else if (gpsTitle)
+					documentTitle += " (" + _t("#by-gps") + ")";
+			} else if (i > 1) {
+				if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
+					documentTitle = gpsName + documentTitle;
+				else
+					documentTitle = textComponents[i] + documentTitle;
+				if (i < components.length - 1 || currentMedia !== null)
+					documentTitle = " \u00ab " + documentTitle;
+			}
 		}
 
 		// leave only the last link on mobile
@@ -663,7 +682,6 @@ $(document).ready(function() {
 				"</span>";
 		}
 
-		document.title = documentTitle;
 		$("#title-string").html(title);
 
 		$("#dots").off();
@@ -675,29 +693,14 @@ $(document).ready(function() {
 			}
 		});
 
-		// generate the html page title
-		for (i = 0; i < components.length; ++i) {
-			if (i == 0) {
-				documentTitle += components[0];
-				if (components.length > 2 || currentMedia !== null)
-					documentTitle = " \u00ab " + documentTitle;
-			}
-			else if (i == 1)
-			 	if (dateTitle)
-					documentTitle += " (" + _t("#by-date") + ")";
-				else if (gpsTitle)
-					documentTitle += " (" + _t("#by-gps") + ")";
-
-			else if (i > 1) {
-				documentTitle = textComponents[i] + documentTitle;
-				if (i < components.length - 1 || currentMedia !== null)
-					documentTitle = " \u00ab " + documentTitle;
-			}
-		}
+		// keep generating the html page title
 		if (currentMedia !== null)
 			documentTitle = photoFloat.trimExtension(currentMedia.name) + documentTitle;
 		else if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1)
 			documentTitle =  photoFloat.trimExtension(currentAlbum.media[0].name) + " \u00ab " + documentTitle;
+
+		document.title = documentTitle;
+
 
 		if (sortButtons) {
 			if (currentAlbum.albums.length > 1) {
