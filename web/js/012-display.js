@@ -592,7 +592,7 @@ $(document).ready(function() {
 							if (currentAlbum.media.length > 0 && numMediaInSubAlbums > 0) {
 								title += ", ";
 								title += _t("#title-total") + " ";
-								title += currentAlbum.media.length + numMediaInSubAlbums + " ";
+								title += currentAlbum.media.length + numMediaInSubAlbums;
 							}
 						}
 						title += ")</span>";
