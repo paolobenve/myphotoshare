@@ -76,6 +76,38 @@ class Geonames(object):
 
 		return result
 
+	def _decode_nearby_place(self, response_text):
+		"""
+		Decodes the response from the geonames nearby place lookup and
+		returns the properties in a dict.
+		"""
+		raw_result = json.loads(response_text)
+		result = {}
+
+		if 'status' not in raw_result and len(raw_result['geonames']) > 0:
+				geoname = raw_result['geonames'][0]
+				correspondence = {
+					'country_name': 'countryName',
+					'country_code': 'countryCode',
+					'region_name': 'adminName1',
+					'region_code': 'adminCode1',
+					'place_name': 'name',
+					'place_code': 'geonameId',
+					'latitude': 'lat',
+					'longitude': 'lng',
+					'distance': 'distance'
+				}
+				for index in correspondence:
+					# vatican places don't have region fields, and perhaps others fields could not exist
+					if correspondence[index] in geoname:
+						result[index] = geoname[correspondence[index]]
+					else:
+						if index[-5:] == '_code':
+							result[index] = Options.config['unspecified_geonames_code']
+						else:
+							result[index] = ''
+		return result
+
 	# a recursive function that receives a big list of photos whose coordinates are quite near each other
 	# and returns a list of smaller clusters not farther than max_distance
 	def reduce_clusters_size(self, media_list, max_distance):
@@ -152,38 +184,6 @@ class Geonames(object):
 		c = 2.0 * math.asin(math.sqrt(a))
 		m = 6371.0 * c * 1000.0
 		return m
-
-	def _decode_nearby_place(self, response_text):
-		"""
-		Decodes the response from the geonames nearby place lookup and
-		returns the properties in a dict.
-		"""
-		raw_result = json.loads(response_text)
-		result = {}
-
-		if 'status' not in raw_result and len(raw_result['geonames']) > 0:
-				geoname = raw_result['geonames'][0]
-				correspondence = {
-					'country_name': 'countryName',
-					'country_code': 'countryCode',
-					'region_name': 'adminName1',
-					'region_code': 'adminCode1',
-					'place_name': 'name',
-					'place_code': 'geonameId',
-					'latitude': 'lat',
-					'longitude': 'lng',
-					'distance': 'distance'
-				}
-				for index in correspondence:
-					# vatican places don't have region fields, and perhaps others fields could not exist
-					if correspondence[index] in geoname:
-						result[index] = geoname[correspondence[index]]
-					else:
-						if index[-5:] == '_code':
-							result[index] = Options.config['unspecified_geonames_code']
-						else:
-							result[index] = ''
-		return result
 
 	def lookup_feature(self, geoname_id):
 		"""
