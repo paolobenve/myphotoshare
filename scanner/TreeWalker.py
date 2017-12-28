@@ -86,7 +86,8 @@ class TreeWalker:
 				self.all_cache_entries.append(Options.config['by_gps_string'] + ".json")
 				self.origin_album.add_album(by_geonames_album)
 
-			self.all_albums_to_json_file(self.origin_album)
+			for sub_album in self.origin_album.albums_list:
+				self.all_albums_to_json_file(sub_album)
 		self.remove_stale()
 		message("complete", "", 4)
 
