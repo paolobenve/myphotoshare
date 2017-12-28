@@ -52,14 +52,18 @@ class TreeWalker:
 		self.origin_album = Album(Options.config['album_path'])
 		self.origin_album.cache_base = cache_base(Options.config['album_path'])
 		album_cache_base = Options.config['folders_string']
+		next_level()
 		[folders_album, num, max_file_date] = self.walk(Options.config['album_path'], album_cache_base, self.origin_album)
+		back_level()
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
 		else:
 			message("saving all media json file...", "", 4)
-			self.save_all_media_json()
 			next_level()
-			message("saved all media json file", "", 5)
+			self.save_all_media_json()
+			back_level()
+			next_level()
+			message("all media json file saved", "", 5)
 			back_level()
 
 			self.all_cache_entries.append("all_media.json")
@@ -86,8 +90,13 @@ class TreeWalker:
 				self.all_cache_entries.append(Options.config['by_gps_string'] + ".json")
 				self.origin_album.add_album(by_geonames_album)
 
+			message("saving all albums to json files...", "", 4)
+			next_level()
 			for sub_album in self.origin_album.albums_list:
 				self.all_albums_to_json_file(sub_album)
+			message("all albums saved to json files", "", 5)
+			back_level()
+			back_level()
 		self.remove_stale()
 		message("complete", "", 4)
 
@@ -120,7 +129,7 @@ class TreeWalker:
 				month_max_file_date = None
 				year_album.add_album(month_album)
 				for day, media in self.tree_by_date[year][month].iteritems():
-					message("elaborating day album...", "", 5)
+					message("working with day album...", "", 5)
 					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
 					day_album.parent = month_album
@@ -156,7 +165,7 @@ class TreeWalker:
 							by_date_max_file_date = single_media_date
 					self.all_albums.append(day_album)
 					next_level()
-					message("day album elaborated", media[0].year + "-" + media[0].month + "-" + media[0].day, 4)
+					message("day album worked out", media[0].year + "-" + media[0].month + "-" + media[0].day, 4)
 					back_level()
 					self.generate_composite_image(day_album, day_max_file_date)
 				self.all_albums.append(month_album)
@@ -199,7 +208,7 @@ class TreeWalker:
 				for place_code, media_list in self.tree_by_geonames[country_code][region_code].iteritems():
 					place_code = str(place_code)
 					place_name = media_list[0].place_name
-					message("elaborating place_code album...", media_list[0].country_name + "-" + media_list[0].region_name + "-" + place_name, 4)
+					message("working with place album...", media_list[0].country_name + "-" + media_list[0].region_name + "-" + place_name, 4)
 					next_level()
 					message("sorting media...", "", 5)
 					media_list.sort(key=lambda m: m.latitude + m.longitude)
@@ -296,7 +305,7 @@ class TreeWalker:
 						self.all_albums.append(place_album)
 						back_level()
 						next_level()
-						message("place album elaborated", cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
+						message("place album worked out", cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
 						back_level()
 						self.generate_composite_image(place_album, place_max_file_date)
 				self.all_albums.append(region_album)
@@ -483,7 +492,7 @@ class TreeWalker:
 						next_album_cache_base = _next_album_cache_base
 						break
 				next_level()
-				message("determined cache base", "", 5)
+				message("cache base determined", "", 5)
 				back_level()
 				[next_walked_album, num, sub_max_file_date] = self.walk(entry_with_path, next_album_cache_base, album)
 				if next_walked_album is not None:
@@ -657,6 +666,7 @@ class TreeWalker:
 		return [None, random_number]
 
 	def generate_composite_image(self, album, max_file_date):
+		next_level()
 		composite_image_name = album.cache_base + ".jpg"
 		self.all_album_composite_images.append(composite_image_name)
 		composite_image_path = os.path.join(self.album_cache_path, composite_image_name)
@@ -769,7 +779,9 @@ class TreeWalker:
 		# save the composite image
 		img.save(composite_image_path, "JPEG", quality=Options.config['jpeg_quality'])
 		next_level()
-		message("generated composite image", "", 5)
+		message("composite image generated", "", 5)
+		back_level()
+
 		back_level()
 
 	def save_all_media_json(self):
@@ -783,12 +795,14 @@ class TreeWalker:
 		for media in self.all_media:
 			media_list.append(media.path)
 		next_level()
-		message("built media path list", "", 5)
+		message("media path list built", "", 5)
 		back_level()
 		message("caching all media path list...", "", 4)
 		with open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w') as fp:
 			json.dump(media_list, fp, cls=PhotoAlbumEncoder)
-		message("cached all media path list", "", 5)
+		next_level()
+		message("all media path list cached", "", 5)
+		back_level()
 		fp.close()
 
 	def save_json_options(self):
@@ -885,6 +899,6 @@ class TreeWalker:
 					continue
 				back_level()
 		if not subdir:
-			back_level()
 			message("cleaned", "", 5)
+			back_level()
 			back_level()
