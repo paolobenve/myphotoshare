@@ -112,7 +112,7 @@ class Geonames(object):
 	# and returns a list of smaller clusters not farther than max_distance
 	def reduce_clusters_size(self, media_list, max_distance):
 		next_level()
-		message("big list found, " + str(len(media_list)) + " photos", "reducing with max_distance=" + str(max_distance), 5)
+		message("big list found, " + str(len(media_list)) + " photos", "grouping points with max_distance = " + str(max_distance) + " meters", 5)
 		cluster_list = []
 		biggest_cluster_size = 0
 		for media in media_list:
@@ -153,7 +153,7 @@ class Geonames(object):
 			if length > biggest_cluster_size:
 				biggest_cluster_size = length
 		next_level()
-		message("reduced to " + str(len(reorganized_cluster_list)), "biggest size is " + str(biggest_cluster_size), 5)
+		message("biggest cluster has now " + str(biggest_cluster_size) + " photos", "clusters are " + str(len(reorganized_cluster_list)), 5)
 		back_level()
 		back_level()
 		return reorganized_cluster_list
