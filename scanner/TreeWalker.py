@@ -96,7 +96,6 @@ class TreeWalker:
 				self.all_albums_to_json_file(sub_album)
 			message("all albums saved to json files", "", 5)
 			back_level()
-			back_level()
 		self.remove_stale()
 		message("complete", "", 4)
 
@@ -828,7 +827,6 @@ class TreeWalker:
 
 	def remove_stale(self, subdir = ""):
 		if not subdir:
-			next_level()
 			message("cleaning up, be patient...", "", 3)
 			next_level()
 			message("building stale list...", "", 4)
