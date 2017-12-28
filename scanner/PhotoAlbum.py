@@ -156,7 +156,7 @@ class Album(object):
 		with open(json_file_with_path, 'w') as fp:
 			json.dump(self, fp, cls=PhotoAlbumEncoder)
 		next_level()
-		message("saved album", json_file_with_path, 3)
+		message("album saved", json_file_with_path, 3)
 		back_level()
 
 	@staticmethod
@@ -165,7 +165,7 @@ class Album(object):
 		with open(path, "r") as fp:
 			dictionary = json.load(fp)
 		next_level()
-		message("read album", path, 5)
+		message("album read", path, 5)
 		back_level()
 		# generate the album from the json file loaded
 		# subalbums are not generated yet
@@ -173,7 +173,7 @@ class Album(object):
 		dictionary = Album.from_dict(dictionary, album_cache_base)
 		next_level()
 		if dictionary is not None:
-			message("converted album to dictionary", "", 4)
+			message("album converted to dictionary", "", 4)
 		else:
 			message("json version unexistent or old", "", 4)
 		back_level()

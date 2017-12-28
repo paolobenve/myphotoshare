@@ -818,7 +818,7 @@ class TreeWalker:
 						self.all_cache_entries_by_subdir[album_subdir] = list()
 						self.all_cache_entries_by_subdir[album_subdir].append(entry_without_subdir)
 			next_level()
-			message("built stale list", "", 5)
+			message("stale list built", "", 5)
 			back_level()
 			info = "in cache path"
 			deletable_files_suffixes_re ="\.json$"
@@ -837,6 +837,7 @@ class TreeWalker:
 
 		for cache_file in sorted(os.listdir(os.path.join(Options.config['cache_path'], subdir))):
 			if os.path.isdir(os.path.join(Options.config['cache_path'], cache_file)):
+				next_level()
 				self.remove_stale(cache_file)
 				if not os.listdir(os.path.join(Options.config['cache_path'], cache_file)):
 					next_level()
@@ -847,6 +848,7 @@ class TreeWalker:
 					message("empty subdir, deleted", "", 5)
 					back_level()
 					back_level()
+				back_level()
 			else:
 				# only delete json's, transcoded videos, reduced images and thumbnails
 				next_level()
@@ -874,7 +876,7 @@ class TreeWalker:
 						file_to_delete = os.path.join(Options.config['cache_path'], subdir, cache_file)
 						os.unlink(file_to_delete)
 						next_level()
-						message("removed stale cache file", "", 5)
+						message("stale cache file removed", "", 5)
 						back_level()
 				else:
 					next_level()
@@ -883,6 +885,6 @@ class TreeWalker:
 					continue
 				back_level()
 		if not subdir:
-			message("cleaned", "", 5)
 			back_level()
+			message("cleaned", "", 5)
 			back_level()
