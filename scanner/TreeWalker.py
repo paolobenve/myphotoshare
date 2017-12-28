@@ -164,10 +164,10 @@ class TreeWalker:
 						else:
 							by_date_max_file_date = single_media_date
 					self.all_albums.append(day_album)
+					self.generate_composite_image(day_album, day_max_file_date)
 					next_level()
 					message("day album worked out", media[0].year + "-" + media[0].month + "-" + media[0].day, 4)
 					back_level()
-					self.generate_composite_image(day_album, day_max_file_date)
 				self.all_albums.append(month_album)
 				self.generate_composite_image(month_album, month_max_file_date)
 			self.all_albums.append(year_album)
@@ -219,23 +219,25 @@ class TreeWalker:
 					# in case, "place" album will be split in "place 1", "place 2",..., separating the groups according to max_distance
 					# and, in case, reducing max_distance until a proper size is obtained
 					# transform media_list in an element in a list, probably most times, we'll work with it
-					message("checking for big lists...", "", 5)
+					message("checking if it's a big list...", "", 5)
 					if len(media_list) > Options.config['big_virtual_folders_threshold']:
 						max_distance = 1000
 						cluster_list = geoname.reduce_clusters_size(media_list, max_distance)
 					else:
 						next_level()
-						message("no big list", "", 5)
+						message("it's not a big list", "", 5)
 						back_level()
 						cluster_list = [media_list]
 
-					# now iterate on cluster_list
+					# iterate on cluster_list
 					num_digits = len(str(len(cluster_list)))
 					alt_place_code = place_code
 					alt_place_name = place_name
 					set_alt_place = (len(cluster_list) > 1)
 					for i, cluster in enumerate(cluster_list):
 						if set_alt_place:
+							next_level()
+							message("working with " + str(i) + "-th cluster", 5)
 							alt_place_code = place_code + "_" + str(i + 1).zfill(num_digits)
 							alt_place_name = place_name + "_" + str(i + 1).zfill(num_digits)
 
@@ -303,10 +305,20 @@ class TreeWalker:
 							else:
 								by_geonames_max_file_date = single_media_date
 						self.all_albums.append(place_album)
-						next_level()
-						message("place album worked out", cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
-						back_level()
 						self.generate_composite_image(place_album, place_max_file_date)
+						if set_alt_place:
+							next_level()
+							message(str(i) + "-th cluster worked out", cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
+							back_level()
+							back_level()
+						else:
+							# next_level()
+							message("place album worked out", cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
+							# back_level()
+					if set_alt_place:
+						# next_level()
+						message("place album worked out", cluster[0].country_code + "-" + cluster[0].region_code + "-" + place_name, 4)
+						# back_level()
 					back_level()
 				self.all_albums.append(region_album)
 				self.generate_composite_image(region_album, region_max_file_date)
