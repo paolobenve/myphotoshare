@@ -231,15 +231,13 @@ $(document).ready(function() {
 			$(".album-button-and-caption").css("opacity", 1);
 			$(".thumb-container").css("opacity", 1);
 			$(".album-button-random-media-link").css("opacity", 1);
-
 		}
-
 
 		url = location.protocol + "//" + location.host;
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
 		url += folders;
-		if (currentMedia === null) {
+		if (currentMedia === null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
 			mediaParameter = PhotoFloat.pathJoin([
 				Options.server_cache_path,
 				Options.cache_album_subdir,
