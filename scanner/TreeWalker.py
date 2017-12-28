@@ -303,11 +303,11 @@ class TreeWalker:
 							else:
 								by_geonames_max_file_date = single_media_date
 						self.all_albums.append(place_album)
-						back_level()
 						next_level()
 						message("place album worked out", cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
 						back_level()
 						self.generate_composite_image(place_album, place_max_file_date)
+					back_level()
 				self.all_albums.append(region_album)
 				self.generate_composite_image(region_album, region_max_file_date)
 			self.all_albums.append(country_album)
