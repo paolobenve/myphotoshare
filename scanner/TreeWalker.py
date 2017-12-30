@@ -600,6 +600,8 @@ class TreeWalker:
 						Options.num_photo += 1
 						if not cache_hit:
 							Options.num_photo_processed += 1
+						if media.has_gps_data:
+							Options.num_photo_geotagged += 1
 					message("adding media to album...", "", 5)
 					album.add_media(media)
 					next_level()
