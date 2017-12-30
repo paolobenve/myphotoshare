@@ -602,6 +602,8 @@ class TreeWalker:
 							Options.num_photo_processed += 1
 						if media.has_gps_data:
 							Options.num_photo_geotagged += 1
+						else:
+							Options.photos_without_geotag.append(entry_with_path)
 					message("adding media to album...", "", 5)
 					album.add_media(media)
 					next_level()
