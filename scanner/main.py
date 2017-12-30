@@ -62,6 +62,7 @@ def main():
 				back_level()
 				Options.config[option] = default_config.getint('options', option)
 		elif option in ('follow_symlinks',
+				'checksum',
 				'different_album_thumbnails',
 				'albums_slide_style',
 				'show_media_names_below_thumbs_in_albums',

@@ -170,3 +170,13 @@ def video_cache_name(video):
 
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))
+
+def checksum(path):
+	block_size = 65536
+	hasher = hashlib.md5()
+	with open(path, 'rb') as afile:
+	    buf = afile.read(block_size)
+	    while len(buf) > 0:
+	        hasher.update(buf)
+	        buf = afile.read(block_size)
+	return hasher.hexdigest()

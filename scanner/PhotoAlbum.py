@@ -312,11 +312,25 @@ class Media(object):
 			self.is_valid = False
 			return
 
-		if attributes is not None and attributes["dateTimeFile"] >= mtime:
+		if Options.config['checksum']:
+			next_level()
+			message("generating checksum...", media_path, 5)
+			this_checksum = checksum(media_path)
+			next_level()
+			message("checksum generated", "", 5)
+			back_level()
+			back_level()
+
+		if (
+			attributes is not None and
+			attributes["dateTimeFile"] >= mtime and
+			(not Options.config['checksum'] or 'checksum' in attributes and attributes['checksum'] == this_checksum)
+		):
 			self._attributes = attributes
 			self._attributes["dateTimeDir"] = dir_mtime
 			self.cache_base = attributes["cacheBase"]
 			return
+
 		self._attributes = {}
 		self._attributes["metadata"] = {}
 		self._attributes["dateTimeFile"] = mtime
@@ -1410,6 +1424,8 @@ class Media(object):
 		if self.gps_album_path:
 			media["gpsAlbum"]          = self.gps_album_path
 			media["gpsAlbumCacheBase"] = cache_base(self.gps_album_path, True)
+		if Options.config['checksum']:
+			media["checksum"]          = checksum(os.path.join(Options.config['album_path'], self.media_file_name))
 
 		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
 		media["albumName"]         = self.album_path

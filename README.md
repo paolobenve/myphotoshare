@@ -286,6 +286,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+ * new option `checksum`: controls whether a checksum should be generated in order to decide if a media file has changed (useful with geotags)
+ * better scanner reports
+ * bug fixes
+
 ### version 3.0 (December 12, 2017):
 
 * Manages photo's gps data and retrieves map names from geonames.org web service: builds a country/region-state/place tree as for dates, and, when a photo has gps metadata permits switching among album, date and place viewed

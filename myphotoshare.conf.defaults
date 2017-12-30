@@ -23,7 +23,6 @@
 # 3 = browsing info
 # 4 = other info
 # 5 = more info
-
 max_verbose = 3
 
 # absolute path of the folder where index.html resides; normally album_path will be its "albums" subfolder, and cache_path its "cache" subfolder
@@ -78,6 +77,11 @@ recreate_fixed_height_thumbnails = false
 # should symlinks be follwed when scanning the albums tree?
 # beware: setting to true exposes to the risk of never endind loops
 follow_symlinks = false
+
+# should the scanner generate a checksum in order to know if the media has changed?
+# this option is useful with geotagged photos, whose geotag is put in the file by apps that restore the file modification datetime
+# if not using geotags, it can safely be left to false
+checksum = false
 
 ###########################################################
 # scanner and ui options
