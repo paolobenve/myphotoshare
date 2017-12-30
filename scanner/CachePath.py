@@ -90,15 +90,15 @@ def report_times():
 	_num_photo_without_geotags = str(Options.num_photo - Options.num_photo_geotagged)
 	_num_video		= str(Options.num_video)
 	_num_video_processed	= str(Options.num_video_processed)
-	max_digit = 6
-	print "Media:    total   ", (max_digit - len(_num_media)) * " ", _num_media
-	print "                                   processed: ", (max_digit - len(_num_media_processed)) * " ", _num_media_processed
-	print "  Photos: total:  ", (max_digit - len(_num_photo)) * " ", _num_photo
-	print "                                   processed: ", (max_digit - len(_num_photo_processed)) * " ", _num_photo_processed
-	print "                                   geotagged: ", (max_digit - len(_num_photo_geotagged)) * " ", _num_photo_geotagged
-	print "                            whithout geotags: ", (max_digit - len(_num_photo_without_geotags)) * " ", _num_photo_without_geotags
-	print "  Videos: total = ", (max_digit - len(_num_video)) * " ", _num_video
-	print "                                   processed: ", (max_digit - len(_num_video_processed)) * " ", _num_video_processed
+	max_digit = len(_num_media)
+	print "Media    " + ((max_digit - len(_num_media)) * " ") + _num_media
+	print "                    processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed
+	print "  Photos " + ((max_digit - len(_num_photo)) * " ") + _num_photo
+	print "                    processed " + ((max_digit - len(_num_photo_processed)) * " ") + _num_photo_processed
+	print "                                                 geotagged " + ((max_digit - len(_num_photo_geotagged)) * " ") + _num_photo_geotagged
+	print "                                          whithout geotags " + ((max_digit - len(_num_photo_without_geotags)) * " ") + _num_photo_without_geotags
+	print "  Videos " + ((max_digit - len(_num_video)) * " ") + _num_video
+	print "                    processed " + ((max_digit - len(_num_video_processed)) * " ") + _num_video_processed
 
 message.level = 0
 
