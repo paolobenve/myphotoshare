@@ -1077,8 +1077,8 @@ class Media(object):
 		for n in range(2):
 			(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
 			self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
-			if thumb_type == "fit":
-				# square thumbnail is needed too for albums
+			if thumb_type == "fit" and not mobile_bigger:
+				# square thumbnail is needed too for sharing albums
 				thumb_type = "square"
 				self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
 
