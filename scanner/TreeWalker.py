@@ -456,6 +456,8 @@ class TreeWalker:
 
 		#~ for entry in sorted(os.listdir(absolute_path)):
 		message("reading directory...", absolute_path, 5)
+		num_photo_in_dir = 0
+		photos_without_geotag_in_dir = []
 		for entry in self.listdir_sorted_by_time(absolute_path):
 			try:
 				entry = entry.decode(sys.getfilesystemencoding())
@@ -598,12 +600,13 @@ class TreeWalker:
 							Options.num_video_processed += 1
 					else:
 						Options.num_photo += 1
+						num_photo_in_dir += 1
 						if not cache_hit:
 							Options.num_photo_processed += 1
 						if media.has_gps_data:
 							Options.num_photo_geotagged += 1
 						else:
-							Options.photos_without_geotag.append(entry_with_path)
+							photos_without_geotag_in_dir.append(entry_with_path)
 					message("adding media to album...", "", 5)
 					album.add_media(media)
 					next_level()
@@ -644,6 +647,10 @@ class TreeWalker:
 					message("not image nor video", entry_with_path, 1)
 					back_level()
 				back_level()
+		if num_photo_in_dir and num_photo_in_dir == len(photos_without_geotag_in_dir):
+			Options.photos_without_geotag.append(absolute_path + " (" + str(num_photo_in_dir) + " photos)")
+		else:
+			Options.photos_without_geotag.extend(photos_without_geotag_in_dir)
 		if not album.empty:
 			next_level()
 			message("adding album to big list...", "", 5)
