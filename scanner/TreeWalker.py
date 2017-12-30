@@ -526,7 +526,7 @@ class TreeWalker:
 					back_level()
 					if (
 						cached_media and
-						mtime == cached_media.attributes["dateTimeFile"]
+						mtime <= cached_media.attributes["dateTimeFile"]
 					):
 						cache_files = cached_media.image_caches
 						# check if the cache files actually exist and are not old
