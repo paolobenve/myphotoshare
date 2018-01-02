@@ -10,9 +10,11 @@ elapsed_times_counter = {}
 num_photo = 0
 num_photo_processed = 0
 num_photo_geotagged = 0
+num_photo_with_exif_date = 0
 num_video = 0
 num_video_processed = 0
 photos_without_geotag = []
+photos_without_exif_date = []
 # set this variable to a new integer number whenever the json files structure changes
 # json_version = 1 since ...
 # json_version = 2 since checksums have been added

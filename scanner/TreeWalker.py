@@ -458,6 +458,7 @@ class TreeWalker:
 		message("reading directory...", absolute_path, 5)
 		num_photo_in_dir = 0
 		photos_without_geotag_in_dir = []
+		photos_without_exif_date_in_dir = []
 		for entry in self.listdir_sorted_by_time(absolute_path):
 			try:
 				entry = entry.decode(sys.getfilesystemencoding())
@@ -603,6 +604,10 @@ class TreeWalker:
 						num_photo_in_dir += 1
 						if not cache_hit:
 							Options.num_photo_processed += 1
+						if media.has_exif_date:
+							Options.num_photo_with_exif_date += 1
+						else:
+							photos_without_exif_date_in_dir.append(entry_with_path)
 						if media.has_gps_data:
 							Options.num_photo_geotagged += 1
 						else:
@@ -647,10 +652,15 @@ class TreeWalker:
 					message("not image nor video", entry_with_path, 1)
 					back_level()
 				back_level()
-		if num_photo_in_dir and num_photo_in_dir == len(photos_without_geotag_in_dir):
-			Options.photos_without_geotag.append(absolute_path + " (" + str(num_photo_in_dir) + " photos)")
-		else:
-			Options.photos_without_geotag.extend(photos_without_geotag_in_dir)
+		if num_photo_in_dir:
+			if num_photo_in_dir == len(photos_without_geotag_in_dir):
+				Options.photos_without_geotag.append(absolute_path + " (" + str(num_photo_in_dir) + " photos)")
+			else:
+				Options.photos_without_geotag.extend(photos_without_geotag_in_dir)
+			if num_photo_in_dir == len(photos_without_exif_date_in_dir):
+				Options.photos_without_exif_date.append(absolute_path + " (" + str(num_photo_in_dir) + " photos)")
+			else:
+				Options.photos_without_exif_date.extend(photos_without_exif_date_in_dir)
 		if not album.empty:
 			next_level()
 			message("adding album to big list...", "", 5)
