@@ -289,8 +289,9 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ### version 3.1.1 (, 2018)
 
-* Added `debug_css` and `debug_js` options for debugging
-* Added french translations
+* Added `debug_css` and `debug_js` options for debugging (thanks to pmetras)
+* Added french translations (thanks to pmetras)
+* Bug fixes by pmetras
 
 ### version 3.1 (December 30, 2017)
 
