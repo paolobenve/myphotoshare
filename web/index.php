@@ -95,7 +95,7 @@
 		<!-- End Piwik Code -->
 	<?php } ?>
 
-	<?php if (isset($options['google_analitics_id'])) { ?>
+	<?php if (isset($options['google_analytics_id'])) { ?>
 		<!-- google analytics -->
 		<script type="text/javascript">
 			// from https://git.zx2c4.com/PhotoFloat/tree/web/js/999-googletracker.js
@@ -115,7 +115,7 @@
 				});
 			});
 		</script>
-		<!-- End google analitics code -->
+		<!-- End google analytics code -->
 	<?php } ?>
 </head>
 <body>
