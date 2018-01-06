@@ -286,7 +286,13 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-### version 3.1 (December 30, 2018)
+
+### version 3.1.1 (, 2018)
+
+* Added `debug_css` and `debug_js` options for debugging
+* Added french translations
+
+### version 3.1 (December 30, 2017)
 
  * new option `checksum`: controls whether a checksum should be generated in order to decide if a media file has changed (useful with geotags)
  * better scanner reports
