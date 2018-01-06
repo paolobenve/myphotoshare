@@ -67,7 +67,13 @@ $(document).ready(function() {
 
 	function _t(id) {
 		language = getLanguage();
-		return translations[language][id];
+		if (translations[language] !== undefined) {
+			return translations[language][id];
+		} else {
+			// Using English as default language when translation does not exist
+			// for browser or options language.
+			return translations['en'][id];
+		}
 	}
 
 	function translate() {
