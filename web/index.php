@@ -7,7 +7,7 @@
 	<meta name="fragment" content="!" />
 	<meta name="medium" content="image" />
 	<?php
-		$jsonString = file_get_contents('options.json');
+		$jsonString = file_get_contents('cache/options.json');
 		$options = json_decode($jsonString, true);
 	?>
 	<title><?php if ($options['page_title'])
