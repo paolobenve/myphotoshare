@@ -92,7 +92,9 @@ $(document).ready(function() {
 			language = Options.language;
 		else {
 			var userLang = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage;
-			language = userLang.split('-')[0];
+			userLang = userLang.split('-')[0];
+			if (translations[userLang] !== undefined)
+				language = userLang;
 		}
 		return language;
 	}
