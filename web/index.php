@@ -7,21 +7,24 @@
 	<meta name="fragment" content="!" />
 	<meta name="medium" content="image" />
 	<?php
-		$jsonString = file_get_contents('options.json');
+		$jsonString = file_get_contents('cache/options.json');
 		$options = json_decode($jsonString, true);
 	?>
 	<title><?php if ($options['page_title'])
 			echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
+<?php if (!$options['debug_css']) { ?>
 	<link href="css/styles.min.css" rel="stylesheet" type="text/css" />
-	<script type="text/javascript" src="js/scripts.min.js"></script>
-
-<!--
+<?php } else { ?>
 	<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 	<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 	<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
 	<link href="css/003-social.css" rel="stylesheet" type="text/css" />
+<?php } ?>
+<?php if (!$options['debug_js']) { ?>
+	<script type="text/javascript" src="js/scripts.min.js"></script>
+<?php } else { ?>
 	<script type="text/javascript" src="js/000-jquery-1.12.4.js"></script>
 	<script type="text/javascript" src="js/001-hashchange.js"></script>
 	<script type="text/javascript" src="js/002-preloadimages.js"></script>
@@ -32,7 +35,7 @@
 	<script type="text/javascript" src="js/009-translations.js"></script>
 	<script type="text/javascript" src="js/010-libphotofloat.js"></script>
 	<script type="text/javascript" src="js/012-display.js"></script>
--->
+<?php } ?>
 
 	<?php
 		//~ ini_set('display_errors', 1);
@@ -91,7 +94,7 @@
 		<!-- End Piwik Code -->
 	<?php } ?>
 
-	<?php if (isset($options['google_analitics_id'])) { ?>
+	<?php if (isset($options['google_analytics_id'])) { ?>
 		<!-- google analytics -->
 		<script type="text/javascript">
 			// from https://git.zx2c4.com/PhotoFloat/tree/web/js/999-googletracker.js
@@ -111,7 +114,7 @@
 				});
 			});
 		</script>
-		<!-- End google analitics code -->
+		<!-- End google analytics code -->
 	<?php } ?>
 </head>
 <body>
