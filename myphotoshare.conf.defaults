@@ -17,8 +17,8 @@
 ###########################################################
 
 # debug CSS and JavaScript: don't use minified versions
-debug_css = 0
-debug_js = 0
+debug_css = false
+debug_js = false
 
 ###########################################################
 # scanner option
