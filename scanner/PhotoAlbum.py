@@ -259,7 +259,6 @@ class Album(object):
 
 		dictionary = {
 			"path": path_to_dict,
-			"absolutePath": self.absolute_path,
 			"cacheSubdir": self._subdir,
 			"date": self.date,
 			"albums": subalbums,
