@@ -1,4 +1,4 @@
-# myphotoshare v. 3.1
+# myphotoshare v. 3.2
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
 
@@ -46,7 +46,7 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Media animation when passing to next/previous image
 * Folders (or trees) are not scanned if a marker in put inside them
 * Verbosity levels can be set in scanner
-
+* debug mode for using unminimized css's and js's
 
 ### Usability:
 
@@ -287,11 +287,12 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 ## Changelog
 
 
-### version 3.1.1 (, 2018)
+### version 3.2 (January 7, 2018)
 
 * Added `debug_css` and `debug_js` options for debugging (thanks to pmetras)
 * Added french translations (thanks to pmetras)
 * Bug fixes by pmetras
+* Fixed unnecessary exposure of paths (thanks pmetras for reporting it)
 
 ### version 3.1 (December 30, 2017)
 
