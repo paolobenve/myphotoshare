@@ -232,11 +232,11 @@ def main():
 			sys.exit(-97)
 
 	json_options_file = os.path.join(Options.config['index_html_path'], "cache/options.json")
-		try:
-			with open(json_options_file) as old_options_file:
-				old_options = json.load(old_options_file)
-		except IOError:
-			old_options = Options.config
+	try:
+		with open(json_options_file) as old_options_file:
+			old_options = json.load(old_options_file)
+	except IOError:
+		old_options = Options.config
 
 	Options.config['recreate_reduced_photos'] = False
 	try:
