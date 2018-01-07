@@ -433,6 +433,7 @@ class TreeWalker:
 		except KeyboardInterrupt:
 			raise
 		except IOError:
+			# will execution never come here?
 			next_level()
 			message("json file unexistent", json_message, 4)
 			back_level()
@@ -486,7 +487,7 @@ class TreeWalker:
 				message("unreadable file", entry_with_path, 2)
 				back_level()
 			elif os.path.islink(entry_with_path) and not Options.config['follow_symlinks']:
-				# this way file symlink are skippe too: may be symlinks can be checked only for directories?
+				# this way file symlink are skipped too: may be symlinks can be checked only for directories?
 				next_level()
 				message("symlink, skipping as set in options", entry_with_path, 3)
 				back_level()
