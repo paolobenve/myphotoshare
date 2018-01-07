@@ -840,8 +840,14 @@ class TreeWalker:
 	def save_json_options(self):
 		json_options_file = os.path.join(Options.config['cache_path'], 'options.json')
 		message("saving json options file...", json_options_file, 4)
+		# some option must not be saved
+		options_to_save = {}
+		for key, value in Options.config.items():
+			if key not in Options.options_not_to_be_saved:
+				options_to_save[key] = value
+
 		with open(json_options_file, 'w') as fp:
-			json.dump(Options.config, fp)
+			json.dump(options_to_save, fp)
 		next_level()
 		message("saved json options file", "", 5)
 		back_level()
