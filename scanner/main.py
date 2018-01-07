@@ -231,12 +231,7 @@ def main():
 			message("FATAL ERROR", Options.config['cache_path'] + " not writable, quitting")
 			sys.exit(-97)
 
-	json_options_file = os.path.join(Options.config['index_html_path'], 'options.json')
-	try:
-		with open(json_options_file) as old_options_file:
-			old_options = json.load(old_options_file)
-	except IOError:
-		json_options_file = os.path.join(Options.config['index_html_path'], "cache/options.json")
+	json_options_file = os.path.join(Options.config['index_html_path'], "cache/options.json")
 		try:
 			with open(json_options_file) as old_options_file:
 				old_options = json.load(old_options_file)
