@@ -717,6 +717,7 @@ class TreeWalker:
 			next_level()
 			message("composite image OK, touched", composite_image_path, 4)
 			back_level()
+			back_level()
 			return
 
 		message("generating composite image...", composite_image_path, 5)
