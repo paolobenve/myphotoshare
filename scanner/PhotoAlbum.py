@@ -297,7 +297,6 @@ class Media(object):
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
 
 		self.is_valid = True
-		self.has_exif_date = False
 
 		image = None
 		try:
@@ -1284,10 +1283,8 @@ class Media(object):
 			correct_date = datetime(1900, 1, 1)
 		if "dateTimeOriginal" in self._attributes["metadata"]:
 			correct_date = self._attributes["metadata"]["dateTimeOriginal"]
-			self.has_exif_date = True
 		elif "dateTime" in self._attributes["metadata"]:
 			correct_date = self._attributes["metadata"]["dateTime"]
-			self.has_exif_date = True
 		else:
 			correct_date = self._attributes["dateTimeFile"]
 		return correct_date
@@ -1295,6 +1292,10 @@ class Media(object):
 	@property
 	def has_gps_data(self):
 		return "latitude" in self._attributes["metadata"]
+
+	@property
+	def has_exif_date(self):
+		return "dateTimeOriginal" in self._attributes["metadata"] or "dateTime" in self._attributes["metadata"]
 
 	@property
 	def latitude(self):
