@@ -93,6 +93,10 @@ Old `ffmpeg/avconv` could not be able to transcode some video. Be sure you have 
 
 The scanner gets modification date-time for video date-time. Be sure you do not modify it; or, if you modified it, touch it to desidered date-time.
 
+#### Pillow bug
+
+As a result of a pillow bug, exif data could not be read for some photos shooted around 2005
+
 ## Community
 
 Github platform permits you to report bugs.
