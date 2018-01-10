@@ -71,7 +71,8 @@ def main():
 				'default_media_name_sort',
 				'default_album_date_reverse_sort',
 				'default_media_date_reverse_sort',
-				'recreate_fixed_height_thumbnails'
+				'recreate_fixed_height_thumbnails',
+				'use_geonames'
 		):
 			try:
 				Options.config[option] = usr_config.getboolean('options', option)

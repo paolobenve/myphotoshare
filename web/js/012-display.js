@@ -1537,7 +1537,7 @@ $(document).ready(function() {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
 		var prevMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
 		var nextReducedPhoto, prevReducedPhoto;
-		var link, linkTitle;
+		var link;
 
 		mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentMedia);
 		firstEscKey = true;
@@ -1837,11 +1837,13 @@ $(document).ready(function() {
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
-		linkTitle = _t('#show-map') + Options.map_service;
-		$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
-			ev.stopPropagation();
-			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, Options.photo_map_zoom_level), '_blank');
-		});
+		if (Options.map_service) {
+			var linkTitle = _t('#show-map') + Options.map_service;
+			$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
+				ev.stopPropagation();
+				window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, Options.photo_map_zoom_level), '_blank');
+			});
+		}
 
 		translate();
 
@@ -1850,7 +1852,7 @@ $(document).ready(function() {
 	}
 
 	function hasGpsData(media) {
-		return media.mediaType == "photo" && typeof media.metadata.latitude !== "undefined";
+		return Options.use_geonames && media.mediaType == "photo" && typeof media.metadata.latitude !== "undefined";
 	}
 
 	function mapLink(latitude, longitude, zoom) {

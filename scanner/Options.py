@@ -19,4 +19,5 @@ options_not_to_be_saved = ['cache_path', 'index_html_path', 'album_path']
 # set this variable to a new integer number whenever the json files structure changes
 # json_version = 1 since ...
 # json_version = 2 since checksums have been added
-json_version = 2
+# json_version = 3 since geotag managing is optional
+json_version = 3

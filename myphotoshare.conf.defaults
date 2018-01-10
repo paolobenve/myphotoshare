@@ -124,6 +124,18 @@ media_thumb_type = fixed_height
 # Disable this feature setting it to 1; values < 1 will be considered equivalent to 1
 mobile_thumbnail_factor = 2
 
+# strings used internally, do not change them unless you know what you are doing
+folders_string = _f
+by_date_string = _bd
+cache_folder_separator = -
+
+# should country/state/place albums be created?
+# the following options will have no effect if this option is false
+use_geonames = false
+
+# strings used internally, do not change it unless you know what you are doing
+by_gps_string = _bg
+
 # geoname user for geonames.org requests
 # The value here ('myphotoshare') is like a demo
 # you can use it in testing phase, but you must generate a new user for production installs:
@@ -151,12 +163,6 @@ map_zoom_levels = [6, 9, 15]
 # The zoom value to use for the map shown with the photo
 photo_map_zoom_level = 16
 
-# strings used internally, do not change them unless you know what you are doing
-folders_string = _f
-by_date_string = _bd
-by_gps_string = _bg
-cache_folder_separator = -
-
 
 ###########################################################
 # js options
@@ -167,10 +173,11 @@ server_album_path = albums
 
 # the service to use for geotag maps:
 # available values:
-# - openstreetmap (no marker)
-# - googlemaps (no marker)
-# - osmtools (with marker)
-map_service = osmtools
+# - (nothing)
+# - openstreetmap (the maps which are generated have no marker)
+# - googlemaps (the maps which are generated have no marker)
+# - osmtools (the maps which are generated have a marker)
+map_service =
 
 ###########################################################
 # user interface options
