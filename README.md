@@ -291,7 +291,6 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 ## Changelog
 
 * new option `use_geonames`, defaults to false, set it to true in order to create country/state/place albums
-* `map_service` option defaults now to nothing
 
 ### version 3.2 (January 7, 2018)
 

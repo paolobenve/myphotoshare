@@ -173,11 +173,10 @@ server_album_path = albums
 
 # the service to use for geotag maps:
 # available values:
-# - (nothing)
 # - openstreetmap (the maps which are generated have no marker)
 # - googlemaps (the maps which are generated have no marker)
 # - osmtools (the maps which are generated have a marker)
-map_service =
+map_service = osmtools
 
 ###########################################################
 # user interface options
