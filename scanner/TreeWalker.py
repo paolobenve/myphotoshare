@@ -32,9 +32,10 @@ class TreeWalker:
 		message("Browsing", "start!", 3)
 		self.all_albums = list()
 		self.tree_by_date = {}
-		self.tree_by_geonames = {}
-		self.media_with_geonames_list = list()
-		self.media_with_geonames_list_is_sorted = True
+		if Options.config['use_geonames']:
+			self.tree_by_geonames = {}
+			self.media_with_geonames_list = list()
+			self.media_with_geonames_list_is_sorted = True
 		self.all_media = list()
 		self.all_album_composite_images = list()
 		self.album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
