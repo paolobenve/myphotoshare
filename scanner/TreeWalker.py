@@ -275,7 +275,7 @@ class TreeWalker:
 					for i, cluster in enumerate(cluster_list):
 						if set_alt_place:
 							next_level()
-							message("working with " + str(i) + "-th cluster", 5)
+							message("working with clusters", str(i) + "-th cluster", 5)
 							alt_place_code = place_code + "_" + str(i + 1).zfill(num_digits)
 							alt_place_name = place_name + "_" + str(i + 1).zfill(num_digits)
 
