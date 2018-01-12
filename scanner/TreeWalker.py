@@ -232,26 +232,25 @@ class TreeWalker:
 							message("big list found", str(len(media_list)) + " photos", 5)
 							next_level()
 							while True:
-								message("clustering with k-means algorithm", "trying with K = " + str(K), 5)
+								message("clustering with k-means algorithm...", "", 5)
 								cluster_list = geoname.find_centers(media_list, K)
-								if max([len(cluster) for cluster in cluster_list]) <= Options.config['big_virtual_folders_threshold']:
+								max_cluster_length = max([len(cluster) for cluster in cluster_list])
+								if max_cluster_length <= Options.config['big_virtual_folders_threshold']:
 									next_level()
-									message("clustering with k-means algorithm", "OK with K = " + str(K), 5)
+									message("clustered with k-means algorithm", "OK with K = " + str(K), 5)
 									back_level()
 									break
 								if K > len(media_list):
 									next_level()
-									message("clustering with k-means algorithm", "failed: clusters are too big even with K = " + str(K), 5)
+									message("clustered with k-means algorithm", "failed even with K = " + str(K) + ": clusters are too big (" + str(max_cluster_length) + " photos)", 5)
 									back_level()
 									break
+								next_level()
+								message("clustered with k-means algorithm", "not ok with K = " + str(K) + ": biggest cluster has " + str(max_cluster_length) + " photos", 5)
+								back_level()
 								K = K * 2
-						biggest_cluster_size = 0
-						for cluster in cluster_list:
-							length = len(cluster)
-							if length > biggest_cluster_size:
-								biggest_cluster_size = length
 						next_level()
-						message("clustering terminated", "biggest cluster has now " + str(biggest_cluster_size) + " photos, clusters are " + str(len(cluster_list)), 5)
+						message("clustering terminated", "clusters are " + str(len(cluster_list)), 5)
 						back_level()
 						back_level()
 						back_level()
