@@ -226,13 +226,7 @@ class TreeWalker:
 						if Options.config['legacy_clustering_function']:
 							max_distance = 1000
 							message("big list found", str(len(media_list)) + " photos, grouping points with max_distance = " + str(max_distance) + " meters", 5)
-							next_level()
-							message("clustering with legacy algorithm...", "", 5)
 							cluster_list = geoname.legacy_reduce_clusters_size(media_list, max_distance)
-							max_cluster_length = max([len(cluster) for cluster in cluster_list])
-							next_level()
-							message("clustered with legacy algorithm", "biggest cluster has " + str(max_cluster_length) + " photos", 5)
-							back_level()
 						else:
 							K = 2
 							message("big list found", str(len(media_list)) + " photos", 5)
@@ -243,7 +237,7 @@ class TreeWalker:
 								max_cluster_length = max([len(cluster) for cluster in cluster_list])
 								if max_cluster_length <= Options.config['big_virtual_folders_threshold']:
 									next_level()
-									message("clustered with k-means algorithm", "OK with K = " + str(K) + ": biggest cluster has " + str(max_cluster_length) + " photos", 5)
+									message("clustered with k-means algorithm", "OK with K = " + str(K), 5)
 									back_level()
 									break
 								if K > len(media_list):
