@@ -275,7 +275,7 @@ class TreeWalker:
 					for i, cluster in enumerate(cluster_list):
 						if set_alt_place:
 							next_level()
-							message("working with " + str(i) + "-th cluster", 5)
+							message("working with clusters", str(i) + "-th cluster", 5)
 							alt_place_code = place_code + "_" + str(i + 1).zfill(num_digits)
 							alt_place_name = place_name + "_" + str(i + 1).zfill(num_digits)
 
@@ -346,7 +346,7 @@ class TreeWalker:
 						self.generate_composite_image(place_album, place_max_file_date)
 						if set_alt_place:
 							next_level()
-							message(str(i) + "-th cluster worked out", cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
+							message("cluster worked out", str(i) + "-th cluster: " + cluster[0].country_code + "-" + cluster[0].region_code + "-" + alt_place_name, 4)
 							back_level()
 							back_level()
 						else:
