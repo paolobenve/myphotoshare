@@ -6,6 +6,8 @@ import Options
 from CachePath import *
 import TreeWalker
 import math
+import numpy as np
+import random
 
 # For information on endpoints and arguments see the geonames
 # API documentation at:
@@ -110,7 +112,7 @@ class Geonames(object):
 
 	# a recursive function that receives a big list of photos whose coordinates are quite near each other
 	# and returns a list of smaller clusters not farther than max_distance
-	def reduce_clusters_size(self, media_list, max_distance):
+	def legacy_reduce_clusters_size(self, media_list, max_distance):
 		next_level()
 		message("big list found, " + str(len(media_list)) + " photos", "grouping points with max_distance = " + str(max_distance) + " meters", 5)
 		cluster_list = []
@@ -139,11 +141,11 @@ class Geonames(object):
 		for i, cluster in enumerate(cluster_list):
 			if len(cluster['media_list']) > Options.config['big_virtual_folders_threshold']:
 				if max_distance > 1:
-					reorganized_cluster_list.extend(self.reduce_clusters_size(cluster['media_list'], max_distance / 2))
+					reorganized_cluster_list.extend(self.legacy_reduce_clusters_size(cluster['media_list'], max_distance / 2))
 				else:
 					last = Options.config['big_virtual_folders_threshold'] - 1
 					reorganized_cluster_list.append(cluster['media_list'][0:last])
-					reorganized_cluster_list.extend(self.reduce_clusters_size(cluster['media_list'][Options.config['big_virtual_folders_threshold']:], max_distance / 2))
+					reorganized_cluster_list.extend(self.legacy_reduce_clusters_size(cluster['media_list'][Options.config['big_virtual_folders_threshold']:], max_distance / 2))
 			else:
 				reorganized_cluster_list.append(cluster['media_list'])
 
@@ -184,3 +186,52 @@ class Geonames(object):
 		c = 2.0 * math.asin(math.sqrt(a))
 		m = 6371.0 * c * 1000.0
 		return m
+
+	# the following functions implement k-means clustering, got from https://datasciencelab.wordpress.com/2013/12/12/clustering-with-k-means-in-python/
+	# the main functino is find_centers
+	def cluster_points(self, media_list, mu):
+		clusters  = {}
+		for media in media_list:
+			# bestmukey = min([(i[0], np.linalg.norm(x-mu[i[0]])) for i in enumerate(mu)], key=lambda t:t[1])[0]
+			bestmukey = min([(index_and_point[0], np.linalg.norm(self.coordinates(media) - mu[index_and_point[0]])) for index_and_point in enumerate(mu)], key=lambda t:t[1])[0]
+			try:
+				clusters[bestmukey].append(media)
+			except KeyError:
+				clusters[bestmukey] = [media]
+		return clusters
+
+	def reevaluate_centers(self, mu, clusters):
+		newmu = []
+		keys = sorted(clusters.keys())
+		for k in keys:
+			newmu.append(np.mean([self.coordinates(_media) for _media in clusters[k]], axis = 0))
+		return newmu
+
+	def has_converged(self, mu, oldmu):
+		return set([tuple(a) for a in mu]) == set([tuple(a) for a in oldmu])
+
+	def coordinates(self, media):
+		return np.array((media.latitude, media.longitude))
+
+	def find_centers(self, media_list, K):
+		# Initialize to K random centers
+		coordinate_list = [self.coordinates(media) for media in media_list]
+		try:
+			oldmu = random.sample(coordinate_list, K)
+		except ValueError:
+			oldmu = coordinate_list
+		try:
+			mu = random.sample(coordinate_list, K)
+		except ValueError:
+			mu = coordinate_list
+		first_time = True
+		while first_time or not self.has_converged(mu, oldmu):
+			oldmu = mu
+			# Assign all points in media_list to clusters
+			clusters = self.cluster_points(media_list, mu)
+			# Reevaluate centers
+			mu = self.reevaluate_centers(oldmu, clusters)
+			if first_time:
+				first_time = False
+		cluster_list = [cluster for key, cluster in clusters.iteritems()]
+		return cluster_list

@@ -222,8 +222,17 @@ class TreeWalker:
 					# transform media_list in an element in a list, probably most times, we'll work with it
 					message("checking if it's a big list...", "", 5)
 					if len(media_list) > Options.config['big_virtual_folders_threshold']:
-						max_distance = 1000
-						cluster_list = geoname.reduce_clusters_size(media_list, max_distance)
+						if Options.config['legacy_clustering_function']:
+							max_distance = 1000
+							cluster_list = geoname.legacy_reduce_clusters_size(media_list, max_distance)
+						else:
+							K = 2
+							while True:
+								cluster_list = geoname.find_centers(media_list, K)
+								if max([len(cluster) for cluster in cluster_list]) <= Options.config['big_virtual_folders_threshold'] or K > len(media_list):
+									break
+								K = K * 2
+
 					else:
 						next_level()
 						message("it's not a big list", "", 5)

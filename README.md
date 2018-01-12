@@ -131,6 +131,7 @@ It is, essentially, a slick and fast, minimal but still well-featured photo gall
 Photofloat needs:
 
 * `python` 2.7
+* `python-numpy`
 * `avconv` / `ffmpeg` in order to be able to manage videos.
 * a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
 * `php5-gd` in order to create albums share images
@@ -291,6 +292,8 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 ## Changelog
 
 * new option `use_geonames`, defaults to false, set it to true in order to create country/state/place albums
+* clustering of places with too many photos is done by the k-means algorithm, better than the previous one, which remains a "legacy"
+* new option `legacy_clustering_function`: if set to false (default), the k-means algorithm is used for clustering places with too many photos
 
 ### version 3.2 (January 7, 2018)
 
