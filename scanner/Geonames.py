@@ -113,8 +113,6 @@ class Geonames(object):
 	# a recursive function that receives a big list of photos whose coordinates are quite near each other
 	# and returns a list of smaller clusters not farther than max_distance
 	def legacy_reduce_clusters_size(self, media_list, max_distance):
-		next_level()
-		message("big list found, " + str(len(media_list)) + " photos", "grouping points with max_distance = " + str(max_distance) + " meters", 5)
 		cluster_list = []
 		biggest_cluster_size = 0
 		for media in media_list:
@@ -154,10 +152,6 @@ class Geonames(object):
 			length = len(cluster)
 			if length > biggest_cluster_size:
 				biggest_cluster_size = length
-		next_level()
-		message("biggest cluster has now " + str(biggest_cluster_size) + " photos", "clusters are " + str(len(reorganized_cluster_list)), 5)
-		back_level()
-		back_level()
 		return reorganized_cluster_list
 
 	def recalculate_mean(self, old_mean, old_len, new_value, new_len = 1):

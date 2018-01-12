@@ -222,16 +222,39 @@ class TreeWalker:
 					# transform media_list in an element in a list, probably most times, we'll work with it
 					message("checking if it's a big list...", "", 5)
 					if len(media_list) > Options.config['big_virtual_folders_threshold']:
+						next_level()
 						if Options.config['legacy_clustering_function']:
 							max_distance = 1000
+							message("big list found", str(len(media_list)) + " photos, grouping points with max_distance = " + str(max_distance) + " meters", 5)
 							cluster_list = geoname.legacy_reduce_clusters_size(media_list, max_distance)
 						else:
 							K = 2
+							message("big list found", str(len(media_list)) + " photos", 5)
+							next_level()
 							while True:
+								message("clustering with k-means algorithm", "trying with K = " + str(K), 5)
 								cluster_list = geoname.find_centers(media_list, K)
-								if max([len(cluster) for cluster in cluster_list]) <= Options.config['big_virtual_folders_threshold'] or K > len(media_list):
+								if max([len(cluster) for cluster in cluster_list]) <= Options.config['big_virtual_folders_threshold']:
+									next_level()
+									message("clustering with k-means algorithm", "OK with K = " + str(K), 5)
+									back_level()
+									break
+								if K > len(media_list):
+									next_level()
+									message("clustering with k-means algorithm", "failed: clusters are too big even with K = " + str(K), 5)
+									back_level()
 									break
 								K = K * 2
+						biggest_cluster_size = 0
+						for cluster in cluster_list:
+							length = len(cluster)
+							if length > biggest_cluster_size:
+								biggest_cluster_size = length
+						next_level()
+						message("clustering terminated", "biggest cluster has now " + str(biggest_cluster_size) + " photos, clusters are " + str(len(cluster_list)), 5)
+						back_level()
+						back_level()
+						back_level()
 
 					else:
 						next_level()
