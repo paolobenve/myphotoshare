@@ -11,6 +11,53 @@ MINIFY_CSS=${MINIFY_CSS:-web_service}
 
 unixseconds=$(date +%s)
 
+# Check that local minifiers are installed
+case $MINIFY_JS in
+	web_service)
+		curl https://javascript-minifier.com/ > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'curl' not installed or 'https://javascript-minifier.com/' down"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+	jsmin2)
+		python2 -m jsmin > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'jsmin' for Python2 is not installed. Look for package 'python-jsmin' or 'https://github.com/tikitu/jsmin'"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+	jsmin3)
+		python3 -m jsmin > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'jsmin' for Python3 is not installed. Look for package 'python3-jsmin' or 'https://github.com/tikitu/jsmin'"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+esac
+
+case $MINIFY_CSS in
+	web_service)
+		curl https://cssminifier.com/ > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'curl' not installed or 'https://cssminifier.com/' down"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+	cssmin)
+		cssmin -h > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'cssmin' is not installed. Look for package 'cssmin' or 'https://github.com/zacharyvoase/cssmin'"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+esac
+
 # minify all .js-files
 cd web/js
 echo
