@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 
 from TreeWalker import TreeWalker
 from CachePath import message, next_level, back_level, report_times

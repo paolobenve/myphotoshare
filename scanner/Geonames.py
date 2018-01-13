@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # original from https://gist.github.com/Markbnj/e1541d15699c4d2d8c98
 
 import requests

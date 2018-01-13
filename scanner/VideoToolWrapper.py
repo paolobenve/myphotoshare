@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from CachePath import message
 import os
 import subprocess

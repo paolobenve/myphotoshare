@@ -1,4 +1,4 @@
-# coding=utf8
+# -*- coding: utf-8 -*-
 # do not remove previous line: it's not a comment!
 import os.path
 from datetime import datetime
