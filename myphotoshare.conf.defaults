@@ -172,6 +172,7 @@ photo_map_zoom_level = 16
 server_album_path = albums
 
 # the service to use for geotag maps:
+# if use_geonames is false this services aren't used at all
 # available values:
 # - openstreetmap (the maps which are generated have no marker)
 # - googlemaps (the maps which are generated have no marker)
