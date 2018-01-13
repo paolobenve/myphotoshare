@@ -20,6 +20,25 @@
 debug_css = false
 debug_js = false
 
+
+###########################################################
+# minify
+###########################################################
+
+# CSS minifier
+# permitted values:
+#    web_service : https://cssminifier.com/ (Default)
+#    cssmin : cssmin (https://github.com/zacharyvoase/cssmin)
+minify_css = web_service
+
+# JavaScript minifier
+# permitted values:
+#    web_service : https://javascript-minifier.com/ (Default)
+#    jsmin2 : python-jsmin (https://github.com/tikitu/jsmin)
+#    jsmin3 : python3-jsmin (https://github.com/tikitu/jsmin)
+minify_js = web_service
+
+
 ###########################################################
 # scanner option
 ###########################################################

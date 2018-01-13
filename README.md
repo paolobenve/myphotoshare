@@ -162,6 +162,8 @@ This simply minifies and concatenate everything of js and css.
 
     $ ./js-css-minify.sh
 
+By default, it uses https://javascript-minifier.com/ and https;//cssminifier.com/ web services, but the minifier tools can be changed in the configuration file (/etc/myphotoshare/myphotoshare.conf), cssmin and jsmin are currently supported. More local tools can easily be added.
+
 ### Config your web server
 
 Be sure you have a web server installed (`apache2`, `nginx`, ...), with `php` and `php5-gd` modules installed and set.
@@ -294,6 +296,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * new option `use_geonames`, defaults to false, set it to true in order to create country/state/place albums
 * clustering of places with too many photos is done by the k-means algorithm, better than the previous one, which remains a "legacy"
 * new option `legacy_clustering_function`: if set to false (default), the k-means algorithm is used for clustering places with too many photos
+* Can use local CSS and JavaScript minifiers instead of web services.
 
 ### version 3.2 (January 7, 2018)
 
