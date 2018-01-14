@@ -12,6 +12,7 @@ import numpy as np
 import random
 import os
 import sys
+import math
 
 # For information on endpoints and arguments see the geonames
 # API documentation at:
@@ -104,7 +105,7 @@ class Geonames(object):
 			back_level()
 		else:
 			# get country, region (state for federal countries), and place
-			result = min([city for city in self.cities], key=lambda c: self.distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
+			result = min([city for city in self.cities], key=lambda c: self.quick_distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
 			result['distance'] = self.distance_between_coordinates(latitude, longitude, result['latitude'], result['longitude'])
 			next_level()
 			message("geoname got from geonames local files", "", 5)
@@ -164,8 +165,8 @@ class Geonames(object):
 		# https://gis.stackexchange.com/questions/61924/python-gdal-degrees-to-meters-without-reprojecting
 		# Calculate the great circle distance in meters between two points on the earth (specified in decimal degrees)
 
-		next_level()
-		message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
+		# next_level()
+		# message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
 		# convert decimal degrees to radians
 		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
 		# haversine formula
@@ -173,7 +174,19 @@ class Geonames(object):
 		d_r_lat = r_lat2 - r_lat1
 		a = math.sin(d_r_lat / 2.0) ** 2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(d_r_lon / 2.0) ** 2
 		c = 2.0 * math.asin(math.sqrt(a))
-		m = 6371.0 * c * 1000.0
+		m = int(6371.0 * c * 1000.0)
+		return m
+
+	def quick_distance_between_coordinates(self, lat1, lon1, lat2, lon2):
+		# do not output messages in this functions, it is called too many times!
+		# convert decimal degrees to radians
+		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+		# equirectangular distance approximation
+		# got from https://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
+		R = 6371000  # radius of the earth in m
+		x = (r_lon2 - r_lon1) * math.cos(0.5 * (r_lat2 + r_lat1))
+		y = r_lat2 - r_lat1
+		m = int(R * math.sqrt(x*x + y*y))
 		return m
 
 	# the following functions implement k-means clustering, got from https://datasciencelab.wordpress.com/2013/12/12/clustering-with-k-means-in-python/
