@@ -74,17 +74,17 @@ class Geonames(object):
 		filtering for feature class and feature code.
 		"""
 
-		for (c_latitude, c_longitude, c_feature_class, c_feature_code) in Geonames.geonames_cache:
+		for (c_latitude, c_longitude) in Geonames.geonames_cache:
 			distance = self.distance_between_coordinates(c_latitude, c_longitude, latitude, longitude)
-			if c_feature_class == feature_class and c_feature_code == feature_code and distance < self.max_distance_meters:
+			if distance < self.max_distance_meters:
 				# get it from cache!
-				result = Geonames.geonames_cache[(c_latitude, c_longitude, feature_class, feature_code)]
+				result = Geonames.geonames_cache[(c_latitude, c_longitude)]
 				next_level()
 				message("geoname got from cache", "", 5)
 				back_level()
 				# add to cache only if not too closed to existing point
 				if distance > self.max_distance_meters / 10.0:
-					Geonames.geonames_cache[(latitude, longitude, feature_class, feature_code)] = result
+					Geonames.geonames_cache[(latitude, longitude)] = result
 				return result
 
 		if Options.config['use_geonames_online']:
@@ -103,7 +103,7 @@ class Geonames(object):
 			back_level()
 
 		# add to cache
-		Geonames.geonames_cache[(latitude, longitude, feature_class, feature_code)] = result
+		Geonames.geonames_cache[(latitude, longitude)] = result
 
 		return result
 
