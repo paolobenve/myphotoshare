@@ -1837,7 +1837,7 @@ $(document).ready(function() {
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
-		if (true || Options.use_geonames_online) {
+		if (true || Options.get_geonames_online) {
 			var linkTitle = _t('#show-map') + Options.map_service;
 			$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
 				ev.stopPropagation();

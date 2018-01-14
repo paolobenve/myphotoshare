@@ -143,7 +143,7 @@ unspecified_geonames_code = 000000
 
 # should country/state/place albums be created?
 # the following option will have no effect if this option is false
-use_geonames_online = false
+get_geonames_online = false
 
 # geoname user for geonames.org requests
 # The value here ('myphotoshare') is like a demo
@@ -164,7 +164,7 @@ geonames_user = myphotoshare
 server_album_path = albums
 
 # the service to use for geotag maps:
-# if use_geonames_online is false this services aren't used at all
+# if get_geonames_online is false this services aren't used at all
 # available values:
 # - openstreetmap (the maps which are generated have no marker)
 # - googlemaps (the maps which are generated have no marker)

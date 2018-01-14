@@ -30,7 +30,7 @@ class Geonames(object):
 	max_distance_meters = 50
 
 	def __init__(self):
-		if Options.config['use_geonames_online']:
+		if Options.config['get_geonames_online']:
 			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
 		else:
 			territories_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/territories.json')
@@ -86,7 +86,7 @@ class Geonames(object):
 					Geonames.geonames_cache[(latitude, longitude)] = result
 				return result
 
-		if Options.config['use_geonames_online']:
+		if Options.config['get_geonames_online']:
 			# get country, region (state for federal countries), and place
 			url = self._base_nearby_url.format(latitude, longitude)
 			response = requests.get(url)

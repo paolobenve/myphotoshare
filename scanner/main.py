@@ -72,7 +72,7 @@ def main():
 				'default_album_date_reverse_sort',
 				'default_media_date_reverse_sort',
 				'recreate_fixed_height_thumbnails',
-				'use_geonames_online'
+				'get_geonames_online'
 		):
 			try:
 				Options.config[option] = usr_config.getboolean('options', option)
@@ -123,7 +123,7 @@ def main():
 		else:
 			Options.config['geonames_language'] = os.getenv('LANG')[:2]
 			message("geonames_language and language options unset", "using system language (" + Options.config['geonames_language'] + ") for geonames_language option")
-	if Options.config['use_geonames_online']:
+	if Options.config['get_geonames_online']:
 		# warn if using demo geonames user
 		if Options.config['geonames_user'] == str(default_config.get('options', 'geonames_user')):
 			message("WARNING!", "You are using the myphotoshare demo geonames user, get and use your own user as soon as possible")
