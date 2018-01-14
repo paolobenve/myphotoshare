@@ -7,6 +7,12 @@ if [ -z "$1" ]; then
 	echo
 	echo Quitting
 	exit
+elif [ ! -f "$1" ]; then
+	echo
+	echo Error: file "$1" do not exist
+	echo
+	echo Quitting
+	exit
 fi
 
 # Parse which minifiers to use from configuration file
