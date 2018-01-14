@@ -136,6 +136,7 @@ Photofloat needs:
 * a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
 * `php5-gd` in order to create albums share images
 * `curl`, used by minify script
+* `cssmin` (`https://github.com/zacharyvoase/cssmin`, debian/ubuntu packages `cssmin`) and `jsmin` (`https://github.com/tikitu/jsmin`, debian/ubuntu package `python-jsmin`), unless using external web service
 
 #### Why `php`? Isn't it enough with javascript?
 
@@ -160,9 +161,9 @@ In your config file (myproject.conf, name can be whatever you want) you must set
 
 This simply minifies and concatenate everything of js and css.
 
-    $ ./js-css-minify.sh
+    $ ./js-css-minify.sh YOUR_MYPHOTOSHARE_CONF_FILE
 
-By default, it uses https://javascript-minifier.com/ and https;//cssminifier.com/ web services, but the minifier tools can be changed in the configuration file (/etc/myphotoshare/myphotoshare.conf), cssmin and jsmin are currently supported. More local tools can easily be added.
+By default, a local minifier is used (cssmin and jsmin are currently supported, more local tools can easily be added); https://javascript-minifier.com/ and https;//cssminifier.com/ web services may be used, changing options in the config file, by they are subject to timeout errors which the script cannot detect.
 
 ### Config your web server
 
@@ -296,7 +297,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * new option `use_geonames`, defaults to false, set it to true in order to create country/state/place albums
 * clustering of places with too many photos is done by the k-means algorithm, better than the previous one, which remains a "legacy"
 * new option `legacy_clustering_function`: if set to false (default), the k-means algorithm is used for clustering places with too many photos
-* added option to use local CSS and JavaScript minifiers instead of web services.
+* added options `js_minifier` and `css_minifier` to specify what minifier to use: web services or local ones
 
 ### version 3.2 (January 7, 2018)
 

@@ -1,13 +1,29 @@
 #!/bin/bash
 
+if [ -z "$1" ]; then
+	# The script must be launched with the user's config file
+	echo
+	echo Usage: ./js-css-minify.sh MYPHOTOSHARE_CONFIG_FILE
+	echo
+	echo Quitting
+	exit
+fi
+
 # Parse which minifiers to use from configuration file
-CONF=/etc/myphotoshare/myphotoshare.conf
+DEFAULT_CONF=myphotoshare.conf.defaults
+CONF="$1"
 
-MINIFY_JS="$(sed -nr 's/^\s*minify_js\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
-MINIFY_JS=${MINIFY_JS:-web_service}
+MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
+DEFAULT_MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $DEFAULT_CONF)"
+MINIFY_JS=${MINIFY_JS:-$DEFAULT_MINIFY_JS}
 
-MINIFY_CSS="$(sed -nr 's/^\s*minify_css\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
-MINIFY_CSS=${MINIFY_CSS:-web_service}
+MINIFY_CSS="$(sed -nr 's/^\s*css_minifier\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
+DEFAULT_MINIFY_CSS="$(sed -nr 's/^\s*css_minifier\s*=\s*(\w+)\s*.*$/\1/p' $DEFAULT_CONF)"
+MINIFY_CSS=${MINIFY_CSS:-$DEFAULT_MINIFY_CSS}
+
+echo
+echo Using "$MINIFY_CSS" as CSS minifier
+echo Using "$MINIFY_JS" as JS minifier
 
 unixseconds=$(date +%s)
 
@@ -81,7 +97,7 @@ ls -1 *.js | grep -Ev "min.js$" | while read jsfile; do
 		;;
 
 		*)
-			echo "Unsupported Javascript minifier: $MINIFY_JS. Check option 'minify_js' in '$CONF'"
+			echo "Unsupported Javascript minifier: $MINIFY_JS. Check option 'js_minifier' in '$CONF'"
 			echo "Doing nothing on file $jsfile"
 	esac
 done
@@ -110,7 +126,7 @@ ls -1 *.css | grep -Ev "min.css$" | while read cssfile; do
 		;;
 
 		*)
-			echo "Unsupported CSS minifier: $MINIFY_CSS. Check option 'minify_css' in '$CONF'"
+			echo "Unsupported CSS minifier: $MINIFY_CSS. Check option 'css_minifier' in '$CONF'"
 			echo "Doing nothing on file $cssfile"
 	esac
 done
