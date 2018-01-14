@@ -49,10 +49,6 @@
 
 	PhotoFloat.prototype.showByGpsButton = function() {
 		// this function returns true if the root album has the by gps subalbum
-		if (! Options.use_geonames) {
-			return;
-		}
-		
 		if (this.geotaggedPhotosFound !== null) {
 			if (this.geotaggedPhotosFound) {
 				$("#by-gps-view-container").show();

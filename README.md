@@ -291,7 +291,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
-* new option `use_geonames`, defaults to false, set it to true in order to create country/state/place albums
+* new option `use_geonames_online`, if true, get country, state, place names from geonames.org (online), otherwise get it from the files in scanner/geonames/cities15000.txt (names are in english)
 * clustering of places with too many photos is now done by the k-means algorithm
 
 ### version 3.2 (January 7, 2018)

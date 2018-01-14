@@ -1,4 +1,6 @@
 # original from https://gist.github.com/Markbnj/e1541d15699c4d2d8c98
+# added code from gottengeography project, https://gitlab.com/robru/gottengeography
+# files scanner/geonames/territories.json and scanner/geonames/countries.json from gottengeography project too
 
 import requests
 import json
@@ -8,6 +10,8 @@ import TreeWalker
 import math
 import numpy as np
 import random
+import os
+import sys
 
 # For information on endpoints and arguments see the geonames
 # API documentation at:
@@ -26,13 +30,45 @@ class Geonames(object):
 	max_distance_meters = 50
 
 	def __init__(self):
-		GEONAMES_USER = Options.config['geonames_user']
-		GEONAMES_LANGUAGE = Options.config['geonames_language']
-		self._base_feature_url = "{}getJSON?geonameId={{}}&username={}&style=full&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
-		self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
-		self._base_neighbourhood_url = "{}neighbourhoodJSON?lat={{}}&lng={{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
+		if Options.config['use_geonames_online']:
+			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
+		else:
+			territories_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/territories.json')
+			countries_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/countries.json')
+			cityfile = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/cities15000.txt')
 
-	def lookup_nearby_place(self, latitude, longitude, feature_class='P', feature_code=None):
+			with open(territories_file, 'r') as territories_file_p:
+				territories = json.load(territories_file_p)
+			with open(countries_file, 'r') as countries_file_p:
+				countries = json.load(countries_file_p)
+
+			with open(cityfile, 'r') as cities:
+				self.cities = []
+				for line in cities:
+					col = line.split('\t')
+					country_code = col[8]
+					state_code = col[10]
+					try:
+						country = countries[country_code]
+					except KeyError:
+						country = ''
+					try:
+						state = territories[country_code + '.' + state_code]
+					except KeyError:
+						state = ''
+					my_line = {
+						'city': col[1],
+						#'city_alt': col[3].split(','),
+						'lat': float(col[4]),
+						'long': float(col[5]),
+						'country_code': country_code,
+						'country': country,
+						'state_code': state_code,
+						'state': state
+					}
+					self.cities.append(my_line)
+
+	def lookup_nearby_place(self, latitude, longitude):
 		"""
 		Looks up places near a specific geographic location, optionally
 		filtering for feature class and feature code.
@@ -51,27 +87,20 @@ class Geonames(object):
 					Geonames.geonames_cache[(latitude, longitude, feature_class, feature_code)] = result
 				return result
 
-		feature_filter = ''
-		if feature_class:
-			feature_filter += "&featureClass={}".format(feature_class)
-		if feature_code:
-			feature_filter += "&featureCode={}".format(feature_code)
-
-		# get country, region (state for federal countries), and place
-		url = self._base_nearby_url.format(latitude, longitude, feature_filter)
-		response = requests.get(url)
-		result = self._decode_nearby_place(response.text)
-		next_level()
-		message("geoname got from geonames.org", "", 5)
-		back_level()
-		# I had an idea of running another request in order to get the nearest city with population of 15000+ and use it as an intermediate level between region and places
-		# I'm not sure it's a good thing...
-		# url = self._base_nearby_city_url.format(latitude, longitude, feature_filter)
-		# print "looking up city", url
-		# response = requests.get(url)
-		# result_city = self._decode_nearby_place(response.text)
-		# result['city_name'] = result_city['place_name']
-		# result['city_code'] = result_city['place_code']
+		if Options.config['use_geonames_online']:
+			# get country, region (state for federal countries), and place
+			url = self._base_nearby_url.format(latitude, longitude)
+			response = requests.get(url)
+			result = self._decode_nearby_place(response.text)
+			next_level()
+			message("geoname got from geonames.org online", "", 5)
+			back_level()
+		else:
+			# get country, region (state for federal countries), and place
+			result = min([city for city in cities], key=self.distance_between_coordinates(city.lat, city.long, latitude, longitude))
+			next_level()
+			message("geoname got from geonames files on disk", "", 5)
+			back_level()
 
 		# add to cache
 		Geonames.geonames_cache[(latitude, longitude, feature_class, feature_code)] = result

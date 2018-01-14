@@ -32,10 +32,9 @@ class TreeWalker:
 		message("Browsing", "start!", 3)
 		self.all_albums = list()
 		self.tree_by_date = {}
-		if Options.config['use_geonames']:
-			self.tree_by_geonames = {}
-			self.media_with_geonames_list = list()
-			self.media_with_geonames_list_is_sorted = True
+		self.tree_by_geonames = {}
+		self.media_with_geonames_list = list()
+		self.media_with_geonames_list_is_sorted = True
 		self.all_media = list()
 		self.all_album_composite_images = list()
 		self.album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
@@ -82,7 +81,7 @@ class TreeWalker:
 				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
 				self.origin_album.add_album(by_date_album)
 
-			if Options.config['use_geonames']:
+			if self.tree_by_geonames:
 				message("generating by geonames albums...", "", 4)
 				by_geonames_album = self.generate_geonames_albums(self.origin_album)
 				next_level()

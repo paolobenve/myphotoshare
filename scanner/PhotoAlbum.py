@@ -57,7 +57,7 @@ class Album(object):
 			Options.config['subdir_method'] in ("md5", "folder") and
 			(
 				self.baseless_path.find(Options.config['by_date_string']) != 0 or
-				Options.config['use_geonames'] and self.baseless_path.find(Options.config['by_gps_string']) != 0
+				self.baseless_path.find(Options.config['by_gps_string']) != 0
 			)
 		):
 			if Options.config['subdir_method'] == "md5":
@@ -237,9 +237,7 @@ class Album(object):
 		path_to_dict = self.path
 		folder_position = path_to_dict.find(Options.config['folders_string'])
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
-		by_gps_position = -1
-		if Options.config['use_geonames']:
-			by_gps_position = path_to_dict.find(Options.config['by_gps_string'])
+		by_gps_position = path_to_dict.find(Options.config['by_gps_string'])
 		if path_to_dict and by_date_position == -1 and by_gps_position == -1 and self.cache_base != "root" and folder_position != 0:
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
 
@@ -1292,7 +1290,7 @@ class Media(object):
 
 	@property
 	def has_gps_data(self):
-		return Options.config['use_geonames'] and "latitude" in self._attributes["metadata"]
+		return "latitude" in self._attributes["metadata"]
 
 	@property
 	def has_exif_date(self):
@@ -1369,7 +1367,7 @@ class Media(object):
 
 	@property
 	def gps_album_path(self):
-		if Options.config['use_geonames'] and hasattr(self, "gps_path"):
+		if hasattr(self, "gps_path"):
 			return self.gps_path
 		else:
 			return ""

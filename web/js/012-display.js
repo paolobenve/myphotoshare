@@ -1837,7 +1837,7 @@ $(document).ready(function() {
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
-		if (Options.use_geonames) {
+		if (true || Options.use_geonames_online) {
 			var linkTitle = _t('#show-map') + Options.map_service;
 			$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
 				ev.stopPropagation();
@@ -1852,7 +1852,7 @@ $(document).ready(function() {
 	}
 
 	function hasGpsData(media) {
-		return Options.use_geonames && media.mediaType == "photo" && typeof media.metadata.latitude !== "undefined";
+		return media.mediaType == "photo" && typeof media.metadata.latitude !== "undefined";
 	}
 
 	function mapLink(latitude, longitude, zoom) {
