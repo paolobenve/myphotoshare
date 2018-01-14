@@ -296,7 +296,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * new option `use_geonames`, defaults to false, set it to true in order to create country/state/place albums
 * clustering of places with too many photos is done by the k-means algorithm, better than the previous one, which remains a "legacy"
 * new option `legacy_clustering_function`: if set to false (default), the k-means algorithm is used for clustering places with too many photos
-* Can use local CSS and JavaScript minifiers instead of web services.
+* added option to use local CSS and JavaScript minifiers instead of web services.
 
 ### version 3.2 (January 7, 2018)
 

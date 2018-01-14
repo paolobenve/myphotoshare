@@ -217,38 +217,33 @@ class TreeWalker:
 					message("media sorted", "", 5)
 					back_level()
 					# check if there are too many media in album
-					# in case, "place" album will be split in "place 1", "place 2",..., separating the groups according to max_distance
-					# and, in case, reducing max_distance until a proper size is obtained
+					# in case, "place" album will be split in "place (subalbum 1)", "place (subalbum 2)",...
+					# clustering is made with the kmeans algorithm
 					# transform media_list in an element in a list, probably most times, we'll work with it
 					message("checking if it's a big list...", "", 5)
 					if len(media_list) > Options.config['big_virtual_folders_threshold']:
 						next_level()
-						if Options.config['legacy_clustering_function']:
-							max_distance = 1000
-							message("big list found", str(len(media_list)) + " photos, grouping points with max_distance = " + str(max_distance) + " meters", 5)
-							cluster_list = geoname.legacy_reduce_clusters_size(media_list, max_distance)
-						else:
-							K = 2
-							message("big list found", str(len(media_list)) + " photos", 5)
-							next_level()
-							while True:
-								message("clustering with k-means algorithm...", "", 5)
-								cluster_list = geoname.find_centers(media_list, K)
-								max_cluster_length = max([len(cluster) for cluster in cluster_list])
-								if max_cluster_length <= Options.config['big_virtual_folders_threshold']:
-									next_level()
-									message("clustered with k-means algorithm", "OK with K = " + str(K), 5)
-									back_level()
-									break
-								if K > len(media_list):
-									next_level()
-									message("clustered with k-means algorithm", "failed even with K = " + str(K) + ": clusters are too big (" + str(max_cluster_length) + " photos)", 5)
-									back_level()
-									break
+						K = 2
+						message("big list found", str(len(media_list)) + " photos", 5)
+						next_level()
+						while True:
+							message("clustering with k-means algorithm...", "", 5)
+							cluster_list = geoname.find_centers(media_list, K)
+							max_cluster_length = max([len(cluster) for cluster in cluster_list])
+							if max_cluster_length <= Options.config['big_virtual_folders_threshold']:
 								next_level()
-								message("clustered with k-means algorithm", "not ok with K = " + str(K) + ": biggest cluster has " + str(max_cluster_length) + " photos", 5)
+								message("clustered with k-means algorithm", "OK with K = " + str(K), 5)
 								back_level()
-								K = K * 2
+								break
+							if K > len(media_list):
+								next_level()
+								message("clustered with k-means algorithm", "failed even with K = " + str(K) + ": clusters are too big (" + str(max_cluster_length) + " photos)", 5)
+								back_level()
+								break
+							next_level()
+							message("clustered with k-means algorithm", "not ok with K = " + str(K) + ": biggest cluster has " + str(max_cluster_length) + " photos", 5)
+							back_level()
+							K = K * 2
 						next_level()
 						message("clustering terminated", "clusters are " + str(len(cluster_list)), 5)
 						back_level()
