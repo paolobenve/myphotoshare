@@ -57,7 +57,7 @@ class Album(object):
 			Options.config['subdir_method'] in ("md5", "folder") and
 			(
 				self.baseless_path.find(Options.config['by_date_string']) != 0 or
-				Options.config['use_geonames'] and self.baseless_path.find(Options.config['by_gps_string']) != 0
+				self.baseless_path.find(Options.config['by_gps_string']) != 0
 			)
 		):
 			if Options.config['subdir_method'] == "md5":
@@ -237,9 +237,7 @@ class Album(object):
 		path_to_dict = self.path
 		folder_position = path_to_dict.find(Options.config['folders_string'])
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
-		by_gps_position = -1
-		if Options.config['use_geonames']:
-			by_gps_position = path_to_dict.find(Options.config['by_gps_string'])
+		by_gps_position = path_to_dict.find(Options.config['by_gps_string'])
 		if path_to_dict and by_date_position == -1 and by_gps_position == -1 and self.cache_base != "root" and folder_position != 0:
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
 
@@ -401,7 +399,6 @@ class Media(object):
 	def _photo_metadata(self, image):
 		next_level()
 		message("extracting metadata...", "", 5)
-		back_level()
 		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
 		try:
@@ -409,9 +406,17 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 		except:
+			next_level()
+			message("unknown error extracting metadata", "", 5)
+			back_level()
+			back_level()
 			return
 
 		if not info:
+			next_level()
+			message("empty metadata", "", 5)
+			back_level()
+			back_level()
 			return
 
 		exif = {}
@@ -522,6 +527,7 @@ class Media(object):
 				self._attributes["metadata"]["longitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 		next_level()
 		message("extracted", "", 5)
+		back_level()
 		back_level()
 
 	def _convert_to_degrees_minutes_seconds(self, value, ref):
@@ -1292,7 +1298,7 @@ class Media(object):
 
 	@property
 	def has_gps_data(self):
-		return Options.config['use_geonames'] and "latitude" in self._attributes["metadata"]
+		return "latitude" in self._attributes["metadata"]
 
 	@property
 	def has_exif_date(self):
@@ -1369,7 +1375,7 @@ class Media(object):
 
 	@property
 	def gps_album_path(self):
-		if Options.config['use_geonames'] and hasattr(self, "gps_path"):
+		if hasattr(self, "gps_path"):
 			return self.gps_path
 		else:
 			return ""
