@@ -139,50 +139,6 @@ class Geonames(object):
 							result[index] = ''
 		return result
 
-	# a recursive function that receives a big list of photos whose coordinates are quite near each other
-	# and returns a list of smaller clusters not farther than max_distance
-	def legacy_reduce_clusters_size(self, media_list, max_distance):
-		cluster_list = []
-		biggest_cluster_size = 0
-		for media in media_list:
-			found = False
-			for i, cluster in enumerate(cluster_list):
-				if self.distance_between_coordinates(media.latitude, media.longitude, cluster['center']['latitude'], cluster['center']['longitude']) < max_distance:
-					cluster_list[i]['center']['latitude'] = self.recalculate_mean(cluster['center']['latitude'], len(cluster['media_list']), media.latitude)
-					cluster_list[i]['center']['longitude'] = self.recalculate_mean(cluster['center']['longitude'], len(cluster['media_list']), media.longitude)
-					cluster_list[i]['media_list'].append(media)
-					if len(cluster['media_list']) > biggest_cluster_size:
-						biggest_cluster_size = len(cluster['media_list'])
-					found = True
-					break
-			if not found:
-				new_cluster = {}
-				new_cluster['center'] = {'latitude': media.latitude, 'longitude': media.longitude}
-				new_cluster['media_list'] = []
-				new_cluster['media_list'].append(media)
-				if biggest_cluster_size == 0:
-					biggest_cluster_size = 1
-				cluster_list.append(new_cluster)
-
-		reorganized_cluster_list = []
-		for i, cluster in enumerate(cluster_list):
-			if len(cluster['media_list']) > Options.config['big_virtual_folders_threshold']:
-				if max_distance > 1:
-					reorganized_cluster_list.extend(self.legacy_reduce_clusters_size(cluster['media_list'], max_distance / 2))
-				else:
-					last = Options.config['big_virtual_folders_threshold'] - 1
-					reorganized_cluster_list.append(cluster['media_list'][0:last])
-					reorganized_cluster_list.extend(self.legacy_reduce_clusters_size(cluster['media_list'][Options.config['big_virtual_folders_threshold']:], max_distance / 2))
-			else:
-				reorganized_cluster_list.append(cluster['media_list'])
-
-		biggest_cluster_size = 0
-		for cluster in reorganized_cluster_list:
-			length = len(cluster)
-			if length > biggest_cluster_size:
-				biggest_cluster_size = length
-		return reorganized_cluster_list
-
 	def recalculate_mean(self, old_mean, old_len, new_value, new_len = 1):
 		return (old_mean * old_len + new_value * new_len) / (old_len + new_len)
 
