@@ -143,7 +143,10 @@ unspecified_geonames_code = 000000
 
 # should the scanner get locations from coordinates from online geonames.org web service?
 # if false, the geonames.org's cities1000.txt file will be used
-# local procedure is faster (about 20 μs) than online one (about 80ms), but only knows places with population > 1000
+# - local procedure is faster (about 20 μs) than online one (about 80ms)
+# - online procedure knows all the place names, while local procedure only knows places with population > 1000
+# - online procedure produces local language names, while local procedure produces exclusively english names
+# - online procedure is surely more up to date than local one
 get_geonames_online = false
 
 # geoname user for geonames.org requests
