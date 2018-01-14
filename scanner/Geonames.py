@@ -31,7 +31,7 @@ class Geonames(object):
 
 	def __init__(self):
 		if Options.config['get_geonames_online']:
-			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
+			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
 		else:
 			territories_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/territories.json')
 			countries_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/countries.json')
@@ -88,7 +88,7 @@ class Geonames(object):
 
 		if Options.config['get_geonames_online']:
 			# get country, region (state for federal countries), and place
-			response = requests.get(self._base_nearby_url.format(latitude, longitude))
+			response = requests.get(self._base_nearby_url.format(str(latitude), str(longitude)))
 			result = self._decode_nearby_place(response.text)
 			next_level()
 			message("geoname got from geonames.org online", "", 5)
