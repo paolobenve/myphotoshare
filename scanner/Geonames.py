@@ -35,7 +35,7 @@ class Geonames(object):
 		else:
 			territories_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/territories.json')
 			countries_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/countries.json')
-			cityfile = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/cities15000.txt')
+			cityfile = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/cities1000.txt')
 
 			with open(territories_file, 'r') as territories_file_p:
 				territories = json.load(territories_file_p)
