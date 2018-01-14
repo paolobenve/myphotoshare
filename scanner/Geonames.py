@@ -95,8 +95,8 @@ class Geonames(object):
 			back_level()
 		else:
 			# get country, region (state for federal countries), and place
-			result = min([city for city in cities], key=self.distance_between_coordinates(city.lat, city.long, latitude, longitude))
-			result['distance'] = self.distance_between_coordinates(latitude, longitude, result['latitude'], ['longitude'])
+			result = min([city for city in self.cities], key=lambda c: self.distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
+			result['distance'] = self.distance_between_coordinates(latitude, longitude, result['latitude'], result['longitude'])
 			next_level()
 			message("geoname got from geonames local files", "", 5)
 			back_level()
