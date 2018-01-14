@@ -165,8 +165,8 @@ class Geonames(object):
 		# https://gis.stackexchange.com/questions/61924/python-gdal-degrees-to-meters-without-reprojecting
 		# Calculate the great circle distance in meters between two points on the earth (specified in decimal degrees)
 
-		# next_level()
-		# message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
+		next_level()
+		message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
 		# convert decimal degrees to radians
 		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
 		# haversine formula
@@ -175,6 +175,10 @@ class Geonames(object):
 		a = math.sin(d_r_lat / 2.0) ** 2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(d_r_lon / 2.0) ** 2
 		c = 2.0 * math.asin(math.sqrt(a))
 		m = int(6371.0 * c * 1000.0)
+		next_level()
+		message("distance between coordinates calculated", str(m) + " meters", 5)
+		back_level()
+		back_level()
 		return m
 
 	def quick_distance_between_coordinates(self, lat1, lon1, lat2, lon2):
