@@ -399,7 +399,6 @@ class Media(object):
 	def _photo_metadata(self, image):
 		next_level()
 		message("extracting metadata...", "", 5)
-		back_level()
 		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
 		try:
@@ -407,9 +406,17 @@ class Media(object):
 		except KeyboardInterrupt:
 			raise
 		except:
+			next_level()
+			message("unknown error extracting metadata", "", 5)
+			back_level()
+			back_level()
 			return
 
 		if not info:
+			next_level()
+			message("empty metadata", "", 5)
+			back_level()
+			back_level()
 			return
 
 		exif = {}
@@ -520,6 +527,7 @@ class Media(object):
 				self._attributes["metadata"]["longitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 		next_level()
 		message("extracted", "", 5)
+		back_level()
 		back_level()
 
 	def _convert_to_degrees_minutes_seconds(self, value, ref):
