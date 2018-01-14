@@ -49,24 +49,24 @@ class Geonames(object):
 					country_code = col[8]
 					state_code = col[10]
 					try:
-						country = countries[country_code]
+						country_name = countries[country_code]
 					except KeyError:
-						country = ''
+						country_name = ''
 					try:
-						state = territories[country_code + '.' + state_code]
+						state_name = territories[country_code + '.' + state_code]
 					except KeyError:
-						state = ''
-					my_line = {
-						'city': col[1],
-						#'city_alt': col[3].split(','),
-						'lat': float(col[4]),
-						'long': float(col[5]),
+						state_name = ''
+					city_line = {
+						'country_name': country_name,
 						'country_code': country_code,
-						'country': country,
-						'state_code': state_code,
-						'state': state
+						'region_name': state_name,
+						'region_code': state_code,
+						'place_name': col[1],
+						'place_code': col[0],
+						'latitude': float(col[4]),
+						'longitude': float(col[5])
 					}
-					self.cities.append(my_line)
+					self.cities.append(city_line)
 
 	def lookup_nearby_place(self, latitude, longitude):
 		"""
@@ -88,8 +88,7 @@ class Geonames(object):
 
 		if Options.config['get_geonames_online']:
 			# get country, region (state for federal countries), and place
-			url = self._base_nearby_url.format(latitude, longitude)
-			response = requests.get(url)
+			response = requests.get(self._base_nearby_url.format(latitude, longitude))
 			result = self._decode_nearby_place(response.text)
 			next_level()
 			message("geoname got from geonames.org online", "", 5)
@@ -97,8 +96,9 @@ class Geonames(object):
 		else:
 			# get country, region (state for federal countries), and place
 			result = min([city for city in cities], key=self.distance_between_coordinates(city.lat, city.long, latitude, longitude))
+			result['distance'] = self.distance_between_coordinates(latitude, longitude, result['latitude'], ['longitude'])
 			next_level()
-			message("geoname got from geonames files on disk", "", 5)
+			message("geoname got from geonames local files", "", 5)
 			back_level()
 
 		# add to cache
