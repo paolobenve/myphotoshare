@@ -70,8 +70,7 @@ class Geonames(object):
 
 	def lookup_nearby_place(self, latitude, longitude):
 		"""
-		Looks up places near a specific geographic location, optionally
-		filtering for feature class and feature code.
+		Looks up places near a specific geographic location
 		"""
 
 		for (c_latitude, c_longitude) in Geonames.geonames_cache:
