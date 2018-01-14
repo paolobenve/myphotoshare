@@ -29,22 +29,25 @@ class Geonames(object):
 	# the maximum distance in meters for considering two different coordinates equivalent
 	max_distance_meters = 50
 
+	cities = []
+
 	def __init__(self):
 		if Options.config['get_geonames_online']:
 			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}&featureClass=P&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
-		else:
+		elif self.cities == []:
+			next_level()
+			message("reading and processing local geonames files", "", 5)
 			territories_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/territories.json')
 			countries_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/countries.json')
-			cityfile = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/cities1000.txt')
+			cities_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/cities1000.txt')
 
 			with open(territories_file, 'r') as territories_file_p:
 				territories = json.load(territories_file_p)
 			with open(countries_file, 'r') as countries_file_p:
 				countries = json.load(countries_file_p)
 
-			with open(cityfile, 'r') as cities:
-				self.cities = []
-				for line in cities:
+			with open(cities_file, 'r') as all_cities:
+				for line in all_cities:
 					col = line.split('\t')
 					country_code = col[8]
 					state_code = col[10]
@@ -67,6 +70,12 @@ class Geonames(object):
 						'longitude': float(col[5])
 					}
 					self.cities.append(city_line)
+			next_level()
+			message("local geonames files read and processed", "", 5)
+			back_level()
+			back_level()
+
+
 
 	def lookup_nearby_place(self, latitude, longitude):
 		"""
@@ -155,6 +164,8 @@ class Geonames(object):
 		# https://gis.stackexchange.com/questions/61924/python-gdal-degrees-to-meters-without-reprojecting
 		# Calculate the great circle distance in meters between two points on the earth (specified in decimal degrees)
 
+		next_level()
+		message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
 		# convert decimal degrees to radians
 		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
 		# haversine formula
