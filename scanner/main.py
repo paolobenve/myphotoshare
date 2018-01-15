@@ -1,26 +1,38 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 
 from TreeWalker import TreeWalker
 from CachePath import message, next_level, back_level, report_times
 import sys
 import os
 #~ import os.path
-import ConfigParser
+try:
+	import configparser
+except ImportError:
+	import ConfigParser as configparser
 import Options
 import json
 
+# Builtins removed in Python3
+try:
+	from imp import reload
+except ImportError:
+	pass
+
+
 def main():
-	reload(sys)
-	sys.setdefaultencoding("UTF-8")
+	if sys.version_info < (3,):
+		reload(sys)
+		sys.setdefaultencoding("UTF-8")
 	if len(sys.argv) != 3 and len(sys.argv) != 2:
-		print "usage: %s ALBUM_PATH CACHE_PATH - or %s CONFIG_FILE" % (sys.argv[0], sys.argv[0])
+		print("usage: {0} ALBUM_PATH CACHE_PATH - or {1} CONFIG_FILE".format(sys.argv[0], sys.argv[0]))
 		return
 
 	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")
 	default_config_file = os.path.join(project_dir, "myphotoshare.conf.defaults")
-	default_config = ConfigParser.ConfigParser()
+	default_config = configparser.ConfigParser()
 	default_config.readfp(open(default_config_file))
-	usr_config = ConfigParser.ConfigParser()
+	usr_config = configparser.ConfigParser()
 	usr_config.add_section("options")
 	for option in default_config.options('options'):
 		usr_config.set("options", option, default_config.get("options", option))
@@ -131,12 +143,20 @@ def main():
 	# values that have type != string
 	back_level()
 
-	if Options.config['index_html_path']:
-		Options.config['index_html_path'] = os.path.abspath(Options.config['index_html_path']).decode(sys.getfilesystemencoding())
-	if Options.config['album_path']:
-		Options.config['album_path'] = os.path.abspath(Options.config['album_path']).decode(sys.getfilesystemencoding())
-	if Options.config['cache_path']:
-		Options.config['cache_path'] = os.path.abspath(Options.config['cache_path']).decode(sys.getfilesystemencoding())
+	if sys.version_info < (3, ):
+		if Options.config['index_html_path']:
+			Options.config['index_html_path'] = os.path.abspath(Options.config['index_html_path']).decode(sys.getfilesystemencoding())
+		if Options.config['album_path']:
+			Options.config['album_path'] = os.path.abspath(Options.config['album_path']).decode(sys.getfilesystemencoding())
+		if Options.config['cache_path']:
+			Options.config['cache_path'] = os.path.abspath(Options.config['cache_path']).decode(sys.getfilesystemencoding())
+	else:
+		if Options.config['index_html_path']:
+			Options.config['index_html_path'] = os.fsdecode(os.path.abspath(Options.config['index_html_path']))
+		if Options.config['album_path']:
+			Options.config['album_path'] = os.fsdecode(os.path.abspath(Options.config['album_path']))
+		if Options.config['cache_path']:
+			Options.config['cache_path'] = os.fsdecode(os.path.abspath(Options.config['cache_path']))
 
 	# try to guess value not given
 	guessed_index_dir = False
@@ -214,7 +234,7 @@ def main():
 		try:
 			os.mkdir(Options.config['cache_path'])
 			message("directory created", Options.config['cache_path'], 4)
-			os.chmod(Options.config['cache_path'], 0777)
+			os.chmod(Options.config['cache_path'], 0o777)
 			message("permissions set", Options.config['cache_path'], 4)
 		except:
 			message("FATAL ERROR", Options.config['cache_path'] + " inexistent and couldn't be created, quitting")
@@ -228,7 +248,7 @@ def main():
 		try:
 			message("creating cache directory for composite images", albumCacheDir, 4)
 			os.mkdir(albumCacheDir)
-			os.chmod(albumCacheDir, 0777)
+			os.chmod(albumCacheDir, 0o777)
 		except OSError:
 			message("FATAL ERROR", Options.config['cache_path'] + " not writable, quitting")
 			sys.exit(-97)
@@ -261,7 +281,7 @@ def main():
 		Options.config['recreate_thumbnails'] = True
 
 	try:
-		os.umask(002)
+		os.umask(0o02)
 		TreeWalker()
 		report_times()
 	except KeyboardInterrupt:

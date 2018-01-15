@@ -132,6 +132,8 @@ Photofloat needs:
 
 * `python` 2.7
 * `python-numpy`
+* `python-requests`
+* `python-pil`
 * `avconv` / `ffmpeg` in order to be able to manage videos.
 * a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
 * `php5-gd` in order to create albums share images
@@ -163,7 +165,7 @@ This simply minifies and concatenate everything of js and css.
 
     $ ./js-css-minify.sh YOUR_MYPHOTOSHARE_CONF_FILE
 
-By default, a local minifier is used (cssmin and jsmin are currently supported, more local tools can easily be added); https://javascript-minifier.com/ and https;//cssminifier.com/ web services may be used, changing options in the config file, by they are subject to timeout errors which the script cannot detect.
+By default, a local minifier is used (cssmin and jsmin are currently supported, more local tools can easily be added); https://javascript-minifier.com/ and https;//cssminifier.com/ web services may be used, changing options in the config file, but they are subject to timeout errors which the script cannot detect.
 
 ### Config your web server
 

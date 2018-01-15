@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # original from https://gist.github.com/Markbnj/e1541d15699c4d2d8c98
 # added code from gottengeography project, https://gitlab.com/robru/gottengeography
 # files scanner/geonames/territories.json and scanner/geonames/countries.json from gottengeography project too
@@ -168,7 +169,7 @@ class Geonames(object):
 		next_level()
 		message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
 		# convert decimal degrees to radians
-		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+		r_lon1, r_lat1, r_lon2, r_lat2 = list(map(math.radians, [lon1, lat1, lon2, lat2]))
 		# haversine formula
 		d_r_lon = r_lon2 - r_lon1
 		d_r_lat = r_lat2 - r_lat1
@@ -239,5 +240,5 @@ class Geonames(object):
 			mu = self.reevaluate_centers(oldmu, clusters)
 			if first_time:
 				first_time = False
-		cluster_list = [cluster for key, cluster in clusters.iteritems()]
+		cluster_list = [cluster for key, cluster in clusters.items()]
 		return cluster_list

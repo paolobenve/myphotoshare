@@ -61,7 +61,10 @@ class Album(object):
 			)
 		):
 			if Options.config['subdir_method'] == "md5":
-				self._subdir = hashlib.md5(path).hexdigest()[:2]
+				if sys.version_info < (3, ):
+					self._subdir = hashlib.md5(path).hexdigest()[:2]
+				else:
+					self._subdir = hashlib.md5(os.fsencode(path)).hexdigest()[:2]
 			elif Options.config['subdir_method'] == "folder":
 				if path.find("/") == -1:
 					self._subdir = "__"
@@ -112,6 +115,12 @@ class Album(object):
 			return cmp(self.date, other.date)
 		except TypeError:
 			return 1
+
+	def __lt__(self, other):
+		try:
+			return (self.date < other.date)
+		except TypeError:
+			return True
 
 	def add_media(self, media):
 		if not any(media.media_file_name == _media.media_file_name for _media in self.media_list):
@@ -420,11 +429,11 @@ class Media(object):
 			return
 
 		exif = {}
-		for tag, value in info.items():
+		for tag, value in list(info.items()):
 			decoded = TAGS.get(tag, tag)
-			if (isinstance(value, tuple) or isinstance(value, list)) and (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime") and len(value) >= 1:
+			if (isinstance(value, tuple) or isinstance(value, list)) and (isinstance(decoded, str) or isinstance(decoded, str)) and decoded.startswith("DateTime") and len(value) >= 1:
 				value = value[0]
-			if isinstance(value, str) or isinstance(value, unicode):
+			if isinstance(value, str) or isinstance(value, str):
 				value = value.strip().partition("\x00")[0]
 				#~ # the following lines (commented out) seem unuseful
 				#~ if (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime"):
@@ -597,7 +606,7 @@ class Media(object):
 			back_level()
 			self.is_valid = False
 			return
-		info = json.loads(p)
+		info = json.loads(p.decode(sys.getdefaultencoding()))
 		for s in info["streams"]:
 			if 'codec_type' in s:
 				next_level()
@@ -607,12 +616,13 @@ class Media(object):
 				self._attributes["mediaType"] = "video"
 				self._attributes["metadata"]["size"] = (int(s["width"]), int(s["height"]))
 				if "duration" in s:
-					self._attributes["metadata"]["duration"] = round(float(s["duration"]) * 10) / 10
+					self._attributes["metadata"]["duration"] = int(round(float(s["duration"]) * 10) / 10)
 				if "tags" in s and "rotate" in s["tags"]:
 					self._attributes["metadata"]["rotate"] = s["tags"]["rotate"]
 				if original:
 					self._attributes["metadata"]["originalSize"] = (int(s["width"]), int(s["height"]))
 				break
+
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
 		# give image the correct orientation
 		try:
@@ -838,13 +848,13 @@ class Media(object):
 			if min(start_image_width, start_image_height) >= actual_thumb_size:
 				# image is bigger than the square which will result from cropping
 				if start_image_width > start_image_height:
-					left = (start_image_width - start_image_height) / 2
+					left = int((start_image_width - start_image_height) / 2)
 					top = 0
 					right = start_image_width - left
 					bottom = start_image_height
 				else:
 					left = 0
-					top = (start_image_height - start_image_width) / 2
+					top = int((start_image_height - start_image_width) / 2)
 					right = start_image_width
 					bottom = start_image_height - top
 				thumbnail_width = actual_thumb_size
@@ -854,7 +864,7 @@ class Media(object):
 				# image smallest size is smaller than the square which would result from cropping
 				# cropped image will not be square
 				if start_image_width > start_image_height:
-					left = (start_image_width - actual_thumb_size) / 2
+					left = int((start_image_width - actual_thumb_size) / 2)
 					top = 0
 					right = start_image_width - left
 					bottom = start_image_height
@@ -862,7 +872,7 @@ class Media(object):
 					thumbnail_height = start_image_height
 				else:
 					left = 0
-					top = (start_image_height - actual_thumb_size) / 2
+					top = int((start_image_height - actual_thumb_size) / 2)
 					right = start_image_width
 					bottom = start_image_height - top
 					thumbnail_width = start_image_width
@@ -966,8 +976,8 @@ class Media(object):
 			start_image_copy_for_saving = start_image_copy.copy()
 			transparency_file = os.path.join(os.path.dirname(__file__), "../web/img/play_button_100_62.png")
 			video_transparency = Image.open(transparency_file)
-			x = (start_image_copy.size[0] - video_transparency.size[0]) / 2
-			y = (start_image_copy.size[1] - video_transparency.size[1]) / 2
+			x = int((start_image_copy.size[0] - video_transparency.size[0]) / 2)
+			y = int((start_image_copy.size[1] - video_transparency.size[1]) / 2)
 			start_image_copy_for_saving.paste(video_transparency, (x, y), video_transparency)
 			next_level()
 			message("video transparency added", "", 4)
@@ -1119,7 +1129,7 @@ class Media(object):
 
 		transcode_path = os.path.join(album_cache_path, album_prefix + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
-		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - 1
+		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
 		transcode_cmd = [
 			'-i', original_path,					# original file to be encoded
 			'-c:v', 'libx264',					# set h264 as videocodec
@@ -1135,7 +1145,7 @@ class Media(object):
 			'-maxrate', '10000000',					# limits max rate, will degrade CRF if needed
 			'-bufsize', '10000000',					# define how much the client should buffer
 			'-f', 'mp4',						# fileformat mp4
-			'-threads', str(num_of_cores),				# number of cores (all minus one)
+			'-threads', str(num_of_cores),				# number of cores (all minus respected_processors)
 			'-loglevel', 'quiet',					# don't display anything
 			'-y' 							# don't prompt for overwrite
 		]
@@ -1389,6 +1399,17 @@ class Media(object):
 			return cmp(self.name, other.name)
 		return date_compare
 
+	def __lt__(self, other):
+		try:
+			if self.date < other.date:
+				return True
+			elif self.date > other.date:
+				return False
+			else:
+				return self.name < other.name
+		except TypeError:
+			return True
+
 	@property
 	def attributes(self):
 		return self._attributes
@@ -1399,7 +1420,7 @@ class Media(object):
 		media_path = os.path.join(basepath, dictionary["name"])
 
 		del dictionary["name"]
-		for key, value in dictionary.items():
+		for key, value in list(dictionary.items()):
 			if key.startswith("dateTime"):
 				try:
 					dictionary[key] = datetime.strptime(value, Options.date_time_format)
@@ -1408,7 +1429,7 @@ class Media(object):
 				except ValueError:
 					pass
 			if key == "metadata":
-				for key1, value1 in value.items():
+				for key1, value1 in list(value.items()):
 					if key1.startswith("dateTime"):
 						try:
 							dictionary[key][key1] = datetime.strptime(value1, Options.date_time_format)
