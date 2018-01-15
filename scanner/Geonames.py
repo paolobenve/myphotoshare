@@ -173,7 +173,7 @@ class Geonames(object):
 		# Calculate the great circle distance in meters between two points on the earth (specified in decimal degrees)
 
 		# convert decimal degrees to radians
-		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+		r_lon1, r_lat1, r_lon2, r_lat2 = list(map(math.radians, [lon1, lat1, lon2, lat2]))
 		# haversine formula
 		d_r_lon = r_lon2 - r_lon1
 		d_r_lat = r_lat2 - r_lat1
@@ -228,5 +228,5 @@ class Geonames(object):
 			mu = self.reevaluate_centers(oldmu, clusters)
 			if first_time:
 				first_time = False
-		cluster_list = [cluster for key, cluster in clusters.iteritems()]
+		cluster_list = [cluster for key, cluster in clusters.items()]
 		return cluster_list

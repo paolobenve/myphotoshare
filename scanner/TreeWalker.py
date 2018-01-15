@@ -117,21 +117,21 @@ class TreeWalker:
 		by_date_album.parent = origin_album
 		by_date_album.cache_base = cache_base(by_date_path)
 		by_date_max_file_date = None
-		for year, months in self.tree_by_date.iteritems():
+		for year, months in self.tree_by_date.items():
 			year_path = os.path.join(by_date_path, str(year))
 			year_album = Album(year_path)
 			year_album.parent = by_date_album
 			year_album.cache_base = cache_base(year_path)
 			year_max_file_date = None
 			by_date_album.add_album(year_album)
-			for month, days in self.tree_by_date[year].iteritems():
+			for month, days in self.tree_by_date[year].items():
 				month_path = os.path.join(year_path, str(month))
 				month_album = Album(month_path)
 				month_album.parent = year_album
 				month_album.cache_base = cache_base(month_path)
 				month_max_file_date = None
 				year_album.add_album(month_album)
-				for day, media in self.tree_by_date[year][month].iteritems():
+				for day, media in self.tree_by_date[year][month].items():
 					message("working with day album...", "", 5)
 					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
@@ -192,7 +192,7 @@ class TreeWalker:
 		by_geonames_album.parent = origin_album
 		by_geonames_album.cache_base = cache_base(by_geonames_path)
 		by_geonames_max_file_date = None
-		for country_code, region_codes in self.tree_by_geonames.iteritems():
+		for country_code, region_codes in self.tree_by_geonames.items():
 			country_path = os.path.join(by_geonames_path, str(country_code))
 			country_album = Album(country_path)
 			country_album.center = {}
@@ -200,7 +200,7 @@ class TreeWalker:
 			country_album.cache_base = cache_base(country_path)
 			country_max_file_date = None
 			by_geonames_album.add_album(country_album)
-			for region_code, place_codes in self.tree_by_geonames[country_code].iteritems():
+			for region_code, place_codes in self.tree_by_geonames[country_code].items():
 				region_path = os.path.join(country_path, str(region_code))
 				region_album = Album(region_path)
 				region_album.center = {}
@@ -208,7 +208,7 @@ class TreeWalker:
 				region_album.cache_base = cache_base(region_path)
 				region_max_file_date = None
 				country_album.add_album(region_album)
-				for place_code, media_list in self.tree_by_geonames[country_code][region_code].iteritems():
+				for place_code, media_list in self.tree_by_geonames[country_code][region_code].items():
 					place_code = str(place_code)
 					place_name = media_list[0].place_name
 					message("working with place album...", media_list[0].country_name + "-" + media_list[0].region_name + "-" + place_name, 4)
@@ -367,11 +367,11 @@ class TreeWalker:
 	def add_media_to_tree_by_date(self, media):
 		# add the given media to a temporary structure where media are organized by year, month, date
 
-		if not media.year in self.tree_by_date.keys():
+		if not media.year in list(self.tree_by_date.keys()):
 			self.tree_by_date[media.year] = {}
-		if not media.month in self.tree_by_date[media.year].keys():
+		if not media.month in list(self.tree_by_date[media.year].keys()):
 			self.tree_by_date[media.year][media.month] = {}
-		if not media.day in self.tree_by_date[media.year][media.month].keys():
+		if not media.day in list(self.tree_by_date[media.year][media.month].keys()):
 			self.tree_by_date[media.year][media.month][media.day] = list()
 		if not any(media.media_file_name == _media.media_file_name for _media in self.tree_by_date[media.year][media.month][media.day]):
 		#~ if not media in self.tree_by_date[media.year][media.month][media.day]:
@@ -380,11 +380,11 @@ class TreeWalker:
 	def add_media_to_tree_by_geonames(self, media):
 		# add the given media to a temporary structure where media are organized by country, region/state, place
 
-		if not media.country_code in self.tree_by_geonames.keys():
+		if not media.country_code in list(self.tree_by_geonames.keys()):
 			self.tree_by_geonames[media.country_code] = {}
-		if not media.region_code in self.tree_by_geonames[media.country_code].keys():
+		if not media.region_code in list(self.tree_by_geonames[media.country_code].keys()):
 			self.tree_by_geonames[media.country_code][media.region_code] = {}
-		if not media.place_code in self.tree_by_geonames[media.country_code][media.region_code].keys():
+		if not media.place_code in list(self.tree_by_geonames[media.country_code][media.region_code].keys()):
 			self.tree_by_geonames[media.country_code][media.region_code][media.place_code] = list()
 		if not any(media.media_file_name == _media.media_file_name for _media in self.tree_by_geonames[media.country_code][media.region_code][media.place_code]):
 			self.tree_by_geonames[media.country_code][media.region_code][media.place_code].append(media)
@@ -499,12 +499,15 @@ class TreeWalker:
 		photos_without_exif_date_in_dir = []
 		for entry in self.listdir_sorted_by_time(absolute_path):
 			try:
-				entry = entry.decode(sys.getfilesystemencoding())
+				if sys.version_info < (3, ):
+					entry = entry.decode(sys.getfilesystemencoding())
+				else:
+					entry = os.fsdecode(entry)
 			except KeyboardInterrupt:
 				raise
 			except:
 				next_level()
-				message("unicode error", entry.decode(sys.getfilesystemencoding(), "replace"), 1)
+				message("unicode error", entry, 1)
 				back_level()
 				continue
 
@@ -881,7 +884,7 @@ class TreeWalker:
 		message("saving json options file...", json_options_file, 4)
 		# some option must not be saved
 		options_to_save = {}
-		for key, value in Options.config.items():
+		for key, value in list(Options.config.items()):
 			if key not in Options.options_not_to_be_saved:
 				options_to_save[key] = value
 
@@ -949,7 +952,10 @@ class TreeWalker:
 				back_level()
 				if match:
 					try:
-						cache_file = cache_file.decode(sys.getfilesystemencoding())
+						if sys.version_info < (3, ):
+							cache_file = cache_file.decode(sys.getfilesystemencoding())
+						else:
+							cache_file = os.fsdecode(cache_file)
 					except KeyboardInterrupt:
 						raise
 					#~ except:
