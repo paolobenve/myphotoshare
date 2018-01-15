@@ -130,8 +130,8 @@ It is, essentially, a slick and fast, minimal but still well-featured photo gall
 
 Photofloat needs:
 
-* `python` 2.7
-* `python-numpy`
+* `python` 3 (running it with python2 is possible, changing the first line in scanner/main.py)
+* `python3-numpy`(python-numpy with python2)
 * `python-requests`
 * `python-pil`
 * `avconv` / `ffmpeg` in order to be able to manage videos.
