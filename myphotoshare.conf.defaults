@@ -22,7 +22,7 @@ debug_js = false
 
 
 ###########################################################
-# minify
+# minifying
 ###########################################################
 
 # CSS minifier
@@ -187,7 +187,6 @@ geonames_user = myphotoshare
 server_album_path = albums
 
 # the service to use for geotag maps:
-# if get_geonames_online is false this services aren't used at all
 # available values:
 # - openstreetmap (the maps which are generated have no marker)
 # - googlemaps (the maps which are generated have no marker)
