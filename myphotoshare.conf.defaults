@@ -29,14 +29,14 @@ debug_js = false
 # permitted values:
 #    web_service : https://cssminifier.com/ (Default)
 #    cssmin : cssmin (https://github.com/zacharyvoase/cssmin)
-minify_css = web_service
+css_minifier = cssmin
 
 # JavaScript minifier
 # permitted values:
 #    web_service : https://javascript-minifier.com/ (Default)
 #    jsmin2 : python-jsmin (https://github.com/tikitu/jsmin)
 #    jsmin3 : python3-jsmin (https://github.com/tikitu/jsmin)
-minify_js = web_service
+js_minifier = jsmin2
 
 
 ###########################################################
@@ -146,24 +146,8 @@ mobile_thumbnail_factor = 2
 # strings used internally, do not change them unless you know what you are doing
 folders_string = _f
 by_date_string = _bd
-cache_folder_separator = -
-
-# should country/state/place albums be created?
-# the following options will have no effect if this option is false
-use_geonames = false
-
-# strings used internally, do not change it unless you know what you are doing
 by_gps_string = _bg
-
-# geoname user for geonames.org requests
-# The value here ('myphotoshare') is like a demo
-# you can use it in testing phase, but you must generate a new user for production installs:
-# simply go to http://www.geonames.org/login and use the "create a new user account" dialog
-# you'll receive an address confirmation email
-# After confirming your email address, you must enable your account for web services:
-# when you are logged in, go to your account options pages and enable web services
-# That's all!
-geonames_user = myphotoshare
+cache_folder_separator = -
 
 # The language you want to get the geonames features
 # must be a 2 character code, like 'en' (without quotes)
@@ -176,15 +160,23 @@ geonames_language =
 # The name is left as a 0-length string, and the translation js file gives a localized value for it
 unspecified_geonames_code = 000000
 
-# should the old clustering function be used for places with too many photos?
-# the new clustering function uses the k-means algorithm
-legacy_clustering_function = false
+# should the scanner get locations from coordinates from online geonames.org web service?
+# if false, the geonames.org's cities1000.txt file will be used
+# - local procedure is faster (about 20 μs) than online one (about 80ms)
+# - online procedure knows all the place names, while local procedure only knows places with population > 1000
+# - online procedure produces local language names, while local procedure produces exclusively english names
+# - online procedure is surely more up to date than local one
+get_geonames_online = false
 
-# A 3-values tuple specifying the zoom values to use respectively for country-, admin- and place-level maps
-map_zoom_levels = [6, 9, 15]
-
-# The zoom value to use for the map shown with the photo
-photo_map_zoom_level = 16
+# geoname user for geonames.org requests
+# The value here ('myphotoshare') is like a demo
+# you can use it in testing phase, but you must generate a new user for production installs:
+# simply go to http://www.geonames.org/login and use the "create a new user account" dialog
+# you'll receive an address confirmation email
+# After confirming your email address, you must enable your account for web services:
+# when you are logged in, go to your account options pages and enable web services
+# That's all!
+geonames_user = myphotoshare
 
 
 ###########################################################
@@ -195,11 +187,18 @@ photo_map_zoom_level = 16
 server_album_path = albums
 
 # the service to use for geotag maps:
+# if get_geonames_online is false this services aren't used at all
 # available values:
 # - openstreetmap (the maps which are generated have no marker)
 # - googlemaps (the maps which are generated have no marker)
 # - osmtools (the maps which are generated have a marker)
 map_service = osmtools
+
+# A 3-values tuple specifying the zoom values to use respectively for country-, admin- and place-level maps
+map_zoom_levels = [6, 9, 15]
+
+# The zoom value to use for the map shown with the photo
+photo_map_zoom_level = 16
 
 ###########################################################
 # user interface options

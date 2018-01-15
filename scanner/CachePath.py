@@ -103,12 +103,11 @@ def report_times():
 	print("                  processed " + ((max_digit - len(_num_video_processed)) * " ") + _num_video_processed)
 	print("- Photos " + ((max_digit - len(_num_photo)) * " ") + _num_photo)
 	print("                  processed " + ((max_digit - len(_num_photo_processed)) * " ") + _num_photo_processed)
-	if Options.config['use_geonames']:
-		print("                                  geotagged        " + ((max_digit - len(_num_photo_geotagged)) * " ") + _num_photo_geotagged)
-		print("                                  whithout geotags " + ((max_digit - len(_num_photo_without_geotags)) * " ") + _num_photo_without_geotags)
-		if Options.num_photo_processed != Options.num_photo_geotagged:
-			for photo in Options.photos_without_geotag:
-				print("                                      - " + photo)
+	print("                                  geotagged        " + ((max_digit - len(_num_photo_geotagged)) * " ") + _num_photo_geotagged)
+	print("                                  whithout geotags " + ((max_digit - len(_num_photo_without_geotags)) * " ") + _num_photo_without_geotags)
+	if Options.num_photo_processed != Options.num_photo_geotagged:
+		for photo in Options.photos_without_geotag:
+			print("                                      - " + photo)
 	print("                                 with exif date    " + ((max_digit - len(_num_photo_with_exif_date)) * " ") + _num_photo_with_exif_date)
 	print("                                 without exif date " + ((max_digit - len(_num_photo_without_exif_date)) * " ") + _num_photo_without_exif_date)
 	if Options.num_photo_processed != Options.num_photo_with_exif_date:

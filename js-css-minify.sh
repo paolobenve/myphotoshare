@@ -1,15 +1,84 @@
 #!/bin/bash
 
+if [ -z "$1" ]; then
+	# The script must be launched with the user's config file
+	echo
+	echo Usage: ./js-css-minify.sh MYPHOTOSHARE_CONFIG_FILE
+	echo
+	echo Quitting
+	exit
+elif [ ! -f "$1" ]; then
+	echo
+	echo Error: file "$1" do not exist
+	echo
+	echo Quitting
+	exit
+fi
+
 # Parse which minifiers to use from configuration file
-CONF=/etc/myphotoshare/myphotoshare.conf
+DEFAULT_CONF=myphotoshare.conf.defaults
+CONF="$1"
 
-MINIFY_JS="$(sed -nr 's/^\s*minify_js\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
-MINIFY_JS=${MINIFY_JS:-web_service}
+MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
+DEFAULT_MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $DEFAULT_CONF)"
+MINIFY_JS=${MINIFY_JS:-$DEFAULT_MINIFY_JS}
 
-MINIFY_CSS="$(sed -nr 's/^\s*minify_css\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
-MINIFY_CSS=${MINIFY_CSS:-web_service}
+MINIFY_CSS="$(sed -nr 's/^\s*css_minifier\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
+DEFAULT_MINIFY_CSS="$(sed -nr 's/^\s*css_minifier\s*=\s*(\w+)\s*.*$/\1/p' $DEFAULT_CONF)"
+MINIFY_CSS=${MINIFY_CSS:-$DEFAULT_MINIFY_CSS}
+
+echo
+echo Using "$MINIFY_CSS" as CSS minifier
+echo Using "$MINIFY_JS" as JS minifier
 
 unixseconds=$(date +%s)
+
+# Check that local minifiers are installed
+case $MINIFY_JS in
+	web_service)
+		curl https://javascript-minifier.com/ > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'curl' not installed or 'https://javascript-minifier.com/' down"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+	jsmin2)
+		python2 -m jsmin > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'jsmin' for Python2 is not installed. Look for package 'python-jsmin' or 'https://github.com/tikitu/jsmin'"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+	jsmin3)
+		python3 -m jsmin > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'jsmin' for Python3 is not installed. Look for package 'python3-jsmin' or 'https://github.com/tikitu/jsmin'"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+esac
+
+case $MINIFY_CSS in
+	web_service)
+		curl https://cssminifier.com/ > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'curl' not installed or 'https://cssminifier.com/' down"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+	cssmin)
+		cssmin -h > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'cssmin' is not installed. Look for package 'cssmin' or 'https://github.com/zacharyvoase/cssmin'"
+			echo "Aborting..."
+			exit 1
+		fi
+	;;
+esac
 
 # minify all .js-files
 cd web/js
@@ -34,7 +103,7 @@ ls -1 *.js | grep -Ev "min.js$" | while read jsfile; do
 		;;
 
 		*)
-			echo "Unsupported Javascript minifier: $MINIFY_JS. Check option 'minify_js' in '$CONF'"
+			echo "Unsupported Javascript minifier: $MINIFY_JS. Check option 'js_minifier' in '$CONF'"
 			echo "Doing nothing on file $jsfile"
 	esac
 done
@@ -63,7 +132,7 @@ ls -1 *.css | grep -Ev "min.css$" | while read cssfile; do
 		;;
 
 		*)
-			echo "Unsupported CSS minifier: $MINIFY_CSS. Check option 'minify_css' in '$CONF'"
+			echo "Unsupported CSS minifier: $MINIFY_CSS. Check option 'css_minifier' in '$CONF'"
 			echo "Doing nothing on file $cssfile"
 	esac
 done

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # original from https://gist.github.com/Markbnj/e1541d15699c4d2d8c98
+# added code from gottengeography project, https://gitlab.com/robru/gottengeography
+# files scanner/geonames/territories.json and scanner/geonames/countries.json from gottengeography project too
 
 import requests
 import json
@@ -9,6 +11,9 @@ import TreeWalker
 import math
 import numpy as np
 import random
+import os
+import sys
+import math
 
 # For information on endpoints and arguments see the geonames
 # API documentation at:
@@ -26,56 +31,89 @@ class Geonames(object):
 	# the maximum distance in meters for considering two different coordinates equivalent
 	max_distance_meters = 50
 
+	cities = []
+
 	def __init__(self):
-		GEONAMES_USER = Options.config['geonames_user']
-		GEONAMES_LANGUAGE = Options.config['geonames_language']
-		self._base_feature_url = "{}getJSON?geonameId={{}}&username={}&style=full&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
-		self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}{{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
-		self._base_neighbourhood_url = "{}neighbourhoodJSON?lat={{}}&lng={{}}&username={}&lang={}".format(self.GEONAMES_API, GEONAMES_USER, GEONAMES_LANGUAGE)
+		if Options.config['get_geonames_online']:
+			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}&featureClass=P&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
+		elif self.cities == []:
+			next_level()
+			message("reading and processing local geonames files", "", 5)
+			territories_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/territories.json')
+			countries_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/countries.json')
+			cities_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/cities1000.txt')
 
-	def lookup_nearby_place(self, latitude, longitude, feature_class='P', feature_code=None):
+			with open(territories_file, 'r') as territories_file_p:
+				territories = json.load(territories_file_p)
+			with open(countries_file, 'r') as countries_file_p:
+				countries = json.load(countries_file_p)
+
+			with open(cities_file, 'r') as all_cities:
+				for line in all_cities:
+					col = line.split('\t')
+					country_code = col[8]
+					state_code = col[10]
+					try:
+						country_name = countries[country_code]
+					except KeyError:
+						country_name = ''
+					try:
+						state_name = territories[country_code + '.' + state_code]
+					except KeyError:
+						state_name = ''
+					city_line = {
+						'country_name': country_name,
+						'country_code': country_code,
+						'region_name': state_name,
+						'region_code': state_code,
+						'place_name': col[1],
+						'place_code': col[0],
+						'latitude': float(col[4]),
+						'longitude': float(col[5])
+					}
+					self.cities.append(city_line)
+			next_level()
+			message("local geonames files read and processed", "", 5)
+			back_level()
+			back_level()
+
+
+
+	def lookup_nearby_place(self, latitude, longitude):
 		"""
-		Looks up places near a specific geographic location, optionally
-		filtering for feature class and feature code.
+		Looks up places near a specific geographic location
 		"""
 
-		for (c_latitude, c_longitude, c_feature_class, c_feature_code) in Geonames.geonames_cache:
+		for (c_latitude, c_longitude) in Geonames.geonames_cache:
 			distance = self.distance_between_coordinates(c_latitude, c_longitude, latitude, longitude)
-			if c_feature_class == feature_class and c_feature_code == feature_code and distance < self.max_distance_meters:
+			if distance < self.max_distance_meters:
 				# get it from cache!
-				result = Geonames.geonames_cache[(c_latitude, c_longitude, feature_class, feature_code)]
+				result = Geonames.geonames_cache[(c_latitude, c_longitude)]
 				next_level()
 				message("geoname got from cache", "", 5)
 				back_level()
 				# add to cache only if not too closed to existing point
 				if distance > self.max_distance_meters / 10.0:
-					Geonames.geonames_cache[(latitude, longitude, feature_class, feature_code)] = result
+					Geonames.geonames_cache[(latitude, longitude)] = result
 				return result
 
-		feature_filter = ''
-		if feature_class:
-			feature_filter += "&featureClass={}".format(feature_class)
-		if feature_code:
-			feature_filter += "&featureCode={}".format(feature_code)
-
-		# get country, region (state for federal countries), and place
-		url = self._base_nearby_url.format(latitude, longitude, feature_filter)
-		response = requests.get(url)
-		result = self._decode_nearby_place(response.text)
-		next_level()
-		message("geoname got from geonames.org", "", 5)
-		back_level()
-		# I had an idea of running another request in order to get the nearest city with population of 15000+ and use it as an intermediate level between region and places
-		# I'm not sure it's a good thing...
-		# url = self._base_nearby_city_url.format(latitude, longitude, feature_filter)
-		# print "looking up city", url
-		# response = requests.get(url)
-		# result_city = self._decode_nearby_place(response.text)
-		# result['city_name'] = result_city['place_name']
-		# result['city_code'] = result_city['place_code']
+		if Options.config['get_geonames_online']:
+			# get country, region (state for federal countries), and place
+			response = requests.get(self._base_nearby_url.format(str(latitude), str(longitude)))
+			result = self._decode_nearby_place(response.text)
+			next_level()
+			message("geoname got from geonames.org online", "", 5)
+			back_level()
+		else:
+			# get country, region (state for federal countries), and place
+			result = min([city for city in self.cities], key=lambda c: self.quick_distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
+			result['distance'] = self.distance_between_coordinates(latitude, longitude, result['latitude'], result['longitude'])
+			next_level()
+			message("geoname got from geonames local files", "", 5)
+			back_level()
 
 		# add to cache
-		Geonames.geonames_cache[(latitude, longitude, feature_class, feature_code)] = result
+		Geonames.geonames_cache[(latitude, longitude)] = result
 
 		return result
 
@@ -111,50 +149,6 @@ class Geonames(object):
 							result[index] = ''
 		return result
 
-	# a recursive function that receives a big list of photos whose coordinates are quite near each other
-	# and returns a list of smaller clusters not farther than max_distance
-	def legacy_reduce_clusters_size(self, media_list, max_distance):
-		cluster_list = []
-		biggest_cluster_size = 0
-		for media in media_list:
-			found = False
-			for i, cluster in enumerate(cluster_list):
-				if self.distance_between_coordinates(media.latitude, media.longitude, cluster['center']['latitude'], cluster['center']['longitude']) < max_distance:
-					cluster_list[i]['center']['latitude'] = self.recalculate_mean(cluster['center']['latitude'], len(cluster['media_list']), media.latitude)
-					cluster_list[i]['center']['longitude'] = self.recalculate_mean(cluster['center']['longitude'], len(cluster['media_list']), media.longitude)
-					cluster_list[i]['media_list'].append(media)
-					if len(cluster['media_list']) > biggest_cluster_size:
-						biggest_cluster_size = len(cluster['media_list'])
-					found = True
-					break
-			if not found:
-				new_cluster = {}
-				new_cluster['center'] = {'latitude': media.latitude, 'longitude': media.longitude}
-				new_cluster['media_list'] = []
-				new_cluster['media_list'].append(media)
-				if biggest_cluster_size == 0:
-					biggest_cluster_size = 1
-				cluster_list.append(new_cluster)
-
-		reorganized_cluster_list = []
-		for i, cluster in enumerate(cluster_list):
-			if len(cluster['media_list']) > Options.config['big_virtual_folders_threshold']:
-				if max_distance > 1:
-					reorganized_cluster_list.extend(self.legacy_reduce_clusters_size(cluster['media_list'], max_distance / 2))
-				else:
-					last = Options.config['big_virtual_folders_threshold'] - 1
-					reorganized_cluster_list.append(cluster['media_list'][0:last])
-					reorganized_cluster_list.extend(self.legacy_reduce_clusters_size(cluster['media_list'][Options.config['big_virtual_folders_threshold']:], max_distance / 2))
-			else:
-				reorganized_cluster_list.append(cluster['media_list'])
-
-		biggest_cluster_size = 0
-		for cluster in reorganized_cluster_list:
-			length = len(cluster)
-			if length > biggest_cluster_size:
-				biggest_cluster_size = length
-		return reorganized_cluster_list
-
 	def recalculate_mean(self, old_mean, old_len, new_value, new_len = 1):
 		return (old_mean * old_len + new_value * new_len) / (old_len + new_len)
 
@@ -172,6 +166,8 @@ class Geonames(object):
 		# https://gis.stackexchange.com/questions/61924/python-gdal-degrees-to-meters-without-reprojecting
 		# Calculate the great circle distance in meters between two points on the earth (specified in decimal degrees)
 
+		next_level()
+		message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
 		# convert decimal degrees to radians
 		r_lon1, r_lat1, r_lon2, r_lat2 = list(map(math.radians, [lon1, lat1, lon2, lat2]))
 		# haversine formula
@@ -179,7 +175,23 @@ class Geonames(object):
 		d_r_lat = r_lat2 - r_lat1
 		a = math.sin(d_r_lat / 2.0) ** 2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(d_r_lon / 2.0) ** 2
 		c = 2.0 * math.asin(math.sqrt(a))
-		m = 6371.0 * c * 1000.0
+		m = int(6371.0 * c * 1000.0)
+		next_level()
+		message("distance between coordinates calculated", str(m) + " meters", 5)
+		back_level()
+		back_level()
+		return m
+
+	def quick_distance_between_coordinates(self, lat1, lon1, lat2, lon2):
+		# do not output messages in this functions, it is called too many times!
+		# convert decimal degrees to radians
+		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+		# equirectangular distance approximation
+		# got from https://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
+		R = 6371000  # radius of the earth in m
+		x = (r_lon2 - r_lon1) * math.cos(0.5 * (r_lat2 + r_lat1))
+		y = r_lat2 - r_lat1
+		m = int(R * math.sqrt(x*x + y*y))
 		return m
 
 	# the following functions implement k-means clustering, got from https://datasciencelab.wordpress.com/2013/12/12/clustering-with-k-means-in-python/

@@ -84,8 +84,7 @@ def main():
 				'default_album_date_reverse_sort',
 				'default_media_date_reverse_sort',
 				'recreate_fixed_height_thumbnails',
-				'use_geonames',
-				'legacy_clustering_function'
+				'get_geonames_online'
 		):
 			try:
 				Options.config[option] = usr_config.getboolean('options', option)
@@ -128,15 +127,15 @@ def main():
 	# all cache names are lower case => bit rate must be lower case too
 	Options.config['video_transcode_bitrate'] = Options.config['video_transcode_bitrate'].lower()
 
-	if Options.config['use_geonames']:
-		# set default values
-		if Options.config['geonames_language'] == '':
-			if Options.config['language'] != '':
-				Options.config['geonames_language'] = Options.config['language']
-				message("geonames_language option unset", "using language value: " + Options.config['language'])
-			else:
-				Options.config['geonames_language'] = os.getenv('LANG')[:2]
-				message("geonames_language and language options unset", "using system language (" + Options.config['geonames_language'] + ") for geonames_language option")
+	# set default values
+	if Options.config['geonames_language'] == '':
+		if Options.config['language'] != '':
+			Options.config['geonames_language'] = Options.config['language']
+			message("geonames_language option unset", "using language value: " + Options.config['language'])
+		else:
+			Options.config['geonames_language'] = os.getenv('LANG')[:2]
+			message("geonames_language and language options unset", "using system language (" + Options.config['geonames_language'] + ") for geonames_language option")
+	if Options.config['get_geonames_online']:
 		# warn if using demo geonames user
 		if Options.config['geonames_user'] == str(default_config.get('options', 'geonames_user')):
 			message("WARNING!", "You are using the myphotoshare demo geonames user, get and use your own user as soon as possible")
