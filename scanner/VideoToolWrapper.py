@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from CachePath import message
 import os
 import subprocess
@@ -8,9 +10,9 @@ class VideoToolWrapper(object):
 		for tool in self.wrappers:
 			try:    
 				if self.check_output:
-					p = subprocess.check_output((tool,) + args)
+					p = subprocess.check_output((tool, ) + args)
 				else:
-					p = subprocess.call((tool,) + args)
+					p = subprocess.call((tool, ) + args)
 					if p > 0:
 						return False
 					else:
@@ -43,5 +45,5 @@ class VideoTranscodeWrapper(VideoToolWrapper):
 class VideoProbeWrapper(VideoToolWrapper):
 	def __init__(self):
 		self.wrappers = ['avprobe', 'ffprobe']
-                self.check_output = True
+		self.check_output = True
 		self.cleanup = False
