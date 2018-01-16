@@ -14,7 +14,7 @@ import sys
 
 zip_file = "alternateNames.zip"
 print()
-print("getting " + zip_file + "  from geonames.org and extracting it to file...")
+print("getting " + zip_file + " from geonames.org and extracting it to file...")
 url = "http://download.geonames.org/export/dump/" + zip_file
 request = requests.get(url)
 if request.status_code != 200:
@@ -26,7 +26,8 @@ else:
 	print("done!")
 	print()
 
-	print("getting known languages list")
+	print("building language list")
+	# get the languages defined in the translation js file
 	translations_file = "web/js/009-translations.js"
 	translations_structure = {}
 	with open(translations_file, "rt") as translations_p:
@@ -37,7 +38,7 @@ else:
 	languages = []
 	for key, value in list(translations_dict.items()):
 		languages.append(key)
-	print("got!")
+
 	# add the languages specified as command line arguments
 	for i in range(len(sys.argv)):
 		if i == 0:
@@ -45,15 +46,16 @@ else:
 		if sys.argv[i] not in languages:
 			languages.append(sys.argv[i])
 
+	print("got: " + str(languages))
 	print()
 
+	# open the target files
 	alt_file_ = "scanner/geonames/alternate_names_"
-	file_ = open(alt_file_, "wt")
-
 	file_languages = {}
 	for language in languages:
 		file_language = alt_file_ + language
 		file_languages[language] = open(file_language, "wt")
+	file_ = open(alt_file_, "wt")
 
 	print("generating local files...")
 	with open(alternate_names_file_name, 'rt') as alternate_names_file:
@@ -71,6 +73,7 @@ else:
 	os.remove(alternate_names_file_name)
 	os.remove(zip_file)
 
+	# close the target files
 	file_.close()
 	for language, file_language in list(file_languages.items()):
 		file_language.close()
