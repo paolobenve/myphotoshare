@@ -12,9 +12,10 @@ import json
 import os
 import sys
 
+zip_file = "alternateNames.zip"
 print()
-print("getting alternateNames.zip from geonames.org and extracting it to file...")
-url = "http://download.geonames.org/export/dump/alternateNames.zip"
+print("getting " + zip_file + "  from geonames.org and extracting it to file...")
+url = "http://download.geonames.org/export/dump/" + zip_file
 request = requests.get(url)
 if request.status_code != 200:
 	print("error getting url, quitting")
@@ -68,6 +69,7 @@ else:
 	print("local files generated!")
 
 	os.remove(alternate_names_file_name)
+	os.remove(zip_file)
 
 	file_.close()
 	for language, file_language in list(file_languages.items()):
