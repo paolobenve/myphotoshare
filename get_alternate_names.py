@@ -3,13 +3,14 @@
 # This script downloads alternateNames.zip from geonames.org and prepares the files the scanner needs for using local language names instead of english city names
 
 # Usage:
-# ./get_alternate_names.py
+# ./get_alternate_names.py language_code1 language_code2 language_code3 ...
 
 from __future__ import print_function  # Only needed for Python 2
 from fileinput import input
 import requests, zipfile, io
 import json
 import os
+import sys
 
 print()
 print("getting alternateNames.zip from geonames.org and extracting it to file...")
@@ -36,6 +37,13 @@ else:
 	for key, value in list(translations_dict.items()):
 		languages.append(key)
 	print("got!")
+	# add the languages specified as command line arguments
+	for i in range(len(sys.argv)):
+		if i == 0:
+			continue
+		if sys.argv[i] not in languages:
+			languages.append(sys.argv[i])
+
 	print()
 
 	alt_file_ = "scanner/geonames/alternate_names_"
