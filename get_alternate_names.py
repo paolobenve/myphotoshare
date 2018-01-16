@@ -4,7 +4,6 @@
 
 # Usage:
 # ./get_alternate_names.py language_code1 language_code2 language_code3 ...
-# the language codes specified as arguments will be added to the ones found in the translations js file
 
 from __future__ import print_function  # Only needed for Python 2
 from fileinput import input
@@ -13,11 +12,9 @@ import json
 import os
 import sys
 
-zip_file = "alternateNames.zip"
 print()
-print("getting " + zip_file + " from geonames.org and extracting it to file...")
-
-url = "http://download.geonames.org/export/dump/" + zip_file
+print("getting alternateNames.zip from geonames.org and extracting it to file...")
+url = "http://download.geonames.org/export/dump/alternateNames.zip"
 request = requests.get(url)
 if request.status_code != 200:
 	print("error getting url, quitting")
@@ -28,8 +25,7 @@ else:
 	print("done!")
 	print()
 
-	print("building language list")
-	# get the languages defined in the translation js file
+	print("getting known languages list")
 	translations_file = "web/js/009-translations.js"
 	translations_structure = {}
 	with open(translations_file, "rt") as translations_p:
@@ -40,7 +36,7 @@ else:
 	languages = []
 	for key, value in list(translations_dict.items()):
 		languages.append(key)
-
+	print("got!")
 	# add the languages specified as command line arguments
 	for i in range(len(sys.argv)):
 		if i == 0:
@@ -48,12 +44,11 @@ else:
 		if sys.argv[i] not in languages:
 			languages.append(sys.argv[i])
 
-	print("got: ", str(languages))
 	print()
 
-	# open the files which will be written
 	alt_file_ = "scanner/geonames/alternate_names_"
 	file_ = open(alt_file_, "wt")
+
 	file_languages = {}
 	for language in languages:
 		file_language = alt_file_ + language
@@ -72,11 +67,8 @@ else:
 					file_language.write(essential_line)
 	print("local files generated!")
 
-	# remove the downloaded zip file and the file extracted from it
 	os.remove(alternate_names_file_name)
-	os.remove(zip_file)
 
-	# close the written files
 	file_.close()
 	for language, file_language in list(file_languages.items()):
 		file_language.close()
