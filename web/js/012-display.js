@@ -1912,6 +1912,7 @@ $(document).ready(function() {
 		});
 		$("#media-name").css("color", Options.title_image_name_color);
 		$(".thumb-and-caption-container").css("margin-right", Options.thumb_spacing.toString() + "px");
+		$(".media-caption").hide();
 	}
 
 	function em2px(selector, em) {

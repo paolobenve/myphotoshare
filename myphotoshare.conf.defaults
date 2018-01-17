@@ -233,6 +233,9 @@ title_image_name_color = lime
 # the page background color (this is ~ gray)
 background_color = #222222
 
+# should we show the media name below the thumbnail?
+show_media_name = false
+
 # the album buttons background color (this is a dirty white, in order to be like an old slide)
 album_button_background_color = Cornsilk
 
