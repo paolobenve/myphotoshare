@@ -22,14 +22,11 @@ class TreeWalker:
 		random.seed()
 		self.all_cache_entries = ["options.json"]
 		self.all_cache_entries_by_subdir = {}
-		if (Options.config['thumbnail_generation_mode'] == "parallel"):
-			message("method", "parallel thumbnail generation", 4)
-		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
-			message("method", "mixed thumbnail generation", 4)
-		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
-			message("method", "cascade thumbnail generation", 4)
-			# be sure reduced_sizes array is correctly sorted
-			Options.config['reduced_sizes'].sort(reverse = True)
+
+		message("method", "cascade thumbnail generation", 4)
+		# be sure reduced_sizes array is correctly sorted
+		Options.config['reduced_sizes'].sort(reverse = True)
+
 		message("Browsing", "start!", 3)
 		self.all_albums = list()
 		self.tree_by_date = {}
