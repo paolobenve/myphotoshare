@@ -50,7 +50,7 @@ def get_options():
 		usr_config.set('options', 'album_path', sys.argv[1])
 		usr_config.set('options', 'cache_path', sys.argv[2])
 
-	message("Options", "asterisk denotes options changed by config file")
+	message("Options", "asterisk denotes options changed by config file", 0)
 	next_level()
 	# pass config values to a dict, because ConfigParser objects are not reliable
 	for option in default_config.options('options'):
@@ -75,7 +75,7 @@ def get_options():
 					config[option] = ""
 			except:
 				next_level()
-				message("WARNING: option " + option + " in user config file", "is not integer, using default value")
+				message("WARNING: option " + option + " in user config file", "is not integer, using default value", 2)
 				back_level()
 				config[option] = default_config.getint('options', option)
 		elif option in ('follow_symlinks',
@@ -95,7 +95,7 @@ def get_options():
 				config[option] = usr_config.getboolean('options', option)
 			except ValueError:
 				next_level()
-				message("WARNING: option " + option + " in user config file", "is not boolean, using default value")
+				message("WARNING: option " + option + " in user config file", "is not boolean, using default value", 2)
 				back_level()
 				config[option] = default_config.getboolean('options', option)
 		elif option in ('reduced_sizes', 'map_zoom_levels'):
@@ -127,7 +127,7 @@ def get_options():
 		else:
 			option_value = "* " + option_value + spaces + "[DEFAULT: " + default_option_value + default_spaces + "]"
 
-		message(option, option_value)
+		message(option, option_value, 0)
 
 	# all cache names are lower case => bit rate must be lower case too
 	config['video_transcode_bitrate'] = config['video_transcode_bitrate'].lower()
@@ -136,14 +136,14 @@ def get_options():
 	if config['geonames_language'] == '':
 		if config['language'] != '':
 			config['geonames_language'] = config['language']
-			message("geonames_language option unset", "using language value: " + config['language'])
+			message("geonames_language option unset", "using language value: " + config['language'], 3)
 		else:
 			config['geonames_language'] = os.getenv('LANG')[:2]
-			message("geonames_language and language options unset", "using system language (" + config['geonames_language'] + ") for geonames_language option")
+			message("geonames_language and language options unset", "using system language (" + config['geonames_language'] + ") for geonames_language option", 3)
 	if config['get_geonames_online']:
 		# warn if using demo geonames user
 		if config['geonames_user'] == str(default_config.get('options', 'geonames_user')):
-			message("WARNING!", "You are using the myphotoshare demo geonames user, get and use your own user as soon as possible")
+			message("WARNING!", "You are using the myphotoshare demo geonames user, get and use your own user as soon as possible", 0)
 
 	# values that have type != string
 	back_level()
@@ -172,7 +172,7 @@ def get_options():
 		not config['album_path'] and
 		not config['cache_path']
 	):
-		message("options", "neither index_html_path nor album_path or cache_path have been defined, assuming default positions")
+		message("options", "neither index_html_path nor album_path or cache_path have been defined, assuming default positions", 3)
 		# default position for index_html_path is script_path/../web
 		# default position for album path is script_path/../web/albums
 		# default position for cache path is script_path/../web/cache
@@ -188,7 +188,7 @@ def get_options():
 		not config['album_path'] and
 		not config['cache_path']
 	):
-		message("options", "only index_html_path is given, using its subfolder 'albums' for album_path and 'cache' for cache_path")
+		message("options", "only index_html_path is given, using its subfolder 'albums' for album_path and 'cache' for cache_path", 3)
 		config['album_path'] = os.path.join(config['index_html_path'], "albums")
 		config['cache_path'] = os.path.join(config['index_html_path'], "cache")
 		guessed_album_dir = True
@@ -201,39 +201,39 @@ def get_options():
 			.rfind("/")] == config['cache_path'][:config['cache_path'].rfind("/")]
 	):
 		guessed_index_dir = True
-		message("options", "only album_path or cache_path has been given, using their common parent folder for index_html_path")
+		message("options", "only album_path or cache_path has been given, using their common parent folder for index_html_path", 3)
 		config['index_html_path'] = config['album_path'][:config['album_path'].rfind("/")]
 	elif not (
 		config['index_html_path'] and
 		config['album_path'] and
 		config['cache_path']
 	):
-		message("options", "you must define at least some of index_html_path, album_path and cache_path, and correctly; quitting")
+		message("options", "you must define at least some of index_html_path, album_path and cache_path, and correctly; quitting", 0)
 		sys.exit(-97)
 
 	if guessed_index_dir or guessed_album_dir or guessed_cache_dir:
-		message("options", "guessed value(s):")
+		message("options", "guessed value(s):", 2)
 		next_level()
 		if guessed_index_dir:
-			message('index_html_path', config['index_html_path'])
+			message('index_html_path', config['index_html_path'], 2)
 		if guessed_album_dir:
-			message('album_path', config['album_path'])
+			message('album_path', config['album_path'], 2)
 		if guessed_cache_dir:
-			message('cache_path', config['cache_path'])
+			message('cache_path', config['cache_path'], 2)
 		back_level()
 
 	# the album directory must exist and be readable
 	try:
 		os.stat(config['album_path'])
 	except:
-		message("FATAL ERROR", config['album_path'] + " doesn't exist or unreadable, quitting")
+		message("FATAL ERROR", config['album_path'] + " doesn't exist or unreadable, quitting", 0)
 		sys.exit(-97)
 
 	# the cache directory must exist and be writable, or we'll try to create it
 	try:
 		os.stat(config['cache_path'])
 		if not os.access(config['cache_path'], os.W_OK):
-			message("FATAL ERROR", config['cache_path'] + " not writable, quitting")
+			message("FATAL ERROR", config['cache_path'] + " not writable, quitting", 0)
 			sys.exit(-97)
 	except:
 		try:
@@ -242,7 +242,7 @@ def get_options():
 			os.chmod(config['cache_path'], 0o777)
 			message("permissions set", config['cache_path'], 4)
 		except:
-			message("FATAL ERROR", config['cache_path'] + " inexistent and couldn't be created, quitting")
+			message("FATAL ERROR", config['cache_path'] + " inexistent and couldn't be created, quitting", 0)
 			sys.exit(-97)
 
 	# create the directory where php will put album composite images
@@ -255,7 +255,7 @@ def get_options():
 			os.mkdir(albumCacheDir)
 			os.chmod(albumCacheDir, 0o777)
 		except OSError:
-			message("FATAL ERROR", config['cache_path'] + " not writable, quitting")
+			message("FATAL ERROR", config['cache_path'] + " not writable, quitting", 0)
 			sys.exit(-97)
 
 	json_options_file = os.path.join(config['index_html_path'], "cache/options.json")
@@ -275,6 +275,7 @@ def get_options():
 	except KeyError:
 		config['recreate_reduced_photos'] = True
 		config['recreate_thumbnails'] = True
+
 	config['recreate_thumbnails'] = False
 	try:
 		if (
