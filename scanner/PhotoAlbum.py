@@ -22,6 +22,11 @@ import hashlib
 import sys
 from pprint import pprint
 import pprint
+try:
+	import configparser
+except ImportError:
+	import ConfigParser as configparser
+
 
 def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
 	# The pool methods use a queue.Queue to pass tasks to the worker processes.
@@ -52,6 +57,9 @@ class Album(object):
 		self.num_media_in_sub_tree = 0
 		self.num_media_in_album = 0
 		self.parent = None
+		self.album_ini = configparser.ConfigParser()
+		message("reading album.ini...", os.path.join(self.baseless_path, "album.ini"), 4)
+		self.album_ini.read(os.path.join(self.baseless_path, "album.ini"))
 
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
@@ -109,6 +117,7 @@ class Album(object):
 		elif len(self.albums_list) == 0:
 			return self.media_list[-1].date
 		return max(self.media_list[-1].date, self.albums_list[-1].date)
+
 
 	def __cmp__(self, other):
 		try:
@@ -193,11 +202,12 @@ class Album(object):
 			path = dictionary["physicalPath"]
 		else:
 			path = dictionary["path"]
+		# Don't use cache if version has changed
 		if not "jsonVersion" in dictionary or float(dictionary["jsonVersion"]) != Options.json_version:
 			return None
 		album = Album(os.path.join(Options.config['album_path'], path))
 		album.cache_base = album_cache_base
-		album.json_version= dictionary["jsonVersion"]
+		album.json_version = dictionary["jsonVersion"]
 		for media in dictionary["media"]:
 			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], remove_folders_marker(album.baseless_path)))
 			if new_media.is_valid:
@@ -210,6 +220,7 @@ class Album(object):
 		album.sort_subalbums_and_media()
 
 		return album
+
 
 	def to_dict(self, cripple=True):
 		self.sort_subalbums_and_media()
@@ -289,12 +300,15 @@ class Album(object):
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base
 		return dictionary
+
+
 	def media_from_path(self, path):
 		_path = remove_album_path(path)
 		for media in self.media_list:
 			if _path == media.media_file_name:
 				return media
 		return None
+
 
 class Media(object):
 	def __init__(self, album, media_path, thumbs_path=None, attributes=None):
@@ -345,6 +359,19 @@ class Media(object):
 		self._attributes["mediaType"] = "photo"
 		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
 
+		# Initialize with album.ini defaults
+		next_level()
+		message("initialize album.ini metadata values", media_path, 5)
+		back_level()
+		try:
+			self._attributes["metadata"]["title"] = album.album_ini[self.media_file_name]["title"]
+		except:
+			pass
+		try:
+			self._attributes["metadata"]["description"] = album.album_ini[self.media_file_name]["description"]
+		except:
+			pass
+
 		# let's avoid that different media names have the same cache base
 		distinguish_suffix = 0
 		while True:
@@ -375,7 +402,10 @@ class Media(object):
 
 		if self.is_valid:
 			if isinstance(image, Image.Image):
-				self._photo_metadata(image)
+				if self.media_file_name in album.album_ini:
+					self._photo_metadata(image, album.album_ini[self.media_file_name])
+				else:
+					self._photo_metadata(image, album.album_ini["DEFAULT"])
 				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
 				if self.has_gps_data:
 					next_level()
@@ -405,7 +435,8 @@ class Media(object):
 					self.is_valid = False
 		return
 
-	def _photo_metadata(self, image):
+
+	def _photo_metadata(self, image, media_ini):
 		next_level()
 		message("extracting metadata...", "", 5)
 		self._attributes["metadata"]["size"] = image.size
@@ -526,9 +557,17 @@ class Media(object):
 
 		if "GPSInfo" in exif:
 			gps_latitude = exif["GPSInfo"].get("GPSLatitude", None)
-			gps_latitude_ref = exif["GPSInfo"].get('GPSLatitudeRef', None)
-			gps_longitude = exif["GPSInfo"].get('GPSLongitude', None)
-			gps_longitude_ref = exif["GPSInfo"].get('GPSLongitudeRef', None)
+			gps_latitude_ref = exif["GPSInfo"].get("GPSLatitudeRef", None)
+			gps_longitude = exif["GPSInfo"].get("GPSLongitude", None)
+			gps_longitude_ref = exif["GPSInfo"].get("GPSLongitudeRef", None)
+		if "latitude" in media_ini:
+			gps_latitude = media_ini["latitude"]
+			gps_latitude_ref = "N" if gps_latitude > 0 else "S"
+		if "longitude" in media_ini:
+			gps_longitude = media_ini["longitude"]
+			gps_longitude_ref = "E" if gps_longitude > 0 else "W"
+
+		if "GPSInfo" in exif or "latitude" in media_ini or "longitude" in media_ini:
 			if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
 				self._attributes["metadata"]["latitude"] = self._convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
 				self._attributes["metadata"]["latitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
@@ -538,6 +577,7 @@ class Media(object):
 		message("extracted", "", 5)
 		back_level()
 		back_level()
+
 
 	def _convert_to_degrees_minutes_seconds(self, value, ref):
 		# Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds
@@ -622,6 +662,8 @@ class Media(object):
 				if original:
 					self._attributes["metadata"]["originalSize"] = (int(s["width"]), int(s["height"]))
 				break
+		# Video should also contain GPS information, at least in QuickTime and MP4 files...
+
 
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
 		# give image the correct orientation
@@ -1224,6 +1266,14 @@ class Media(object):
 	def name(self):
 		return os.path.basename(self.media_file_name)
 
+	@property
+	def title(self):
+		return self._attributes["metadata"]["title"]
+
+	@property
+	def description(self):
+		return self._attributes["metadata"]["description"]
+
 	def __str__(self):
 		return self.name
 
@@ -1414,6 +1464,7 @@ class Media(object):
 	def attributes(self):
 		return self._attributes
 
+
 	@staticmethod
 	def from_dict(album, dictionary, basepath):
 		del dictionary["date"]
@@ -1438,6 +1489,7 @@ class Media(object):
 						except ValueError:
 							pass
 		return Media(album, media_path, None, dictionary)
+
 
 	def to_dict(self):
 		foldersAlbum = Options.config['folders_string']
@@ -1464,6 +1516,7 @@ class Media(object):
 		media["foldersCacheBase"]  = self.album.cache_base
 		media["cacheSubdir"]       = self.album.subdir
 		return media
+
 
 class PhotoAlbumEncoder(json.JSONEncoder):
 	def default(self, obj):
