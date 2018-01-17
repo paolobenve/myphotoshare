@@ -20,7 +20,6 @@ import pprint
 class TreeWalker:
 	def __init__(self):
 		random.seed()
-		self.save_json_options()
 		self.all_cache_entries = ["options.json"]
 		self.all_cache_entries_by_subdir = {}
 		if (Options.config['thumbnail_generation_mode'] == "parallel"):
@@ -99,6 +98,8 @@ class TreeWalker:
 				self.all_albums_to_json_file(sub_album)
 			message("all albums saved to json files", "", 5)
 			back_level()
+		# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
+		self.save_json_options()
 		self.remove_stale()
 		message("complete", "", 4)
 
