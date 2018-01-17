@@ -420,60 +420,63 @@ class TreeWalker:
 		json_file_OK = False
 		cached_album = None
 		json_message = json_file + " (path: " + os.path.basename(absolute_path) + ")"
-		try:
-			if os.path.exists(json_file):
-				if not os.access(json_file, os.R_OK):
-					message("json file unreadable", json_file, 1)
-				elif not os.access(json_file, os.W_OK):
-					message("json file unwritable", json_file, 1)
-				else:
-					message("reading json file to import album...", json_file, 5)
-					# the following is the instruction which could raise the error
-					cached_album = Album.from_cache(json_file, album_cache_base)
-					next_level()
-					message("json file read", "", 5)
-					back_level()
-					if (
-						file_mtime(absolute_path) <= file_mtime(json_file) and
-						cached_album is not None and
-						hasattr(cached_album, "absolute_path") and
-						cached_album.absolute_path == absolute_path and
-						hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
-					):
-						next_level()
-						message("json file is OK", "  " + json_message, 4)
-						back_level()
-						json_file_OK = True
-						album = cached_album
-						message("adding media in album to big lists...", "", 5)
-						for media in album.media:
-							if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
-								self.all_media.append(media)
-								self.add_media_to_tree_by_date(media)
-								if media.has_gps_data:
-									self.add_media_to_tree_by_geonames(media)
-						next_level()
-						message("added media to big lists", "", 5)
-						back_level()
+		if Options.config['recreate_json_files']:
+			message("forced json file recreation", "some sensible option has changed", 3)
+		else:
+			try:
+				if os.path.exists(json_file):
+					if not os.access(json_file, os.R_OK):
+						message("json file unreadable", json_file, 1)
+					elif not os.access(json_file, os.W_OK):
+						message("json file unwritable", json_file, 1)
 					else:
+						message("reading json file to import album...", json_file, 5)
+						# the following is the instruction which could raise the error
+						cached_album = Album.from_cache(json_file, album_cache_base)
 						next_level()
-						message("json file invalid (old or invalid path)", json_message, 4)
+						message("json file read", "", 5)
 						back_level()
-						cached_album = None
-		except KeyboardInterrupt:
-			raise
-		except IOError:
-			# will execution never come here?
-			next_level()
-			message("json file unexistent", json_message, 4)
-			back_level()
-			json_file_OK = False
-		except (ValueError, AttributeError, KeyError) as e:
-			next_level()
-			message(" json file invalid", json_message, 4)
-			back_level()
-			json_file_OK = False
-			cached_album = None
+						if (
+							file_mtime(absolute_path) <= file_mtime(json_file) and
+							cached_album is not None and
+							hasattr(cached_album, "absolute_path") and
+							cached_album.absolute_path == absolute_path and
+							hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
+						):
+							next_level()
+							message("json file is OK", "  " + json_message, 4)
+							back_level()
+							json_file_OK = True
+							album = cached_album
+							message("adding media in album to big lists...", "", 5)
+							for media in album.media:
+								if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
+									self.all_media.append(media)
+									self.add_media_to_tree_by_date(media)
+									if media.has_gps_data:
+										self.add_media_to_tree_by_geonames(media)
+							next_level()
+							message("added media to big lists", "", 5)
+							back_level()
+						else:
+							next_level()
+							message("json file invalid (old or invalid path)", json_message, 4)
+							back_level()
+							cached_album = None
+			except KeyboardInterrupt:
+				raise
+			except IOError:
+				# will execution never come here?
+				next_level()
+				message("json file unexistent", json_message, 4)
+				back_level()
+				json_file_OK = False
+			except (ValueError, AttributeError, KeyError) as e:
+				next_level()
+				message(" json file invalid", json_message, 4)
+				back_level()
+				json_file_OK = False
+				cached_album = None
 
 		if not json_file_OK:
 			message("generating album...", absolute_path, 5)

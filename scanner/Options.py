@@ -25,6 +25,7 @@ num_video_processed = 0
 photos_without_geotag = []
 photos_without_exif_date = []
 options_not_to_be_saved = ['cache_path', 'index_html_path', 'album_path']
+options_requiring_json_regeneration = ['jpeg_quality', 'geonames_language', 'unspecified_geonames_code', 'get_geonames_online', ]
 # set this variable to a new integer number whenever the json files structure changes
 # json_version = 1 since ...
 # json_version = 2 since checksums have been added
@@ -258,6 +259,7 @@ def get_options():
 			message("FATAL ERROR", config['cache_path'] + " not writable, quitting", 0)
 			sys.exit(-97)
 
+	# get old options: they are revised in order to decide whether to recreate something
 	json_options_file = os.path.join(config['index_html_path'], "cache/options.json")
 	try:
 		with open(json_options_file) as old_options_file:
@@ -285,3 +287,15 @@ def get_options():
 			config['recreate_thumbnails'] = True
 	except KeyError:
 		config['recreate_thumbnails'] = True
+
+	config['recreate_json_files'] = False
+	for option in options_requiring_json_regeneration:
+		try:
+			if old_options[option] != config[option]:
+				config['recreate_json_files'] = True
+				message("option '" + option + "' has changed from previous scanner run, forcing recreation of json files", "", 3)
+				break
+		except KeyError:
+			config['recreate_json_files'] = True
+			message("option '" + option + "' wasn't set when previous scanner run, forcing recreation of json files", "", 3)
+			break
