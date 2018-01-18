@@ -1850,13 +1850,11 @@ $(document).ready(function() {
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
-		if (true || Options.get_geonames_online) {
-			var linkTitle = _t('#show-map') + Options.map_service;
-			$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
-				ev.stopPropagation();
-				window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, Options.photo_map_zoom_level), '_blank');
-			});
-		}
+		var linkTitle = _t('#show-map') + Options.map_service;
+		$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
+			ev.stopPropagation();
+			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, Options.photo_map_zoom_level), '_blank');
+		});
 
 		translate();
 
