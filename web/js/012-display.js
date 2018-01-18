@@ -940,9 +940,9 @@ $(document).ready(function() {
 		}
 		$("#thumbs img").each(function() {
 			if (
-				(currentAlbum.cacheBase.indexOf(PhotoFloat.foldersStringWithTrailingSeparator) === 0 || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
-				currentAlbum.cacheBase.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 && this.title === media.albumName ||
-				currentAlbum.cacheBase.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0 && this.title === media.albumName
+				(isFolderAlbum(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
+				isByDateAlbum(currentAlbum.cacheBase) && this.title === media.albumName ||
+				isByGpsAlbum(currentAlbum.cacheBase) && this.title === media.albumName
 			) {
 				thumb = $(this);
 				return false;
@@ -1011,7 +1011,7 @@ $(document).ready(function() {
 					height = currentAlbum.media[i].metadata.size[1];
 					thumbHash = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize, thumbnailSize);
 
-					if (thumbHash.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 || thumbHash.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0) {
+					if (PhotoFloat.isByDateAlbum(thumbHash) || PhotoFloat.isByGpsAlbum(thumbHash)) {
 						currentAlbum.media[i].completeName = PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
 						thumbHash = currentAlbum.cacheBase + Options.cache_folder_separator + currentAlbum.media[i].cacheBase;
 					}
@@ -1035,7 +1035,7 @@ $(document).ready(function() {
 						}
 						calculatedWidth = Options.media_thumb_size;
 					}
-					if (currentAlbum.cacheBase.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 || currentAlbum.cacheBase.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0)
+					if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) || PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase))
 						imgTitle = currentAlbum.media[i].albumName;
 					else
 						imgTitle = currentAlbum.media[i].name;
