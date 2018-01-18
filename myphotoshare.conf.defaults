@@ -215,7 +215,13 @@ thumb_spacing = 3
 albums_slide_style = true
 
 # will photos/videos names be shown below the thumbnail in albums?
-show_media_names_below_thumbs_in_albums = True
+show_media_names_below_thumbs = false
+
+# will album names be shown below the thumbnail?
+show_album_names_below_thumbs = false
+
+# should we show the media count in the album thumbnails and in the title?
+show_album_media_count = false
 
 # The css font-size value for the title on page top
 # other values: large, small, or a px/em size
@@ -232,9 +238,6 @@ title_image_name_color = lime
 
 # the page background color (this is ~ gray)
 background_color = #222222
-
-# should we show the media name below the thumbnail?
-show_media_name = false
 
 # the album buttons background color (this is a dirty white, in order to be like an old slide)
 album_button_background_color = Cornsilk
