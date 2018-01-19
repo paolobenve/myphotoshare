@@ -782,7 +782,7 @@ class TreeWalker:
 		while True:
 			if i >= good_media_number:
 				break
-			if num_random_thumbnails == 1:
+			if len(album.media) and num_random_thumbnails == 1:
 				random_media = album.media[0]
 			else:
 				while True:
