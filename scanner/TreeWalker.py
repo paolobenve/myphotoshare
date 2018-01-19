@@ -505,8 +505,8 @@ class TreeWalker:
 				back_level()
 				continue
 
-			if entry[0] == '.':
-				# skip hidden files and directories
+			if entry[0] == '.' or entry == "album.ini":
+				# skip hidden files and directories, or user's metadata file 'album.ini'
 				continue
 
 			entry_with_path = os.path.join(absolute_path, entry)
