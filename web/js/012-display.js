@@ -975,7 +975,7 @@ $(document).ready(function() {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, margin, imgTitle;
+		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 0, margin, imgTitle;
 		var tooBig = false, virtualAlbum = false;
 		var mapLinkIcon;
 
