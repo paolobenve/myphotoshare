@@ -153,7 +153,7 @@ class Album(object):
 	def to_json_file(self):
 		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
-			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
+			message("FATAL ERROR", json_file_with_path + " not writable, quitting", 0)
 			sys.exit(-97)
 		message("sorting album...", "", 5)
 		self.sort_subalbums_and_media()
