@@ -130,10 +130,10 @@ It is, essentially, a slick and fast, minimal but still well-featured photo gall
 
 Photofloat needs:
 
-* `python` 3 (running it with python2 is possible, changing the first line in scanner/main.py)
-* `python3-numpy`(python-numpy with python2)
-* `python-requests`
-* `python-pil`
+* `python3` (running it with python2 is possible, changing the first line in scanner/main.py and installing the corresponding python2 dependencies)
+* `python3-numpy`
+* `python3-requests`
+* `python3-pil`
 * `avconv` / `ffmpeg` in order to be able to manage videos.
 * a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
 * `php5-gd` in order to create albums share images
