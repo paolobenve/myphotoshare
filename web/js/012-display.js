@@ -1177,13 +1177,15 @@ $(document).ready(function() {
 										distance = (correctedAlbumThumbSize - thumbHeight) / 2;
 									}
 								} else if (Options.album_thumb_type == "square") {
-									if (mediaWidth < correctedAlbumThumbSize || mediaHeight < correctedAlbumThumbSize) {
-										thumbWidth = mediaWidth;
-										thumbHeight = mediaHeight;
-									} else {
-										thumbWidth = correctedAlbumThumbSize;
-										thumbHeight = correctedAlbumThumbSize;
-									}
+									thumbWidth = correctedAlbumThumbSize;
+									thumbHeight = correctedAlbumThumbSize;
+									// if (mediaWidth < correctedAlbumThumbSize || mediaHeight < correctedAlbumThumbSize) {
+									// 	thumbWidth = mediaWidth;
+									// 	thumbHeight = mediaHeight;
+									// } else {
+									// 	thumbWidth = correctedAlbumThumbSize;
+									// 	thumbHeight = correctedAlbumThumbSize;
+									// }
 								}
 
 								if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
