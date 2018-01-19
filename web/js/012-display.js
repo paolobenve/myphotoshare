@@ -1923,9 +1923,12 @@ $(document).ready(function() {
 		});
 		$("#media-name").css("color", Options.title_image_name_color);
 		$(".thumb-and-caption-container").css("margin-right", Options.thumb_spacing.toString() + "px");
+		if (Options.show_media_names_below_thumbs)
+			$(".thumb-and-caption-container").css('margin-bottom', '1em')
 
 		if (! Options.show_album_media_count)
 			$("#title-count").hide();
+
 	}
 
 	function em2px(selector, em) {

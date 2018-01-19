@@ -418,7 +418,7 @@ a.title-anchor.mobile {
 }
 
 .thumb-and-caption-container {
-	margin-bottom: 1em;
+	margin-bottom: 0;
 	display: block;
 }
 .thumb-container {
