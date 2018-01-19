@@ -940,9 +940,9 @@ $(document).ready(function() {
 		}
 		$("#thumbs img").each(function() {
 			if (
-				(isFolderAlbum(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
-				isByDateAlbum(currentAlbum.cacheBase) && this.title === media.albumName ||
-				isByGpsAlbum(currentAlbum.cacheBase) && this.title === media.albumName
+				(PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
+				PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) && this.title === media.albumName ||
+				PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase) && this.title === media.albumName
 			) {
 				thumb = $(this);
 				return false;
