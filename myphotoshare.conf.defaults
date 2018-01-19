@@ -20,6 +20,15 @@
 debug_css = false
 debug_js = false
 
+# verbosity level, a number 0-5
+# 0 = initial options and fatal errors
+# 1 = non-fatal errors
+# 2 = warnings
+# 3 = browsing info
+# 4 = other info
+# 5 = more info
+max_verbose = 3
+
 
 ###########################################################
 # minifying
@@ -43,15 +52,6 @@ js_minifier = jsmin2
 # scanner option
 ###########################################################
 
-# verbosity level, a number 0-5
-# 0 = initial options and fatal errors
-# 1 = non-fatal errors
-# 2 = warnings
-# 3 = browsing info
-# 4 = other info
-# 5 = more info
-max_verbose = 3
-
 # absolute path of the folder where index.html resides; normally album_path will be its "albums" subfolder, and cache_path its "cache" subfolder
 index_html_path =
 
@@ -64,13 +64,6 @@ cache_path =
 
 # cache subfolder: where the album composite images will be saved
 cache_album_subdir = cache_album
-
-# what method will be used to generate tumbnails?
-# permitted values:
-#    cascade : the biggest thumbnail is generated from image, the following from the former, and so on, from biggest to smallest
-#    parallel: every thumbnail is generated from the image, and the processes are launched parallely on the various cores of the cpu
-#    mixed   : the biggest thumbnail is generated from image, the following are generate in a parallel way from the biggest thumbnail
-thumbnail_generation_mode = cascade
 
 # How many processors shouldn't be used in parallel mode?
 respected_processors = 1
@@ -178,6 +171,10 @@ get_geonames_online = false
 # That's all!
 geonames_user = myphotoshare
 
+# When should a virtual (date, gps) album be considered big?
+# Do not set it to a small value or you could get too many albums!
+big_virtual_folders_threshold = 999
+
 
 ###########################################################
 # js options
@@ -218,7 +215,13 @@ thumb_spacing = 3
 albums_slide_style = true
 
 # will photos/videos names be shown below the thumbnail in albums?
-show_media_names_below_thumbs_in_albums = True
+show_media_names_below_thumbs = false
+
+# will album names be shown below the thumbnail?
+show_album_names_below_thumbs = false
+
+# should we show the media count in the album thumbnails and in the title?
+show_album_media_count = false
 
 # The css font-size value for the title on page top
 # other values: large, small, or a px/em size
@@ -258,10 +261,6 @@ default_media_name_sort = false
 # should default sorting be reverse (more recent photos/videos top)?
 default_album_date_reverse_sort = false
 default_media_date_reverse_sort = false
-
-# When should a virtual (date, gps) album be considered big?
-# Do not set it to a small value or you could get too many albums!
-big_virtual_folders_threshold = 999
 
 # How many thumbnails should we put at most in the image that php generates for sharing albums?
 # it must be an integer, and a square: 4, 9, 16,..

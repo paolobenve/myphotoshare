@@ -696,12 +696,7 @@ class Media(object):
 			message("WARNING: Photo couldn't be trasposed", photo_path, 2)
 			pass
 
-		if (Options.config['thumbnail_generation_mode'] == "parallel"):
-			self._photo_thumbnails_parallel(image, photo_path, thumbs_path)
-		elif (Options.config['thumbnail_generation_mode'] == "mixed"):
-			self._photo_thumbnails_mixed(image, photo_path, thumbs_path)
-		elif (Options.config['thumbnail_generation_mode'] == "cascade"):
-			self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
+		self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 
 	def thumbnail_size_is_smaller_then_size_of_(self, image, thumb_size, thumb_type = ""):
 		image_width = image.size[0]
@@ -719,53 +714,6 @@ class Media(object):
 		else:
 			veredict = (thumb_size < max_image_size)
 		return veredict
-
-	def _photo_thumbnails_parallel(self, start_image, photo_path, thumbs_path):
-		# get number of cores on the system, and use all minus one
-		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
-		pool = Pool(processes=num_of_cores)
-		try:
-			# reduced sizes media
-			for thumb_size in Options.config['reduced_sizes']:
-				if (
-					Options.config['thumbnail_generation_mode'] == "mixed" and
-					thumb_size == Options.config['reduced_sizes'][0]
-				):
-					continue
-				pool.apply_async(
-					make_photo_thumbs,
-					args = (self, start_image, photo_path, thumbs_path, thumb_size)
-				)
-			# album thumbnails
-			(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-			pool.apply_async(
-				make_photo_thumbs,
-				args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
-			)
-			if thumb_type == "fit":
-				# square album thumbnail is needed too
-				thumb_type = "square"
-				pool.apply_async(
-					make_photo_thumbs,
-					args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
-				)
-			# media thumbnails
-			(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-			pool.apply_async(
-				make_photo_thumbs,
-				args = (self, start_image, photo_path, thumbs_path, thumb_size, thumb_type)
-			)
-		except KeyboardInterrupt:
-			raise
-		except:
-			pool.terminate()
-		pool.close()
-		pool.join()
-
-	def _photo_thumbnails_mixed(self, image, photo_path, thumbs_path):
-		thumb_size = Options.config['reduced_sizes'][0]
-		thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size)
-		self._photo_thumbnails_parallel(thumb, photo_path, thumbs_path)
 
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		# this function calls self.reduce_size_or_make_thumbnail() with the proper image self.reduce_size_or_make_thumbnail() needs

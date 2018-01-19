@@ -1,6 +1,6 @@
 var translations =
 	{
-		'en': {
+		"en": {
 			"#next-media-title": "Next [n]",
 			"#prev-media-title": "Previous [p]",
 			"#metadata-show": "show metadata [m]",
@@ -44,7 +44,7 @@ var translations =
 			".by-name": "by name",
 			".sort-reverse": " reverse",
 			".current-sort": "current sort is ",
-			"#video-unsupported-html5": "<p>Sorry, your browser doesn\'t support the HTML5 &lt;video&gt; element.</p><p>Here's a <a href=\"http://caniuse.com/video\">list of which browsers do</a>.</p>",
+			"#video-unsupported-html5": "<p>Sorry, your browser doesn't support the HTML5 &lt;video&gt; element.</p><p>Here's a <a href=\"http://caniuse.com/video\">list of which browsers do</a>.</p>",
 			"#video-unsupported-h264": "<p>Sorry, your browser doesn't support the H.264 video format.</p>",
 			"#metadata-data-make": "Camera Maker",
 			"#metadata-data-model": "Camera Model",
@@ -66,9 +66,9 @@ var translations =
 			"#metadata-data-duration": "Duration",
 			"#metadata-data-latitude": "Latitude",
 			"#metadata-data-longitude": "Longitude",
-			"#show-map": "[s] Show the place where the photo was taken using ",
+			"#show-map": "[s] Show the place where the photo was taken using "
 		},
-		'it': {
+		"it": {
 			"#next-media-title": "Prossima [n]",
 			"#prev-media-title": "Precedente [p]",
 			"#metadata-show": "metadati [m]",
@@ -134,9 +134,9 @@ var translations =
 			"#metadata-data-duration": "Durata",
 			"#metadata-data-latitude": "Latitudine",
 			"#metadata-data-longitude": "Longitudine",
-			"#show-map": "[s] Mostra il luogo in cui fu scattata la foto usando ",
+			"#show-map": "[s] Mostra il luogo in cui fu scattata la foto usando "
 		},
-		'es': {
+		"es": {
 			"#next-media-title": "Siguiente [n]",
 			"#prev-media-title": "Anterior [p]",
 			"#metadata-show": "metadatos [m]",
@@ -202,9 +202,9 @@ var translations =
 			"#metadata-data-duration": "Duración",
 			"#metadata-data-latitude": "Latitud",
 			"#metadata-data-longitude": "Longitud",
-			"#show-map": "[s] Muestra el lugar donde la foto fue tomada usando ",
+			"#show-map": "[s] Muestra el lugar donde la foto fue tomada usando "
 		},
-		'fr': {
+		"fr": {
 			"#next-media-title": "Suivant [n]",
 			"#prev-media-title": "Précédent [p]",
 			"#metadata-show": "afficher les metadonnées [m]",
@@ -270,6 +270,6 @@ var translations =
 			"#metadata-data-duration": "Durée",
 			"#metadata-data-latitude": "Latitude",
 			"#metadata-data-longitude": "Longitude",
-			"#show-map": "[s] Afficher la localisation où la photo a été prise en utilisant ",
-		},
+			"#show-map": "[s] Afficher la localisation où la photo a été prise en utilisant "
+		}
 	};

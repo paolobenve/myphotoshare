@@ -940,9 +940,9 @@ $(document).ready(function() {
 		}
 		$("#thumbs img").each(function() {
 			if (
-				(currentAlbum.cacheBase.indexOf(PhotoFloat.foldersStringWithTrailingSeparator) === 0 || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
-				currentAlbum.cacheBase.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 && this.title === media.albumName ||
-				currentAlbum.cacheBase.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0 && this.title === media.albumName
+				(isFolderAlbum(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
+				isByDateAlbum(currentAlbum.cacheBase) && this.title === media.albumName ||
+				isByGpsAlbum(currentAlbum.cacheBase) && this.title === media.albumName
 			) {
 				thumb = $(this);
 				return false;
@@ -1011,7 +1011,7 @@ $(document).ready(function() {
 					height = currentAlbum.media[i].metadata.size[1];
 					thumbHash = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize, thumbnailSize);
 
-					if (thumbHash.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 || thumbHash.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0) {
+					if (PhotoFloat.isByDateAlbum(thumbHash) || PhotoFloat.isByGpsAlbum(thumbHash)) {
 						currentAlbum.media[i].completeName = PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
 						thumbHash = currentAlbum.cacheBase + Options.cache_folder_separator + currentAlbum.media[i].cacheBase;
 					}
@@ -1035,7 +1035,7 @@ $(document).ready(function() {
 						}
 						calculatedWidth = Options.media_thumb_size;
 					}
-					if (currentAlbum.cacheBase.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 || currentAlbum.cacheBase.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0)
+					if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) || PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase))
 						imgTitle = currentAlbum.media[i].albumName;
 					else
 						imgTitle = currentAlbum.media[i].name;
@@ -1138,6 +1138,7 @@ $(document).ready(function() {
 						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
 						imageString += 			" height: " + correctedAlbumThumbSize + "px;";
 						imageString += 			" margin-top: " + margin + "px;";
+						imageString += 			" margin-bottom: " + margin + "px;";
 						imageString += 			" margin-left: " + margin + "px;";
 						imageString += 			" margin-right: " + margin + "px;";
 						if (Options.albums_slide_style)
@@ -1153,9 +1154,10 @@ $(document).ready(function() {
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var distance = 0;
-								var htmlText;
+								var htmlText, height;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
+								var heightfactor = 1.6;
 
 								PhotoFloat.subalbumIndex ++;
 								mediaWidth = randomMedia.metadata.size[0];
@@ -1264,7 +1266,11 @@ $(document).ready(function() {
 
 								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
 								captionHeight = captionFontSize * 3;
-								buttonAndCaptionHeight = correctedAlbumThumbSize + captionHeight * 1.6 + paddingTop + 3 * 4;
+								if (PhotoFloat.isFolderAlbum(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+									heightfactor = 0;
+								else if (! Options.show_album_media_count)
+									heightfactor = 1.1
+								buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
 									html += " slide";
@@ -1279,18 +1285,24 @@ $(document).ready(function() {
 								html += ">";
 								theImage.wrap(html);
 
+
 								html = "<div class=\"album-caption\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
 										"font-size: " + captionFontSize + "px; " +
 										"height: " + captionHeight + "px; ";
 								html += 	"color: " + Options.album_caption_color + "; ";
+								if (PhotoFloat.isFolderAlbum(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+									html +=	"display: none; ";
 								html += "\"";
 								html += ">" + folder ;
 								html += "</div>";
 								html += "<div class=\"album-caption-count\"";
 								html += 	"style=\"font-size: " + Math.round((captionFontSize / 1.5)) + "px;" +
 										"height: " + Math.round(captionHeight / 2) + "px; ";
-								html += 	"color: " + Options.album_caption_color + ";\"";
+								html += 	"color: " + Options.album_caption_color + ";";
+								if (PhotoFloat.isFolderAlbum(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
+									html +=	" display: none;";
+								html += 	"\"";
 								html += ">(";
 								html +=		subalbum.numMediaInSubTree;
 								html +=		" <span class=\"title-media\">";
@@ -1298,6 +1310,7 @@ $(document).ready(function() {
 								html +=		"</span>";
 								html += ")</div>";
 								theImage.parent().append(html);
+
 								numSubAlbumsReady ++;
 								if (numSubAlbumsReady >= originalAlbum.albums.length) {
 									// now all the subalbums random thumbnails has been loaded
@@ -1841,13 +1854,11 @@ $(document).ready(function() {
 			text += "<tr class='gps'><td id=\"metadata-data-longitude\"></td><td>" + currentMedia.metadata.longitudeMS + " </td></tr>";
 		text += "</table>";
 		$("#metadata").html(text);
-		if (true || Options.get_geonames_online) {
-			var linkTitle = _t('#show-map') + Options.map_service;
-			$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
-				ev.stopPropagation();
-				window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, Options.photo_map_zoom_level), '_blank');
-			});
-		}
+		var linkTitle = _t('#show-map') + Options.map_service;
+		$('#metadata tr.gps').attr("title", linkTitle).on('click', function(ev) {
+			ev.stopPropagation();
+			window.open(mapLink(currentMedia.metadata.latitude, currentMedia.metadata.longitude, Options.photo_map_zoom_level), '_blank');
+		});
 
 		translate();
 
@@ -1916,6 +1927,9 @@ $(document).ready(function() {
 		});
 		$("#media-name").css("color", Options.title_image_name_color);
 		$(".thumb-and-caption-container").css("margin-right", Options.thumb_spacing.toString() + "px");
+
+		if (! Options.show_album_media_count)
+			$("#title-count").hide();
 	}
 
 	function em2px(selector, em) {
@@ -2089,7 +2103,7 @@ $(document).ready(function() {
 		}
 		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
-		if (currentMedia !== null || ! Options.show_media_names_below_thumbs_in_albums)
+		if (currentMedia !== null || ! Options.show_media_names_below_thumbs)
 			$(".media-caption").hide();
 		else
 			$(".media-caption").show();

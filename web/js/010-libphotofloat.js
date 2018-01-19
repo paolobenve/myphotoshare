@@ -176,9 +176,23 @@
 	PhotoFloat.mediaHash = function(album, media) {
 		return media.cacheBase;
 	};
+
+	PhotoFloat.isByDateAlbum = function(string) {
+		return string.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0;
+	};
+
+	PhotoFloat.isByGpsAlbum = function(string) {
+		return string.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0;
+	};
+
+	PhotoFloat.isFolderAlbum = function(string) {
+		return string == Options.folders_string || string.indexOf(PhotoFloat.foldersStringWithTrailingSeparator) === 0;
+	};
+
+
 	PhotoFloat.mediaHashURIEncoded = function(album, media) {
 		var hash;
-		if (album.cacheBase.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 || album.cacheBase.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0)
+		if (PhotoFloat.isByDateAlbum(album.cacheBase) || PhotoFloat.isByGpsAlbum(album.cacheBase))
 			hash = PhotoFloat.pathJoin([
 				encodeURIComponent(album.cacheBase),
 				encodeURIComponent(media.foldersCacheBase),
@@ -194,7 +208,7 @@
 	PhotoFloat.mediaHashFolder = function(album, media) {
 		var hash;
 		hash = media.cacheBase;
-		if (hash.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0 || hash.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0) {
+		if (PhotoFloat.isByDateAlbum(hash) || PhotoFloat.isByGpsAlbum(hash)) {
 			media.completeName = PhotoFloat.pathJoin([media.foldersAlbum, media.name]);
 			hash = PhotoFloat.pathJoin([media.foldersAlbum.cacheBase, media.cacheBase]);
 		}
@@ -249,11 +263,11 @@
 		if (hash.indexOf(rootString) === 0)
 			hash = hash.substring(rootString.length);
 		else {
-			if (hash.indexOf(PhotoFloat.foldersStringWithTrailingSeparator) === 0)
+			if (PhotoFloat.isFolderAlbum(hash))
 				hash = hash.substring(PhotoFloat.foldersStringWithTrailingSeparator.length);
-			else if (hash.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0)
+			else if (PhotoFloat.isByDateAlbum(hash))
 				hash = hash.substring(PhotoFloat.byDateStringWithTrailingSeparator.length);
-			else if (hash.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0)
+			else if (PhotoFloat.isByGpsAlbum(hash))
 				hash = hash.substring(PhotoFloat.byGpsStringWithTrailingSeparator.length);
 		}
 		if (media.cacheSubdir)

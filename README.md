@@ -130,8 +130,8 @@ It is, essentially, a slick and fast, minimal but still well-featured photo gall
 
 Photofloat needs:
 
-* `python` 2.7
-* `python-numpy`
+* `python` 3 (running it with python2 is possible, changing the first line in scanner/main.py)
+* `python3-numpy`(python-numpy with python2)
 * `python-requests`
 * `python-pil`
 * `avconv` / `ffmpeg` in order to be able to manage videos.
@@ -299,6 +299,10 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * new option `get_geonames_online`, if true, get country, state, place names from geonames.org (online), otherwise get it from the files in scanner/geonames/cities1000.txt (names are in english)
 * clustering of places with too many photos is done by the k-means algorithm, better than the previous one, which remains a "legacy"
 * added options `js_minifier` and `css_minifier` to specify what minifier to use: web services or local ones
+* removed `thumbnail_generation_mode` option: only cascade method is left, parallel and mixed methods are removed
+* option `show_media_names_below_thumbs_in_albums` changed to `show_media_names_below_thumbs`
+* new option `show_album_names_below_thumbs`: decides whether to show the album name in album thumbnails
+* new option `show_media_count`: decides whether to show the media count in album thumbnail and title
 
 ### version 3.2 (January 7, 2018)
 
