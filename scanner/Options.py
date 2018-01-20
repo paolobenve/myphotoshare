@@ -299,5 +299,5 @@ def get_options():
 				break
 		except KeyError:
 			config['recreate_json_files'] = True
-			message("option '" + option + "' wasn't set when previous scanner run, forcing recreation of json files", "", 3)
+			message("option '" + option + "' wasn't set on previous scanner run, forcing recreation of json files", "", 3)
 			break
