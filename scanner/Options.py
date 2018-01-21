@@ -35,7 +35,7 @@ json_version = 3
 # This is a debug option: it lets the scanner show the faces detected
 # obviously it only make sense when the scanner is run interactively, because the user must close every image with a keystroke
 # I'm getting it working if running in pyCharm, it stops with a segfault if run from terminal. Why????
-show_faces = false
+show_faces = False
 
 def get_options():
 	from CachePath import message, next_level, back_level, report_times
