@@ -27,8 +27,8 @@ cv2_installed = True
 try:
 	import cv2
 	message("importer", "opencv library available, using it!", 3)
-	face_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml')
-	eye_cascade = cv2.CascadeClassifier('/usr/share/opencv/haarcascades/haarcascade_eye.xml')
+	face_cascade = cv2.CascadeClassifier(find('haarcascade_frontalface_default.xml'))
+	eye_cascade = cv2.CascadeClassifier(find('haarcascade_eye.xml'))
 	print ("opencv library available, using it!")
 except ImportError:
 	cv2_installed = False

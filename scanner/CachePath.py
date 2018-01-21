@@ -134,6 +134,14 @@ def trim_base_custom(path, base):
 def remove_album_path(path):
 	return trim_base_custom(path, Options.config['album_path'])
 
+# find a file in file system, from https://stackoverflow.com/questions/1724693/find-a-file-in-python
+def find(name):
+	for root, dirs, files in os.walk('/'):
+		if name in files:
+			return os.path.join(root, name)
+
+
+
 def remove_folders_marker(path):
 	marker_position = path.find(Options.config['folders_string'])
 	if marker_position == 0:
