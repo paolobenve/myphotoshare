@@ -36,16 +36,6 @@ except ImportError:
 	print("No opencv library available, not using it")
 
 
-def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
-	# The pool methods use a queue.Queue to pass tasks to the worker processes.
-	# Everything that goes through the queue.Queue must be pickable, and since
-	# self.reduce_size_or_make_thumbnail is not defined at the top level, it's not pickable.
-	# This is why we have this "dummy" function, so that it's pickable.
-	try:
-		self.reduce_size_or_make_thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
-	except KeyboardInterrupt:
-		raise
-
 class Album(object):
 	#~ def __init__(self, path, path_has_folder_marker):
 	def __init__(self, path):
