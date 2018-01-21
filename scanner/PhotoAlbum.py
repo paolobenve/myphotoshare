@@ -669,7 +669,7 @@ class Media(object):
 
 		self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 
-	def thumbnail_size_is_smaller_then_size_of_(self, image, thumb_size, thumb_type = ""):
+	def thumbnail_size_is_smaller_than_size_of_(self, image, thumb_size, thumb_type = ""):
 		image_width = image.size[0]
 		image_height = image.size[1]
 		max_image_size = max(image_width, image_height)
@@ -702,13 +702,13 @@ class Media(object):
 		# if requested, generate the bigger thumbnail for mobile
 		if Options.config['mobile_thumbnail_factor'] > 1:
 			mobile_thumb_size = int(round(thumb_size * Options.config['mobile_thumbnail_factor']))
-			if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
+			if self.thumbnail_size_is_smaller_than_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
 				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, True)
 			else:
 				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type, True)
 
 		for i in range(2):
-			if thumb_type == "fit" or self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
+			if thumb_type == "fit" or self.thumbnail_size_is_smaller_than_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
 				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
 			else:
 				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
@@ -725,12 +725,12 @@ class Media(object):
 
 		# if requested, generate the bigger thumbnail for mobile
 		if Options.config['mobile_thumbnail_factor'] > 1:
-			if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
+			if self.thumbnail_size_is_smaller_than_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
 				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, True)
 			else:
 				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type, True)
 
-		if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
+		if self.thumbnail_size_is_smaller_than_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
 			thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
 		else:
 			thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
