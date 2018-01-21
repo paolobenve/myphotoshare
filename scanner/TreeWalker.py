@@ -805,7 +805,7 @@ class TreeWalker:
 				if i == num_random_thumbnails:
 					break
 			else:
-				message("unexistent thumbnail " + thumbnail + ", i=" + str(i), "good=", str(good_media_number), 5)
+				message("unexistent thumbnail " + thumbnail, "i=" + str(i) + ", good=" + str(good_media_number), 5)
 				bad_list.append(thumbnail)
 				good_media_number -= 1
 
