@@ -139,6 +139,7 @@ Photofloat needs:
 * `php5-gd` in order to create albums share images
 * `curl`, used by minify script
 * `cssmin` (`https://github.com/zacharyvoase/cssmin`, debian/ubuntu packages `cssmin`) and `jsmin` (`https://github.com/tikitu/jsmin`, debian/ubuntu package `python-jsmin`), unless using external web service
+* optional: opencv, python-opencv: if found, face detection is used when cropping images to square
 
 #### Why `php`? Isn't it enough with javascript?
 
@@ -303,6 +304,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * option `show_media_names_below_thumbs_in_albums` changed to `show_media_names_below_thumbs`
 * new option `show_album_names_below_thumbs`: decides whether to show the album name in album thumbnails
 * new option `show_media_count`: decides whether to show the media count in album thumbnail and title
+* cropping to square takes into account faces if opencv and python-opencv are installed
 
 ### version 3.2 (January 7, 2018)
 
