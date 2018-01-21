@@ -197,8 +197,8 @@ def checksum(path):
 	block_size = 65536
 	hasher = hashlib.md5()
 	with open(path, 'rb') as afile:
-	    buf = afile.read(block_size)
-	    while len(buf) > 0:
-	        hasher.update(buf)
-	        buf = afile.read(block_size)
+		buf = afile.read(block_size)
+		while len(buf) > 0:
+			hasher.update(buf)
+			buf = afile.read(block_size)
 	return hasher.hexdigest()
