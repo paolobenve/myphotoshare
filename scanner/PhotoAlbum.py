@@ -12,7 +12,6 @@ import os
 import os.path
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
-from multiprocessing import Pool
 import gc
 import tempfile
 from VideoToolWrapper import *
