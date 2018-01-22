@@ -25,14 +25,26 @@ import numpy as np
 cv2_installed = True
 try:
 	import cv2
+
 	message("importer", "opencv library available, using it!", 3)
-	face_cascade = cv2.CascadeClassifier(find('haarcascade_frontalface_default.xml'))
+	next_level()
+	face_config_file = "haarcascade_frontalface_default.xml"
+	message("looking for file...", face_config_file, 5)
+	face_config = find('haarcascade_frontalface_default.xml')
+	face_cascade = cv2.CascadeClassifier()
+	next_level()
+	message("found and initialized", face_config_file, 5)
+	back_level()
+	eye_config_file = "haarcascade_eye.xml"
+	message("looking for file...", eye_config_file, 5)
 	eye_cascade = cv2.CascadeClassifier(find('haarcascade_eye.xml'))
-	print ("opencv library available, using it!")
+	next_level()
+	message("found and initialized", eye_config_file, 5)
+	back_level()
+	back_level()
 except ImportError:
 	cv2_installed = False
 	message("importer", "No opencv library available, not using it", 2)
-	print("No opencv library available, not using it")
 
 
 class Album(object):

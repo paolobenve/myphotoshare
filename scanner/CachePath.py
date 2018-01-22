@@ -136,12 +136,9 @@ def remove_album_path(path):
 
 # find a file in file system, from https://stackoverflow.com/questions/1724693/find-a-file-in-python
 def find(name):
-	message("finding file in file system...", name, 4)
 	for root, dirs, files in os.walk('/'):
 		if name in files:
 			return os.path.join(root, name)
-	message("file found in file system", name, 4)
-
 
 
 def remove_folders_marker(path):
