@@ -31,16 +31,17 @@ try:
 	next_level()
 	face_config_file = "haarcascade_frontalface_default.xml"
 	message("looking for file...", face_config_file, 5)
-	face_config = find('haarcascade_frontalface_default.xml')
-	face_cascade = cv2.CascadeClassifier()
+	face_config_file_with_path = find('haarcascade_frontalface_default.xml')
+	face_cascade = cv2.CascadeClassifier(face_config_file_with_path)
 	next_level()
-	message("found and initialized", face_config_file, 5)
+	message("found and initialized", face_config_file_with_path, 5)
 	back_level()
 	eye_config_file = "haarcascade_eye.xml"
 	message("looking for file...", eye_config_file, 5)
-	eye_cascade = cv2.CascadeClassifier(find('haarcascade_eye.xml'))
+	eye_config_file_with_path = find('haarcascade_eye.xml')
+	eye_cascade = cv2.CascadeClassifier(eye_config_file_with_path)
 	next_level()
-	message("found and initialized", eye_config_file, 5)
+	message("found and initialized", eye_config_file_with_path, 5)
 	back_level()
 	back_level()
 except ImportError:
