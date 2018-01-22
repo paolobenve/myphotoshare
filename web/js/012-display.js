@@ -1711,11 +1711,12 @@ $(document).ready(function() {
 					}
 				})
 				.on('click', function(ev) {
-					if(ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey && currentMedia.mediaType == "photo") {
+					if (ev.which == 1 && ! ev.altKey && (! ev.shiftKey && ! ev.ctrlKey && currentMedia.mediaType == "photo" || (ev.shiftKey || ev.ctrlKey) && currentMedia.mediaType == "video")) {
 						swipeLeft(nextLink);
 						return false;
-					} else
+					} else {
 						return true;
+					}
 				})
 				.on('mousewheel', swipeOnWheel);
 				//~ .on('contextmenu click mousewheel', function(ev, delta) {
