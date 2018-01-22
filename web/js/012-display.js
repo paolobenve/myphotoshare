@@ -1711,7 +1711,7 @@ $(document).ready(function() {
 					}
 				})
 				.on('click', function(ev) {
-					if(ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+					if(ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey && currentMedia.mediaType == "photo") {
 						swipeLeft(nextLink);
 						return false;
 					} else
