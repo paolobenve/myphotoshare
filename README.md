@@ -308,6 +308,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * new option `show_media_count`: decides whether to show the media count in album thumbnail and title
 * cropping to square takes now into account faces if opencv and python-opencv are installed
 * scanner code for producing the thumbnails was optimized
+* default options give now a light UI
 
 ### version 3.2 (January 7, 2018)
 
