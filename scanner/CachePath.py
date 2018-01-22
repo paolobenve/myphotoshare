@@ -22,7 +22,7 @@ def message(category, text, verbose = 0):
 	try:
 		max_verbose = Options.config['max_verbose']
 	except KeyError:
-		max_verbose = 0
+		max_verbose = 10
 	except AttributeError:
 		max_verbose = 0
 	if (verbose <= max_verbose):
