@@ -676,54 +676,35 @@ class Media(object):
 			veredict = (thumb_size < max_image_size)
 		return veredict
 
+	def generate_all_thumbnails(self, reduced_size_images, photo_path, thumbs_path):
+		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
+
+		for thumb_type, thumb_sizes in list(_thumbnail_types_and_sizes.items()):
+			thumbs_and_reduced_size_images = reduced_size_images[:]
+			for (thumb_size, mobile_bigger) in thumb_sizes:
+				index = -1
+				last_index = len(thumbs_and_reduced_size_images) -1
+				for thumb_or_reduced_size_image in thumbs_and_reduced_size_images:
+					index += 1
+					if index == last_index or self.thumbnail_size_is_smaller_than_size_of_(thumb_or_reduced_size_image, thumb_size, thumb_type):
+						thumb = self.reduce_size_or_make_thumbnail(thumb_or_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
+						thumbs_and_reduced_size_images = [thumb] + thumbs_and_reduced_size_images
+						break
+
+
+
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		# this function calls self.reduce_size_or_make_thumbnail() with the proper image self.reduce_size_or_make_thumbnail() needs
 		# so that the thumbnail doesn't get blurred
-		thumb = image
+		reduced_size_image = image
 		image_width = image.size[0]
 		image_height = image.size[1]
+		reduced_size_images = []
 		for thumb_size in Options.config['reduced_sizes']:
-			thumb = self.reduce_size_or_make_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
-		smallest_reduced_size_image = thumb
+			reduced_size_image = self.reduce_size_or_make_thumbnail(reduced_size_image, photo_path, thumbs_path, thumb_size)
+			reduced_size_images = [reduced_size_image] + reduced_size_images
 
-		# album size: square thumbnail are generated anyway, because they are needed by the code that generates composite images for sharing albums
-		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-
-		# if requested, generate the bigger thumbnail for mobile
-		if Options.config['mobile_thumbnail_factor'] > 1:
-			mobile_thumb_size = int(round(thumb_size * Options.config['mobile_thumbnail_factor']))
-			if self.thumbnail_size_is_smaller_than_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
-				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, True)
-			else:
-				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type, True)
-
-		for i in range(2):
-			if thumb_type == "fit" or self.thumbnail_size_is_smaller_than_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
-				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
-			else:
-				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
-			if i == 0:
-				if thumb_type == "square":
-					# no need for a second iteration
-					break
-				elif thumb_type == "fit":
-					thumb_type = "square"
-
-		# media size
-		# at this point thumb is always square
-		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-
-		# if requested, generate the bigger thumbnail for mobile
-		if Options.config['mobile_thumbnail_factor'] > 1:
-			if self.thumbnail_size_is_smaller_than_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
-				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, True)
-			else:
-				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type, True)
-
-		if self.thumbnail_size_is_smaller_than_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
-			thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
-		else:
-			thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
+		self.generate_all_thumbnails(reduced_size_images, photo_path, thumbs_path)
 
 	def is_thumbnail(self, thumb_size, thumb_type):
 		_is_thumbnail = (thumb_type != "")
@@ -1360,51 +1341,25 @@ class Media(object):
 				caches.append(
 					os.path.join(
 						self.album.subdir,
-						album_prefix + photo_cache_name(self,thumb_size)
+						album_prefix + photo_cache_name(self, thumb_size)
 					)
 				)
-		# album thumbnail path
-		mobile_bigger = False
-		for n in range(2):
-			caches.append(
-				os.path.join(
-					self.album.subdir,
-					album_prefix + photo_cache_name(
-						self,
-						Options.config['album_thumb_size'],
-						Options.config['album_thumb_type'],
-						mobile_bigger
-					)
-				)
-			)
-			if Options.config['album_thumb_type'] == "fit" and not mobile_bigger:
-				# album square thumbnail path (it's generated always)
+		# album and media thumbnail path
+		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
+		for thumb_type, thumb_sizes in list(_thumbnail_types_and_sizes.items()):
+			for (thumb_size, mobile_bigger) in thumb_sizes:
 				caches.append(
 					os.path.join(
 						self.album.subdir,
 						album_prefix + photo_cache_name(
 							self,
-							Options.config['album_thumb_size'],
-							"square",
+							thumb_size,
+							thumb_type,
 							mobile_bigger
 						)
 					)
 				)
-			# media thumbnail path
-			caches.append(
-				os.path.join(
-					self.album.subdir,
-					album_prefix + photo_cache_name(
-						self,
-						Options.config['media_thumb_size'],
-						Options.config['media_thumb_type'],
-						mobile_bigger
-					)
-				)
-			)
-			if Options.config['mobile_thumbnail_factor'] == 1:
-				break
-			mobile_bigger = True
+
 		return caches
 
 	@property
