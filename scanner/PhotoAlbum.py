@@ -5,6 +5,7 @@
 import locale
 locale.setlocale(locale.LC_ALL, '')
 from CachePath import *
+from Utilities import *
 from datetime import datetime
 from Geonames import *
 import json
@@ -12,7 +13,6 @@ import os
 import os.path
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
-import gc
 import tempfile
 from VideoToolWrapper import *
 import math
@@ -22,6 +22,7 @@ import sys
 from pprint import pprint
 import pprint
 import numpy as np
+
 cv2_installed = True
 try:
 	import cv2

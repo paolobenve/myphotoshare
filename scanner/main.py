@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from TreeWalker import TreeWalker
-from CachePath import message, report_times
+from Utilities import *
 import sys
 import Options
 import os

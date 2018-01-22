@@ -3,11 +3,11 @@
 from datetime import datetime
 import os
 import sys
+import json
 try:
 	import configparser
 except ImportError:
 	import ConfigParser as configparser
-import json
 
 config = {}
 date_time_format = "%Y-%m-%d %H:%M:%S"
@@ -38,7 +38,7 @@ json_version = 3
 show_faces = False
 
 def get_options():
-	from CachePath import message, next_level, back_level, report_times
+	from Utilities import message, next_level, back_level
 	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")
 	default_config_file = os.path.join(project_dir, "myphotoshare.conf.defaults")
 	default_config = configparser.ConfigParser()

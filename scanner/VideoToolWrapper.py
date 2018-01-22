@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from CachePath import message
 import os
 import subprocess
 
@@ -8,7 +7,7 @@ class VideoToolWrapper(object):
 	def call(self, *args):
 		path = args[-1]
 		for tool in self.wrappers:
-			try:    
+			try:
 				if self.check_output:
 					p = subprocess.check_output((tool, ) + args)
 				else:
