@@ -865,6 +865,7 @@ class Media(object):
 						try_shifting = True
 
 						# detect faces
+						message("opencv: detecting faces...", "", 4)
 						faces = face_cascade.detectMultiScale(gray_opencv_image, 1.3, 5)
 						if len(faces) and Options.show_faces:
 							img = opencv_image
@@ -882,7 +883,7 @@ class Media(object):
 						# get the position of the center of the faces
 						if len(faces):
 							next_level()
-							message("opencv", str(len(faces)) + " faces detected", 4)
+							message("faces detected", str(len(faces)) + " faces", 4)
 							(x_center, y_center) = self.face_center(faces.tolist(), actual_thumb_size)
 							next_level()
 							message("opencv", "center: " + str(x_center) + ", " + str(y_center), 4)
@@ -891,7 +892,7 @@ class Media(object):
 						else:
 							try_shifting = False
 							next_level()
-							message("opencv", "no faces detected", 4)
+							message("no faces detected", "", 4)
 							back_level()
 
 				if min(start_image_width, start_image_height) >= actual_thumb_size:
