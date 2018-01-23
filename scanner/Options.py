@@ -32,6 +32,7 @@ options_requiring_json_regeneration = ['jpeg_quality', 'geonames_language', 'uns
 # json_version = 3 since geotag managing is optional
 json_version = 3
 
+
 def get_options():
 	from CachePath import message, next_level, back_level, report_times
 	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")

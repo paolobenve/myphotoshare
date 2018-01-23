@@ -48,6 +48,7 @@ class TreeWalker:
 			back_level()
 
 		self.origin_album = Album(Options.config['album_path'])
+		self.origin_album.read_album_ini()
 		self.origin_album.cache_base = cache_base(Options.config['album_path'])
 		album_cache_base = Options.config['folders_string']
 		next_level()
@@ -478,6 +479,7 @@ class TreeWalker:
 		if not json_file_OK:
 			message("generating album...", absolute_path, 5)
 			album = Album(absolute_path)
+			album.read_album_ini()
 			next_level()
 			message("album generated", "", 5)
 			back_level()
