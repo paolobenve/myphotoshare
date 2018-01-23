@@ -1700,7 +1700,6 @@ $(document).ready(function() {
 			$("#next").show();
 			$("#prev").show();
 			$("#media-view")
-				//.css('cursor', 'ew-resize')
 				.on('contextmenu', function(ev) {
 					if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						ev.preventDefault();
@@ -1716,25 +1715,10 @@ $(document).ready(function() {
 					}
 				})
 				.on('mousewheel', swipeOnWheel);
-				//~ .on('contextmenu click mousewheel', function(ev, delta) {
-					//~ console.log(ev);
-					//~ console.log(ev.handleObj.type);
-					//~ console.log(delta);
-					//~ if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						//~ ev.preventDefault();
-						//~ swipeRight(prevLink);
-					//~ }
-					//~ if(ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						//~ swipeLeft(nextLink);
-						//~ return false;
-					//~ } else
-						//~ return true;
-					//~ swipeOnWheel(ev, delta)
-				//~ });
 				$("#media-bar").on('click', function(ev) {
-	   			ev.stopPropagation();
+					ev.stopPropagation();
 				}).on('contextmenu', function(ev) {
-	   			ev.stopPropagation();
+					ev.stopPropagation();
 				});
 			$('#next').on('click', function(ev) {
 				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
