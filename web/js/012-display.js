@@ -1153,7 +1153,6 @@ $(document).ready(function() {
 						subalbums.push(link);
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
-								var distance = 0;
 								var htmlText, height;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
@@ -1174,7 +1173,6 @@ $(document).ready(function() {
 											thumbWidth = Math.floor(correctedAlbumThumbSize * mediaWidth / mediaHeight);
 											thumbHeight = correctedAlbumThumbSize;
 										}
-										distance = (correctedAlbumThumbSize - thumbHeight) / 2;
 									}
 								} else if (Options.album_thumb_type == "square") {
 									thumbWidth = correctedAlbumThumbSize;
