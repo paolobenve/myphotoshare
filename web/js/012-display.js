@@ -1177,13 +1177,6 @@ $(document).ready(function() {
 								} else if (Options.album_thumb_type == "square") {
 									thumbWidth = correctedAlbumThumbSize;
 									thumbHeight = correctedAlbumThumbSize;
-									// if (mediaWidth < correctedAlbumThumbSize || mediaHeight < correctedAlbumThumbSize) {
-									// 	thumbWidth = mediaWidth;
-									// 	thumbHeight = mediaHeight;
-									// } else {
-									// 	thumbWidth = correctedAlbumThumbSize;
-									// 	thumbHeight = correctedAlbumThumbSize;
-									// }
 								}
 
 								if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
