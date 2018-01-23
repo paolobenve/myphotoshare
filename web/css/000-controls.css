@@ -246,6 +246,10 @@ a.title-anchor.mobile {
 	cursor: ew-resize;
 }
 
+video {
+	cursor: default;
+}
+
 #media-view.no-bottom-space {
 /*
 	bottom: 0 !important;
