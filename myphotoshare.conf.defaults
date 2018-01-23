@@ -109,7 +109,7 @@ checksum = false
 
 # The sizes for the reduced images
 # they must be reverse ordered, i.e. from biggest to smallest
-reduced_sizes = [1600, 1200, 800]
+reduced_sizes = [1200, 1000, 800]
 
 # The sizes for the thumbnails to use for albums
 album_thumb_size = 200
@@ -118,7 +118,7 @@ album_thumb_size = 200
 # permitted values:
 #    square	: photofloat's classical cropped square thumbnail
 #    fit	: rectangular thumbnail fitting in the given size
-album_thumb_type = fit
+album_thumb_type = square
 
 # The sizes for the thumbnails for images/videos
 media_thumb_size = 150
@@ -127,7 +127,7 @@ media_thumb_size = 150
 # permitted values:
 #    square		: photofloat's classical thumbnail
 #    fixed_height	: whole image, the size determines the height, the width will depend on orientation
-media_thumb_type = fixed_height
+media_thumb_type = square
 
 # on mobile screens, which have many pixels but very compressed, browsers do aggregate pixels in order to give the user a correct experience,
 # but this means that an image having 200x200 will be presented on, say, a 300x300 square, so that the user will see it blurred.
@@ -209,16 +209,16 @@ language =
 page_title = My photos
 
 # spacing between thumbnails, pixels (integer)
-thumb_spacing = 3
+thumb_spacing = 0
 
 # should be used a slide-like style?
-albums_slide_style = true
+albums_slide_style = false
 
 # will photos/videos names be shown below the thumbnail in albums?
 show_media_names_below_thumbs = false
 
 # will album names be shown below the thumbnail?
-show_album_names_below_thumbs = false
+show_album_names_below_thumbs = true
 
 # should we show the media count in the album thumbnails and in the title?
 show_album_media_count = false
@@ -243,7 +243,7 @@ background_color = #222222
 album_button_background_color = Cornsilk
 
 # the album buttons background color
-album_caption_color = black
+album_caption_color = white
 
 # The colors for the top right button which switches between folder and date view
 switch_button_background_color = black

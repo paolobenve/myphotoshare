@@ -1,6 +1,6 @@
-# myphotoshare v. 3.2
+# myphotoshare v. 3.3
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
-#### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>)
+#### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>), Pierre Métras (<p.metras@videotron.ca>)
 
 ## Description
 
@@ -10,7 +10,7 @@ Permits browsing the media by folder, date and geotags.
 
 Content (albums, media files) can be shared over some popular social plaforms.
 
-`myphotoshare` is a Jason A. Donenfeld's `photofloat` fork, enriched by Jerome Charaoui's patches permitting showing videos, and Paolo Benvenuto's following development.
+`myphotoshare` is a Jason A. Donenfeld's `photofloat` fork, enriched by Jerome Charaoui's patches permitting showing videos, Paolo Benvenuto's following development and Pierre Métras patches.
 
 [Check out a demo!](http://palmaro.qumran2.net/)
 
@@ -38,7 +38,7 @@ Content (albums, media files) can be shared over some popular social plaforms.
 * Cache folder can be managed with subdirs (useful for large repositories)
 * Albums server folder can be anywhere on the server
 * Media and folders can be sorted ascending/descending by date or by name (via a cookie)
-* Thumbnails can be square (cropped) or full-content
+* Thumbnails can be square (cropped, with optional face detection by opencv) or full-content
 * Single `index.php` file (`php` needed because crawlers and social media do not execute javascript); `php` does a bit of work:
 * - inserts link tag in <head></head> in order to let social media see the shared content
 * - applies basic options to home page
@@ -130,15 +130,16 @@ It is, essentially, a slick and fast, minimal but still well-featured photo gall
 
 Photofloat needs:
 
-* `python` 3 (running it with python2 is possible, changing the first line in scanner/main.py)
-* `python3-numpy`(python-numpy with python2)
-* `python-requests`
-* `python-pil`
+* `python3` (running it with python2 is possible, changing the first line in scanner/main.py and installing the corresponding python2 dependencies)
+* `python3-numpy`
+* `python3-requests`
+* `python3-pil`
 * `avconv` / `ffmpeg` in order to be able to manage videos.
 * a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
 * `php5-gd` in order to create albums share images
 * `curl`, used by minify script
 * `cssmin` (`https://github.com/zacharyvoase/cssmin`, debian/ubuntu packages `cssmin`) and `jsmin` (`https://github.com/tikitu/jsmin`, debian/ubuntu package `python-jsmin`), unless using external web service
+* optional: opencv, python-opencv: if found, face detection is used when cropping images to square
 
 #### Why `php`? Isn't it enough with javascript?
 
@@ -296,13 +297,18 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 
 ## Changelog
 
+### version 3.3 (January 22, 2018)
+
 * new option `get_geonames_online`, if true, get country, state, place names from geonames.org (online), otherwise get it from the files in scanner/geonames/cities1000.txt (names are in english)
-* clustering of places with too many photos is done by the k-means algorithm, better than the previous one, which remains a "legacy"
+* clustering of places with too many photos is done now by the k-means algorithm
 * added options `js_minifier` and `css_minifier` to specify what minifier to use: web services or local ones
 * removed `thumbnail_generation_mode` option: only cascade method is left, parallel and mixed methods are removed
 * option `show_media_names_below_thumbs_in_albums` changed to `show_media_names_below_thumbs`
 * new option `show_album_names_below_thumbs`: decides whether to show the album name in album thumbnails
 * new option `show_media_count`: decides whether to show the media count in album thumbnail and title
+* cropping to square takes now into account faces if opencv and python-opencv are installed
+* scanner code for producing the thumbnails was optimized
+* default options give now a light UI
 
 ### version 3.2 (January 7, 2018)
 

@@ -940,9 +940,9 @@ $(document).ready(function() {
 		}
 		$("#thumbs img").each(function() {
 			if (
-				(isFolderAlbum(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
-				isByDateAlbum(currentAlbum.cacheBase) && this.title === media.albumName ||
-				isByGpsAlbum(currentAlbum.cacheBase) && this.title === media.albumName
+				(PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
+				PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) && this.title === media.albumName ||
+				PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase) && this.title === media.albumName
 			) {
 				thumb = $(this);
 				return false;
@@ -975,7 +975,7 @@ $(document).ready(function() {
 		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
-		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 1, margin, imgTitle;
+		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 0, margin, imgTitle;
 		var tooBig = false, virtualAlbum = false;
 		var mapLinkIcon;
 
@@ -1177,13 +1177,15 @@ $(document).ready(function() {
 										distance = (correctedAlbumThumbSize - thumbHeight) / 2;
 									}
 								} else if (Options.album_thumb_type == "square") {
-									if (mediaWidth < correctedAlbumThumbSize || mediaHeight < correctedAlbumThumbSize) {
-										thumbWidth = mediaWidth;
-										thumbHeight = mediaHeight;
-									} else {
-										thumbWidth = correctedAlbumThumbSize;
-										thumbHeight = correctedAlbumThumbSize;
-									}
+									thumbWidth = correctedAlbumThumbSize;
+									thumbHeight = correctedAlbumThumbSize;
+									// if (mediaWidth < correctedAlbumThumbSize || mediaHeight < correctedAlbumThumbSize) {
+									// 	thumbWidth = mediaWidth;
+									// 	thumbHeight = mediaHeight;
+									// } else {
+									// 	thumbWidth = correctedAlbumThumbSize;
+									// 	thumbHeight = correctedAlbumThumbSize;
+									// }
 								}
 
 								if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
@@ -1709,11 +1711,12 @@ $(document).ready(function() {
 					}
 				})
 				.on('click', function(ev) {
-					if(ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+					if (ev.which == 1 && ! ev.altKey && (! ev.shiftKey && ! ev.ctrlKey && currentMedia.mediaType == "photo" || (ev.shiftKey || ev.ctrlKey) && currentMedia.mediaType == "video")) {
 						swipeLeft(nextLink);
 						return false;
-					} else
+					} else {
 						return true;
+					}
 				})
 				.on('mousewheel', swipeOnWheel);
 				//~ .on('contextmenu click mousewheel', function(ev, delta) {
@@ -1929,9 +1932,12 @@ $(document).ready(function() {
 		});
 		$("#media-name").css("color", Options.title_image_name_color);
 		$(".thumb-and-caption-container").css("margin-right", Options.thumb_spacing.toString() + "px");
+		if (Options.show_media_names_below_thumbs)
+			$(".thumb-and-caption-container").css('margin-bottom', '1em')
 
 		if (! Options.show_album_media_count)
 			$("#title-count").hide();
+
 	}
 
 	function em2px(selector, em) {

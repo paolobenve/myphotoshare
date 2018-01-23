@@ -5,6 +5,7 @@
 import locale
 locale.setlocale(locale.LC_ALL, '')
 from CachePath import *
+from Utilities import *
 from datetime import datetime
 from Geonames import *
 import json
@@ -12,8 +13,6 @@ import os
 import os.path
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
-from multiprocessing import Pool
-import gc
 import tempfile
 from VideoToolWrapper import *
 import math
@@ -26,17 +25,33 @@ try:
 	import configparser
 except ImportError:
 	import ConfigParser as configparser
+import numpy as np
 
+cv2_installed = True
+try:
+	import cv2
 
-def make_photo_thumbs(self, image, original_path, thumbs_path, thumb_size, thumb_type = ""):
-	# The pool methods use a queue.Queue to pass tasks to the worker processes.
-	# Everything that goes through the queue.Queue must be pickable, and since
-	# self.reduce_size_or_make_thumbnail is not defined at the top level, it's not pickable.
-	# This is why we have this "dummy" function, so that it's pickable.
-	try:
-		self.reduce_size_or_make_thumbnail(image, original_path, thumbs_path, thumb_size, thumb_type)
-	except KeyboardInterrupt:
-		raise
+	message("importer", "opencv library available, using it!", 3)
+	next_level()
+	face_config_file = "haarcascade_frontalface_default.xml"
+	message("looking for file...", face_config_file, 5)
+	face_config_file_with_path = find('haarcascade_frontalface_default.xml')
+	face_cascade = cv2.CascadeClassifier(face_config_file_with_path)
+	next_level()
+	message("found and initialized", face_config_file_with_path, 5)
+	back_level()
+	eye_config_file = "haarcascade_eye.xml"
+	message("looking for file...", eye_config_file, 5)
+	eye_config_file_with_path = find('haarcascade_eye.xml')
+	eye_cascade = cv2.CascadeClassifier(eye_config_file_with_path)
+	next_level()
+	message("found and initialized", eye_config_file_with_path, 5)
+	back_level()
+	back_level()
+except ImportError:
+	cv2_installed = False
+	message("importer", "No opencv library available, not using it", 2)
+
 
 class Album(object):
 	#~ def __init__(self, path, path_has_folder_marker):
@@ -172,7 +187,7 @@ class Album(object):
 	def to_json_file(self):
 		json_file_with_path = os.path.join(Options.config['cache_path'], self.json_file)
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
-			message("FATAL ERROR", json_file_with_path + " not writable, quitting")
+			message("FATAL ERROR", json_file_with_path + " not writable, quitting", 0)
 			sys.exit(-97)
 		message("sorting album...", "", 5)
 		self.sort_subalbums_and_media()
@@ -647,7 +662,7 @@ class Media(object):
 
 		self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 
-	def thumbnail_size_is_smaller_then_size_of_(self, image, thumb_size, thumb_type = ""):
+	def thumbnail_size_is_smaller_than_size_of_(self, image, thumb_size, thumb_type = ""):
 		image_width = image.size[0]
 		image_height = image.size[1]
 		max_image_size = max(image_width, image_height)
@@ -664,58 +679,93 @@ class Media(object):
 			veredict = (thumb_size < max_image_size)
 		return veredict
 
+	def generate_all_thumbnails(self, reduced_size_images, photo_path, thumbs_path):
+		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
+
+		for thumb_type, thumb_sizes in list(_thumbnail_types_and_sizes.items()):
+			thumbs_and_reduced_size_images = reduced_size_images[:]
+			for (thumb_size, mobile_bigger) in thumb_sizes:
+				index = -1
+				last_index = len(thumbs_and_reduced_size_images) -1
+				for thumb_or_reduced_size_image in thumbs_and_reduced_size_images:
+					index += 1
+					if index == last_index or self.thumbnail_size_is_smaller_than_size_of_(thumb_or_reduced_size_image, thumb_size, thumb_type):
+						thumb = self.reduce_size_or_make_thumbnail(thumb_or_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
+						thumbs_and_reduced_size_images = [thumb] + thumbs_and_reduced_size_images
+						break
+
+
+
 	def _photo_thumbnails_cascade(self, image, photo_path, thumbs_path):
 		# this function calls self.reduce_size_or_make_thumbnail() with the proper image self.reduce_size_or_make_thumbnail() needs
 		# so that the thumbnail doesn't get blurred
-		thumb = image
+		reduced_size_image = image
 		image_width = image.size[0]
 		image_height = image.size[1]
+		reduced_size_images = []
 		for thumb_size in Options.config['reduced_sizes']:
-			thumb = self.reduce_size_or_make_thumbnail(thumb, photo_path, thumbs_path, thumb_size)
-		smallest_reduced_size_image = thumb
+			reduced_size_image = self.reduce_size_or_make_thumbnail(reduced_size_image, photo_path, thumbs_path, thumb_size)
+			reduced_size_images = [reduced_size_image] + reduced_size_images
 
-		# album size: square thumbnail are generated anyway, because they are needed by the code that generates composite images for sharing albums
-		(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-
-		# if requested, generate the bigger thumbnail for mobile
-		if Options.config['mobile_thumbnail_factor'] > 1:
-			mobile_thumb_size = int(round(thumb_size * Options.config['mobile_thumbnail_factor']))
-			if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
-				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, True)
-			else:
-				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type, True)
-
-		for i in range(2):
-			if thumb_type == "fit" or self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
-				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
-			else:
-				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
-			if i == 0:
-				if thumb_type == "square":
-					# no need for a second iteration
-					break
-				elif thumb_type == "fit":
-					thumb_type = "square"
-
-		# media size
-		# at this point thumb is always square
-		(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-
-		# if requested, generate the bigger thumbnail for mobile
-		if Options.config['mobile_thumbnail_factor'] > 1:
-			if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, mobile_thumb_size, thumb_type):
-				thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, True)
-			else:
-				thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type, True)
-
-		if self.thumbnail_size_is_smaller_then_size_of_(smallest_reduced_size_image, thumb_size, thumb_type):
-			thumb = self.reduce_size_or_make_thumbnail(smallest_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type)
-		else:
-			thumb = self.reduce_size_or_make_thumbnail(image, photo_path, thumbs_path, thumb_size, thumb_type)
+		self.generate_all_thumbnails(reduced_size_images, photo_path, thumbs_path)
 
 	def is_thumbnail(self, thumb_size, thumb_type):
 		_is_thumbnail = (thumb_type != "")
 		return _is_thumbnail
+
+	def face_center(self, faces, image_size):
+		length = len(faces)
+		(x0, y0, w0, h0) = faces[0]
+		if length == 1:
+			# return the only face
+			return (int(x0 + w0 / 2), int(y0 + h0 / 2))
+		elif length == 2:
+			(x1, y1, w1, h1) = faces[1]
+			center0_x = int(x0 + w0 / 2)
+			center0_y = int(y0 + h0 / 2)
+			center1_x = int(x1 + w1 / 2)
+			center1_y = int(y1 + h1 / 2)
+			dist_x = max(x0, x1) + (w0 + w1) / 2 - min(x0, x1)
+			dist_y = max(y0, y1) + (h0 + h1) / 2 - min(y0, y1)
+			if dist_x > image_size or dist_y > image_size:
+				# the faces are too far each other, choose one: return the bigger one
+				if w1 > w0:
+					return (center1_x, center1_y)
+				else:
+					return (center0_x, center0_y)
+			else:
+				return (int((center1_x + center0_x) / 2), int((center1_y + center0_y) / 2))
+		else:
+			dist_x = max([x for (x, y, w, h) in faces]) - min([x for (x, y, w, h) in faces])
+			dist_y = max([y for (x, y, w, h) in faces]) - min([y for (x, y, w, h) in faces])
+			if dist_x < image_size and dist_y < image_size:
+				# all the faces are within the square, get the mean point
+				return (int(np.mean([x + w / 2 for (x, y, w, h) in faces])), int(np.mean([y + h / 2 for (x, y, w, h) in faces])))
+			else:
+				# remove the farther faces and then return the agerage point of the remaining group
+				distances = np.empty((length, length))
+				positions = np.empty(length, dtype=object)
+				max_sum_of_distances = 0
+				for k1, f1 in enumerate(faces):
+					(x, y, w, h) = f1
+					x_pos = x + int(w / 2)
+					y_pos = y + int(h / 2)
+					positions[k1] = np.array([x_pos, y_pos])
+					sum_of_distances = 0
+					for k2, f2 in enumerate(faces):
+						distances[k1, k2] = math.sqrt((f1[0] - f2[0]) ** 2 + (f1[1] - f2[1]) ** 2)
+						sum_of_distances += distances[k1, k2]
+					if sum_of_distances > max_sum_of_distances:
+						max_sum_of_distances = sum_of_distances
+						max_key = k1
+
+				mean_distance = np.mean(distances)
+				if max_sum_of_distances / length > 2 * mean_distance:
+					# remove the face
+					faces.pop(max_key)
+					return self.face_center(faces, image_size)
+				else:
+					return np.mean(np.asarray(positions)).tolist()
 
 	def reduce_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = "", mobile_bigger = False):
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
@@ -782,48 +832,158 @@ class Media(object):
 
 		start_image_width = start_image.size[0]
 		start_image_height = start_image.size[1]
+		must_crop = False
+		try_shifting = False
 		if thumb_type == "square":
 			# image is to be cropped: calculate the cropping values
-			if min(start_image_width, start_image_height) >= actual_thumb_size:
-				# image is bigger than the square which will result from cropping
-				if start_image_width > start_image_height:
-					left = int((start_image_width - start_image_height) / 2)
-					top = 0
-					right = start_image_width - left
-					bottom = start_image_height
-				else:
-					left = 0
-					top = int((start_image_height - start_image_width) / 2)
-					right = start_image_width
-					bottom = start_image_height - top
-				thumbnail_width = actual_thumb_size
-				thumbnail_height = actual_thumb_size
+			# if opencv is installed, crop it, taking into account the faces
+			if (
+				start_image_width != start_image_height and
+			 	min(start_image_width, start_image_height) >= actual_thumb_size or max(start_image_width, start_image_height) >= actual_thumb_size
+			):
 				must_crop = True
-			elif max(start_image_width, start_image_height) >= actual_thumb_size:
-				# image smallest size is smaller than the square which would result from cropping
-				# cropped image will not be square
-				if start_image_width > start_image_height:
-					left = int((start_image_width - actual_thumb_size) / 2)
-					top = 0
-					right = start_image_width - left
-					bottom = start_image_height
+				if cv2_installed:
+					# opencv!
+					# see http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html#haar-cascade-detection-in-opencv
+					try:
+						opencv_image = np.array(start_image.convert('RGB'))[:, :, ::-1].copy()
+						gray_opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2GRAY)
+					except cv2.error:
+						# this happens with gif... weird
+						pass
+					else:
+						try_shifting = True
+
+						# detect faces
+						message("opencv: detecting faces...", "", 4)
+						faces = face_cascade.detectMultiScale(gray_opencv_image, 1.3, 5)
+						if len(faces) and Options.show_faces:
+							img = opencv_image
+							for (x,y,w,h) in faces:
+								cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+								roi_gray = gray_opencv_image[y:y+h, x:x+w]
+								roi_color = img[y:y+h, x:x+w]
+								eyes = eye_cascade.detectMultiScale(roi_gray)
+								for (ex,ey,ew,eh) in eyes:
+									cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+							cv2.imshow('img',img)
+							cv2.waitKey(0)
+							cv2.destroyAllWindows()
+
+						# get the position of the center of the faces
+						if len(faces):
+							next_level()
+							message("faces detected", str(len(faces)) + " faces", 4)
+							(x_center, y_center) = self.face_center(faces.tolist(), actual_thumb_size)
+							next_level()
+							message("opencv", "center: " + str(x_center) + ", " + str(y_center), 4)
+							back_level()
+							back_level()
+						else:
+							try_shifting = False
+							next_level()
+							message("no faces detected", "", 4)
+							back_level()
+
+				if min(start_image_width, start_image_height) >= actual_thumb_size:
+					# image is bigger than the square which will result from cropping
+					if start_image_width > start_image_height:
+						# wide image
+						top = 0
+						bottom = start_image_height
+						left = int((start_image_width - start_image_height) / 2)
+						right = start_image_width - left
+						if cv2_installed and try_shifting:
+							# maybe the position of the square could be modified so that it includes more faces
+							# center on the faces
+							shift = int(x_center - start_image_width / 2)
+							message("cropping for square", "shifting horizontally by " + str(shift) + " px", 4)
+							left += shift
+							if left < 0:
+								left = 0
+								right = start_image_height
+							else:
+								right += shift
+								if right > start_image_width:
+									right = start_image_width
+									left = start_image_width - start_image_height
+					else:
+						# tall image
+						left = 0
+						right = start_image_width
+						top = int((start_image_height - start_image_width) / 2)
+						bottom = start_image_height - top
+						if cv2_installed and try_shifting:
+							# maybe the position of the square could be modified so that it includes more faces
+							# center on the faces
+							shift = int(y_center - start_image_height / 2)
+							message("cropping for square", "shifting vertically by " + str(shift) + " px", 4)
+							top += shift
+							if top < 0:
+								top = 0
+								bottom = start_image_width
+							else:
+								bottom += shift
+								if bottom > start_image_height:
+									bottom = start_image_height
+									top = start_image_height - start_image_width
 					thumbnail_width = actual_thumb_size
-					thumbnail_height = start_image_height
-				else:
-					left = 0
-					top = int((start_image_height - actual_thumb_size) / 2)
-					right = start_image_width
-					bottom = start_image_height - top
-					thumbnail_width = start_image_width
 					thumbnail_height = actual_thumb_size
-				must_crop = True
+
+				elif max(start_image_width, start_image_height) >= actual_thumb_size:
+					# image smallest size is smaller than the square which would result from cropping
+					# cropped image will not be square
+					if start_image_width > start_image_height:
+						# wide image
+						top = 0
+						bottom = start_image_height
+						left = int((start_image_width - actual_thumb_size) / 2)
+						right = left + actual_thumb_size
+						if cv2_installed and try_shifting:
+							# maybe the position of the crop could be modified so that it includes more faces
+							# center on the faces
+							shift = int(x_center - start_image_width / 2)
+							message("cropping wide image", "shifting horizontally by " + str(shift) + " px", 4)
+							left += shift
+							if left < 0:
+								left = 0
+								right = actual_thumb_size
+							else:
+								right += shift
+								if right > start_image_width:
+									right = start_image_width
+									left = right - actual_thumb_size
+						thumbnail_width = actual_thumb_size
+						thumbnail_height = start_image_height
+					else:
+						# tall image
+						left = 0
+						right = start_image_width
+						top = int((start_image_height - actual_thumb_size) / 2)
+						bottom = top + actual_thumb_size
+						if cv2_installed and try_shifting:
+							# maybe the position of the crop could be modified so that it includes more faces
+							# center on the faces
+							shift = int(y_center - start_image_height / 2)
+							message("cropping tall image", "shifting vertically by " + str(shift) + " px", 4)
+							top += shift
+							if top < 0:
+								top = 0
+								bottom = actual_thumb_size
+							else:
+								bottom += shift
+								if bottom > start_image_height:
+									bottom = start_image_height
+									top = bottom - actual_thumb_size
+						thumbnail_width = start_image_width
+						thumbnail_height = actual_thumb_size
 			else:
-				# image is smaller than the square thumbnail, don't crop it
+				# image is square, or is smaller than the square thumbnail, don't crop it
 				thumbnail_width = start_image_width
 				thumbnail_height = start_image_height
-				must_crop = False
+
+
 		else:
-			must_crop = False
 			if (
 				original_thumb_size == media_thumb_size and
 				thumb_type == "fixed_height" and
@@ -1028,21 +1188,8 @@ class Media(object):
 			elif self._attributes["metadata"]["rotate"] == "270":
 				mirror = image.transpose(Image.ROTATE_90)
 
-		mobile_bigger = False
-		for n in range(2):
-			(thumb_size, thumb_type) = (Options.config['album_thumb_size'], Options.config['album_thumb_type'])
-			self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
-			if thumb_type == "fit" and not mobile_bigger:
-				# square thumbnail is needed too for sharing albums
-				thumb_type = "square"
-				self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
-
-			(thumb_size, thumb_type) = (Options.config['media_thumb_size'], Options.config['media_thumb_type'])
-			self.reduce_size_or_make_thumbnail(mirror, original_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
-
-			if Options.config['mobile_thumbnail_factor'] == 1:
-				break
-			mobile_bigger = True
+		# generate the thumbnails
+		self.generate_all_thumbnails([mirror], original_path, thumbs_path)
 
 		try:
 			os.unlink(tfn)
@@ -1193,51 +1340,25 @@ class Media(object):
 				caches.append(
 					os.path.join(
 						self.album.subdir,
-						album_prefix + photo_cache_name(self,thumb_size)
+						album_prefix + photo_cache_name(self, thumb_size)
 					)
 				)
-		# album thumbnail path
-		mobile_bigger = False
-		for n in range(2):
-			caches.append(
-				os.path.join(
-					self.album.subdir,
-					album_prefix + photo_cache_name(
-						self,
-						Options.config['album_thumb_size'],
-						Options.config['album_thumb_type'],
-						mobile_bigger
-					)
-				)
-			)
-			if Options.config['album_thumb_type'] == "fit" and not mobile_bigger:
-				# album square thumbnail path (it's generated always)
+		# album and media thumbnail path
+		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
+		for thumb_type, thumb_sizes in list(_thumbnail_types_and_sizes.items()):
+			for (thumb_size, mobile_bigger) in thumb_sizes:
 				caches.append(
 					os.path.join(
 						self.album.subdir,
 						album_prefix + photo_cache_name(
 							self,
-							Options.config['album_thumb_size'],
-							"square",
+							thumb_size,
+							thumb_type,
 							mobile_bigger
 						)
 					)
 				)
-			# media thumbnail path
-			caches.append(
-				os.path.join(
-					self.album.subdir,
-					album_prefix + photo_cache_name(
-						self,
-						Options.config['media_thumb_size'],
-						Options.config['media_thumb_type'],
-						mobile_bigger
-					)
-				)
-			)
-			if Options.config['mobile_thumbnail_factor'] == 1:
-				break
-			mobile_bigger = True
+
 		return caches
 
 	@property
@@ -1455,9 +1576,15 @@ def _set_metadata_from_album_ini(name, attributes, album_ini):
 
 	# Date
 	if album_ini.has_option(name, "date"):
-		attributes["metadata"]["dateTime"] = album_ini.get(name, "date")
+		try:
+			attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.get(name, "date"), "%Y-%m-%d")
+		except ValueError:
+			message("ERROR", "Incorrect date in [" + name + "] in 'album.ini'", 1)
 	elif "date" in album_ini.defaults():
-		attributes["metadata"]["dateTime"] = album_ini.defaults()["date"]
+		try:
+			attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.defaults()["date"], "%Y-%m-%d")
+		except ValueError:
+			message("ERROR", "Incorrect date in [DEFAULT] in 'album.ini'", 1)
 
 	# Latitude and longitude
 	gps_latitude = None
@@ -1485,7 +1612,7 @@ def _set_metadata_from_album_ini(name, attributes, album_ini):
 
 	# Tags
 	if album_ini.has_option(name, "tags"):
-		attributes["metadata"]["tags"] = album_ini.get(name, "tags")
+		attributes["metadata"]["tags"] = album_ini.get(name, "tags").split(",")
 	elif "tags" in album_ini.defaults():
 		attributes["metadata"]["latitude"] = album_ini.defaults()["tags"].split(",")
 	back_level()

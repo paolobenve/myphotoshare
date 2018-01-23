@@ -5,6 +5,7 @@ import os.path
 import sys
 from datetime import datetime
 from CachePath import *
+from Utilities import *
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from Geonames import *
 import json
@@ -784,7 +785,7 @@ class TreeWalker:
 		while True:
 			if i >= good_media_number:
 				break
-			if num_random_thumbnails == 1:
+			if len(album.media) and num_random_thumbnails == 1:
 				random_media = album.media[0]
 			else:
 				while True:
@@ -807,7 +808,7 @@ class TreeWalker:
 				if i == num_random_thumbnails:
 					break
 			else:
-				message("unexistent thumbnail " + thumbnail + ", i=" + i, "good=", good_media_number, 5)
+				message("unexistent thumbnail", thumbnail + " - i=" + str(i) + ", good=" + str(good_media_number), 5)
 				bad_list.append(thumbnail)
 				good_media_number -= 1
 

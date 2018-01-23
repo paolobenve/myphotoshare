@@ -3,11 +3,11 @@
 from datetime import datetime
 import os
 import sys
+import json
 try:
 	import configparser
 except ImportError:
 	import ConfigParser as configparser
-import json
 
 config = {}
 date_time_format = "%Y-%m-%d %H:%M:%S"
@@ -32,9 +32,13 @@ options_requiring_json_regeneration = ['jpeg_quality', 'geonames_language', 'uns
 # json_version = 3 since geotag managing is optional
 json_version = 3
 
+# This is a debug option: it lets the scanner show the faces detected
+# obviously it only make sense when the scanner is run interactively, because the user must close every image with a keystroke
+# I'm getting it working if running in pyCharm, it stops with a segfault if run from terminal. Why????
+show_faces = False
 
 def get_options():
-	from CachePath import message, next_level, back_level, report_times
+	from Utilities import message, next_level, back_level
 	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")
 	default_config_file = os.path.join(project_dir, "myphotoshare.conf.defaults")
 	default_config = configparser.ConfigParser()
@@ -300,5 +304,5 @@ def get_options():
 				break
 		except KeyError:
 			config['recreate_json_files'] = True
-			message("option '" + option + "' wasn't set when previous scanner run, forcing recreation of json files", "", 3)
+			message("option '" + option + "' wasn't set on previous scanner run, forcing recreation of json files", "", 3)
 			break
