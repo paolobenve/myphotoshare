@@ -25,6 +25,7 @@ try:
 	import configparser
 except ImportError:
 	import ConfigParser as configparser
+from configparser import NoOptionError
 import numpy as np
 
 cv2_installed = True
@@ -429,6 +430,9 @@ class Media(object):
 					#  'place_name': the nearby place name
 					#  'place_code': the nearby place geonames id
 					#  'distance': the distance between given coordinates and nearby place geonames coordinates
+
+					# Overwrite with album.ini values
+					_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 					back_level()
 			else:
 				# try with video detection
@@ -437,6 +441,9 @@ class Media(object):
 					self._video_transcode(thumbs_path, media_path)
 					if self.is_valid:
 						self._video_thumbnails(thumbs_path, media_path)
+
+						# Overwrite with album.ini values
+						_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 				else:
 					next_level()
 					message("error transcodind, not a video?", media_path, 5)
@@ -1563,23 +1570,31 @@ def _set_metadata_from_album_ini(name, attributes, album_ini):
 	message("initialize album.ini metadata values", "", 5)
 
 	# Title
-	if album_ini.has_option(name, "title"):
-		attributes["metadata"]["title"] = album_ini.get(name, "title")
+	if album_ini.has_section(name):
+		try:
+			attributes["metadata"]["title"] = album_ini.get(name, "title")
+		except NoOptionError:
+			pass
 	elif "title" in album_ini.defaults():
 		attributes["metadata"]["title"] = album_ini.defaults()["title"]
 
 	# Description
-	if album_ini.has_option(name, "description"):
-		attributes["metadata"]["description"] = album_ini.get(name, "description")
+	if album_ini.has_section(name):
+		try:
+			attributes["metadata"]["description"] = album_ini.get(name, "description")
+		except NoOptionError:
+			pass
 	elif "description" in album_ini.defaults():
 		attributes["metadata"]["description"] = album_ini.defaults()["description"]
 
 	# Date
-	if album_ini.has_option(name, "date"):
+	if album_ini.has_section(name):
 		try:
 			attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.get(name, "date"), "%Y-%m-%d")
 		except ValueError:
 			message("ERROR", "Incorrect date in [" + name + "] in 'album.ini'", 1)
+		except NoOptionError:
+			pass
 	elif "date" in album_ini.defaults():
 		try:
 			attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.defaults()["date"], "%Y-%m-%d")
@@ -1591,16 +1606,32 @@ def _set_metadata_from_album_ini(name, attributes, album_ini):
 	gps_latitude_ref = None
 	gps_longitude = None
 	gps_longitude_ref = None
-	if album_ini.has_option(name, "latitude") or "latitude" in album_ini.defaults():
+	if album_ini.has_section(name):
 		try:
 			gps_latitude = _create_GPS_struct(abs(album_ini.getfloat(name, "latitude")))
 			gps_latitude_ref = "N" if album_ini.getfloat(name, "latitude") > 0.0 else "S"
 		except ValueError:
 			message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
-	if album_ini.has_option(name, "longitude") or "longitude" in album_ini.defaults():
+		except NoOptionError:
+			pass
+	elif "latitude" in album_ini.defaults():
+		try:
+			gps_latitude = _create_GPS_struct(abs(float(album_ini.defaults()["latitude"])))
+			gps_latitude_ref = "N" if float(album_ini.defaults()["latitude"]) > 0.0 else "S"
+		except ValueError:
+			message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
+	if album_ini.has_section(name):
 		try:
 			gps_longitude = _create_GPS_struct(abs(album_ini.getfloat(name, "longitude")))
 			gps_longitude_ref = "E" if album_ini.getfloat(name, "longitude") > 0.0 else "W"
+		except ValueError:
+			message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
+		except NoOptionError:
+			pass
+	elif "longitude" in album_ini.defaults():
+		try:
+			gps_longitude = _create_GPS_struct(abs(float(album_ini.defaults()["longitude"])))
+			gps_longitude_ref = "E" if float(album_ini.defaults()["longitude"]) > 0.0 else "W"
 		except ValueError:
 			message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
 
@@ -1611,11 +1642,38 @@ def _set_metadata_from_album_ini(name, attributes, album_ini):
 		attributes["metadata"]["longitudeMS"] = _convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 
 	# Tags
-	if album_ini.has_option(name, "tags"):
-		attributes["metadata"]["tags"] = album_ini.get(name, "tags").split(",")
+	if album_ini.has_section(name):
+		try:
+			attributes["metadata"]["tags"] = album_ini.get(name, "tags").split(",")
+		except NoOptionError:
+			message("******** ERROR No Tags ************", name, 1)
+			pass
 	elif "tags" in album_ini.defaults():
 		attributes["metadata"]["latitude"] = album_ini.defaults()["tags"].split(",")
+
 	back_level()
+
+
+def _set_geoname_from_album_ini(name, attributes, album_ini):
+	"""Set the 'attributes' dictionnary for album or media named 'name'
+	with the geoname values from the ConfigParser 'album_ini'.
+
+	The geoname values that can be set from album.ini are:
+		* place_name: The name of the nearest place (town or city) calculated
+		from latitude/longitude getotag.
+
+	The geonames values must be overwrittent *after* the 'metadata' values
+	because the geonames are retrieved from _attributes['metadata']['latitude'] and
+	_attributes['metadata']['longitude'].
+	"""
+	# Place_name
+	if album_ini.has_section(name):
+		try:
+			attributes["geoname"]["place_name"] = album_ini.get(name, "place_name")
+		except NoOptionError:
+			pass
+	elif "place_name" in album_ini.defaults():
+		attributes["geoname"]["place_name"] = album_ini.defaults()["place_name"]
 
 
 def _create_GPS_struct(value):
