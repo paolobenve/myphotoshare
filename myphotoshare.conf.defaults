@@ -129,6 +129,9 @@ media_thumb_size = 150
 #    fixed_height	: whole image, the size determines the height, the width will depend on orientation
 media_thumb_type = square
 
+# what color will be used for crops smaller that canonical size?
+small_square_crops_background_color = gray
+
 # on mobile screens, which have many pixels but very compressed, browsers do aggregate pixels in order to give the user a correct experience,
 # but this means that an image having 200x200 will be presented on, say, a 300x300 square, so that the user will see it blurred.
 # In order to see it using every real pixel, a bigger thumbnail for albums and media can be generated, using a multiplying factor specified in this option.

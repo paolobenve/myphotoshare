@@ -1062,6 +1062,18 @@ class Media(object):
 				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
 			back_level()
 
+		# if the crop results smaller than the required size, extend it with a background
+		start_image_copy_filled = start_image_copy
+		if thumb_type == "square" and min(start_image_copy.size[0], start_image_copy.size[1]) < actual_thumb_size:
+			# it's smaller than the square we need: fill it
+			message("small crop: filling...", "background color: " + Options.config['small_square_crops_background_color'], 5)
+			newImage = Image.new('RGBA', (actual_thumb_size, actual_thumb_size), Options.config['small_square_crops_background_color'])
+			newImage.paste(start_image_copy, (int((actual_thumb_size - start_image_copy.size[0]) / 2), int((actual_thumb_size - start_image_copy.size[1]) / 2)))
+			start_image_copy_filled = newImage
+			next_level()
+			message("filled", "", 5)
+			back_level()
+
 		# the subdir hadn't been created when creating the album in order to avoid creation of empty directories
 		if not os.path.exists(thumbs_path_with_subdir):
 			message("creating unexistent subdir", "", 5)
@@ -1076,17 +1088,17 @@ class Media(object):
 
 		if self._attributes["mediaType"] == "video":
 			message("adding video transparency...", "", 5)
-			start_image_copy_for_saving = start_image_copy.copy()
+			start_image_copy_for_saving = start_image_copy_filled.copy()
 			transparency_file = os.path.join(os.path.dirname(__file__), "../web/img/play_button_100_62.png")
 			video_transparency = Image.open(transparency_file)
-			x = int((start_image_copy.size[0] - video_transparency.size[0]) / 2)
-			y = int((start_image_copy.size[1] - video_transparency.size[1]) / 2)
+			x = int((start_image_copy_filled.size[0] - video_transparency.size[0]) / 2)
+			y = int((start_image_copy_filled.size[1] - video_transparency.size[1]) / 2)
 			start_image_copy_for_saving.paste(video_transparency, (x, y), video_transparency)
 			next_level()
 			message("video transparency added", "", 4)
 			back_level()
 		else:
-			start_image_copy_for_saving = start_image_copy
+			start_image_copy_for_saving = start_image_copy_filled
 
 		message("saving...", info_string, 5)
 		try:
