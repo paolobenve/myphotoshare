@@ -141,24 +141,35 @@
 		</div>
 	</div>
 	<div id="title-container">
+
+
 		<div id="buttons-container">
-			<span id="day-gps-folders-view-container">
-				<span id="folders-view-container">
-					<a id="folders-view-link" href="javascript:void(0)">
-						<span id="folders-view"></span>
-					</a>
-				</span>
-				<span id="by-date-view-container">
-					<a id="by-date-view-link" href="javascript:void(0)">
-						<span id="by-date-view"></span>
-					</a>
-				</span>
-				<span id="by-gps-view-container">
-					<a id="by-gps-view-link" href="javascript:void(0)">
-						<span id="by-gps-view"></span>
-					</a>
-				</span>
-			</span>
+			<ul id="right-menu">
+				<li id="menu-line">
+					<a id="menu-icon" href="javascript:void(0);"> ☰ </a>
+				</li>
+				<li>&nbsp;
+				</li>
+				<li>
+					<span id="day-gps-folders-view-container">
+						<span id="folders-view-container">
+							<a id="folders-view-link" href="javascript:void(0)">
+								<span id="folders-view"></span>
+							</a>
+						</span>
+						<span id="by-date-view-container">
+							<a id="by-date-view-link" href="javascript:void(0)">
+								<span id="by-date-view"></span>
+							</a>
+						</span>
+						<span id="by-gps-view-container">
+							<a id="by-gps-view-link" href="javascript:void(0)">
+								<span id="by-gps-view"></span>
+							</a>
+						</span>
+					</span>
+				</li>
+			</ul>
 		</div>
 		<div id="title">
 			<span id="title-string"></span>
