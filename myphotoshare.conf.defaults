@@ -130,6 +130,7 @@ media_thumb_size = 150
 media_thumb_type = square
 
 # what color will be used for crops smaller that canonical size?
+# if you do not want to see the border, set this option to the same color as background_color' one
 small_square_crops_background_color = gray
 
 # on mobile screens, which have many pixels but very compressed, browsers do aggregate pixels in order to give the user a correct experience,
