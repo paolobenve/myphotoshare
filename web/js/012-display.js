@@ -1026,13 +1026,13 @@ $(document).ready(function() {
 						}
 						calculatedWidth = thumbWidth;
 					} else if (Options.media_thumb_type == "square") {
-						if (Math.max(width, height) < Options.media_thumb_size) {
-							thumbHeight = height;
-							thumbWidth = width;
-						} else {
-							thumbHeight = thumbnailSize;
-							thumbWidth = thumbnailSize;
-						}
+						// if (Math.max(width, height) < Options.media_thumb_size) {
+						// 	thumbHeight = height;
+						// 	thumbWidth = width;
+						// } else {
+						thumbHeight = thumbnailSize;
+						thumbWidth = thumbnailSize;
+						// }
 						calculatedWidth = Options.media_thumb_size;
 					}
 					if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) || PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase))
@@ -1177,12 +1177,6 @@ $(document).ready(function() {
 								} else if (Options.album_thumb_type == "square") {
 									thumbWidth = correctedAlbumThumbSize;
 									thumbHeight = correctedAlbumThumbSize;
-									if (mediaWidth < correctedAlbumThumbSize) {
-										thumbWidth = mediaWidth;
-									}
-									if (mediaHeight < correctedAlbumThumbSize) {
-										thumbHeight = mediaHeight;
-									}
 								}
 
 								if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {

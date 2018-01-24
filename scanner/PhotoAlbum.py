@@ -849,7 +849,7 @@ class Media(object):
 			# if opencv is installed, crop it, taking into account the faces
 			if (
 				start_image_width != start_image_height and
-			 	min(start_image_width, start_image_height) >= actual_thumb_size or max(start_image_width, start_image_height) >= actual_thumb_size
+				(min(start_image_width, start_image_height) >= actual_thumb_size or max(start_image_width, start_image_height) >= actual_thumb_size)
 			):
 				must_crop = True
 				if cv2_installed:
@@ -939,7 +939,6 @@ class Media(object):
 									top = start_image_height - start_image_width
 					thumbnail_width = actual_thumb_size
 					thumbnail_height = actual_thumb_size
-
 				elif max(start_image_width, start_image_height) >= actual_thumb_size:
 					# image smallest size is smaller than the square which would result from cropping
 					# cropped image will not be square
@@ -991,8 +990,6 @@ class Media(object):
 				# image is square, or is smaller than the square thumbnail, don't crop it
 				thumbnail_width = start_image_width
 				thumbnail_height = start_image_height
-
-
 		else:
 			if (
 				original_thumb_size == media_thumb_size and
@@ -1012,18 +1009,6 @@ class Media(object):
 
 		# now thumbnail_width and thumbnail_height are the values the thumbnail will get,
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
-
-		must_resize = True
-		if max(start_image_width, start_image_height) <= actual_thumb_size:
-			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
-			# simply copy the start image to the thumbnail
-			must_resize = False
-			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
-				message("small image, no reduction", info_string, 4)
-			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
-				message("small image, no thumbing for album", info_string, 4)
-			else:
-				message("small image, no thumbing for media", info_string, 4)
 
 		try:
 			message("making copy...", "", 5)
@@ -1050,7 +1035,16 @@ class Media(object):
 			message("cropped (" + str(original_thumb_size) + ")", "", 5)
 			back_level()
 
-		if must_resize:
+		if max(start_image_copy.size[0], start_image_copy.size[1]) <= actual_thumb_size:
+			# no resize
+			# resizing to thumbnail size an image smaller than the thumbnail we must produce would return a blurred image
+			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
+				message("small image, no reduction", info_string, 4)
+			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
+				message("small image, no thumbing for album", info_string, 4)
+			else:
+				message("small image, no thumbing for media", info_string, 4)
+		else:
 			# resizing
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reducing size...", info_string, 5)
