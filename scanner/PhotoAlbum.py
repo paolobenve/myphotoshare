@@ -442,8 +442,14 @@ class Media(object):
 					if self.is_valid:
 						self._video_thumbnails(thumbs_path, media_path)
 
-						# Overwrite with album.ini values
-						_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+						if self.has_gps_data:
+							next_level()
+							message("looking for geonames...", media_path, 5)
+							geoname = Geonames()
+							self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
+							# Overwrite with album.ini values
+							_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+							back_level()
 				else:
 					next_level()
 					message("error transcodind, not a video?", media_path, 5)
@@ -1383,7 +1389,7 @@ class Media(object):
 
 	@property
 	def has_gps_data(self):
-		return "latitude" in self._attributes["metadata"]
+		return "latitude" in self._attributes["metadata"] and "longitude" in self._attributes["metadata"]
 
 	@property
 	def has_exif_date(self):
@@ -1646,10 +1652,9 @@ def _set_metadata_from_album_ini(name, attributes, album_ini):
 		try:
 			attributes["metadata"]["tags"] = album_ini.get(name, "tags").split(",")
 		except NoOptionError:
-			message("******** ERROR No Tags ************", name, 1)
 			pass
 	elif "tags" in album_ini.defaults():
-		attributes["metadata"]["latitude"] = album_ini.defaults()["tags"].split(",")
+		attributes["metadata"]["tags"] = album_ini.defaults()["tags"].split(",")
 
 	back_level()
 
@@ -1659,13 +1664,36 @@ def _set_geoname_from_album_ini(name, attributes, album_ini):
 	with the geoname values from the ConfigParser 'album_ini'.
 
 	The geoname values that can be set from album.ini are:
+		* country_name: The name of the country
+		* region_name: The name of the region
 		* place_name: The name of the nearest place (town or city) calculated
 		from latitude/longitude getotag.
+	The geonames values that are not visible to the user, like 'country_code'
+	can't be changed. We only overwrite the visible values displayed to the user. 
 
 	The geonames values must be overwrittent *after* the 'metadata' values
 	because the geonames are retrieved from _attributes['metadata']['latitude'] and
-	_attributes['metadata']['longitude'].
+	_attributes['metadata']['longitude']. You can use Media.has_gps_data to
+	determine if you can call this procedure.
 	"""
+	# Country_name
+	if album_ini.has_section(name):
+		try:
+			attributes["geoname"]["country_name"] = album_ini.get(name, "country_name")
+		except NoOptionError:
+			pass
+	elif "country_name" in album_ini.defaults():
+		attributes["geoname"]["country_name"] = album_ini.defaults()["country_name"]
+
+	# Region_name
+	if album_ini.has_section(name):
+		try:
+			attributes["geoname"]["region_name"] = album_ini.get(name, "region_name")
+		except NoOptionError:
+			pass
+	elif "region_name" in album_ini.defaults():
+		attributes["geoname"]["region_name"] = album_ini.defaults()["region_name"]
+
 	# Place_name
 	if album_ini.has_section(name):
 		try:
