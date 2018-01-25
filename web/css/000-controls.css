@@ -13,7 +13,7 @@ a:hover {
 	color: #FFAD27;
 }
 
-#title, #title:hover, #day-gps-folders-view-container{
+#title, #title:hover, .day-gps-folders-view {
 	font-weight: bold;
 	font-size: medium;
 }
@@ -53,20 +53,6 @@ img.thumbnail-img {
 
 a.title-anchor.mobile {
 	color: orange !important;
-}
-
-/*#day-gps-folders-view-container,*/
-#folders-view-container, #by-date-view-container, #by-gps-view-container {
-	font-variant: small-caps;
-	text-align: center;
-	border-radius: .5em;
-	opacity: 0.5;
-	color: inherit;
-	display: none;
-}
-
-#folders-view, #by-date-view, #by-gps-view {
-	padding: .5em;
 }
 
 #loading {
@@ -463,9 +449,13 @@ video {
 	text-decoration: none;
 }
 
-.sort img {
+.sort {
 	padding: 0 .5em;
 	cursor: pointer;
+}
+
+.sort.caption, .sort.grayed {
+	cursor: default;
 }
 
 .sort img.opaque {
@@ -503,56 +493,90 @@ ul#right-menu {
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
+	float: right;
+	width: 20%;
+	position: absolute;
+	top: 0;
+	right: 0;
 }
-ul#right-menu  li a.right-menu.selected {
+ul#right-menu  li.selected {
 	background-color: gray;
 }
 ul#right-menu li {
-	float: left;
+	/*float: left;*/
 }
 ul#right-menu li a {
-	display: inline-block;
+	display: list-item;
 	color: #ffffff;
 	text-align: center;
-	padding: 2px 5px;
 	text-decoration: none;
 	transition: 0.2s;
 	font-size: 14px;
 }
-ul#right-menu li a:hover {
+
+ul#right-menu li:not(.grayed) a:hover {
 	background-color: #003366;
 }
 /*ul#right-menu li#menu-icon, ul#right-menu li#menu-line {
 	display: none;
 }*/
+ul#right-menu li a#menu-icon, ul#right-menu.expand li a#menu-icon {
+	text-align: right;
+}
+
 ul#right-menu li a#menu-icon:hover {
-	background-color: #0066CC;
+	background-color: transparent;
 }
 
 ul#right-menu li {
 	display: none;
 }
 
+/*#day-gps-folders-view-container,*/
+#folders-view-container, #by-date-view-container, #by-gps-view-container,
+ul#right-menu.expand li {
+	font-variant: small-caps;
+	text-align: center;
+	/*border-radius: .5em;*/
+	color: inherit;
+	display: none;
+}
+
+ul#right-menu.expand li.caption {
+	text-align: left;
+}
+
 ul#right-menu li#menu-icon, ul#right-menu li#menu-line {
-	float: right;
-	display: inline-block;
+	/*float: right;*/
+	display: list-item;
 }
 
 /*ul#right-menu.expand {
 	position: relative;
 }*/
-ul#right-menu.expand li#menu-icon, ul#right-menu.expand li#menu-line {
+/*ul#right-menu.expand li#menu-icon, ul#right-menu.expand li#menu-line {
 	position: absolute;
 	right: 0;
 	top: 0;
-}
+}*/
 ul#right-menu.expand li {
 	float: none;
-	display: inline;
+	display: list-item;
+	text-align: right;
+	background-color: black;
 }
+
+ul#right-menu li, ul#right-menu.expand li {
+	padding: .1em .5em;
+	opacity: 0.5;
+}
+
 ul#right-menu.expand li a {
 	display: block;
 	text-align: right;
-	padding: 6px 12px;
+}
+
+ul#right-menu li.grayed, ul#right-menu li.grayed a {
+	color: gray !important;
 }
 /* end right menu */

@@ -140,36 +140,9 @@
 			<a href="" class="ssk ssk-email"></a>
 		</div>
 	</div>
+
 	<div id="title-container">
-
-
 		<div id="buttons-container">
-			<ul id="right-menu">
-				<li id="menu-line">
-					<a id="menu-icon" href="javascript:void(0);"> ☰ </a>
-				</li>
-				<li>&nbsp;
-				</li>
-				<li>
-					<span id="day-gps-folders-view-container">
-						<span id="folders-view-container">
-							<a id="folders-view-link" href="javascript:void(0)">
-								<span id="folders-view"></span>
-							</a>
-						</span>
-						<span id="by-date-view-container">
-							<a id="by-date-view-link" href="javascript:void(0)">
-								<span id="by-date-view"></span>
-							</a>
-						</span>
-						<span id="by-gps-view-container">
-							<a id="by-gps-view-link" href="javascript:void(0)">
-								<span id="by-gps-view"></span>
-							</a>
-						</span>
-					</span>
-				</li>
-			</ul>
 		</div>
 		<div id="title">
 			<span id="title-string"></span>
@@ -211,6 +184,36 @@
 			<a href="https://github.com/paolobenve/myphotoshare" target="_blank">MyPhotoShare</a>
 		</div>
 	</div>
+
+	<ul id="right-menu">
+		<li id="menu-line">
+			<a id="menu-icon" href="javascript:void(0);"> ☰ </a>
+		</li>
+		</li>
+		<li id="folders-view-container" class="day-gps-folders-view">
+			<a id="folders-view-link" href="javascript:void(0)">
+				<span id="folders-view"></span>
+			</a>
+		</li>
+		<li id="by-date-view-container" class="day-gps-folders-view">
+			<a id="by-date-view-link" href="javascript:void(0)">
+				<span id="by-date-view"></span>
+			</a>
+		</li>
+		<li id="by-gps-view-container" class="day-gps-folders-view">
+			<a id="by-gps-view-link" href="javascript:void(0)">
+				<span id="by-gps-view"></span>
+			</a>
+		</li>
+		<li id="album-sort" class="sort caption"></li>
+		<li class='sort album-sort by-date grayed'></li>
+		<li class='sort album-sort by-name grayed'></li>
+		<li class='sort album-sort sort-reverse grayed'></li>
+		<li id="media-sort" class="sort caption"></li>
+		<li class='sort media-sort by-date grayed'></li>
+		<li class='sort media-sort by-name grayed'></li>
+		<li class='sort media-sort sort-reverse grayed'></li>
+	</ul>
 
 	<div id="error-overlay"></div>
 	<div id="error-options-file"></div>
