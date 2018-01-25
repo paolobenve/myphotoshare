@@ -1786,6 +1786,12 @@ $(document).ready(function() {
 
 		$('#metadata tr.gps').off('click');
 		text = "<table>";
+		if (typeof currentMedia.metadata.title !== "undefined")
+			text += "<tr><td id=\"metadata-data-title\"></td><td>" + currentMedia.metadata.title + "</td></tr>";
+		if (typeof currentMedia.metadata.description !== "undefined")
+			text += "<tr><td id=\"metadata-data-description\"></td><td>" + currentMedia.metadata.description + "</td></tr>";
+		if (typeof currentMedia.metadata.tags !== "undefined")
+			text += "<tr><td id=\"metadata-data-tags\"></td><td>" + currentMedia.metadata.tags + "</td></tr>";
 		if (typeof currentMedia.date !== "undefined")
 			text += "<tr><td id=\"metadata-data-date\"></td><td>" + currentMedia.date + "</td></tr>";
 		if (typeof currentMedia.metadata.size !== "undefined")
