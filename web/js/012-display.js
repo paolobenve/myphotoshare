@@ -692,6 +692,10 @@ $(document).ready(function() {
 				return false;
 			}
 		});
+		$("#menu-icon").on("click", function(ev) {
+			$("#right-menu").toggleClass("expand");
+			return false;
+		});
 
 		// keep generating the html page title
 		if (currentMedia !== null)
@@ -1345,15 +1349,15 @@ $(document).ready(function() {
 			$("#by-gps-view-link").attr("href", "#!/" + encodeURIComponent(Options.by_gps_string));
 			if (currentAlbum.cacheBase == Options.folders_string) {
 				$("#folders-view-container").hide();
-				$("#by-date-view-container").show();
+				$("#by-date-view-container").css("display", "list-item");
 				photoFloat.showByGpsButton();
 			} else if (currentAlbum.cacheBase == Options.by_date_string) {
-				$("#folders-view-container").show();
+				$("#folders-view-container").css("display", "list-item");
 				$("#by-date-view-container").hide();
 				photoFloat.showByGpsButton();
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
-				$("#folders-view-container").show();
-				$("#by-date-view-container").show();
+				$("#folders-view-container").css("display", "list-item");
+				$("#by-date-view-container").css("display", "list-item");
 				$("#by-gps-view-container").hide();
 			} else {
 				$("#folders-view-container").hide();
@@ -1764,23 +1768,23 @@ $(document).ready(function() {
 		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
 			// folder album: change to by date or by gps view
 			$("#folders-view-container").hide();
-			$("#by-date-view-container").show();
+			$("#by-date-view-container").css("display", "list-item");
 			if (hasGpsData(currentMedia))
-				$("#by-gps-view-container").show();
+				$("#by-gps-view-container").css("display", "list-item");
 			else
 				$("#by-gps-view-container").hide();
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0) {
 			// by date album: change to folder or by gps view
-			$("#folders-view-container").show();
+			$("#folders-view-container").css("display", "list-item");
 			$("#by-date-view-container").hide();
 			if (hasGpsData(currentMedia))
-				$("#by-gps-view-container").show();
+				$("#by-gps-view-container").css("display", "list-item");
 			else
 				$("#by-gps-view-container").hide();
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0) {
 			// by gps album: change to folder or by day view
-			$("#folders-view-container").show();
-			$("#by-date-view-container").show();
+			$("#folders-view-container").css("display", "list-item");
+			$("#by-date-view-container").css("display", "list-item");
 			$("#by-gps-view-container").hide();
 		}
 
