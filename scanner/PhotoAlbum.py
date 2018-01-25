@@ -852,7 +852,7 @@ class Media(object):
 			# if opencv is installed, crop it, taking into account the faces
 			if (
 				start_image_width != start_image_height and
-			 	min(start_image_width, start_image_height) >= actual_thumb_size or max(start_image_width, start_image_height) >= actual_thumb_size
+				(min(start_image_width, start_image_height) >= actual_thumb_size or max(start_image_width, start_image_height) >= actual_thumb_size)
 			):
 				must_crop = True
 				if cv2_installed:
@@ -942,7 +942,6 @@ class Media(object):
 									top = start_image_height - start_image_width
 					thumbnail_width = actual_thumb_size
 					thumbnail_height = actual_thumb_size
-
 				elif max(start_image_width, start_image_height) >= actual_thumb_size:
 					# image smallest size is smaller than the square which would result from cropping
 					# cropped image will not be square
@@ -994,8 +993,6 @@ class Media(object):
 				# image is square, or is smaller than the square thumbnail, don't crop it
 				thumbnail_width = start_image_width
 				thumbnail_height = start_image_height
-
-
 		else:
 			if (
 				original_thumb_size == media_thumb_size and
@@ -1015,18 +1012,6 @@ class Media(object):
 
 		# now thumbnail_width and thumbnail_height are the values the thumbnail will get,
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
-
-		must_resize = True
-		if max(start_image_width, start_image_height) <= actual_thumb_size:
-			# resizing to thumbnail size an image smaller than the thumbnail to produce would return a blurred image
-			# simply copy the start image to the thumbnail
-			must_resize = False
-			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
-				message("small image, no reduction", info_string, 4)
-			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
-				message("small image, no thumbing for album", info_string, 4)
-			else:
-				message("small image, no thumbing for media", info_string, 4)
 
 		try:
 			message("making copy...", "", 5)
@@ -1053,7 +1038,16 @@ class Media(object):
 			message("cropped (" + str(original_thumb_size) + ")", "", 5)
 			back_level()
 
-		if must_resize:
+		if max(start_image_copy.size[0], start_image_copy.size[1]) <= actual_thumb_size:
+			# no resize
+			# resizing to thumbnail size an image smaller than the thumbnail we must produce would return a blurred image
+			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
+				message("small image, no reduction", info_string, 4)
+			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
+				message("small image, no thumbing for album", info_string, 4)
+			else:
+				message("small image, no thumbing for media", info_string, 4)
+		else:
 			# resizing
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reducing size...", info_string, 5)
@@ -1071,6 +1065,18 @@ class Media(object):
 				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
 			back_level()
 
+		# if the crop results smaller than the required size, extend it with a background
+		start_image_copy_filled = start_image_copy
+		if thumb_type == "square" and min(start_image_copy.size[0], start_image_copy.size[1]) < actual_thumb_size:
+			# it's smaller than the square we need: fill it
+			message("small crop: filling...", "background color: " + Options.config['small_square_crops_background_color'], 5)
+			newImage = Image.new('RGBA', (actual_thumb_size, actual_thumb_size), Options.config['small_square_crops_background_color'])
+			newImage.paste(start_image_copy, (int((actual_thumb_size - start_image_copy.size[0]) / 2), int((actual_thumb_size - start_image_copy.size[1]) / 2)))
+			start_image_copy_filled = newImage
+			next_level()
+			message("filled", "", 5)
+			back_level()
+
 		# the subdir hadn't been created when creating the album in order to avoid creation of empty directories
 		if not os.path.exists(thumbs_path_with_subdir):
 			message("creating unexistent subdir", "", 5)
@@ -1085,17 +1091,17 @@ class Media(object):
 
 		if self._attributes["mediaType"] == "video":
 			message("adding video transparency...", "", 5)
-			start_image_copy_for_saving = start_image_copy.copy()
+			start_image_copy_for_saving = start_image_copy_filled.copy()
 			transparency_file = os.path.join(os.path.dirname(__file__), "../web/img/play_button_100_62.png")
 			video_transparency = Image.open(transparency_file)
-			x = int((start_image_copy.size[0] - video_transparency.size[0]) / 2)
-			y = int((start_image_copy.size[1] - video_transparency.size[1]) / 2)
+			x = int((start_image_copy_filled.size[0] - video_transparency.size[0]) / 2)
+			y = int((start_image_copy_filled.size[1] - video_transparency.size[1]) / 2)
 			start_image_copy_for_saving.paste(video_transparency, (x, y), video_transparency)
 			next_level()
 			message("video transparency added", "", 4)
 			back_level()
 		else:
-			start_image_copy_for_saving = start_image_copy
+			start_image_copy_for_saving = start_image_copy_filled
 
 		message("saving...", info_string, 5)
 		try:

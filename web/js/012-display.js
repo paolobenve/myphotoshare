@@ -692,6 +692,10 @@ $(document).ready(function() {
 				return false;
 			}
 		});
+		$("#menu-icon").on("click", function(ev) {
+			$("#right-menu").toggleClass("expand");
+			return false;
+		});
 
 		// keep generating the html page title
 		if (currentMedia !== null)
@@ -1026,13 +1030,13 @@ $(document).ready(function() {
 						}
 						calculatedWidth = thumbWidth;
 					} else if (Options.media_thumb_type == "square") {
-						if (Math.max(width, height) < Options.media_thumb_size) {
-							thumbHeight = height;
-							thumbWidth = width;
-						} else {
-							thumbHeight = thumbnailSize;
-							thumbWidth = thumbnailSize;
-						}
+						// if (Math.max(width, height) < Options.media_thumb_size) {
+						// 	thumbHeight = height;
+						// 	thumbWidth = width;
+						// } else {
+						thumbHeight = thumbnailSize;
+						thumbWidth = thumbnailSize;
+						// }
 						calculatedWidth = Options.media_thumb_size;
 					}
 					if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) || PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase))
@@ -1153,7 +1157,6 @@ $(document).ready(function() {
 						subalbums.push(link);
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
-								var distance = 0;
 								var htmlText, height;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
@@ -1174,18 +1177,10 @@ $(document).ready(function() {
 											thumbWidth = Math.floor(correctedAlbumThumbSize * mediaWidth / mediaHeight);
 											thumbHeight = correctedAlbumThumbSize;
 										}
-										distance = (correctedAlbumThumbSize - thumbHeight) / 2;
 									}
 								} else if (Options.album_thumb_type == "square") {
 									thumbWidth = correctedAlbumThumbSize;
 									thumbHeight = correctedAlbumThumbSize;
-									// if (mediaWidth < correctedAlbumThumbSize || mediaHeight < correctedAlbumThumbSize) {
-									// 	thumbWidth = mediaWidth;
-									// 	thumbHeight = mediaHeight;
-									// } else {
-									// 	thumbWidth = correctedAlbumThumbSize;
-									// 	thumbHeight = correctedAlbumThumbSize;
-									// }
 								}
 
 								if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
@@ -1354,15 +1349,15 @@ $(document).ready(function() {
 			$("#by-gps-view-link").attr("href", "#!/" + encodeURIComponent(Options.by_gps_string));
 			if (currentAlbum.cacheBase == Options.folders_string) {
 				$("#folders-view-container").hide();
-				$("#by-date-view-container").show();
+				$("#by-date-view-container").css("display", "list-item");
 				photoFloat.showByGpsButton();
 			} else if (currentAlbum.cacheBase == Options.by_date_string) {
-				$("#folders-view-container").show();
+				$("#folders-view-container").css("display", "list-item");
 				$("#by-date-view-container").hide();
 				photoFloat.showByGpsButton();
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
-				$("#folders-view-container").show();
-				$("#by-date-view-container").show();
+				$("#folders-view-container").css("display", "list-item");
+				$("#by-date-view-container").css("display", "list-item");
 				$("#by-gps-view-container").hide();
 			} else {
 				$("#folders-view-container").hide();
@@ -1703,7 +1698,6 @@ $(document).ready(function() {
 			$("#next").show();
 			$("#prev").show();
 			$("#media-view")
-				//.css('cursor', 'ew-resize')
 				.on('contextmenu', function(ev) {
 					if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						ev.preventDefault();
@@ -1719,25 +1713,10 @@ $(document).ready(function() {
 					}
 				})
 				.on('mousewheel', swipeOnWheel);
-				//~ .on('contextmenu click mousewheel', function(ev, delta) {
-					//~ console.log(ev);
-					//~ console.log(ev.handleObj.type);
-					//~ console.log(delta);
-					//~ if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						//~ ev.preventDefault();
-						//~ swipeRight(prevLink);
-					//~ }
-					//~ if(ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						//~ swipeLeft(nextLink);
-						//~ return false;
-					//~ } else
-						//~ return true;
-					//~ swipeOnWheel(ev, delta)
-				//~ });
 				$("#media-bar").on('click', function(ev) {
-	   			ev.stopPropagation();
+					ev.stopPropagation();
 				}).on('contextmenu', function(ev) {
-	   			ev.stopPropagation();
+					ev.stopPropagation();
 				});
 			$('#next').on('click', function(ev) {
 				if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
@@ -1789,23 +1768,23 @@ $(document).ready(function() {
 		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
 			// folder album: change to by date or by gps view
 			$("#folders-view-container").hide();
-			$("#by-date-view-container").show();
+			$("#by-date-view-container").css("display", "list-item");
 			if (hasGpsData(currentMedia))
-				$("#by-gps-view-container").show();
+				$("#by-gps-view-container").css("display", "list-item");
 			else
 				$("#by-gps-view-container").hide();
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0) {
 			// by date album: change to folder or by gps view
-			$("#folders-view-container").show();
+			$("#folders-view-container").css("display", "list-item");
 			$("#by-date-view-container").hide();
 			if (hasGpsData(currentMedia))
-				$("#by-gps-view-container").show();
+				$("#by-gps-view-container").css("display", "list-item");
 			else
 				$("#by-gps-view-container").hide();
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0) {
 			// by gps album: change to folder or by day view
-			$("#folders-view-container").show();
-			$("#by-date-view-container").show();
+			$("#folders-view-container").css("display", "list-item");
+			$("#by-date-view-container").css("display", "list-item");
 			$("#by-gps-view-container").hide();
 		}
 

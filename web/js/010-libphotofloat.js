@@ -51,7 +51,7 @@
 		// this function returns true if the root album has the by gps subalbum
 		if (this.geotaggedPhotosFound !== null) {
 			if (this.geotaggedPhotosFound) {
-				$("#by-gps-view-container").show();
+				$("#by-gps-view-container").css("display", "list-item");
 			}
 		} else {
 			self = this;
@@ -59,7 +59,7 @@
 				Options.by_gps_string,
 				function() {
 					self.geotaggedPhotosFound = true;
-					$("#by-gps-view-container").show();
+					$("#by-gps-view-container").css("display", "list-item");
 				},
 				function() {
 					self.geotaggedPhotosFound = false;
