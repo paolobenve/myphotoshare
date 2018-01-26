@@ -108,6 +108,12 @@ follow_symlinks = false
 # if not using geotags, it can safely be left to false
 checksum = false
 
+# When detecting faces with opencv, a scaleFactor must be given
+# See the beginning of the page https://docs.opencv.org/2.4/modules/objdetect/doc/cascade_classification.html
+# The page doesn't say what values this parameter can have, it seems that it must be strictly > 1
+# Must be a float
+face_cascade_scale_factor = 1.1
+
 ###########################################################
 # scanner and ui options
 ###########################################################

@@ -300,6 +300,7 @@ Both the scanner and the webpage have a `make deploy` target, and the scanner ha
 * new option `small_square_crops_background_color` for filling the background of small square crops
 * bug fixes
 * new debug option `show_faces`: lets the scanner show the faces detected (but read the not in `myphotoshare.conf.default`)
+* new option `face_cascade_scale_factor`: a parameter of `opencv`'s `detectMultiScale` function that detects the faces in the photo
 
 ### version 3.3 (January 22, 2018)
 

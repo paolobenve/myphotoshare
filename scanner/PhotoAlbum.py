@@ -888,14 +888,22 @@ class Media(object):
 						opencv_image = np.array(start_image.convert('RGB'))[:, :, ::-1].copy()
 						gray_opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2GRAY)
 					except cv2.error:
-						# this happens with gif... weird
+						# this happens with gif's... weird...
 						pass
 					else:
 						try_shifting = True
 
 						# detect faces
 						message("opencv: detecting faces...", "", 4)
-						faces = face_cascade.detectMultiScale(gray_opencv_image, 1.3, 5)
+						# from https://docs.opencv.org/2.4/modules/objdetect/doc/cascade_classification.html:
+						# detectMultiScale(image[, scaleFactor[, minNeighbors[, flags[, minSize[, maxSize]]]]])
+						# - scaleFactor – Parameter specifying how much the image size is reduced at each image scale.
+						# - minNeighbors – Parameter specifying how many neighbors each candidate rectangle should have to retain it.
+						# - flags – Parameter with the same meaning for an old cascade as in the function cvHaarDetectObjects. It is not used for a new cascade.
+						# - minSize – Minimum possible object size. Objects smaller than that are ignored.
+						# - maxSize – Maximum possible object size. Objects larger than that are ignored.
+						# You should read the beginning of the page in order to understand the parameters
+						faces = face_cascade.detectMultiScale(gray_opencv_image, Options.config['face_cascade_scale_factor'], 5)
 						if len(faces) and Options.config['show_faces']:
 							img = opencv_image
 							for (x,y,w,h) in faces:

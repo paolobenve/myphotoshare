@@ -104,7 +104,7 @@ def get_options():
 				config[option] = default_config.getboolean('options', option)
 		elif option in ('reduced_sizes', 'map_zoom_levels'):
 			config[option] = eval(usr_config.get('options', option))
-		elif option in ('mobile_thumbnail_factor'):
+		elif option in ('mobile_thumbnail_factor', 'face_cascade_scale_factor'):
 			config[option] = usr_config.getfloat('options', option)
 			if config[option] < 1:
 				config[option] = 1
