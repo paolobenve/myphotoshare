@@ -431,8 +431,9 @@ class Media(object):
 					#  'place_code': the nearby place geonames id
 					#  'distance': the distance between given coordinates and nearby place geonames coordinates
 
-					# Overwrite with album.ini values
-					_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+					# Overwrite with album.ini values when album has been read from file
+					if self.album.album_ini:
+						_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 					back_level()
 			else:
 				# try with video detection
@@ -447,8 +448,9 @@ class Media(object):
 							message("looking for geonames...", media_path, 5)
 							geoname = Geonames()
 							self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
-							# Overwrite with album.ini values
-							_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+							# Overwrite with album.ini values when read from file
+							if self.album.album_ini:
+								_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 							back_level()
 				else:
 					next_level()
@@ -593,8 +595,9 @@ class Media(object):
 			self._attributes["metadata"]["longitude"] = _convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
 			self._attributes["metadata"]["longitudeMS"] = _convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 
-		# Overwrite with album.ini values
-		_set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+		# Overwrite with album.ini values when it has been read from file
+		if self.album.album_ini:
+			_set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
 
 		next_level()
 		message("extracted", "", 5)
@@ -639,7 +642,8 @@ class Media(object):
 				break
 
 		# Video should also contain metadata like GPS information, at least in QuickTime and MP4 files...
-		_set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+		if self.album.album_ini:
+			_set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
 
 
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
