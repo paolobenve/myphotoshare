@@ -896,7 +896,7 @@ class Media(object):
 						# detect faces
 						message("opencv: detecting faces...", "", 4)
 						faces = face_cascade.detectMultiScale(gray_opencv_image, 1.3, 5)
-						if len(faces) and Options.show_faces:
+						if len(faces) and Options.config['show_faces']:
 							img = opencv_image
 							for (x,y,w,h) in faces:
 								cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)

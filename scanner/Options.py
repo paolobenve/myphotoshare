@@ -32,11 +32,6 @@ options_requiring_json_regeneration = ['jpeg_quality', 'geonames_language', 'uns
 # json_version = 3 since geotag managing is optional
 json_version = 3
 
-# This is a debug option: it lets the scanner show the faces detected
-# obviously it only make sense when the scanner is run interactively, because the user must close every image with a keystroke
-# I'm getting it working if running in pyCharm, it stops with a segfault if run from terminal. Why????
-show_faces = False
-
 def get_options():
 	from Utilities import message, next_level, back_level
 	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")
@@ -97,7 +92,8 @@ def get_options():
 				'default_album_date_reverse_sort',
 				'default_media_date_reverse_sort',
 				'recreate_fixed_height_thumbnails',
-				'get_geonames_online'
+				'get_geonames_online',
+				'show_faces'
 		):
 			try:
 				config[option] = usr_config.getboolean('options', option)
