@@ -114,6 +114,10 @@ checksum = false
 # Must be a float
 face_cascade_scale_factor = 1.1
 
+# How many thumbnails should we put at most in the image that php generates for sharing albums?
+# it must be an integer, and a square: 4, 9, 16,..
+max_album_share_thumbnails_number = 16
+
 ###########################################################
 # scanner and ui options
 ###########################################################
@@ -276,10 +280,6 @@ default_media_name_sort = false
 # should default sorting be reverse (more recent photos/videos top)?
 default_album_date_reverse_sort = false
 default_media_date_reverse_sort = false
-
-# How many thumbnails should we put at most in the image that php generates for sharing albums?
-# it must be an integer, and a square: 4, 9, 16,..
-max_album_share_thumbnails_number = 16
 
 # How many album thumbnails will fit at least on screen width?
 # Album button sizes will be reduced in order that the given number of buttons fit in it
