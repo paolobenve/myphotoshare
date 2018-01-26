@@ -21,6 +21,11 @@ import hashlib
 import sys
 from pprint import pprint
 import pprint
+try:
+	import configparser
+except ImportError:
+	import ConfigParser as configparser
+from configparser import NoOptionError
 import numpy as np
 
 cv2_installed = True
@@ -68,6 +73,9 @@ class Album(object):
 		self.num_media_in_sub_tree = 0
 		self.num_media_in_album = 0
 		self.parent = None
+		self.album_ini = None
+		self._attributes = {}
+		self._attributes["metadata"] = {}
 
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
@@ -137,6 +145,17 @@ class Album(object):
 			return (self.date < other.date)
 		except TypeError:
 			return True
+
+	def read_album_ini(self):
+		"""Read the 'album.ini' file in the directory 'self.absolute_path' to
+		get user defined metadata for the album and pictures.
+		"""
+		self.album_ini = configparser.ConfigParser()
+		message("reading album.ini...", os.path.join(self.absolute_path, "album.ini"), 4)
+		self.album_ini.read(os.path.join(self.absolute_path, "album.ini"))
+
+		_set_metadata_from_album_ini("album", self._attributes, self.album_ini)
+
 
 	def add_media(self, media):
 		if not any(media.media_file_name == _media.media_file_name for _media in self.media_list):
@@ -209,11 +228,12 @@ class Album(object):
 			path = dictionary["physicalPath"]
 		else:
 			path = dictionary["path"]
+		# Don't use cache if version has changed
 		if not "jsonVersion" in dictionary or float(dictionary["jsonVersion"]) != Options.json_version:
 			return None
 		album = Album(os.path.join(Options.config['album_path'], path))
 		album.cache_base = album_cache_base
-		album.json_version= dictionary["jsonVersion"]
+		album.json_version = dictionary["jsonVersion"]
 		for media in dictionary["media"]:
 			new_media = Media.from_dict(album, media, os.path.join(Options.config['album_path'], remove_folders_marker(album.baseless_path)))
 			if new_media.is_valid:
@@ -226,6 +246,7 @@ class Album(object):
 		album.sort_subalbums_and_media()
 
 		return album
+
 
 	def to_dict(self, cripple=True):
 		self.sort_subalbums_and_media()
@@ -305,12 +326,15 @@ class Album(object):
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base
 		return dictionary
+
+
 	def media_from_path(self, path):
 		_path = remove_album_path(path)
 		for media in self.media_list:
 			if _path == media.media_file_name:
 				return media
 		return None
+
 
 class Media(object):
 	def __init__(self, album, media_path, thumbs_path=None, attributes=None):
@@ -406,6 +430,10 @@ class Media(object):
 					#  'place_name': the nearby place name
 					#  'place_code': the nearby place geonames id
 					#  'distance': the distance between given coordinates and nearby place geonames coordinates
+
+					# Overwrite with album.ini values when album has been read from file
+					if self.album.album_ini:
+						_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 					back_level()
 			else:
 				# try with video detection
@@ -414,12 +442,23 @@ class Media(object):
 					self._video_transcode(thumbs_path, media_path)
 					if self.is_valid:
 						self._video_thumbnails(thumbs_path, media_path)
+
+						if self.has_gps_data:
+							next_level()
+							message("looking for geonames...", media_path, 5)
+							geoname = Geonames()
+							self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
+							# Overwrite with album.ini values when read from file
+							if self.album.album_ini:
+								_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+							back_level()
 				else:
 					next_level()
 					message("error transcodind, not a video?", media_path, 5)
 					back_level()
 					self.is_valid = False
 		return
+
 
 	def _photo_metadata(self, image):
 		next_level()
@@ -540,68 +579,31 @@ class Media(object):
 				# value isn't usable, forget it
 				pass
 
+		gps_latitude = None
+		gps_latitude_ref = None
+		gps_longitude = None
+		gps_longitude_ref = None
 		if "GPSInfo" in exif:
 			gps_latitude = exif["GPSInfo"].get("GPSLatitude", None)
-			gps_latitude_ref = exif["GPSInfo"].get('GPSLatitudeRef', None)
-			gps_longitude = exif["GPSInfo"].get('GPSLongitude', None)
-			gps_longitude_ref = exif["GPSInfo"].get('GPSLongitudeRef', None)
-			if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
-				self._attributes["metadata"]["latitude"] = self._convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
-				self._attributes["metadata"]["latitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
-				self._attributes["metadata"]["longitude"] = self._convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
-				self._attributes["metadata"]["longitudeMS"] = self._convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+			gps_latitude_ref = exif["GPSInfo"].get("GPSLatitudeRef", None)
+			gps_longitude = exif["GPSInfo"].get("GPSLongitude", None)
+			gps_longitude_ref = exif["GPSInfo"].get("GPSLongitudeRef", None)
+
+		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
+			self._attributes["metadata"]["latitude"] = _convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["latitudeMS"] = _convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["longitude"] = _convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["longitudeMS"] = _convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+
+		# Overwrite with album.ini values when it has been read from file
+		if self.album.album_ini:
+			_set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+
 		next_level()
 		message("extracted", "", 5)
 		back_level()
 		back_level()
 
-	def _convert_to_degrees_minutes_seconds(self, value, ref):
-		# Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds
-
-		# Degrees
-		d0 = value[0][0]
-		d1 = value[0][1]
-		d = int(float(d0) / float(d1))
-		# Minutes
-		m0 = value[1][0]
-		m1 = value[1][1]
-		m = int(float(m0) / float(m1))
-		# Seconds
-		s0 = value[2][0]
-		s1 = value[2][1]
-		s = int((float(s0) / float(s1)) * 1000) / 1000.0
-
-		# result = ''
-		# if ref == "S" or ref == "W":
-		# 	result = '-'
-
-		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
-
-		return result
-
-	def _convert_to_degrees_decimal(self, value, ref):
-		#Helper function to convert the GPS coordinates stored in the EXIF to degress in float format
-
-		# Degrees
-		d0 = value[0][0]
-		d1 = value[0][1]
-		d = float(d0) / float(d1)
-		# Minutes
-		m0 = value[1][0]
-		m1 = value[1][1]
-		m = float(m0) / float(m1)
-		# Seconds
-		s0 = value[2][0]
-		s1 = value[2][1]
-		s = float(s0) / float(s1)
-
-		result = d + (m / 60.0) + (s / 3600.0)
-		# limit decimal digits to what is needed by openstreetmap
-		six_zeros = 1000000.0
-		result = int(result * six_zeros) / six_zeros
-		if ref == "S" or ref == "W":
-			result = - result
-		return result
 
 
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
@@ -638,6 +640,11 @@ class Media(object):
 				if original:
 					self._attributes["metadata"]["originalSize"] = (int(s["width"]), int(s["height"]))
 				break
+
+		# Video should also contain metadata like GPS information, at least in QuickTime and MP4 files...
+		if self.album.album_ini:
+			_set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+
 
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
 		# give image the correct orientation
@@ -1326,6 +1333,14 @@ class Media(object):
 	def name(self):
 		return os.path.basename(self.media_file_name)
 
+	@property
+	def title(self):
+		return self._attributes["metadata"]["title"]
+
+	@property
+	def description(self):
+		return self._attributes["metadata"]["description"]
+
 	def __str__(self):
 		return self.name
 
@@ -1384,7 +1399,7 @@ class Media(object):
 
 	@property
 	def has_gps_data(self):
-		return "latitude" in self._attributes["metadata"]
+		return "latitude" in self._attributes["metadata"] and "longitude" in self._attributes["metadata"]
 
 	@property
 	def has_exif_date(self):
@@ -1490,6 +1505,7 @@ class Media(object):
 	def attributes(self):
 		return self._attributes
 
+
 	@staticmethod
 	def from_dict(album, dictionary, basepath):
 		del dictionary["date"]
@@ -1514,6 +1530,7 @@ class Media(object):
 						except ValueError:
 							pass
 		return Media(album, media_path, None, dictionary)
+
 
 	def to_dict(self):
 		foldersAlbum = Options.config['folders_string']
@@ -1541,6 +1558,7 @@ class Media(object):
 		media["cacheSubdir"]       = self.album.subdir
 		return media
 
+
 class PhotoAlbumEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, datetime):
@@ -1548,3 +1566,212 @@ class PhotoAlbumEncoder(json.JSONEncoder):
 		if isinstance(obj, Album) or isinstance(obj, Media):
 			return obj.to_dict()
 		return json.JSONEncoder.default(self, obj)
+
+
+def _set_metadata_from_album_ini(name, attributes, album_ini):
+	"""Set the 'attributes' dictionnary for album or media named 'name'
+	with the metadata values from the ConfigParser 'album_ini'.
+
+	The metadata than can be overloaded by values in 'album.ini' file are:
+		* title: the caption of the album or media
+		* description: a long description whose words can be searched.
+		* date: a YYYY-MM-DD date replacing the one from EXIF
+		* latitude: for when the media is not geotagged
+		* longitude: for when the media is not geotagged
+		* tags: a ',' separated list of terms
+	"""
+
+	# Initialize with album.ini defaults
+	next_level()
+	message("initialize album.ini metadata values", "", 5)
+
+	# Title
+	if album_ini.has_section(name):
+		try:
+			attributes["metadata"]["title"] = album_ini.get(name, "title")
+		except NoOptionError:
+			pass
+	elif "title" in album_ini.defaults():
+		attributes["metadata"]["title"] = album_ini.defaults()["title"]
+
+	# Description
+	if album_ini.has_section(name):
+		try:
+			attributes["metadata"]["description"] = album_ini.get(name, "description")
+		except NoOptionError:
+			pass
+	elif "description" in album_ini.defaults():
+		attributes["metadata"]["description"] = album_ini.defaults()["description"]
+
+	# Date
+	if album_ini.has_section(name):
+		try:
+			attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.get(name, "date"), "%Y-%m-%d")
+		except ValueError:
+			message("ERROR", "Incorrect date in [" + name + "] in 'album.ini'", 1)
+		except NoOptionError:
+			pass
+	elif "date" in album_ini.defaults():
+		try:
+			attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.defaults()["date"], "%Y-%m-%d")
+		except ValueError:
+			message("ERROR", "Incorrect date in [DEFAULT] in 'album.ini'", 1)
+
+	# Latitude and longitude
+	gps_latitude = None
+	gps_latitude_ref = None
+	gps_longitude = None
+	gps_longitude_ref = None
+	if album_ini.has_section(name):
+		try:
+			gps_latitude = _create_GPS_struct(abs(album_ini.getfloat(name, "latitude")))
+			gps_latitude_ref = "N" if album_ini.getfloat(name, "latitude") > 0.0 else "S"
+		except ValueError:
+			message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
+		except NoOptionError:
+			pass
+	elif "latitude" in album_ini.defaults():
+		try:
+			gps_latitude = _create_GPS_struct(abs(float(album_ini.defaults()["latitude"])))
+			gps_latitude_ref = "N" if float(album_ini.defaults()["latitude"]) > 0.0 else "S"
+		except ValueError:
+			message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
+	if album_ini.has_section(name):
+		try:
+			gps_longitude = _create_GPS_struct(abs(album_ini.getfloat(name, "longitude")))
+			gps_longitude_ref = "E" if album_ini.getfloat(name, "longitude") > 0.0 else "W"
+		except ValueError:
+			message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
+		except NoOptionError:
+			pass
+	elif "longitude" in album_ini.defaults():
+		try:
+			gps_longitude = _create_GPS_struct(abs(float(album_ini.defaults()["longitude"])))
+			gps_longitude_ref = "E" if float(album_ini.defaults()["longitude"]) > 0.0 else "W"
+		except ValueError:
+			message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
+
+	if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
+		attributes["metadata"]["latitude"] = _convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+		attributes["metadata"]["latitudeMS"] = _convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+		attributes["metadata"]["longitude"] = _convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+		attributes["metadata"]["longitudeMS"] = _convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+
+	# Tags
+	if album_ini.has_section(name):
+		try:
+			attributes["metadata"]["tags"] = album_ini.get(name, "tags").split(",")
+		except NoOptionError:
+			pass
+	elif "tags" in album_ini.defaults():
+		attributes["metadata"]["tags"] = album_ini.defaults()["tags"].split(",")
+
+	back_level()
+
+
+def _set_geoname_from_album_ini(name, attributes, album_ini):
+	"""Set the 'attributes' dictionnary for album or media named 'name'
+	with the geoname values from the ConfigParser 'album_ini'.
+
+	The geoname values that can be set from album.ini are:
+		* country_name: The name of the country
+		* region_name: The name of the region
+		* place_name: The name of the nearest place (town or city) calculated
+		from latitude/longitude getotag.
+	The geonames values that are not visible to the user, like 'country_code'
+	can't be changed. We only overwrite the visible values displayed to the user. 
+
+	The geonames values must be overwrittent *after* the 'metadata' values
+	because the geonames are retrieved from _attributes['metadata']['latitude'] and
+	_attributes['metadata']['longitude']. You can use Media.has_gps_data to
+	determine if you can call this procedure.
+	"""
+	# Country_name
+	if album_ini.has_section(name):
+		try:
+			attributes["geoname"]["country_name"] = album_ini.get(name, "country_name")
+		except NoOptionError:
+			pass
+	elif "country_name" in album_ini.defaults():
+		attributes["geoname"]["country_name"] = album_ini.defaults()["country_name"]
+
+	# Region_name
+	if album_ini.has_section(name):
+		try:
+			attributes["geoname"]["region_name"] = album_ini.get(name, "region_name")
+		except NoOptionError:
+			pass
+	elif "region_name" in album_ini.defaults():
+		attributes["geoname"]["region_name"] = album_ini.defaults()["region_name"]
+
+	# Place_name
+	if album_ini.has_section(name):
+		try:
+			attributes["geoname"]["place_name"] = album_ini.get(name, "place_name")
+		except NoOptionError:
+			pass
+	elif "place_name" in album_ini.defaults():
+		attributes["geoname"]["place_name"] = album_ini.defaults()["place_name"]
+
+
+def _create_GPS_struct(value):
+	"""Helper function to create the data structure returned by the EXIF GPS info
+	from the decimal value entered by the user in a 'album.ini' metadata file.
+	Longitude and latitude metadata are stored as rationals.
+		GPS = ( (deg1, deg2),
+			(min1, min2),
+			(sec1, sec2) )
+	"""
+	frac, deg = math.modf(value)
+	frac, min = math.modf(frac * 60.0)
+	frac, sec = math.modf(frac * 60.0)
+	return ((int(deg), 1), (int(min), 1), (int(sec), 1))
+
+
+def _convert_to_degrees_minutes_seconds(value, ref):
+	# Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds
+
+	# Degrees
+	d0 = value[0][0]
+	d1 = value[0][1]
+	d = int(float(d0) / float(d1))
+	# Minutes
+	m0 = value[1][0]
+	m1 = value[1][1]
+	m = int(float(m0) / float(m1))
+	# Seconds
+	s0 = value[2][0]
+	s1 = value[2][1]
+	s = int((float(s0) / float(s1)) * 1000) / 1000.0
+
+	result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
+
+	return result
+
+
+def _convert_to_degrees_decimal(value, ref):
+	# Helper function to convert the GPS coordinates stored in the EXIF to degrees in float format
+
+	# Degrees
+	d0 = value[0][0]
+	d1 = value[0][1]
+	d = float(d0) / float(d1)
+	# Minutes
+	m0 = value[1][0]
+	m1 = value[1][1]
+	m = float(m0) / float(m1)
+	# Seconds
+	s0 = value[2][0]
+	s1 = value[2][1]
+	s = float(s0) / float(s1)
+
+	result = d + (m / 60.0) + (s / 3600.0)
+
+	# limit decimal digits to what is needed by openstreetmap
+	six_zeros = 1000000.0
+	result = int(result * six_zeros) / six_zeros
+	if ref == "S" or ref == "W":
+		result = - result
+
+	return result
+
