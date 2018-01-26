@@ -170,8 +170,11 @@ class Album(object):
 		get user defined metadata for the album and pictures.
 		"""
 		self.album_ini = configparser.ConfigParser()
-		message("reading album.ini...", os.path.join(self.absolute_path, "album.ini"), 4)
+		message("reading album.ini...", "", 5)
 		self.album_ini.read(os.path.join(self.absolute_path, "album.ini"))
+		next_level()
+		message("album.ini read", os.path.join(self.absolute_path, "album.ini"), 5)
+		back_level()
 
 		_set_metadata_from_album_ini("album", self._attributes, self.album_ini)
 
