@@ -1687,6 +1687,7 @@ $(document).ready(function() {
 				albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "";
 			prevLink = "";
+			$("#media-view").css('cursor', 'default')
 		} else {
 			albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
@@ -1694,6 +1695,7 @@ $(document).ready(function() {
 			$("#next").show();
 			$("#prev").show();
 			$("#media-view")
+				.css('cursor', '')
 				.on('contextmenu', function(ev) {
 					if (! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 						ev.preventDefault();
