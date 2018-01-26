@@ -25,7 +25,10 @@ try:
 	import configparser
 except ImportError:
 	import ConfigParser as configparser
-from configparser import NoOptionError
+try:
+	from configparser import NoOptionError
+except ImportError:
+	from ConfigParser import NoOptionError
 import numpy as np
 
 cv2_installed = True
