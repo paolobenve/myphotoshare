@@ -1139,7 +1139,11 @@ class Media(object):
 
 		message("saving...", info_string, 5)
 		try:
-			start_image_copy_for_saving.save(thumb_path, "JPEG", quality=Options.config['jpeg_quality'])
+			jpeg_quality = Options.config['jpeg_quality']
+			if thumb_type:
+				# use maximum quality for album and media thumbnails
+				jpeg_quality = 100
+			start_image_copy_for_saving.save(thumb_path, "JPEG", quality=jpeg_quality)
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("saved reduced", thumb_path, 4)
