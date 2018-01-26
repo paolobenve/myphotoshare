@@ -1701,7 +1701,7 @@ def _set_geoname_from_album_ini(name, attributes, album_ini):
 		* place_name: The name of the nearest place (town or city) calculated
 		from latitude/longitude getotag.
 	The geonames values that are not visible to the user, like 'country_code'
-	can't be changed. We only overwrite the visible values displayed to the user. 
+	can't be changed. We only overwrite the visible values displayed to the user.
 
 	The geonames values must be overwrittent *after* the 'metadata' values
 	because the geonames are retrieved from _attributes['metadata']['latitude'] and
@@ -1796,4 +1796,3 @@ def _convert_to_degrees_decimal(value, ref):
 		result = - result
 
 	return result
-
