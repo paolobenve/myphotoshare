@@ -36,18 +36,34 @@ try:
 	next_level()
 	face_config_file = "haarcascade_frontalface_default.xml"
 	message("looking for file...", face_config_file, 5)
-	face_config_file_with_path = find('haarcascade_frontalface_default.xml')
-	face_cascade = cv2.CascadeClassifier(face_config_file_with_path)
-	next_level()
-	message("found and initialized", face_config_file_with_path, 5)
-	back_level()
-	eye_config_file = "haarcascade_eye.xml"
-	message("looking for file...", eye_config_file, 5)
-	eye_config_file_with_path = find('haarcascade_eye.xml')
-	eye_cascade = cv2.CascadeClassifier(eye_config_file_with_path)
-	next_level()
-	message("found and initialized", eye_config_file_with_path, 5)
-	back_level()
+	face_config_file_with_path = find_in_usr_share(face_config_file)
+	if not face_config_file_with_path:
+		face_config_file_with_path = find(face_config_file)
+	if not face_config_file_with_path:
+		next_level()
+		message("face xml file not found", face_config_file, 5)
+		back_level()
+		cv2_installed = False
+	else:
+		face_cascade = cv2.CascadeClassifier(face_config_file_with_path)
+		next_level()
+		message("found and initialized:", face_config_file_with_path, 5)
+		back_level()
+		eye_config_file = "haarcascade_eye.xml"
+		message("looking for file...", eye_config_file, 5)
+		eye_config_file_with_path = find_in_usr_share(eye_config_file)
+		if not eye_config_file_with_path:
+			eye_config_file_with_path = find(eye_config_file)
+		if not eye_config_file_with_path:
+			next_level()
+			message("eyes xml file not found", eye_config_file, 5)
+			back_level()
+			cv2_installed = False
+		else:
+			eye_cascade = cv2.CascadeClassifier(eye_config_file_with_path)
+			next_level()
+			message("found and initialized:", eye_config_file_with_path, 5)
+			back_level()
 	back_level()
 except ImportError:
 	cv2_installed = False
