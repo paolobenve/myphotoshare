@@ -2080,6 +2080,9 @@ $(document).ready(function() {
 			if (currentMedia === null) {
 				currentMedia = currentAlbum.media[0];
 				currentMediaIndex = 0;
+				$("#next-media").css("cursor", "default");
+			} else {
+				$("#next-media").css("cursor", "ew-resize");
 			}
 			// $(".day-gps-folders-view").show();
 			nextMedia = null;
