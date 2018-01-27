@@ -47,11 +47,15 @@
 		$.ajax(ajaxOptions);
 	};
 
-	PhotoFloat.prototype.showByGpsButton = function() {
+	PhotoFloat.prototype.AddClickToByGpsButton = function(link) {
 		// this function returns true if the root album has the by gps subalbum
 		if (this.geotaggedPhotosFound !== null) {
 			if (this.geotaggedPhotosFound) {
-				$("#by-gps-view-container").removeClass("grayed");
+				$("#by-gps-view").removeClass("grayed").on("click", function(ev) {
+					window.location = link;
+					return false;
+				});
+
 			}
 		} else {
 			self = this;
@@ -59,10 +63,10 @@
 				Options.by_gps_string,
 				function() {
 					self.geotaggedPhotosFound = true;
-					$("#by-gps-view-container").removeClass("grayed");
+					window.location = link;
 				},
 				function() {
-					$("#by-gps-view-link").removeAttr("href");
+					$("#by-gps-view").hide();
 					self.geotaggedPhotosFound = false;
 				}
 			);

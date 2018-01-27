@@ -1341,28 +1341,38 @@ $(document).ready(function() {
 			$("#media-box-inner").empty();
 			$("#media-box").hide();
 			$("#thumbs").show();
-			$("#folders-view-link").attr("href", "#!/" + encodeURIComponent(Options.folders_string));
-			$("#by-date-view-link").attr("href", "#!/" + encodeURIComponent(Options.by_date_string));
-			$("#by-gps-view-link").attr("href", "#!/" + encodeURIComponent(Options.by_gps_string));
+			foldersViewLink = "#!/" + encodeURIComponent(Options.folders_string);
+			byDateViewLink = "#!/" + encodeURIComponent(Options.by_date_string);
+			byGpsViewLink = "#!/" + encodeURIComponent(Options.by_gps_string);
 			$(".day-gps-folders-view").removeClass("grayed");
 			if (currentAlbum.cacheBase == Options.folders_string) {
-				$("#folders-view-container").addClass("grayed");
-				$("#folders-view-link").removeAttr("href");
-				photoFloat.showByGpsButton();
+				$("#folders-view").addClass("grayed").off("click");
+				$("#by-date-view").on("click", function(ev) {
+					window.location = byDateViewLink;
+					return false;
+				});
+				photoFloat.AddClickToByGpsButton(byGpsViewLink);
 			} else if (currentAlbum.cacheBase == Options.by_date_string) {
-				$("#by-date-view-container").addClass("grayed");
-				$("#by-date-view-link").removeAttr("href");
-				photoFloat.showByGpsButton();
+				$("#folders-view").on("click", function(ev) {
+					window.location = foldersViewLink;
+					return false;
+				});
+				$("#by-date-view").addClass("grayed").off("click");
+				photoFloat.AddClickToByGpsButton(byGpsViewLink);
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
-				$("#by-gps-view-container").addClass("grayed");
-				$("#by-gps-view-link").removeAttr("href");
+				$("#folders-view").on("click", function(ev) {
+					window.location = foldersViewLink;
+					return false;
+				});
+				$("#by-date-view").on("click", function(ev) {
+					window.location = byDateViewLink;
+					return false;
+				});
+				$("#by-gps-view").addClass("grayed").off("click");
 			} else {
-				$("#folders-view-container").addClass("grayed");
-				$("#folders-view-link").removeAttr("href");
-				$("#by-date-view-container").addClass("grayed");
-				$("#by-date-view-link").removeAttr("href");
-				$("#by-gps-view-container").addClass("grayed");
-				$("#by-gps-view-link").removeAttr("href");
+				$("#folders-view").addClass("grayed").off("click");
+				$("#by-date-view").addClass("grayed").off("click");
+				$("#by-gps-view").addClass("grayed").off("click");
 			}
 			$("#powered-by").show();
 		} else {
@@ -1744,45 +1754,63 @@ $(document).ready(function() {
 			$('#menu-map-divider').hide();
 		}
 
-		$("#folders-view-link").attr("href", "#!/" +
-					PhotoFloat.pathJoin([
-						encodeURIComponent(currentMedia.foldersCacheBase),
-						encodeURIComponent(currentMedia.cacheBase)
-					]));
-		$("#by-date-view-link").attr("href", "#!/" +
-					PhotoFloat.pathJoin([
-						encodeURIComponent(currentMedia.dayAlbumCacheBase),
-						encodeURIComponent(currentMedia.foldersCacheBase),
-						encodeURIComponent(currentMedia.cacheBase)
-					]));
-		$("#by-gps-view-link").attr("href", "#!/" +
-	 			PhotoFloat.pathJoin([
-					encodeURIComponent(currentMedia.gpsAlbumCacheBase),
-					encodeURIComponent(currentMedia.foldersCacheBase),
-					encodeURIComponent(currentMedia.cacheBase)
-				]));
+		foldersViewLink = "#!/" + PhotoFloat.pathJoin([
+									encodeURIComponent(currentMedia.foldersCacheBase),
+									encodeURIComponent(currentMedia.cacheBase)
+								]);
+		byDateViewLink = "#!/" + PhotoFloat.pathJoin([
+									encodeURIComponent(currentMedia.dayAlbumCacheBase),
+									encodeURIComponent(currentMedia.foldersCacheBase),
+									encodeURIComponent(currentMedia.cacheBase)
+								]);
+		byGpsViewLink = "#!/" + PhotoFloat.pathJoin([
+									encodeURIComponent(currentMedia.gpsAlbumCacheBase),
+									encodeURIComponent(currentMedia.foldersCacheBase),
+									encodeURIComponent(currentMedia.cacheBase)
+								]);
 
-		$(".day-gps-folders-view").removeClass("grayed")
+		$(".day-gps-folders-view").removeClass("grayed");
 		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
 			// folder album: change to by date or by gps view
-			$("#folders-view-container").addClass("grayed");
-			$("#folders-view-link").removeAttr("href");
+			$("#folders-view").addClass("grayed").off("click");
+			$("#by-date-view").on("click", function(ev) {
+				window.location = byDateViewLink;
+				return false;
+			});
 			if (! hasGpsData(currentMedia)) {
-				$("#by-gps-view-container").addClass("grayed");
-				$("#by-gps-view-link").removeAttr("href");
+				$("#by-gps-view").hide();
+			} else {
+				$("#by-gps-view").on("click", function(ev) {
+					window.location = byGpsViewLink;
+					return false;
+				});
 			}
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0) {
 			// by date album: change to folder or by gps view
-			$("#by-date-view-container").toggleClass("grayed");
-			$("#by-date-view-link").removeAttr("href");
+			$("#folders-view").on("click", function(ev) {
+				window.location = foldersViewLink;
+				return false;
+			});
+			$("#by-date-view").addClass("grayed").off("click");
 			if (! hasGpsData(currentMedia)) {
-				$("#by-gps-view-container").addClass("grayed");
-				$("#by-gps-view-link").removeAttr("href");
+				$("#by-gps-view").hide();
+			} else {
+				$("#by-gps-view").on("click", function(ev) {
+					window.location = byGpsViewLink;
+					return false;
+				});
 			}
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0) {
+			$("#folders-view").on("click", function(ev) {
+				window.location = foldersViewLink;
+				return false;
+			});
+			$("#by-date-view").on("click", function(ev) {
+				window.location = byDateViewLink;
+				return false;
+			});
 			// by gps album: change to folder or by day view
-			$("#by-gps-view-container").toggleClass("grayed");
-			$("#by-gps-view-link").removeAttr("href");
+			$("#by-gps-view").addClass("grayed").off("click");
 		}
 
 		$('#metadata tr.gps').off('click');
@@ -2053,13 +2081,13 @@ $(document).ready(function() {
 				currentMedia = currentAlbum.media[0];
 				currentMediaIndex = 0;
 			}
-			$("#day-gps-folders-view-container").show();
+			// $(".day-gps-folders-view").show();
 			nextMedia = null;
 			previousMedia = null;
 			showMedia(currentAlbum);
 		}
 		else {
-			$("#day-gps-folders-view-container").hide();
+			// $(".day-gps-folders-view").hide();
 		}
 		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);

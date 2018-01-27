@@ -189,22 +189,9 @@
 		<li id="menu-line">
 			<a id="menu-icon" href="javascript:void(0);"> ☰ </a>
 		</li>
-		</li>
-		<li id="folders-view-container" class="day-gps-folders-view">
-			<a id="folders-view-link" href="javascript:void(0)">
-				<span id="folders-view"></span>
-			</a>
-		</li>
-		<li id="by-date-view-container" class="day-gps-folders-view">
-			<a id="by-date-view-link" href="javascript:void(0)">
-				<span id="by-date-view"></span>
-			</a>
-		</li>
-		<li id="by-gps-view-container" class="day-gps-folders-view">
-			<a id="by-gps-view-link" href="javascript:void(0)">
-				<span id="by-gps-view"></span>
-			</a>
-		</li>
+		<li id="folders-view" class="day-gps-folders-view"></li>
+		<li id="by-date-view" class="day-gps-folders-view"></li>
+		<li id="by-gps-view" class="day-gps-folders-view"></li>
 		<li id="album-sort" class="sort caption"></li>
 		<li class='sort album-sort by-date grayed'></li>
 		<li class='sort album-sort by-name grayed'></li>

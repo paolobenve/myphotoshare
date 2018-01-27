@@ -532,8 +532,6 @@ ul#right-menu li {
 	display: none;
 }
 
-/*#day-gps-folders-view-container,*/
-#folders-view-container, #by-date-view-container, #by-gps-view-container,
 ul#right-menu.expand li {
 	font-variant: small-caps;
 	text-align: center;
@@ -543,7 +541,8 @@ ul#right-menu.expand li {
 }
 
 ul#right-menu.expand li.caption {
-	text-align: left;
+	/*text-align: left;*/
+	padding-right: 2em;
 }
 
 ul#right-menu li#menu-icon, ul#right-menu li#menu-line {
@@ -568,7 +567,7 @@ ul#right-menu.expand li {
 
 ul#right-menu li, ul#right-menu.expand li {
 	padding: .1em .5em;
-	opacity: 0.5;
+	opacity: 0.8;
 }
 
 ul#right-menu.expand li a {
