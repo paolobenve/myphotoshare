@@ -324,70 +324,29 @@ $(document).ready(function() {
 		return cacheBase;
 	}
 
-	function HideShowSortButtons(albumOrMedia) {
-		var selectorInactive, selectorActive;
-		var reverseNameSort = albumOrMedia + "NameReverseSort";
-		var reverseDateSort = albumOrMedia + "DateReverseSort";
-		var nameSort = albumOrMedia + "NameSort";
-		var sortReverseClass = "." + albumOrMedia + "-sort-reverse";
-		var sortNormalClass = "." + albumOrMedia + "-sort-normal";
-		var sort = "." + albumOrMedia + "-sort";
-		var sortNameClass = sort + "-name";
-		var sortDateClass = sort + "-date";
-		var sortReverseNameClass = sortNameClass + sortReverseClass;
-		var sortReverseDateClass = sortDateClass + sortReverseClass;
-		var sortNormalNameClass = sortNameClass + sortNormalClass;
-		var sortNormalDateClass = sortDateClass + sortNormalClass;
-		var currentSort = _t(".current-sort");
-		var arrayActiveSelectors;
-		var latitude, longitude;
+	function modifySortButtons(albumOrMedia) {
 
-		if (currentAlbum[reverseDateSort] || currentAlbum[reverseNameSort])
-			$("li.album-sort.reverse-sort").removeClass("grayed");
-		if (currentAlbum[nameSort]) {
-			$("li.album-sort.by-name").removeClass("grayed");
-			currentSort += _t(".by-name");
-			if (currentAlbum[reverseNameSort]) {
-				currentSort += _t(".sort-reverse");
-				selectorInactive = sortReverseNameClass;
-				selectorActive = sortNormalNameClass;
-			} else {
-				selectorInactive = sortNormalNameClass;
-				selectorActive = sortReverseNameClass;
-			}
-			if (currentAlbum[reverseDateSort]) {
-				selectorInactive += ", " + sortNormalDateClass;
-				selectorActive += ", " + sortReverseDateClass;
-			} else {
-				selectorInactive += ", " + sortReverseDateClass;
-				selectorActive += ", " + sortNormalDateClass;
-			}
+		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
+			// nothing to sort
+			$("li.sort").hide();
 		} else {
-			$("li.album-sort.by-date").removeClass("grayed");
-			currentSort += _t(".by-date");
-			if (currentAlbum[reverseDateSort]) {
-				currentSort += _t(".sort-reverse");
-				selectorInactive = sortReverseDateClass;
-				selectorActive = sortNormalDateClass;
+			$("li.sort").css("display", "list-item").removeClass("selected");
+			if (currentAlbum[albumOrMedia + "NameSort"] || currentAlbum[albumOrMedia + "NameSort"]) {
+				$("." + albumOrMedia + "-sort.by-name").addClass("grayed").addClass("selected").css("cursor", "default");
+				$("." + albumOrMedia + "-sort.by-date").removeClass("grayed").css("cursor", "pointer");
 			} else {
-				selectorInactive = sortNormalDateClass;
-				selectorActive = sortReverseDateClass;
-			}
-			if (currentAlbum[reverseNameSort]) {
-				selectorInactive += ", " + sortNormalNameClass;
-				selectorActive += ", " + sortReverseNameClass;
-			} else {
-				selectorInactive += ", " + sortReverseNameClass;
-				selectorActive += ", " + sortNormalNameClass;
+				$("." + albumOrMedia + "-sort.by-date").addClass("grayed").addClass("selected").css("cursor", "default");
+				$("." + albumOrMedia + "-sort.by-name").removeClass("grayed").css("cursor", "pointer");
 			}
 		}
-		currentSort += ", ";
-		// $(selectorInactive).addClass("grayed");
-		// $(selectorActive).removeClass("grayed");
-		arrayActiveSelectors = selectorActive.split(", ");
-		for (var i = 0; i < arrayActiveSelectors.length; i++) {
-			if (true || arrayActiveSelectors.hasOwnProperty(sel))
-				$(arrayActiveSelectors[i]).html(currentSort + $(arrayActiveSelectors[i]).html());
+
+		if (
+			currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "NameReverseSort"] ||
+		 	! currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "DateReverseSort"]
+		) {
+			$("." + albumOrMedia + "-sort.sort-reverse").removeClass("grayed");
+		} else {
+			$("." + albumOrMedia + "-sort.sort-reverse").addClass("grayed").addClass("selected");
 		}
 	}
 
@@ -406,7 +365,7 @@ $(document).ready(function() {
 
 	function setTitle() {
 		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle;
-		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, sortButtons, m;
+		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, m;
 		// gpsLevelNumber is the number of levels for the by gps tree
 		// current levels are country, region, place => 3
 		var gpsLevelNumber = 3;
@@ -419,75 +378,6 @@ $(document).ready(function() {
 		else
 			originalTitle = translations[language]["#title-string"];
 
-		if (needAlbumNameSort()) {
-			currentAlbum.albums = sortByPath(currentAlbum.albums);
-			currentAlbum.albumNameSort = true;
-			if (getBooleanCookie("albumNameReverseSortRequested")) {
-				currentAlbum.albums = currentAlbum.albums.reverse();
-				currentAlbum.albumNameReverseSort = true;
-			}
-			$("li.album-sort.by-name").addClass("selected");
-		} else if (needAlbumDateSort()) {
-			currentAlbum.albums = sortByDate(currentAlbum.albums);
-			currentAlbum.albumNameSort = false;
-			if (getBooleanCookie("albumDateReverseSortRequested")) {
-				currentAlbum.albums = currentAlbum.albums.reverse();
-				currentAlbum.albumDateReverseSort = true;
-			}
-			$("li..album-sort.by-date").addClass("selected");
-		}
-		if (needAlbumNameReverseSort() || needAlbumDateReverseSort()) {
-			currentAlbum.albums = currentAlbum.albums.reverse();
-			if (needAlbumNameReverseSort())
-				currentAlbum.albumNameReverseSort = ! currentAlbum.albumNameReverseSort;
-			else
-				currentAlbum.albumDateReverseSort = ! currentAlbum.albumDateReverseSort;
-			$("li.album-sort.sort-reverse").addClass("selected");
-		}
-
-		if (needMediaNameSort()) {
-			currentAlbum.media = sortByName(currentAlbum.media);
-			currentAlbum.mediaNameSort = true;
-			if (getBooleanCookie("mediaNameReverseSortRequested")) {
-				currentAlbum.media = currentAlbum.media.reverse();
-				currentAlbum.mediaNameReverseSort = true;
-			}
-			if (currentMedia !== null) {
-				for (m = 0; m < currentAlbum.media.length; m ++) {
-					if (currentAlbum.media[m].cacheBase == currentMedia.cacheBase && currentAlbum.media[m].foldersCacheBase == currentMedia.foldersCacheBase) {
-						currentMediaIndex = m;
-						break;
-					}
-				}
-			}
-			$("li.media-sort.by-name").addClass("selected");
-		} else if (needMediaDateSort()) {
-			currentAlbum.media = sortByDate(currentAlbum.media);
-			currentAlbum.mediaNameSort = false;
-			if (getBooleanCookie("mediaDateReverseSortRequested")) {
-				currentAlbum.media = currentAlbum.media.reverse();
-				currentAlbum.mediaDateReverseSort = true;
-			}
-			if (currentMedia !== null) {
-				for (m = 0; m < currentAlbum.media.length; m ++) {
-					if (currentAlbum.media[m].cacheBase == currentMedia.cacheBase && currentAlbum.media[m].foldersCacheBase == currentMedia.foldersCacheBase) {
-						currentMediaIndex = m;
-						break;
-					}
-				}
-			}
-				$("li.media-sort.by-date").addClass("selected");
-		}
-		if (needMediaDateReverseSort() || needMediaNameReverseSort()) {
-			currentAlbum.media = currentAlbum.media.reverse();
-			if (needMediaNameReverseSort())
-				currentAlbum.mediaNameReverseSort = ! currentAlbum.mediaNameReverseSort;
-			else
-				currentAlbum.mediaDateReverseSort = ! currentAlbum.mediaDateReverseSort;
-			if (currentMediaIndex !== undefined && currentMediaIndex != -1)
-				currentMediaIndex = currentAlbum.media.length - 1 - currentMediaIndex;
-			$("li.media-sort.sort-reverse").addClass("selected");
-		}
 
 		if (! currentAlbum.path.length)
 			components = [originalTitle];
@@ -679,16 +569,6 @@ $(document).ready(function() {
 
 		if (currentMedia === null && currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
 			title += " &raquo; <span id=\"media-name\">" + photoFloat.trimExtension(currentAlbum.media[0].name) + "</span>";
-			sortButtons = false;
-		} else {
-			sortButtons = true;
-			// the buttons for changing sort
-			if (currentAlbum.albums.length > 1) {
-				$(".album-sort").removeClass("grayed");
-			}
-			if (currentAlbum.media.length > 1) {
-				$(".media-sort").removeClass("grayed");
-			}
 		}
 
 		$("#title-string").html(title);
@@ -709,187 +589,250 @@ $(document).ready(function() {
 			documentTitle =  photoFloat.trimExtension(currentAlbum.media[0].name) + " \u00ab " + documentTitle;
 
 		document.title = documentTitle;
+		setOptions();
 
+		return;
+	}
 
-		$(".album-sort").addClass("grayed");
-		$(".media-sort").addClass("grayed");
-		if (sortButtons) {
-			if (currentAlbum.albums.length > 1) {
-				$(".album-sort").removeClass("grayed");
-				HideShowSortButtons("album");
+	function initializeAlbumsAndMediaSorting() {
+		// this function applies the sorting on the media and subalbum lists
+		// and sets the album properties that attest the lists status
+
+		// album properties reflect the current sorting of album and media objects
+		// json files have albums and media sorted by date not reversed
+
+		if (currentAlbum.albumNameSort === undefined)
+			currentAlbum.albumNameSort = false;
+		if (currentAlbum.albumDateReverseSort === undefined)
+			currentAlbum.albumDateReverseSort = false;
+		if (currentAlbum.albumNameReverseSort === undefined)
+			currentAlbum.albumNameReverseSort = false;
+
+		if (currentAlbum.mediaNameSort === undefined)
+			currentAlbum.mediaNameSort = false;
+		if (currentAlbum.mediaDateReverseSort === undefined)
+			currentAlbum.mediaDateReverseSort = false;
+		if (currentAlbum.mediaNameReverseSort === undefined)
+			currentAlbum.mediaNameReverseSort = false;
+
+		// cookies reflect the requested sorting in ui
+		// they remember the ui state when a change in sort is requested (via the top buttons) and when the hash changes
+		// if they are not set yet, they are set to default values
+
+		if (getBooleanCookie("albumNameSortRequested") === null)
+			setBooleanCookie("albumNameSortRequested", Options.default_album_name_sort);
+		if (getBooleanCookie("albumDateReverseSortRequested") === null)
+			setBooleanCookie("albumDateReverseSortRequested", Options.default_album_date_reverse_sort);
+		if (getBooleanCookie("albumNameReverseSortRequested") === null)
+			setBooleanCookie("albumNameReverseSortRequested", false);
+
+		if (getBooleanCookie("mediaNameSortRequested") === null)
+			setBooleanCookie("mediaNameSortRequested", Options.default_media_name_sort);
+		if (getBooleanCookie("mediaDateReverseSortRequested") === null)
+			setBooleanCookie("mediaDateReverseSortRequested", Options.default_media_date_reverse_sort);
+		if (getBooleanCookie("mediaNameReverseSortRequested") === null)
+			setBooleanCookie("mediaNameReverseSortRequested", false);
+	}
+
+	function sortAlbumsMedia() {
+		// this function applies the sorting on the media and subalbum lists
+		// and sets the album properties that attest the lists status
+
+		// album properties reflect the current sorting of album and media objects
+		// json files have albums and media sorted by date not reversed
+
+		$("li.album-sort").removeClass("selected");
+		if (needAlbumNameSort()) {
+			currentAlbum.albums = sortByPath(currentAlbum.albums);
+			currentAlbum.albumNameSort = true;
+			if (getBooleanCookie("albumNameReverseSortRequested")) {
+				currentAlbum.albums = currentAlbum.albums.reverse();
+				currentAlbum.albumNameReverseSort = true;
 			}
-
-			if (currentAlbum.media.length > 1) {
-				$(".media-sort").removeClass("grayed");
-				HideShowSortButtons("media");
+			$("li.album-sort.by-name").addClass("selected");
+		} else if (needAlbumDateSort()) {
+			currentAlbum.albums = sortByDate(currentAlbum.albums);
+			currentAlbum.albumNameSort = false;
+			if (getBooleanCookie("albumDateReverseSortRequested")) {
+				currentAlbum.albums = currentAlbum.albums.reverse();
+				currentAlbum.albumDateReverseSort = true;
 			}
-
-			// $(".sort").removeClass("grayed");
-			// if (isMobile.any()) {
-			// 	$(".sort").css("padding", "0 .5em").css("display", "inline");
-			// }
-
-			if (currentAlbum.albums.length > 1) {
-				$(".album-sort-date.album-sort-reverse").unbind('click');
-				$(".album-sort-date.album-sort-reverse").on('click', function(ev) {
-					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						if (currentAlbum.albumNameSort) {
-							currentAlbum.albums = sortByDate(currentAlbum.albums);
-							currentAlbum.albumNameSort = false;
-							currentAlbum.albums = currentAlbum.albums.reverse();
-						} else if (! currentAlbum.albumDateReverseSort) {
-							currentAlbum.albums = currentAlbum.albums.reverse();
-						} else
-							return;
-						currentAlbum.albumDateReverseSort = true;
-						setBooleanCookie("albumNameSortRequested", false);
-						setBooleanCookie("albumDateReverseSortRequested", true);
-						HideShowSortButtons("album");
-						showAlbum("sortAlbums");
-						return false;
-					}
-				});
-
-				$(".album-sort-name.album-sort-reverse").unbind('click');
-				$(".album-sort-name.album-sort-reverse").on('click', function(ev) {
-					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						if (! currentAlbum.albumNameSort) {
-							currentAlbum.albums = sortByPath(currentAlbum.albums);
-							currentAlbum.albumNameSort = true;
-							currentAlbum.albums = currentAlbum.albums.reverse();
-						} else if (! currentAlbum.albumNameReverseSort) {
-							currentAlbum.albums = currentAlbum.albums.reverse();
-						} else
-							return;
-						currentAlbum.albumNameReverseSort = true;
-						setBooleanCookie("albumNameSortRequested", true);
-						setBooleanCookie("albumNameReverseSortRequested", true);
-						HideShowSortButtons("album");
-						showAlbum("sortAlbums");
-						return false;
-					}
-				});
-
-				$(".album-sort-date.album-sort-normal").unbind('click');
-				$(".album-sort-date.album-sort-normal").on('click', function(ev) {
-					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						if (currentAlbum.albumNameSort) {
-							currentAlbum.albums = sortByDate(currentAlbum.albums);
-							currentAlbum.albumNameSort = false;
-						} else if (currentAlbum.albumDateReverseSort) {
-							currentAlbum.albums = currentAlbum.albums.reverse();
-						} else
-							return;
-						currentAlbum.albumDateReverseSort = false;
-						setBooleanCookie("albumNameSortRequested", false);
-						setBooleanCookie("albumDateReverseSortRequested", false);
-						HideShowSortButtons("album");
-						showAlbum("sortAlbums");
-						return false;
-					}
-				});
-
-				$(".album-sort-name.album-sort-normal").unbind('click');
-				$(".album-sort-name.album-sort-normal").on('click', function(ev) {
-					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						if (! currentAlbum.albumNameSort) {
-							currentAlbum.albums = sortByPath(currentAlbum.albums);
-							currentAlbum.albumNameSort = true;
-						} else if (currentAlbum.albumNameReverseSort) {
-							currentAlbum.albums = currentAlbum.albums.reverse();
-						} else
-							return;
-						currentAlbum.albumNameReverseSort = false;
-						setBooleanCookie("albumNameSortRequested", true);
-						setBooleanCookie("albumNameReverseSortRequested", false);
-						HideShowSortButtons("album");
-						showAlbum("sortAlbums");
-						return false;
-					}
-				});
-			}
-
-			if (currentAlbum.media.length > 1) {
-				$(".media-sort-date.media-sort-reverse").unbind('click');
-				$(".media-sort-date.media-sort-reverse").on('click', function(ev) {
-					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						if (currentAlbum.mediaNameSort) {
-							currentAlbum.media = sortByDate(currentAlbum.media);
-							currentAlbum.mediaNameSort = false;
-							currentAlbum.media = currentAlbum.media.reverse();
-						} else if (! currentAlbum.mediaDateReverseSort) {
-							currentAlbum.media = currentAlbum.media.reverse();
-						} else
-							return;
-						currentAlbum.mediaDateReverseSort = true;
-						setBooleanCookie("mediaNameSortRequested", false);
-						setBooleanCookie("mediaDateReverseSortRequested", true);
-						HideShowSortButtons("media");
-						showAlbum("sortMedia");
-						return false;
-					}
-				});
-
-				$(".media-sort-name.media-sort-reverse").unbind('click');
-				$(".media-sort-name.media-sort-reverse").on('click', function(ev) {
-					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						if (! currentAlbum.mediaNameSort) {
-							currentAlbum.media = sortByName(currentAlbum.media);
-							currentAlbum.mediaNameSort = true;
-							currentAlbum.media = currentAlbum.media.reverse();
-						} else if (! currentAlbum.mediaNameReverseSort) {
-							currentAlbum.media = currentAlbum.media.reverse();
-						} else
-							return;
-						currentAlbum.mediaNameReverseSort = true;
-						setBooleanCookie("mediaNameSortRequested", true);
-						setBooleanCookie("mediaNameReverseSortRequested", true);
-						HideShowSortButtons("media");
-						showAlbum("sortMedia");
-						return false;
-					}
-				});
-
-				$(".media-sort-date.media-sort-normal").unbind('click');
-				$(".media-sort-date.media-sort-normal").on('click', function(ev) {
-					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						if (currentAlbum.mediaNameSort) {
-							currentAlbum.media = sortByDate(currentAlbum.media);
-							currentAlbum.mediaNameSort = false;
-						} else if (currentAlbum.mediaDateReverseSort) {
-							currentAlbum.media = currentAlbum.media.reverse();
-						} else
-							return;
-						currentAlbum.mediaDateReverseSort = false;
-						setBooleanCookie("mediaNameSortRequested", false);
-						setBooleanCookie("mediaDateReverseSortRequested", false);
-						HideShowSortButtons("media");
-						showAlbum("sortMedia");
-						return false;
-					}
-				});
-
-				$(".media-sort-name.media-sort-normal").unbind('click');
-				$(".media-sort-name.media-sort-normal").on('click', function(ev) {
-					if (ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-						if (! currentAlbum.mediaNameSort) {
-							currentAlbum.media = sortByName(currentAlbum.media);
-							currentAlbum.mediaNameSort = true;
-						} else if (currentAlbum.mediaNameReverseSort) {
-							currentAlbum.media = currentAlbum.media.reverse();
-						} else
-							return;
-						currentAlbum.mediaNameReverseSort = false;
-						setBooleanCookie("mediaNameSortRequested", true);
-						setBooleanCookie("mediaNameReverseSortRequested", false);
-						HideShowSortButtons("media");
-						showAlbum("sortMedia");
-						return false;
-					}
-				});
-			}
-			setOptions();
+			$("li.album-sort.by-date").addClass("selected");
 		}
+		if (needAlbumNameReverseSort() || needAlbumDateReverseSort()) {
+			currentAlbum.albums = currentAlbum.albums.reverse();
+			if (needAlbumNameReverseSort())
+				currentAlbum.albumNameReverseSort = ! currentAlbum.albumNameReverseSort;
+			else
+				currentAlbum.albumDateReverseSort = ! currentAlbum.albumDateReverseSort;
+			$("li.album-sort.sort-reverse").addClass("selected");
+		}
+
+		$("li.media-sort").removeClass("selected");
+		if (needMediaNameSort()) {
+			currentAlbum.media = sortByName(currentAlbum.media);
+			currentAlbum.mediaNameSort = true;
+			if (getBooleanCookie("mediaNameReverseSortRequested")) {
+				currentAlbum.media = currentAlbum.media.reverse();
+				currentAlbum.mediaNameReverseSort = true;
+			}
+			if (currentMedia !== null) {
+				for (m = 0; m < currentAlbum.media.length; m ++) {
+					if (currentAlbum.media[m].cacheBase == currentMedia.cacheBase && currentAlbum.media[m].foldersCacheBase == currentMedia.foldersCacheBase) {
+						currentMediaIndex = m;
+						break;
+					}
+				}
+			}
+			$("li.media-sort.by-name").addClass("selected");
+		} else if (needMediaDateSort()) {
+			currentAlbum.media = sortByDate(currentAlbum.media);
+			currentAlbum.mediaNameSort = false;
+			if (getBooleanCookie("mediaDateReverseSortRequested")) {
+				currentAlbum.media = currentAlbum.media.reverse();
+				currentAlbum.mediaDateReverseSort = true;
+			}
+			if (currentMedia !== null) {
+				for (m = 0; m < currentAlbum.media.length; m ++) {
+					if (currentAlbum.media[m].cacheBase == currentMedia.cacheBase && currentAlbum.media[m].foldersCacheBase == currentMedia.foldersCacheBase) {
+						currentMediaIndex = m;
+						break;
+					}
+				}
+			}
+			$("li.media-sort.by-date").addClass("selected");
+		}
+		if (needMediaDateReverseSort() || needMediaNameReverseSort()) {
+			currentAlbum.media = currentAlbum.media.reverse();
+			if (needMediaNameReverseSort())
+				currentAlbum.mediaNameReverseSort = ! currentAlbum.mediaNameReverseSort;
+			else
+				currentAlbum.mediaDateReverseSort = ! currentAlbum.mediaDateReverseSort;
+			if (currentMediaIndex !== undefined && currentMediaIndex != -1)
+				currentMediaIndex = currentAlbum.media.length - 1 - currentMediaIndex;
+			$("li.media-sort.sort-reverse").addClass("selected");
+		}
+	}
+
+	function bindClicksToSortMenu() {
+		// binds the click events to the sort buttons
+
+		// disable previous clicks
+		$(".album-sort.by-date").off('click');
+		$(".album-sort.by-name").off('click');
+		$(".album-sort.sort-reverse").off('click');
+
+		// albums
+		$("li.album-sort.by-date").on('click', function(ev) {
+			if (currentMedia === null && currentAlbum.albums.length > 1 && currentAlbum.albumNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+				setBooleanCookie("albumNameSortRequested", false);
+				if (currentAlbum.albumNameReverseSort)
+					setBooleanCookie("albumDateReverseSortRequested", true);
+				else
+					setBooleanCookie("albumDateReverseSortRequested", false);
+				sortAlbumsMedia();
+				modifySortButtons("album");
+				showAlbum("sortAlbums");
+				return false;
+			} else
+				return false;
+		});
+
+		$("li.album-sort.by-name").on('click', function(ev) {
+			if (currentMedia === null && currentAlbum.albums.length > 1 && ! currentAlbum.albumNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+				setBooleanCookie("albumNameSortRequested", true);
+				if (currentAlbum.albumDateReverseSort)
+					setBooleanCookie("albumNameReverseSortRequested", true);
+				else
+					setBooleanCookie("albumNameReverseSortRequested", false);
+				sortAlbumsMedia();
+				modifySortButtons("album");
+				showAlbum("sortAlbums");
+				return false;
+			} else
+				return false;
+		});
+
+		$("li.album-sort.sort-reverse").on('click', function(ev) {
+			if (currentMedia === null && currentAlbum.albums.length > 1 && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+				$(".album-sort").removeClass("grayed");
+				if (currentAlbum.albumNameSort) {
+					if (currentAlbum.albumNameReverseSort) {
+						setBooleanCookie("albumNameReverseSortRequested", false);
+					} else {
+						setBooleanCookie("albumNameReverseSortRequested", true);
+					}
+				} else {
+					if (currentAlbum.albumDateReverseSort) {
+						setBooleanCookie("albumDateReverseSortRequested", false);
+					} else {
+						setBooleanCookie("albumDateReverseSortRequested", true);
+					}
+				}
+				sortAlbumsMedia();
+				modifySortButtons("album");
+				showAlbum("sortAlbums");
+				return false;
+			} else
+				return false;
+		});
+
+		// media
+		$("li.media-sort.by-date").on('click', function(ev) {
+			if (currentMedia === null && currentAlbum.albums.length > 1 && currentAlbum.mediaNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+				setBooleanCookie("mediaNameSortRequested", false);
+				if (currentAlbum.mediaNameReverseSort)
+					setBooleanCookie("mediaDateReverseSortRequested", true);
+				else
+					setBooleanCookie("mediaDateReverseSortRequested", false);
+				sortAlbumsMedia();
+				modifySortButtons("media");
+				showAlbum("sortMedia");
+				return false;
+			} else
+				return false;
+		});
+
+		$("li.media-sort.by-name").on('click', function(ev) {
+			if (currentMedia === null && currentAlbum.albums.length > 1 && ! currentAlbum.mediaNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+				setBooleanCookie("mediaNameSortRequested", true);
+				if (currentAlbum.mediaDateReverseSort)
+					setBooleanCookie("mediaNameReverseSortRequested", true);
+				else
+					setBooleanCookie("mediaNameReverseSortRequested", false);
+				sortAlbumsMedia();
+				modifySortButtons("media");
+				showAlbum("sortMedia");
+				return false;
+			} else
+				return false;
+		});
+
+		$("li.media-sort.sort-reverse").on('click', function(ev) {
+			if (currentMedia === null && currentAlbum.albums.length > 1 && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+				$(".media-sort").removeClass("grayed");
+				if (currentAlbum.mediaNameSort) {
+					if (currentAlbum.mediaNameReverseSort) {
+						setBooleanCookie("mediaNameReverseSortRequested", false);
+					} else {
+						setBooleanCookie("mediaNameReverseSortRequested", true);
+					}
+				} else {
+					if (currentAlbum.mediaDateReverseSort) {
+						setBooleanCookie("mediaDateReverseSortRequested", false);
+					} else {
+						setBooleanCookie("mediaDateReverseSortRequested", true);
+					}
+				}
+				sortAlbumsMedia();
+				modifySortButtons("media");
+				showAlbum("sortMedia");
+				return false;
+			} else
+				return false;
+		});
+
+
 	}
 
 	function cacheBaseToCoordinateArray(cacheBase) {
@@ -909,7 +852,7 @@ $(document).ready(function() {
 
 	function sortByPath(albumList) {
 		if (albumList[0].cacheBase.indexOf(Options.by_gps_string) == 0)
-			return sortBy(albumList, 'alt_name');
+			return sortBy(albumList, 'name');
 		else
 			return sortBy(albumList, 'path');
 	}
@@ -2037,46 +1980,18 @@ $(document).ready(function() {
 
 		setOptions();
 
-		// album properties reflect the current sorting of album and media objects
-		// json files have albums and media sorted by date not reversed
-
-		if (currentAlbum.albumNameSort === undefined)
-			currentAlbum.albumNameSort = false;
-		if (currentAlbum.albumDateReverseSort === undefined)
-			currentAlbum.albumDateReverseSort = false;
-		if (currentAlbum.albumNameReverseSort === undefined)
-			currentAlbum.albumNameReverseSort = false;
-
-		if (currentAlbum.mediaNameSort === undefined)
-			currentAlbum.mediaNameSort = false;
-		if (currentAlbum.mediaDateReverseSort === undefined)
-			currentAlbum.mediaDateReverseSort = false;
-		if (currentAlbum.mediaNameReverseSort === undefined)
-			currentAlbum.mediaNameReverseSort = false;
-
-		// cookies reflect the requested sorting in ui
-		// they remember the ui state when a change in sort is requested (via the top buttons) and when the hash changes
-		// if they are not set yet, they are set to default values
-
-		if (getBooleanCookie("albumNameSortRequested") === null)
-			setBooleanCookie("albumNameSortRequested", Options.default_album_name_sort);
-		if (getBooleanCookie("albumDateReverseSortRequested") === null)
-			setBooleanCookie("albumDateReverseSortRequested", Options.default_album_date_reverse_sort);
-		if (getBooleanCookie("albumNameReverseSortRequested") === null)
-			setBooleanCookie("albumNameReverseSortRequested", false);
-
-		if (getBooleanCookie("mediaNameSortRequested") === null)
-			setBooleanCookie("mediaNameSortRequested", Options.default_media_name_sort);
-		if (getBooleanCookie("mediaDateReverseSortRequested") === null)
-			setBooleanCookie("mediaDateReverseSortRequested", Options.default_media_date_reverse_sort);
-		if (getBooleanCookie("mediaNameReverseSortRequested") === null)
-			setBooleanCookie("mediaNameReverseSortRequested", false);
-
-		if (currentMedia === null || typeof currentMedia === "object")
+		if (currentMedia === null || typeof currentMedia === "object") {
 			setTitle();
 
-		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1)
-		{
+			initializeAlbumsAndMediaSorting();
+			sortAlbumsMedia();
+			bindClicksToSortMenu();
+			modifySortButtons("album");
+			modifySortButtons("media");
+			$(".album-sort.sort-reverse").css("cursor", "pointer");
+		}
+
+		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
 			if (currentMedia === null) {
 				currentMedia = currentAlbum.media[0];
 				currentMediaIndex = 0;
@@ -2088,8 +2003,7 @@ $(document).ready(function() {
 			nextMedia = null;
 			previousMedia = null;
 			showMedia(currentAlbum);
-		}
-		else {
+		} else {
 			// $(".day-gps-folders-view").hide();
 		}
 		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
@@ -2118,6 +2032,8 @@ $(document).ready(function() {
 			// subalbums are present, we have to wait when all the random thumbnails will be loaded
 		}
 		fromEscKey = false;
+
+		return;
 	}
 
 	function getOptions(callback) {

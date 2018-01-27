@@ -186,9 +186,7 @@
 	</div>
 
 	<ul id="right-menu">
-		<li id="menu-line">
-			<a id="menu-icon" href="javascript:void(0);"> ☰ </a>
-		</li>
+		<li id="menu-icon"> ☰ </li>
 		<li id="folders-view" class="day-gps-folders-view"></li>
 		<li id="by-date-view" class="day-gps-folders-view"></li>
 		<li id="by-gps-view" class="day-gps-folders-view"></li>
