@@ -338,15 +338,15 @@ $(document).ready(function() {
 				$("." + albumOrMedia + "-sort.by-date").addClass("grayed").addClass("selected").css("cursor", "default");
 				$("." + albumOrMedia + "-sort.by-name").removeClass("grayed").css("cursor", "pointer");
 			}
-		}
-
-		if (
-			currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "NameReverseSort"] ||
-		 	! currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "DateReverseSort"]
-		) {
-			$("." + albumOrMedia + "-sort.sort-reverse").removeClass("grayed");
-		} else {
-			$("." + albumOrMedia + "-sort.sort-reverse").addClass("grayed").addClass("selected");
+			
+			if (
+				currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "NameReverseSort"] ||
+			 	! currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "DateReverseSort"]
+			) {
+				$("." + albumOrMedia + "-sort.sort-reverse").removeClass("grayed");
+			} else {
+				$("." + albumOrMedia + "-sort.sort-reverse").addClass("grayed").addClass("selected");
+			}
 		}
 	}
 
