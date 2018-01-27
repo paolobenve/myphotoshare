@@ -677,7 +677,7 @@ $(document).ready(function() {
 			}
 		}
 
-		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
+		if (currentMedia === null && currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
 			title += " &raquo; <span id=\"media-name\">" + photoFloat.trimExtension(currentAlbum.media[0].name) + "</span>";
 			sortButtons = false;
 		} else {
@@ -705,7 +705,7 @@ $(document).ready(function() {
 		// keep generating the html page title
 		if (currentMedia !== null)
 			documentTitle = photoFloat.trimExtension(currentMedia.name) + documentTitle;
-		else if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1)
+		else if (currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1)
 			documentTitle =  photoFloat.trimExtension(currentAlbum.media[0].name) + " \u00ab " + documentTitle;
 
 		document.title = documentTitle;
