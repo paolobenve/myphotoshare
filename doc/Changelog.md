@@ -4,6 +4,7 @@
 * bug fixes
 * new debug option `show_faces`: lets the scanner show the faces detected (but read the not in `myphotoshare.conf.default`)
 * new option `face_cascade_scale_factor`: a parameter of `opencv`'s `detectMultiScale` function that detects the faces in the photo
+* UI cleaned putting sort and view switches to a hidden top right menu
 
 ### version 3.3 (January 22, 2018)
 
@@ -218,4 +219,3 @@
 * Optional Google Analytics integration
 * Optional server-side authentication support
 * A thousand other tweaks here and there...
-
