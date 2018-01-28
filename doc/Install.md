@@ -139,5 +139,13 @@ Testing that Python loads OpenCV:
     $ python3 -m cv2
 ```
 
-Python will require also the XML file `haarcascade_frontalface_alt.xml` for face detection. On Debian based system, this file is provided by package `opencv-data`,
-If this file is not found, a message will be printed whenverbose level is 3 at least.
+Python will require also the XML file `haarcascade_frontalface_alt.xml` for face detection. On Debian based system, this file is provided by package `opencv-data`. If this file is not found, a message will be printed when the verbose level is at least 3.
+
+```bash
+$ ./main.py /etc/myphotoshare/myphotoshare.conf 
+   2612236 2018-01-28 11:01:42.562583   [importer]                                     opencv library available, using it!
+       118 2018-01-28 11:01:42.562701   |--[looking for file...]                          haarcascade_frontalface_default.xml
+  67881115 2018-01-28 11:02:50.443816   |  |--[face xml file not found]                      haarcascade_frontalface_default.xml
+     38652 2018-01-28 11:02:50.482468   [Options]                                      asterisk denotes options changed by config file
+     ...
+```
