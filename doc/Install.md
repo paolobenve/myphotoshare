@@ -140,4 +140,4 @@ Testing that Python loads OpenCV:
 ```
 
 Python will require also the XML file `haarcascade_frontalface_alt.xml` for face detection. On Debian based system, this file is provided by package `opencv-data`,
-
+If this file is not found, a message will be printed whenverbose level is 3 at least.

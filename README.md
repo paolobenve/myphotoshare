@@ -4,13 +4,13 @@
 
 ## Description
 
-`MyPhotoShare` is an open source web photo gallery aimed at sleekness and speed. It works over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
+**MyPhotoShare** is an open source web photo gallery aimed at sleekness and speed. It works over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
-Permits browsing the media by folder, date and geotags.
+It permits browsing the media by folder, date and geotags.
 
-Content (albums, media files) can be shared over some popular social plaforms.
+Content (albums and media files) can be shared over some popular social plaforms.
 
-`MyPhotoShare` is a Jason A. Donenfeld's `photofloat` fork, enriched by Jerome Charaoui's patches permitting showing videos, Paolo Benvenuto's following development and Pierre Métras' patches.
+**MyPhotoShare** is a Jason A. Donenfeld's *photofloat* fork, enriched by Jerome Charaoui's patches permitting showing videos, Paolo Benvenuto's following development and Pierre Métras' patches.
 
 [Check out a demo!](http://palmaro.qumran2.net/)
 
