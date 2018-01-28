@@ -32,51 +32,58 @@ Content (albums and media files) can be shared over some popular social plaforms
 ## Features
 
 ### Gallery
-[x] Manages images and videos, and permits sharing them (single image or album).
-[x] Media can be browsed by folder, by date or by geolocation. Switching among album, date and place views.
-[x] Media and folders can be sorted ascending/descending by date or by name.
-[x] Thumbnails can be square (cropped, with optional face detection by [OpenCV](https://opencv.org/)) or full-content.
+
+- [x] Manages images and videos, and permits sharing them (single image or album).
+- [x] Media can be browsed by folder, by date or by geolocation. Switching among album, date and place views.
+- [x] Media and folders can be sorted ascending/descending by date or by name.
+- [x] Thumbnails can be square (cropped, with optional face detection by [OpenCV](https://opencv.org/)) or full-content.
 
 ### For Photographers
-[x] Photos with GPS data can be browsed by country/region-state/place; names are retrieves in choosen language from geonames.org web service.
-[x] Fullscreen mode.
-[x] EXIF, IPTC and XMP Metadata display.
-[x] Link to original media.
-[x] Link for direct download.
+
+- [x] Photos with GPS data can be browsed by country/region-state/place; names are retrieves in choosen language from geonames.org web service.
+- [x] Fullscreen mode.
+- [x] EXIF, IPTC and XMP Metadata display.
+- [x] Link to original media.
+- [x] Link for direct download.
 
 ### Mobile Friendly
-[x] Swipe gestures for mobile.
-[x] Sharp images and thumbnails on mobile.
-[x] Smooth media scaling.
-[x] Consistent hash URL format.
+
+- [x] Swipe gestures for mobile.
+- [x] Sharp images and thumbnails on mobile.
+- [x] Smooth media scaling.
+- [x] Consistent hash URL format.
 
 ### Great User Experience
-[x] Keyboard navigation: arrows, pageup/down, `[esc]`, `[f]` (fullscreen), `[m]` (metadata).
-[x] Mouse-wheel support.
-[x] Animations to make the interface feel nice.
-[x] Separate album view and photo view.
-[x] Media animation when passing to next/previous media.
-[x] Available in English, Italian, Spanish, French. User interface translated via separate translation file. Add your language!
+
+- [x] Keyboard navigation: arrows, pageup/down, `[esc]`, `[f]` (fullscreen), `[m]` (metadata).
+- [x] Mouse-wheel support.
+- [x] Animations to make the interface feel nice.
+- [x] Separate album view and photo view.
+- [x] Media animation when passing to next/previous media.
+- [x] Available in English, Italian, Spanish, French. User interface translated via separate translation file. Add your language!
 
 ### Social
-[x] Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+`: a preview of the image/album is shared.
+
+- [x] Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+`: a preview of the image/album is shared.
 
 ### Performance
-[x] Album metadata pre-fetching.
-[x] Photo pre-loading.
-[x] Scanner uses recursive async randomized tree walking album thumbnail algorithm.
-[x] HTML5 with minified CSS and JavaScript files for minimal load time.
+
+- [x] Album metadata pre-fetching.
+- [x] Photo pre-loading.
+- [x] Scanner uses recursive async randomized tree walking album thumbnail algorithm.
+- [x] HTML5 with minified CSS and JavaScript files for minimal load time.
 
 ### And More...
-[x] Analytics with optional Google Analytics and Piwik integration.
-[x] Optional server-side authentication support.
-[x] Many customizations available through config file.
-[x] Cache folder can be managed with subdirs: useful for large repositories.
-[x] Source albums server folders can be anywhere on the server.
-[x] Folders (or trees) are not scanned if a marker in put inside them.
-[x] Scanner verbosity levels can be set in the configuration file.
-[x] Developer friendly with debug mode for using unminimized css's and js's.
-[x] Photos metadata can be overloaded by user defined values in special file `album.ini`.
+
+- [x] Analytics with optional Google Analytics and Piwik integration.
+- [x] Optional server-side authentication support.
+- [x] Many customizations available through config file.
+- [x] Cache folder can be managed with subdirs: useful for large repositories.
+- [x] Source albums server folders can be anywhere on the server.
+- [x] Folders (or trees) are not scanned if a marker in put inside them.
+- [x] Scanner verbosity levels can be set in the configuration file.
+- [x] Developer friendly with debug mode for using unminimized css's and js's.
+- [x] Photos metadata can be overloaded by user defined values in special file `album.ini`.
 
 
 ## Community
@@ -97,9 +104,9 @@ The Python script scans a directory tree of images, whereby each directory const
 The JavaScript application consists of a single `index.php` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the `options.json` file and the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface.
 
 MyPhotoShare features share buttons, and PHP permits to pass the shared image/video/album to social media:
-* - inserts link tag in `<head>...</head>` in order to let social media see the shared content;
-* - applies basic options to home page;
-* - insert proper parameters for analytics tracking.
+- inserts link tag in `<head>...</head>` in order to let social media see the shared content;
+- applies basic options to home page;
+- insert proper parameters for analytics tracking.
 
 It is, essentially, a slick and fast, minimal but still well-featured photo gallery app on the net, suitable for sharing your media with your friends.
 
