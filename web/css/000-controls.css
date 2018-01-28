@@ -13,7 +13,7 @@ a:hover {
 	color: #FFAD27;
 }
 
-#title, #title:hover, .day-gps-folders-view {
+#title, #title:hover {
 	font-weight: bold;
 	font-size: medium;
 }
@@ -502,10 +502,6 @@ ul#right-menu {
 	right: 0;
 }
 
-ul#right-menu li#menu-icon {
-	text-align: right;
-}
-
 ul#right-menu li a#menu-icon:hover {
 	background-color: transparent;
 }
@@ -519,27 +515,26 @@ ul#right-menu li#menu-icon, ul#right-menu li#menu-line {
 	display: list-item;
 }
 
-/*ul#right-menu.expand {
-	position: relative;
-}*/
-/*ul#right-menu.expand li#menu-icon, ul#right-menu.expand li#menu-line {
-	position: absolute;
-	right: 0;
-	top: 0;
-}*/
-ul#right-menu.expand li.caption {
-	/*text-align: left;*/
-	padding-right: 2em;
-}
-
 ul#right-menu li#menu-icon, ul#right-menu.expand li {
-	font-variant: small-caps;
 	float: none;
-	display: list-item;
 	text-align: right;
 	background-color: black;
 	padding: .1em .5em;
+}
+
+ul#right-menu.expand li {
+	display: list-item;
+	text-align: right;
 	opacity: 0.8;
+	font-style: italic;
+}
+
+ul#right-menu.expand li.caption {
+	/*text-align: left;*/
+	padding-right: 2em;
+	font-variant: small-caps;
+	font-weight: bold;
+	font-style: normal;
 }
 
 ul#right-menu.expand li:not(#menu-icon) {
@@ -550,6 +545,8 @@ ul#right-menu li#menu-icon {
 	width: 1em;
 	cursor: pointer;
 	float: right;
+	text-align: right;
+	font-style: normal;
 }
 
 ul#right-menu.expand li.selected {
