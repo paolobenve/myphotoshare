@@ -10,7 +10,7 @@ It permits browsing the media by folder, date and geotags.
 
 Content (albums and media files) can be shared over some popular social plaforms.
 
-**MyPhotoShare** is a Jason A. Donenfeld's *photofloat* fork, enriched by Jerome Charaoui's patches permitting showing videos, Paolo Benvenuto's following development and Pierre Métras' patches.
+**MyPhotoShare** is a Jason A. Donenfeld's *photofloat* fork, enriched by Jerome Charaoui's patches permitting showing videos, Paolo Benvenuto's and Pierre Métras's following development.
 
 [Check out a demo!](http://palmaro.qumran2.net/)
 
@@ -117,4 +117,3 @@ As a term of comparizon, on my medium-sized pc, with the images on a NFS mounted
 
 * scanning for the first time a 124 photos directory for a total size of 295 MB takes about 100 seconds (about 1 sec/media, 1 media/sec).
 * re-scan of "all OK" tree with 36000 media files for a total size of 87 GB takes about 14 minutes (about 20 ms/media, 50 media/sec).
-
