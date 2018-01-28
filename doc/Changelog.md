@@ -2,9 +2,15 @@
 
 * new option `small_square_crops_background_color` for filling the background of small square crops
 * bug fixes
-* new debug option `show_faces`: lets the scanner show the faces detected (but read the not in `myphotoshare.conf.default`)
+* new debug option `show_faces`: lets the scanner show the faces detected (but read the note in `myphotoshare.conf.default`)
 * new option `face_cascade_scale_factor`: a parameter of `opencv`'s `detectMultiScale` function that detects the faces in the photo
 * UI cleaned putting sort and view switches to a hidden top right menu
+* Reorganization of documentation:
+  * Creation of `doc` and `doc/img` folders.
+  * `README.md` split into individual files.
+  * Explained how to use advanced features like geonames or face detection.
+  * Created a gallery of screenshots.
+
 
 ### version 3.3 (January 22, 2018)
 
