@@ -51,11 +51,12 @@
 		// this function returns true if the root album has the by gps subalbum
 		if (this.geotaggedPhotosFound !== null) {
 			if (this.geotaggedPhotosFound) {
-				$("#by-gps-view").removeClass("grayed").on("click", function(ev) {
+				$("#by-gps-view").removeClass("hidden").addClass("active").on("click", function(ev) {
 					window.location = link;
 					return false;
 				});
-
+			} else {
+				$("#by-gps-view").addClass("hidden");
 			}
 		} else {
 			self = this;
@@ -63,10 +64,11 @@
 				Options.by_gps_string,
 				function() {
 					self.geotaggedPhotosFound = true;
+					$("#by-gps-view").addClass("hidden");
 					window.location = link;
 				},
 				function() {
-					$("#by-gps-view").hide();
+					$("#by-gps-view").addClass("hidden");
 					self.geotaggedPhotosFound = false;
 				}
 			);

@@ -449,15 +449,6 @@ video {
 	text-decoration: none;
 }
 
-.sort, .day-gps-folders-view {
-	padding: 0 .5em;
-	cursor: pointer;
-}
-
-.sort.caption, .sort.grayed,  .day-gps-folders-view.grayed {
-	cursor: default;
-}
-
 .sort img.opaque {
 /*
 	opacity: 0.25;
@@ -489,6 +480,16 @@ video {
 
 /****************************/
 /* right menu */
+
+.sort, .day-gps-folders-view {
+	padding: 0 .5em;
+	cursor: pointer;
+}
+
+.sort.caption, .sort:not(.active),  .day-gps-folders-view:not(.active) {
+	cursor: default;
+}
+
 ul#right-menu {
 	list-style-type: none;
 	margin: 0;
@@ -556,11 +557,15 @@ ul#right-menu.expand li.selected {
 	color: white;
 }
 
-ul#right-menu li.grayed {
+ul#right-menu li:not(.active) {
 	color: darkgray;
 }
 ul#right-menu li:not(.caption):hover {
 	color: black !important;
 	background-color: white !important;
+}
+
+ul#right-menu.expand li.hidden {
+	display: none;
 }
 /* end right menu */

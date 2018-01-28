@@ -187,17 +187,18 @@
 
 	<ul id="right-menu">
 		<li id="menu-icon"> ☰ </li>
+		<li class="day-gps-folders-view caption"></li>
 		<li id="folders-view" class="day-gps-folders-view"></li>
 		<li id="by-date-view" class="day-gps-folders-view"></li>
 		<li id="by-gps-view" class="day-gps-folders-view"></li>
-		<li id="album-sort" class="sort caption"></li>
-		<li class='sort album-sort by-date grayed'></li>
-		<li class='sort album-sort by-name grayed'></li>
-		<li class='sort album-sort sort-reverse grayed'></li>
-		<li id="media-sort" class="sort caption"></li>
-		<li class='sort media-sort by-date grayed'></li>
-		<li class='sort media-sort by-name grayed'></li>
-		<li class='sort media-sort sort-reverse grayed'></li>
+		<li class="sort album-sort caption"></li>
+		<li class='sort album-sort by-date'></li>
+		<li class='sort album-sort by-name'></li>
+		<li class='sort album-sort sort-reverse active'></li>
+		<li class="sort media-sort caption"></li>
+		<li class='sort media-sort by-date'></li>
+		<li class='sort media-sort by-name'></li>
+		<li class='sort media-sort sort-reverse active'></li>
 	</ul>
 
 	<div id="error-overlay"></div>
