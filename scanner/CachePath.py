@@ -23,6 +23,13 @@ def find(name):
 	for root, dirs, files in os.walk('/'):
 		if name in files:
 			return os.path.join(root, name)
+	return False
+
+def find_in_usr_share(name):
+	for root, dirs, files in os.walk('/usr/share/'):
+		if name in files:
+			return os.path.join(root, name)
+	return False
 
 
 def remove_folders_marker(path):

@@ -25,17 +25,14 @@ num_video_processed = 0
 photos_without_geotag = []
 photos_without_exif_date = []
 options_not_to_be_saved = ['cache_path', 'index_html_path', 'album_path']
-options_requiring_json_regeneration = ['jpeg_quality', 'geonames_language', 'unspecified_geonames_code', 'get_geonames_online', ]
+options_requiring_json_regeneration = ['geonames_language', 'unspecified_geonames_code', 'get_geonames_online']
+options_requiring_reduced_images_regeneration = ['jpeg_quality']
+options_requiring_thumbnails_regeneration = ['face_cascade_scale_factor', 'small_square_crops_background_color']
 # set this variable to a new integer number whenever the json files structure changes
 # json_version = 1 since ...
 # json_version = 2 since checksums have been added
 # json_version = 3 since geotag managing is optional
 json_version = 3
-
-# This is a debug option: it lets the scanner show the faces detected
-# obviously it only make sense when the scanner is run interactively, because the user must close every image with a keystroke
-# I'm getting it working if running in pyCharm, it stops with a segfault if run from terminal. Why????
-show_faces = False
 
 def get_options():
 	from Utilities import message, next_level, back_level
@@ -97,7 +94,8 @@ def get_options():
 				'default_album_date_reverse_sort',
 				'default_media_date_reverse_sort',
 				'recreate_fixed_height_thumbnails',
-				'get_geonames_online'
+				'get_geonames_online',
+				'show_faces'
 		):
 			try:
 				config[option] = usr_config.getboolean('options', option)
@@ -108,7 +106,7 @@ def get_options():
 				config[option] = default_config.getboolean('options', option)
 		elif option in ('reduced_sizes', 'map_zoom_levels'):
 			config[option] = eval(usr_config.get('options', option))
-		elif option in ('mobile_thumbnail_factor'):
+		elif option in ('mobile_thumbnail_factor', 'face_cascade_scale_factor'):
 			config[option] = usr_config.getfloat('options', option)
 			if config[option] < 1:
 				config[option] = 1
@@ -275,34 +273,34 @@ def get_options():
 		old_options = config
 
 	config['recreate_reduced_photos'] = False
-	try:
-		if (
-			old_options['jpeg_quality'] != config['jpeg_quality']
-		):
+	for option in options_requiring_reduced_images_regeneration:
+		try:
+			if old_options[option] != config[option]:
+				config['recreate_reduced_photos'] = True
+				message("options", "'" + option + "' has changed from previous scanner run, forcing recreation of reduced size images", 3)
+		except KeyError:
 			config['recreate_reduced_photos'] = True
-			config['recreate_thumbnails'] = True
-	except KeyError:
-		config['recreate_reduced_photos'] = True
-		config['recreate_thumbnails'] = True
+			message("options", "'" + option + "' wasn't set on previous scanner run, forcing recreation of reduced size images", 3)
 
 	config['recreate_thumbnails'] = False
-	try:
-		if (
-			old_options['media_thumb_type'] != config['media_thumb_type'] or
-			old_options['album_thumb_type'] != config['album_thumb_type']
-		):
+	for option in options_requiring_thumbnails_regeneration:
+		try:
+			if old_options[option] != config[option]:
+				config['recreate_thumbnails'] = True
+				message("options", "'" + option + "' has changed from previous scanner run, forcing recreation of thumbnails", 3)
+		except KeyError:
 			config['recreate_thumbnails'] = True
-	except KeyError:
-		config['recreate_thumbnails'] = True
+			message("options", "'" + option + "' wasn't set on previous scanner run, forcing recreation of thumbnails", 3)
+
 
 	config['recreate_json_files'] = False
 	for option in options_requiring_json_regeneration:
 		try:
 			if old_options[option] != config[option]:
 				config['recreate_json_files'] = True
-				message("option '" + option + "' has changed from previous scanner run, forcing recreation of json files", "", 3)
+				message("options", "'" + option + "' has changed from previous scanner run, forcing recreation of json files", 3)
 				break
 		except KeyError:
 			config['recreate_json_files'] = True
-			message("option '" + option + "' wasn't set on previous scanner run, forcing recreation of json files", "", 3)
+			message("options", "'" + option + "' wasn't set on previous scanner run, forcing recreation of json files", 3)
 			break

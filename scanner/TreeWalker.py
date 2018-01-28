@@ -49,6 +49,7 @@ class TreeWalker:
 			back_level()
 
 		self.origin_album = Album(Options.config['album_path'])
+		# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parente of the root physical tree and of the virtual albums
 		self.origin_album.cache_base = cache_base(Options.config['album_path'])
 		album_cache_base = Options.config['folders_string']
 		next_level()
@@ -416,6 +417,8 @@ class TreeWalker:
 			back_level()
 		json_file = os.path.join(Options.config['cache_path'], album_cache_base) + ".json"
 		json_file_OK = False
+		album_ini_file = os.path.join(absolute_path, 'album.ini')
+		album_ini_OK = True
 		cached_album = None
 		json_message = json_file + " (path: " + os.path.basename(absolute_path) + ")"
 		if Options.config['recreate_json_files']:
@@ -428,39 +431,50 @@ class TreeWalker:
 					elif not os.access(json_file, os.W_OK):
 						message("json file unwritable", json_file, 1)
 					else:
-						message("reading json file to import album...", json_file, 5)
-						# the following is the instruction which could raise the error
-						cached_album = Album.from_cache(json_file, album_cache_base)
-						next_level()
-						message("json file read", "", 5)
-						back_level()
-						if (
-							file_mtime(absolute_path) <= file_mtime(json_file) and
-							cached_album is not None and
-							hasattr(cached_album, "absolute_path") and
-							cached_album.absolute_path == absolute_path and
-							hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
-						):
+						if os.path.exists(album_ini_file):
+							if not os.access(album_ini_file, os.R_OK):
+								message("album.ini file unreadable", "", 2)
+								album_ini_OK = False
+							else:
+								if file_mtime(album_ini_file) > file_mtime(json_file):
+									# a check on album_ini_file would be necessary too
+									# execution comes here even if album.ini hasn't anything significant
+									message("album.ini newer than json file", "recreating json file taking into account album.ini", 4)
+									album_ini_OK = False
+						if album_ini_OK:
+							message("reading json file to import album...", json_file, 5)
+							# the following is the instruction which could raise the error
+							cached_album = Album.from_cache(json_file, album_cache_base)
 							next_level()
-							message("json file is OK", "  " + json_message, 4)
+							message("json file read", "", 5)
 							back_level()
-							json_file_OK = True
-							album = cached_album
-							message("adding media in album to big lists...", "", 5)
-							for media in album.media:
-								if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
-									self.all_media.append(media)
-									self.add_media_to_tree_by_date(media)
-									if media.has_gps_data:
-										self.add_media_to_tree_by_geonames(media)
-							next_level()
-							message("added media to big lists", "", 5)
-							back_level()
-						else:
-							next_level()
-							message("json file invalid (old or invalid path)", json_message, 4)
-							back_level()
-							cached_album = None
+							if (
+								file_mtime(absolute_path) <= file_mtime(json_file) and
+								cached_album is not None and
+								hasattr(cached_album, "absolute_path") and
+								cached_album.absolute_path == absolute_path and
+								hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
+							):
+								next_level()
+								message("json file is OK", "  " + json_message, 4)
+								back_level()
+								json_file_OK = True
+								album = cached_album
+								message("adding media in album to big lists...", "", 5)
+								for media in album.media:
+									if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
+										self.all_media.append(media)
+										self.add_media_to_tree_by_date(media)
+										if media.has_gps_data:
+											self.add_media_to_tree_by_geonames(media)
+								next_level()
+								message("added media to big lists", "", 5)
+								back_level()
+							else:
+								next_level()
+								message("json file invalid (old or invalid path)", json_message, 4)
+								back_level()
+								cached_album = None
 			except KeyboardInterrupt:
 				raise
 			except IOError:
@@ -479,6 +493,7 @@ class TreeWalker:
 		if not json_file_OK:
 			message("generating album...", absolute_path, 5)
 			album = Album(absolute_path)
+			album.read_album_ini()
 			next_level()
 			message("album generated", "", 5)
 			back_level()
@@ -507,8 +522,8 @@ class TreeWalker:
 				back_level()
 				continue
 
-			if entry[0] == '.':
-				# skip hidden files and directories
+			if entry[0] == '.' or entry == "album.ini":
+				# skip hidden files and directories, or user's metadata file 'album.ini'
 				continue
 
 			entry_with_path = os.path.join(absolute_path, entry)

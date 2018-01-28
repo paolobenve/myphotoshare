@@ -1,540 +1,120 @@
-# myphotoshare v. 3.3
+# MyPhotoShare v. 3.3
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>), Pierre Métras (<p.metras@videotron.ca>)
 
 ## Description
 
-`myphotoshare` is an open source web photo gallery aimed at sleekness and speed. It works over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
+**MyPhotoShare** is an open source web photo gallery aimed at sleekness and speed. It works over directory structures rather than esoteric photo database management software. Everything it generates is static, which means it's extremely fast.
 
-Permits browsing the media by folder, date and geotags.
+It permits browsing the media by folder, date and geotags.
 
-Content (albums, media files) can be shared over some popular social plaforms.
+Content (albums and media files) can be shared over some popular social plaforms.
 
-`myphotoshare` is a Jason A. Donenfeld's `photofloat` fork, enriched by Jerome Charaoui's patches permitting showing videos, Paolo Benvenuto's following development and Pierre Métras patches.
+**MyPhotoShare** is a Jason A. Donenfeld's *photofloat* fork, enriched by Jerome Charaoui's patches permitting showing videos, Paolo Benvenuto's following development and Pierre Métras' patches.
 
 [Check out a demo!](http://palmaro.qumran2.net/)
 
+![Screenshot](doc/img/myphotoshare-2.2-panorama.png)
+
+
+## Read more
+
+* [Install and update procedure](doc/Install.md)
+* [Gallery of MyPhotoShare screenshots](doc/Gallery.md)
+* [Geotagging](doc/GPS.md)
+* [Tweaking metadata with `album.ini`](doc/Metadata.md)
+* [Make some albums private](doc/Authentication.md)
+* [Versions changelog](doc/Changelog.md)
+* [Known issues](doc/Issues.md)
+* [License](doc/License.md)
+
+
 ## Features
 
-* Manages images and videos, and permits sharing them (single image or album)
-* Media can be browsed by folder or by date
-* Photos with gps data can be browsed by country/region-state/place; names are retrieves in choosen language from geonames.org web service:
-* Switching among album, date and place views is permitted (with place whenever photo has gps data)
-* Sharp images and thumbnails on mobile
-* Fullscreen mode
-* Metadata display
-* Link to original media
-* Link for direct download
-* Animations to make the interface feel nice
-* Separate album view and photo view
-* Album metadata pre-fetching
-* Photo pre-loading
-* Recursive async randomized tree walking album thumbnail algorithm
-* Smooth media scaling
-* Consistent hash url format
-* Optional Google Analytics and Piwik integration
-* Optional server-side authentication support
-* Many customization through config file
-* Cache folder can be managed with subdirs (useful for large repositories)
-* Albums server folder can be anywhere on the server
-* Media and folders can be sorted ascending/descending by date or by name (via a cookie)
-* Thumbnails can be square (cropped, with optional face detection by opencv) or full-content
-* Single `index.php` file (`php` needed because crawlers and social media do not execute javascript); `php` does a bit of work:
-* - inserts link tag in <head></head> in order to let social media see the shared content
-* - applies basic options to home page
-* - insert proper parameters for analytics tracking
-* Media animation when passing to next/previous image
-* Folders (or trees) are not scanned if a marker in put inside them
-* Verbosity levels can be set in scanner
-* debug mode for using unminimized css's and js's
+### Gallery
 
-### Usability:
+- [x] Manages images and videos, and permits sharing them (single image or album).
+- [x] Media can be browsed by folder, by date or by geolocation. Switching among album, date and place views.
+- [x] Media and folders can be sorted ascending/descending by date or by name.
+- [x] Thumbnails can be square (cropped, with optional face detection by [OpenCV](https://opencv.org/)) or full-content.
 
-* Swipe gestures for mobile
-* Keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
-* Mouse-wheel support
-* Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+`: a preview of the image/album is shared
-* User interface translated via separate translation file
+### For Photographers
 
-### Scanner times
+- [x] Photos with GPS data can be browsed by country/region-state/place; names are retrieves in choosen language from geonames.org web service.
+- [x] Fullscreen mode.
+- [x] EXIF, IPTC and XMP Metadata display.
+- [x] Link to original media.
+- [x] Link for direct download.
 
-As a term of comparizon, on my medium-sized pc, with the images on a nfs mounted nas partition:
+### Mobile Friendly
 
-* scanning for the first time a 124 photos directory for a total size of 295 MB takes about 100 seconds (about 1 sec/media, 1 media/sec).
-* re-scan of "all OK" tree with 36000 media files for a total size of 87 GB takes about 14 minutes (about 20 ms/media, 50 media/sec)
+- [x] Swipe gestures for mobile.
+- [x] Sharp images and thumbnails on mobile.
+- [x] Smooth media scaling.
+- [x] Consistent hash URL format.
 
-### Known issues:
+### Great User Experience
 
-#### Issues related to previous scanner versions
+- [x] Keyboard navigation: arrows, pageup/down, `[esc]`, `[f]` (fullscreen), `[m]` (metadata).
+- [x] Mouse-wheel support.
+- [x] Animations to make the interface feel nice.
+- [x] Separate album view and photo view.
+- [x] Media animation when passing to next/previous media.
+- [x] Available in English, Italian, Spanish, French. User interface translated via separate translation file. Add your language!
 
-##### Previous bug
+### Social
 
-The scanner had bug in the past, so thumbnail generated with previous versions of the scanner could have some defect or lack something:
-* fixed height media thumbnails could result blurred
-* video thumbnails could lack the transparent video marker
+- [x] Share buttons for `facebook`, `whatsapp` (mobile only), `twitter`, `google+`, `email`; on `facebook`, `whatsapp` and `google+`: a preview of the image/album is shared.
 
-You can delete once for ever all the cache content, but perhaps you don't want to regenerate again all the thumbnails. The solution is to manually delete only the "failed" thumbnail.
+### Performance
 
-As an example, the command to delete thumbnails of `mp4` videos is:
+- [x] Album metadata pre-fetching.
+- [x] Photo pre-loading.
+- [x] Scanner uses recursive async randomized tree walking album thumbnail algorithm.
+- [x] HTML5 with minified CSS and JavaScript files for minimal load time.
 
-    find /your/cache/directory/ -iname "*mp4_*.jpg" -exec rm {} \;
+### And More...
 
-Repeat the same command for other video extensions, like `avi`.
+- [x] Analytics with optional Google Analytics and Piwik integration.
+- [x] Optional server-side authentication support.
+- [x] Many customizations available through config file.
+- [x] Cache folder can be managed with subdirs: useful for large repositories.
+- [x] Source albums server folders can be anywhere on the server.
+- [x] Folders (or trees) are not scanned if a marker in put inside them.
+- [x] Scanner verbosity levels can be set in the configuration file.
+- [x] Developer friendly with debug mode for using unminimized css's and js's.
+- [x] Photos metadata can be overloaded by user defined values in special file `album.ini`.
 
-##### Added gps data
-
-The scanner could not be able to add gps data if json files where generated by pre-gps (<= 2.8) versions; you must manually delete all the json files in cache folder in order to get them with all the needed data
-
-#### ffmpeg/avconv version
-
-Old `ffmpeg/avconv` could not be able to transcode some video. Be sure you have the last version installed.
-
-#### Video date and time
-
-The scanner gets modification date-time for video date-time. Be sure you do not modify it; or, if you modified it, touch it to desidered date-time.
-
-#### Pillow bug
-
-As a result of a pillow bug, exif data could not be read for some photos which have two APP1 (0xFFE1/65505) aka Exif segments. A fix is available, see https://github.com/python-pillow/Pillow/issues/2944#issuecomment-356316273: a line of code is to be added in a python source file.
 
 ## Community
 
-Github platform permits you to report bugs.
+Report bugs through [GitHub Issues](https://github.com/paolobenve/MyPhotoShare/issues).
 
-You can fork `myphotoshare` and submit pull requests, too! We're open to adding more features!
+You can fork MyPhotoShare and submit pull requests, too! We're open to adding more features!
 
-If you have any question, feel free to contact the `myphotoshare` community via our [mailing list/discussion group](https://groups.google.com/forum/#!forum/myphotoshareapp).
+If you have any questions, feel free to contact the MyPhotoShare community via our [mailing list/discussion group](https://groups.google.com/forum/#!forum/myphotoshareapp).
 
-## Screenshots
-
-![Screenshot](screnshot-panorama-2.2.png)
-![Screenshot](screnshot-classic-square-2.2.png)
-![Screenshot](screnshot-no-slide-mode-fit-2.2.png)
-![Screenshot](screnshot-slide-mode-2.2.png)
 
 ## How It Works
 
-``myphotoshare`` consists of two segments – a Python script and a JavaScript application.
+MyPhotoShare consists of two segments – a Python script and a JavaScript application.
 
-The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. It writes an `options.json` file too in html root folder, putting inside it all the options from default config file or user config file. The scanner extracts metadata from EXIF tags in JPEG photos and other data from videos. Photofloat is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be quite fast if there are few or zero changes since the last time you ran it.
+The Python script scans a directory tree of images, whereby each directory constitutes an album. It then populates a second folder, known as the cache folder with statically generated JSON files and thumbnails. It writes an `options.json` file too in html root folder, putting inside it all the options from default config file or user config file. The scanner extracts metadata from EXIF tags in JPEG photos and other data from videos or `album.ini` user defined file in albums. MyPhotoShare is smart about file and directory modification time, so you are free to run the scanner script as many times as you want, and it will be quite fast if there are few or zero changes since the last time you ran it.
 
 The JavaScript application consists of a single `index.php` file with a single `scripts.min.js` and a single `styles.min.css`. It fetches the `options.json` file and the statically generated JSON files and thumbnails on the fly from the `cache` folder to create a speedy interface.
 
-Photofloat features share buttons, and `php` permits to pass the shared image/video/album to social media.
+MyPhotoShare features share buttons, and PHP permits to pass the shared image/video/album to social media:
+- inserts link tag in `<head>...</head>` in order to let social media see the shared content;
+- applies basic options to home page;
+- insert proper parameters for analytics tracking.
 
 It is, essentially, a slick and fast, minimal but still well-featured photo gallery app on the net, suitable for sharing your media with your friends.
 
-## Installation
 
-### Dependencies
+### Performance of scanner
 
-Photofloat needs:
+As a term of comparizon, on my medium-sized pc, with the images on a NFS mounted NAS partition:
 
-* `python3` (running it with python2 is possible, changing the first line in scanner/main.py and installing the corresponding python2 dependencies)
-* `python3-numpy`
-* `python3-requests`
-* `python3-pil`
-* `avconv` / `ffmpeg` in order to be able to manage videos.
-* a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed
-* `php5-gd` in order to create albums share images
-* `curl`, used by minify script
-* `cssmin` (`https://github.com/zacharyvoase/cssmin`, debian/ubuntu packages `cssmin`) and `jsmin` (`https://github.com/tikitu/jsmin`, debian/ubuntu package `python-jsmin`), unless using external web service
-* optional: opencv, python-opencv: if found, face detection is used when cropping images to square
+* scanning for the first time a 124 photos directory for a total size of 295 MB takes about 100 seconds (about 1 sec/media, 1 media/sec).
+* re-scan of "all OK" tree with 36000 media files for a total size of 87 GB takes about 14 minutes (about 20 ms/media, 50 media/sec).
 
-#### Why `php`? Isn't it enough with javascript?
-
-`php` is *needed* for sharing, because social app do not execute any javascript when they receive an *URI*. Without `php`, sharing any page is perfectly equivalent to sharing the simple index.html: no information of the particular page you want to share is retained.
-
-`php` does the job you need for sharing: `javascript` creates proper urls based on the page hash, and when a share button is pressed a parameter is passed to `php`, and it sets the proper html page title and appends the proper `<link rel='video_src' href="`video_link`">` or `<link rel='image_src' href="`image_link`">` tag to the `<head>` tag; this way the social media gets the data they need and show a preview of the media/album you are sharing.
-
-### Download the source code from the git repository:
-
-    $ git clone https://github.com/paolobenve/myphotoshare.git
-    $ cd myphotoshare
-
-### Copy and tweak the configuration file
-
-    $ sudo mkdir /etc/myphotoshare
-    $ sudo cp myphotoshare.conf.defaults /etc/myphotoshare/myproject.conf
-    $ sudo vim /etc/myphotoshare/myproject.conf
-
-In your config file (myproject.conf, name can be whatever you want) you must set the proper folders for albums (your photo, they won't be modified) and cache (all the stuff `myphotoshare` requieres in order to work)
-
-### Build the web page.
-
-This simply minifies and concatenate everything of js and css.
-
-    $ ./js-css-minify.sh YOUR_MYPHOTOSHARE_CONF_FILE
-
-By default, a local minifier is used (cssmin and jsmin are currently supported, more local tools can easily be added); https://javascript-minifier.com/ and https;//cssminifier.com/ web services may be used, changing options in the config file, but they are subject to timeout errors which the script cannot detect.
-
-### Config your web server
-
-Be sure you have a web server installed (`apache2`, `nginx`, ...), with `php` and `php5-gd` modules installed and set.
-
-Be sure you installed `avconv` / `ffmpeg`.
-
-The simplest way to configure the web server is:
-
-* set `web` subdir as the root of your site
-* `ln -s /absolute/path/to/your/albums/root albums`
-* `mkdir cache` and give it proper permissions: `cache` must be writable by the scanner
-
-However, "debian's way" could be better:
-
-* clone `myphotoshare` repository in `/usr/share`, so that you end with a `/usr/share/myphotoshare` directory
-* copy `myphotoshare.conf.defaults` to `/etc/myphotoshare` and properly config it
-* in your web site root, put links to `myphotoshare` web folder files and directories: `css`, `favicon.ico`, `fonts`, `img`, `index.php`, `js`
-* make sure the scanner has write access to your web site root
-
-### (When `myphotoshare` code is updated) Update your `myphotoshare` installation
-
-Go to the folder you cloned the repository in and execute:
-
-    $ git pull https://github.com/paolobenve/myphotoshare.git
-    $ ./js-css-minify.sh
-
-Obviously the scanner should be launched too.
-
-### Generate the albums:
-
-When you're done run the static generator (you need Python≥2.6 and the Python Imaging Library; for video something like libav-conv is requiered too):
-
-    $ /your/myphotoshare/installation/dir/scanner/main.py /etc/myphotoshare/myproject.conf
-
-After it finishes, you will be all set. Simply have your web server serve pages out of your web directory. You may want to do the scanning step in a cronjob, if you don't use the deployment makefiles mentioned below.
-
-Note: The albums web folder and the cache one could be anywhere in the file system or in web, the only requierement is that the web server has access to them.
-
-#### `cron` file example:
-
-You can automate the updating process, so that you don't need to worry of running the scanner, simply do whatever you want on your albums tree, and `myphotoshare` will be updated every night:
-
-    # update myphotoshare cache
-    58 1  * * * root    /your/myphotoshare/installation/dir/scanner/main.py /etc/myphotoshare/myproject.conf > /var/log/my-myphotoshare-project.log
-
-Instead or running `myphotoshare` as root, you can use whatever user that have access to the directories you set up in your config file
-
-## Optional: Server-side Authentication
-
-The JavaScript application uses a very simple API to determine if a photo can be viewed or not. If a JSON file returns error `403`, the album is hidden from view. To authenticate, `POST` a username and a password to `/auth`. If unsuccessful, `403` is returned. If successful, `200` is returned, and the previously denied json files may now be requested. If an unauthorized album is directly requested in a URL when the page loads, an authentication box is shown.
-
-`myphotoshare` ships with an optional server side component called FloatApp to faciliate this, which lives in `scanner/floatapp`. It is a simple Flask-based Python web application.
-
-#### Edit the app.cfg configuration file:
-
-    $ cd scanner/floatapp
-    $ vim app.cfg
-
-Give this file a correct username and password, for both an admin user and a photo user, as well as a secret token. The admin user is allowed to call `/scan`, which automatically runs the scanner script mentioned in the previous section.
-
-#### Decide which albums or photos are protected:
-
-    $ vim auth.txt
-
-This file takes one path per line. It restricts access to all photos in this path. If the path is a single photo, then that single photo is restricted.
-
-#### Configure nginx:
-
-FloatApp makes use of `X-Accel-Buffering` and `X-Accel-Redirect` to force the server-side component to have minimal overhead. Here is an example nginx configuration that can be tweaked:
-
-    server {                                                                                                               
-            listen 80;                                                                                                     
-            server_name photos.jasondonenfeld.com;                                                                         
-            location / {
-                    index index.html;
-                    root /var/www/htdocs/photos.jasondonenfeld.com;
-            }
-
-            include uwsgi_params;
-            location /albums/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
-            }
-            location /cache/ {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
-            }
-            location /scan {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
-            }
-            location /auth {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
-            }
-            location /photos {
-                    uwsgi_pass unix:/var/run/uwsgi-apps/myphotoshare.socket;
-            }
-
-            location /internal-cache/ {
-                    internal;
-                    alias /var/www/uwsgi/myphotoshare/cache/;
-            }
-            location /internal-albums/ {
-                    internal;
-                    alias /var/www/uwsgi/myphotoshare/albums/;
-            }
-    }
-
-Note that the `internal-*` paths must match that of `app.cfg`. This makes use of uwsgi for execution:
-
-    metheny ~ # cat /etc/uwsgi.d/myphotoshare.ini
-    [uwsgi]
-    chdir = /var/www/uwsgi/%n
-    master = true
-    uid = %n
-    gid = %n
-    chmod-socket = 660
-    chown-socket = %n:nginx
-    socket = /var/run/uwsgi-apps/%n.socket
-    logto = /var/log/uwsgi/%n.log
-    processes = 4
-    idle = 1800
-    die-on-idle = true
-    plugins = python27
-    module = floatapp:app
-
-## Optional: Deployment Makefiles
-
-Both the scanner and the webpage have a `make deploy` target, and the scanner has a `make scan` target, to automatically deploy assets to a remote server and run the scanner. For use, customize `deployment-config.mk` in the root of the project, and carefully read the `Makefile`s to learn what's happening.
-
-## Changelog
-
-* new option `small_square_crops_background_color` for filling the background of small square crops
-* bug fixes
-
-### version 3.3 (January 22, 2018)
-
-* new option `get_geonames_online`, if true, get country, state, place names from geonames.org (online), otherwise get it from the files in scanner/geonames/cities1000.txt (names are in english)
-* clustering of places with too many photos is done now by the k-means algorithm
-* added options `js_minifier` and `css_minifier` to specify what minifier to use: web services or local ones
-* removed `thumbnail_generation_mode` option: only cascade method is left, parallel and mixed methods are removed
-* option `show_media_names_below_thumbs_in_albums` changed to `show_media_names_below_thumbs`
-* new option `show_album_names_below_thumbs`: decides whether to show the album name in album thumbnails
-* new option `show_media_count`: decides whether to show the media count in album thumbnail and title
-* cropping to square takes now into account faces if opencv and python-opencv are installed
-* scanner code for producing the thumbnails was optimized
-* default options give now a light UI
-
-### version 3.2 (January 7, 2018)
-
-* Added `debug_css` and `debug_js` options for debugging (thanks to pmetras)
-* Added french translations (thanks to pmetras)
-* Bug fixes by pmetras
-* Fixed unnecessary exposure of paths (thanks pmetras for reporting it)
-
-### version 3.1 (December 30, 2017)
-
- * new option `checksum`: controls whether a checksum should be generated in order to decide if a media file has changed (useful with geotags)
- * better scanner reports
- * bug fixes
-
-### version 3.0 (December 12, 2017):
-
-* Manages photo's gps data and retrieves map names from geonames.org web service: builds a country/region-state/place tree as for dates, and, when a photo has gps metadata permits switching among album, date and place viewed
-* - shows place in map
-* - place virtual albums are split into various subfolder if they have too many photos inside them
-* - new option `map_service`: specify what service is used for showing maps; can be "openstreetmap", "googlemaps", or osmtools; the last allows a marker on the map
-* - new option `unspecified_geonames_code`: the code used in gps tree for unspecified admin names (there should be no need to change it)
-* - new option `map_zoom_levels`: a 3-values tuple specifying the zoom values to use respectively for country-, admin- and place-level maps
-* - new option `photo_map_zoom_level`: the value to use for the map shown with the photos
-* - option `big_date_folders_threshold` renamed to `big_virtual_folders_threshold`
-
-### version 2.8 (November 18, 2017):
-
-* better user experience on mobile: show sharper images
-* removed option server_cache_path (closes #54), server cache folder is now always "cache":
-  if it was previously set to a different value in custom option file, please move it on your server and change web server settings in order to avoid recreation of all the thumbnails
-
-### version 2.7.5 (October 26, 2017):
-
-* added link for direct download of media
-* piwik bug fixed
-
-### version 2.7.4 (September 29, 2017):
-
-* various bugs fixed
-
-### version 2.7.3 (September 21, 2017):
-
-* various bugs fixed
-
-### version 2.7.2 (September 16, 2017):
-
-* various bugs fixed
-
-### version 2.7.1 (September 11, 2017):
-
-* fixed php bug in album sharing
-
-### version 2.7 (September 10, 2017):
-
-* fullscreen simulation for devices not implementing fullscreen api
-* added sorting by name of subalbums and media
-* modified default reverse sorting options, and now they only apply to date sorting (name default sorting is always normal)
-* - default_album_reverse_sort -> default_album_date_reverse_sort
-* - default_media_reverse_sort -> default_media_date_reverse_sort
-* bug fixes
-
-### version 2.6.4 (September 5, 2017):
-
-* fixed sharing of videos
-* removed unnecessary parameter when sharing
-
-### version 2.6.3 (September 2, 2017):
-
-* album buttons has now a link to go to random image directly
-
-### version 2.6.2 (September 2, 2017):
-
-* videos: a transparency indicating it's a video is added to thumbnails
-* added media count in title
-* updated modernizr
-* bug fixes
-
-### version 2.6.1 (August 16, 2017):
-
-* added media count to subalbums slides
-* only update json files and composite images if needed
-* bug fixes
-
-### version 2.6 (August 16, 2017):
-
-* composite images for sharing albums are now generated by scanner (not by php any more);
-* new option `cache_album_subdir`: the subdir of cache_path where the album composite images will be saved
-* new option `video_crf` for video quality
-* new option `follow_symlinks`, defaults to false, set it to true if you want to use symlink directories
-* albums and media which have a companion which would have the same cache base are now managed correctly (solves #43, #44)
-* date albums with same image in two different folders are now managed correctly (solves #30)
-* scanner produced a final time report (useful for trimming the code)
-* more speedy (removed unuseful garbage collectors)
-
-### version 2.5 (August 3, 2017):
-
-* project name is now `myphotoshare`
-* keyboard navigation: arrows, pageup/down, esc, f (fullscreen), m (metadata)
-* added vertical swipe gestures on media (they are mapped on arrow up/down)
-* restored cache use in scanner: scanner is now faster on already scanned albums
-* implemented verbosity levels, default is now 3 = errors, warnings, walkings
-* new option `recreate_fixed_height_thumbnails`: makes the scanner delete wide media fixed height thumbnail, in order to get rid of a previous versions bug which caused these thumbnail be generated blurred. Set it to `true`/`1` and make the scanner work, then reset again it to `false`/`0`
-
-### version 2.4.1 (July 26, 2017):
-
-* do not produce canvas for small images: they are shown in their original size
-* two new options: `exclude_files_marker` and `exclude_tree_marker`: when the markers are found in a folder, the media in the folder itself or the whole tree isn't scanned
-
-### version 2.4 (July 24, 2017):
-
-* swipe gesture on mobile to go to next/previous photo/video
-* media animation when passing to next/previous image
-* simplified html structure and json files
-* new option `min_album_thumbnail`: sets how many album thumbnails will fit at least on screen width
-
-### version 2.3 (July 20, 2017):
-
-* social buttons for sharing on facebook, whatsapp (only on mobile), twitter, google+, email
-* web page isn't `index.html` any more, it's `index.php`: this way we accomplish various things through php:
-* - php can set page title (by reading the options.json file)
-* - php can set the `<link rel"..." ...>` tag in <head></head>, which permits facebook and google+ to show the image when sharing a photo or a video: when sharing an album, php builds an image made of n x n thumbnail (in order to get that, album-size square thumbnails are always generated by python scanner)
-* new options `max_album_share_thumbnails_number`: how many thumbnails will be used at most when creating the composite image for sharing albums
-
-### version 2.2 (July 15, 2017):
-
-* translations are now managed via a separate js file: enthusiasts and followers are encouraged to provide the translation for their language
-* better managing of errors
-* separated albums and media sorting
-* - default_album_reverse_sort (boolean) sets default sorting for albums
-* - default_media_reverse_sort (boolean) sets default sorting for images/video
-* separate managing of album and media thumbnails
-* - albums thumbs can have square (classic behaviour) or fit (rectangular thumbnail) type, according to new album_thumb_type option
-* - images/video thumbs can have square (classic behaviour) or fixed height (rectangular thumbnail) type, according to new media_thumb_type option
-* more new options:
-* - big_date_folders_threshold: doesn't make thumbnails show for date albums too big
-* - albums_slide_style (boolean): albums are shown in a simple way or with slide style
-* removed options:
-* - different_album_thumbnails
-* buttons appearing on mouse over are shown persistently on mobile
-* landscape photos are shown vertically centered
-* if the window is resized, the reduced size image shown is changed according to window size, so that it never shows blurred
-* videos now works perfectly in fullscreen mode
-* new option `respected_processors`: tells the scanner how many processor not to use
-
-### version 2.1.1 (July 6, 2017):
-
-* new options:
-* - persistent_metadata (boolean): permits to have metadata shown persistently on image
-* - album_button_background_color
-* - album_caption_color
-
-### version 2.1 (July 6, 2017):
-
-* Images and directories can be sorted ascending/descending (via a cookie)
-
-### version 2.0 (July 4, 2017):
-
-* A date tree is builded, permitting photo to be seen by year, month, date
-* When a photo is viewed, the user can switch between the folder and the date the photo was taken
-* Better error management: if folder is wrong, show root folder; if image is wrong, show album
-* In addition to former invocation (with albums and cache paths), `myphotoshare` can be invoked with one parameter: the customization file, which adds many configuration variables;
-* web site appearance now is very customizable:
-* - choose between cascade, parallel and mixed thumbnails generation
-* - fhoose between putting thumbnails in cache dir or in subdir, by 2-letters, from folder md5 or beginning of folder
-* - thumbnail can be spaced
-* - album thumbnails can be showed different from images ones
-* - jpeg quality can be set
-* - 3 different thumbnail types: square (photofloat's classical), fixed_height (the size determines the height, the width will depend on orientation), canvas (square thumbnail containing the whole image)
-* - page title, font sizes, colors and background colors can be customized
-* - photo names can be shown below thumbnails when showing an album
-* - initial language support
-* - albums and cache server folders can be anywhere, even on another server (obviously, they will be generated on a pc and then uploaded wherever)
-* (to do) share buttons
-
-### version by Joachim (2015):
-
-* generate minified css and js through external api
-* parallel thumbnail generation
-
-### version by Jerome (2013):
-
-* manage videos
-
-### initial features by Jason (2012):
-
-* Animations to make the interface feel nice
-* Separate album view and photo view
-* Album metadata pre-fetching
-* Photo pre-loading
-* Recursive async randomized tree walking album thumbnail algorithm
-* Smooth up and down scaling
-* Mouse-wheel support
-* Metadata display
-* Consistent hash url format
-* Linkable states via ajax urls
-* Static rendering for googlebot conforming to the AJAX crawling spec.
-* Facebook meta tags for thumbnail and post type
-* Link to original images (can be turned off)
-* Optional Google Analytics integration
-* Optional server-side authentication support
-* A thousand other tweaks here and there...
-
-## License
-
-Copyright (C):
-* 2010 - 2014 Jason A. Donenfeld
-* 2016 Jerome Charaoui
-* 2017 Paolo Benvenuto
-
-Thanks to Joachim and all other contributors for their help!
-
-All Rights Reserved.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.

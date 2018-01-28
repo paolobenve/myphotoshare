@@ -29,6 +29,11 @@ debug_js = false
 # 5 = more info
 max_verbose = 3
 
+# This is a debug option: it lets the scanner show the faces detected
+# obviously it only make sense when the scanner is run interactively, because the user must close every image with a keystroke
+# I'm getting it working if running in pyCharm, the scanner stops with a segfault if run from terminal. Why????
+show_faces = False
+
 
 ###########################################################
 # minifying
@@ -102,6 +107,16 @@ follow_symlinks = false
 # this option is useful with geotagged photos, whose geotag is put in the file by apps that restore the file modification datetime
 # if not using geotags, it can safely be left to false
 checksum = false
+
+# When detecting faces with opencv, a scaleFactor must be given
+# See the beginning of the page https://docs.opencv.org/2.4/modules/objdetect/doc/cascade_classification.html
+# The page doesn't say what values this parameter can have, it seems that it must be strictly > 1
+# Must be a float
+face_cascade_scale_factor = 1.1
+
+# How many thumbnails should we put at most in the image that php generates for sharing albums?
+# it must be an integer, and a square: 4, 9, 16,..
+max_album_share_thumbnails_number = 16
 
 ###########################################################
 # scanner and ui options
@@ -265,10 +280,6 @@ default_media_name_sort = false
 # should default sorting be reverse (more recent photos/videos top)?
 default_album_date_reverse_sort = false
 default_media_date_reverse_sort = false
-
-# How many thumbnails should we put at most in the image that php generates for sharing albums?
-# it must be an integer, and a square: 4, 9, 16,..
-max_album_share_thumbnails_number = 16
 
 # How many album thumbnails will fit at least on screen width?
 # Album button sizes will be reduced in order that the given number of buttons fit in it
