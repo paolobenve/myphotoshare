@@ -14,7 +14,7 @@ Content (albums and media files) can be shared over some popular social plaforms
 
 [Check out a demo!](http://palmaro.qumran2.net/)
 
-![Screenshot](doc/img/screnshot-panorama-2.2.png)
+![Screenshot](doc/img/myphotoshare-2.2-panorama.png)
 
 
 ## Read more
