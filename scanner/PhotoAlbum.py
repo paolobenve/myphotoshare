@@ -1694,11 +1694,11 @@ def _set_metadata_from_album_ini(name, attributes, album_ini):
 	# Tags
 	if album_ini.has_section(name):
 		try:
-			attributes["metadata"]["tags"] = album_ini.get(name, "tags").split(",")
+			attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.get(name, "tags").split(",")]
 		except NoOptionError:
 			pass
 	elif "tags" in album_ini.defaults():
-		attributes["metadata"]["tags"] = album_ini.defaults()["tags"].split(",")
+		attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.defaults()["tags"].split(",")]
 
 	back_level()
 
