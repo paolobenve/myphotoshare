@@ -1768,9 +1768,9 @@ $(document).ready(function() {
 		$('#metadata tr.gps').off('click');
 		text = "<table>";
 		if (typeof currentMedia.metadata.title !== "undefined")
-			text += "<tr><td id=\"metadata-data-title\"></td><td>" + currentMedia.metadata.title.replace(/\n/g, "<br />") + "</td></tr>";
+			text += "<tr><td id=\"metadata-data-title\"></td><td>" + currentMedia.metadata.title.replace(/\n/g, "<br>") + "</td></tr>";
 		if (typeof currentMedia.metadata.description !== "undefined")
-			text += "<tr><td id=\"metadata-data-description\"></td><td>" + currentMedia.metadata.description.replace(/\n/g, "<br />") + "</td></tr>";
+			text += "<tr><td id=\"metadata-data-description\"></td><td>" + currentMedia.metadata.description.replace(/\n/g, "<br>") + "</td></tr>";
 		if (typeof currentMedia.metadata.tags !== "undefined")
 			text += "<tr><td id=\"metadata-data-tags\"></td><td>" + currentMedia.metadata.tags + "</td></tr>";
 		if (typeof currentMedia.date !== "undefined")
