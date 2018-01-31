@@ -821,6 +821,7 @@ class Media(object):
 		thumb_path = os.path.join(thumbs_path_with_subdir, album_prefix + photo_cache_name(self, thumb_size, thumb_type, mobile_bigger))
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_file = os.path.join(thumbs_path, self.album.json_file)
+		json_file_exists = os.path.exists(json_file)
 		_is_thumbnail = self.is_thumbnail(thumb_size, thumb_type)
 		is_video = self._attributes["mediaType"] == "video"
 		next_level()
@@ -829,9 +830,7 @@ class Media(object):
 			os.path.exists(thumbs_path_with_subdir) and
 			os.path.exists(thumb_path) and
 			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
-			(
-				not os.path.exists(json_file) or file_mtime(thumb_path) < file_mtime(json_file)
-			) and
+			(not json_file_exists or file_mtime(thumb_path) < file_mtime(json_file)) and
 			(
 				not _is_thumbnail and not Options.config['recreate_reduced_photos'] or
 				_is_thumbnail and not Options.config['recreate_thumbnails']
@@ -852,7 +851,7 @@ class Media(object):
 			message("unexistent reduction/thumbnail", thumb_path, 5)
 		elif not file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
 			message("reduction/thumbnail older than media date time", thumb_path, 5)
-		elif not os.path.exists(json_file):
+		elif not json_file_exists:
 			message("unexistent json file", json_file, 5)
 		elif not file_mtime(thumb_path) < file_mtime(json_file):
 			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
