@@ -372,19 +372,34 @@ $(document).ready(function() {
 					$("#right-menu li." + albumOrMedia + "-sort.sort-reverse").addClass("selected");
 				}
 			}
+		}
 
+		$("ul#right-menu li.ui").removeClass("hidden");
+		if (currentMedia !== null || currentAlbum.albums.length <= 1) {
+			$("ul#right-menu li.slide").addClass("hidden");
+		} else {
+			$("ul#right-menu li.slide").removeClass("hidden");
 			if (Options.albums_slide_style) {
 				$("ul#right-menu li.slide").addClass("selected");
 			} else {
 				$("ul#right-menu li.slide").removeClass("selected");
 			}
+		}
 
+		if (currentMedia !== null || currentAlbum.albums.length <= 1 && currentAlbum.media.length <= 1) {
+			$("ul#right-menu li.spaced").addClass("hidden");
+		} else {
+			$("ul#right-menu li.spaced").removeClass("hidden");
 			if (Options.spacing) {
 				$("ul#right-menu li.spaced").addClass("selected");
 			} else {
 				$("ul#right-menu li.spaced").removeClass("selected");
 			}
 		}
+		if ($("ul#right-menu li.slide").hasClass("hidden") && $("ul#right-menu li.spaced").hasClass("hidden"))
+			$("ul#right-menu li.ui").addClass("hidden");
+		else
+			$("ul#right-menu li.ui").removeClass("hidden");
 	}
 
 	function transformAltPlaceName(altPlaceName) {
