@@ -496,7 +496,7 @@ ul#right-menu {
 	padding: 0;
 	overflow: hidden;
 	float: right;
-	width: 15em;
+	max-width: 15em;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -551,7 +551,9 @@ ul#right-menu li#menu-icon {
 
 ul#right-menu.expand li.selected {
 	background-color: dimgray;
-	color: white;
+	/*color: white;*/
+	background-image: url(../img/ic_check_circle_black_24dp_1x.png);
+	background-repeat: no-repeat;
 }
 
 ul#right-menu li:not(.active) {
