@@ -200,7 +200,8 @@
 		<li class='sort media-sort by-name'></li>
 		<li class='sort media-sort sort-reverse active'></li>
 		<li class='ui caption'></li>
-		<li class='ui slide'></li>
+		<li class='ui slide active'></li>
+		<li class='ui spaced active'></li>
 	</ul>
 
 	<div id="error-overlay"></div>
