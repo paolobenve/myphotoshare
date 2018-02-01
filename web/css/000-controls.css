@@ -564,6 +564,10 @@ ul#right-menu li:not(.caption):hover {
 	background-color: white !important;
 }
 
+ul#right-menu li:not(.caption) {
+	padding-left: 1.7em;
+}
+
 ul#right-menu.expand li.hidden {
 	display: none;
 }

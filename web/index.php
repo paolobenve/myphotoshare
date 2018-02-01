@@ -199,6 +199,8 @@
 		<li class='sort media-sort by-date'></li>
 		<li class='sort media-sort by-name'></li>
 		<li class='sort media-sort sort-reverse active'></li>
+		<li class='ui caption'></li>
+		<li class='ui slide'></li>
 	</ul>
 
 	<div id="error-overlay"></div>

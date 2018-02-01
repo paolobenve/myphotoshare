@@ -331,7 +331,7 @@ $(document).ready(function() {
 		return cacheBase;
 	}
 
-	function modifySortButtons() {
+	function modifyMenuButtons() {
 		var albumOrMedia;
 		// add the correct classes to the menu sort buttons
 		if (currentMedia !== null) {
@@ -371,6 +371,12 @@ $(document).ready(function() {
 				} else {
 					$("#right-menu li." + albumOrMedia + "-sort.sort-reverse").addClass("selected");
 				}
+			}
+
+			if (Options.albums_slide_style) {
+				$("ul#right-menu li.slide").removeClass("active").addClass("selected");
+			} else {
+				$("ul#right-menu li.slide").addClass("active").removeClass("selected");
 			}
 		}
 	}
@@ -619,7 +625,7 @@ $(document).ready(function() {
 		return;
 	}
 
-	function initializeAlbumsAndMediaSorting() {
+	function initializeMenu() {
 		// this function applies the sorting on the media and subalbum lists
 		// and sets the album properties that attest the lists status
 
@@ -657,6 +663,12 @@ $(document).ready(function() {
 			setBooleanCookie("mediaDateReverseSortRequested", Options.default_media_date_reverse_sort);
 		if (getBooleanCookie("mediaNameReverseSortRequested") === null)
 			setBooleanCookie("mediaNameReverseSortRequested", false);
+
+		if (Options.albums_slide_style) {
+			$("ul#right-menu li.slide").removeClass("active").addClass("selected");
+		} else {
+			$("ul#right-menu li.slide").addClass("active").removeClass("selected");
+		}
 	}
 
 	function sortAlbumsMedia() {
@@ -739,7 +751,7 @@ $(document).ready(function() {
 		}
 	}
 
-	function bindClicksToSortMenu() {
+	function bindClicksToMenuItems() {
 		// binds the click events to the sort buttons
 
 		// disable previous clicks
@@ -754,7 +766,7 @@ $(document).ready(function() {
 				else
 					setBooleanCookie("albumDateReverseSortRequested", false);
 				sortAlbumsMedia();
-				modifySortButtons();
+				modifyMenuButtons();
 				showAlbum("sortAlbums");
 			}
 			return false;
@@ -768,7 +780,7 @@ $(document).ready(function() {
 				else
 					setBooleanCookie("albumNameReverseSortRequested", false);
 				sortAlbumsMedia();
-				modifySortButtons();
+				modifyMenuButtons();
 				showAlbum("sortAlbums");
 			}
 			return false;
@@ -790,7 +802,7 @@ $(document).ready(function() {
 					}
 				}
 				sortAlbumsMedia();
-				modifySortButtons();
+				modifyMenuButtons();
 				showAlbum("sortAlbums");
 			}
 			return false;
@@ -805,7 +817,7 @@ $(document).ready(function() {
 				else
 					setBooleanCookie("mediaDateReverseSortRequested", false);
 				sortAlbumsMedia();
-				modifySortButtons();
+				modifyMenuButtons();
 				showAlbum("sortMedia");
 			}
 			return false;
@@ -819,7 +831,7 @@ $(document).ready(function() {
 				else
 					setBooleanCookie("mediaNameReverseSortRequested", false);
 				sortAlbumsMedia();
-				modifySortButtons();
+				modifyMenuButtons();
 				showAlbum("sortMedia");
 			}
 			return false;
@@ -841,12 +853,27 @@ $(document).ready(function() {
 					}
 				}
 				sortAlbumsMedia();
-				modifySortButtons();
+				modifyMenuButtons();
 				showAlbum("sortMedia");
 			}
 			return false;
 		});
 
+		$(".ui").off('click');
+		$("li.ui").on('click', function(ev) {
+			if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+				if (Options.albums_slide_style) {
+					setBooleanCookie("albums_slide_style", false);
+					Options.albums_slide_style = false;
+				} else {
+					setBooleanCookie("albums_slide_style", true);
+					Options.albums_slide_style = true;
+				}
+				modifyMenuButtons();
+				showAlbum("sortAlbums");
+			}
+			return false;
+		});
 
 	}
 
@@ -2005,10 +2032,10 @@ $(document).ready(function() {
 		if (currentMedia === null || typeof currentMedia === "object") {
 			setTitle();
 
-			initializeAlbumsAndMediaSorting();
+			initializeMenu();
 			sortAlbumsMedia();
-			bindClicksToSortMenu();
-			modifySortButtons();
+			bindClicksToMenuItems();
+			modifyMenuButtons();
 		}
 
 		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
@@ -2079,6 +2106,11 @@ $(document).ready(function() {
 					byGpsRegex = "^" + Options.by_gps_string + "\/";
 
 					maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
+
+					// override according to user selections
+					var slideCookie = getBooleanCookie("albums_slide_style");
+					if (slideCookie !== null)
+						Options.albums_slide_style = slideCookie;
 
 					callback(location.hash, hashParsed, die);
 				},
@@ -2281,7 +2313,7 @@ $(document).ready(function() {
 
 	$("#menu-icon").on("click", function(ev) {
 		$("ul#right-menu").toggleClass("expand");
-		modifySortButtons();
+		modifyMenuButtons();
 		return false;
 	});
 
