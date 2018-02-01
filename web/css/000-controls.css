@@ -524,7 +524,7 @@ ul#right-menu li#menu-icon, ul#right-menu.expand li {
 
 ul#right-menu.expand li {
 	display: list-item;
-	text-align: right;
+	text-align: left;
 	opacity: 0.6;
 	font-style: italic;
 }
@@ -555,6 +555,7 @@ ul#right-menu li#menu-icon {
 ul#right-menu.expand li.selected {
 	background-image: url(../img/ic_check_circle_black_24dp_1x.png);
 	background-repeat: no-repeat;
+	background-position: right;
 }
 
 ul#right-menu li:not(.active) {

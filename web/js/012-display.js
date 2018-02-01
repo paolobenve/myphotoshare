@@ -669,12 +669,6 @@ $(document).ready(function() {
 			setBooleanCookie("mediaDateReverseSortRequested", Options.default_media_date_reverse_sort);
 		if (getBooleanCookie("mediaNameReverseSortRequested") === null)
 			setBooleanCookie("mediaNameReverseSortRequested", false);
-
-		if (Options.albums_slide_style) {
-			$("ul#right-menu li.slide").addClass("selected");
-		} else {
-			$("ul#right-menu li.slide").removeClass("selected");
-		}
 	}
 
 	function sortAlbumsMedia() {
@@ -1817,6 +1811,27 @@ $(document).ready(function() {
 		return true;
 	}
 
+	function getCookie(key) {
+		var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+		if (! keyValue)
+			return null;
+		else
+			return keyValue[2];
+	}
+	function getNumberCookie(key) {
+		var keyValue = getCookie(key);
+		if (keyValue === null)
+			return null;
+		else
+			return parseFloat(keyValue);
+	}
+	function setCookie(key, value) {
+		var expires = new Date();
+		expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000));
+		document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+		return true;
+	}
+
 	// this function refer to the need that the html showed be sorted
 	function needAlbumNameSort() {
 		return ! ! currentAlbum.albums.length && ! currentAlbum.albumNameSort && getBooleanCookie("albumNameSortRequested");
@@ -1996,11 +2011,11 @@ $(document).ready(function() {
 						Options.spacingSave = Options.thumb_spacing;
 					else
 						Options.spacingSave = Options.media_thumb_size * 0.03;
-					var spacingCookie = getBooleanCookie("spacing");
+					var spacingCookie = getNumberCookie("spacing");
 					if (spacingCookie !== null) {
 						Options.spacing = spacingCookie;
 					} else {
-						Options.spacing = Options.thumb_spacing;
+						Options.spacing = Options.spacingSave;
 					}
 
 					callback(location.hash, hashParsed, die);
@@ -2284,13 +2299,11 @@ $(document).ready(function() {
 
 	function toggleSpacing(ev) {
 		if ((currentAlbum.albums.length || currentAlbum.media.length) && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-			if (Options.spacing) {
-				setBooleanCookie("spacing", 0);
+			if (Options.spacing)
 				Options.spacing = 0;
-			} else {
-				setBooleanCookie("spacing", Options.spacingSave);
+			else
 				Options.spacing = Options.spacingSave;
-			}
+			setCookie("spacing", Options.spacing);
 			modifyMenuButtons();
 			showAlbum("sortAlbums");
 			showAlbum("sortMedia");
