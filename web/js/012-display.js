@@ -67,21 +67,28 @@ $(document).ready(function() {
 
 	function _t(id) {
 		language = getLanguage();
-		return translations[language][id];
+		if (translations[language][id])
+			return translations[language][id];
+		else
+			return translations.en[id];
 	}
 
 	function translate() {
-		var selector;
+		var selector, keyLanguage;
 
 		language = getLanguage();
-		for (var key in translations[language]) {
-			if (translations[language].hasOwnProperty(key)) {
+		for (var key in translations.en) {
+			if (translations[language].hasOwnProperty(key) || translations.en.hasOwnProperty(key)) {
+				keyLanguage = language;
+				if (! translations[language].hasOwnProperty(key))
+					keyLanguage = 'en';
+
 				if (key == '#title-string' && document.title.substr(0, 5) != "<?php")
 					// don't set page title, php has already set it
 					continue;
 				selector = $(key);
 				if (selector.length) {
-					selector.html(translations[language][key]);
+					selector.html(translations[keyLanguage][key]);
 				}
 			}
 		}
