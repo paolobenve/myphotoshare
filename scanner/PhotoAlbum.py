@@ -1399,6 +1399,7 @@ class Media(object):
 						album_prefix + photo_cache_name(self, thumb_size)
 					)
 				)
+
 		# album and media thumbnail path
 		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
 		for thumb_type, thumb_sizes in list(_thumbnail_types_and_sizes.items()):

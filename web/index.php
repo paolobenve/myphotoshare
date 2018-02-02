@@ -202,6 +202,8 @@
 		<li class='ui caption'></li>
 		<li class='ui slide active'></li>
 		<li class='ui spaced active'></li>
+		<li class='ui square-album-thumbnails active'></li>
+		<li class='ui square-media-thumbnails active'></li>
 	</ul>
 
 	<div id="error-overlay"></div>
