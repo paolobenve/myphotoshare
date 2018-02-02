@@ -416,6 +416,8 @@ class TreeWalker:
 			skip_files = True
 			back_level()
 		json_file = os.path.join(Options.config['cache_path'], album_cache_base) + ".json"
+		json_file_mtime = file_mtime(json_file)
+		json_file_exists = os.path.exists(json_file)
 		json_file_OK = False
 		album_ini_file = os.path.join(absolute_path, 'album.ini')
 		album_ini_OK = True
@@ -425,7 +427,7 @@ class TreeWalker:
 			message("forced json file recreation", "some sensible option has changed", 3)
 		else:
 			try:
-				if os.path.exists(json_file):
+				if json_file_exists:
 					if not os.access(json_file, os.R_OK):
 						message("json file unreadable", json_file, 1)
 					elif not os.access(json_file, os.W_OK):
@@ -436,7 +438,7 @@ class TreeWalker:
 								message("album.ini file unreadable", "", 2)
 								album_ini_OK = False
 							else:
-								if file_mtime(album_ini_file) > file_mtime(json_file):
+								if file_mtime(album_ini_file) > json_file_mtime:
 									# a check on album_ini_file would be necessary too
 									# execution comes here even if album.ini hasn't anything significant
 									message("album.ini newer than json file", "recreating json file taking into account album.ini", 4)
@@ -449,7 +451,7 @@ class TreeWalker:
 							message("json file read", "", 5)
 							back_level()
 							if (
-								file_mtime(absolute_path) <= file_mtime(json_file) and
+								file_mtime(absolute_path) <= json_file_mtime and
 								cached_album is not None and
 								hasattr(cached_album, "absolute_path") and
 								cached_album.absolute_path == absolute_path and
@@ -588,9 +590,10 @@ class TreeWalker:
 						cache_hit = True
 						for cache_file in cache_files:
 							absolute_cache_file = os.path.join(Options.config['cache_path'], cache_file)
+							absolute_cache_file_exists = os.path.exists(absolute_cache_file)
 							if (
 								Options.config['recreate_fixed_height_thumbnails'] and
-								os.path.exists(absolute_cache_file) and file_mtime(absolute_cache_file) < file_mtime(json_file)
+								absolute_cache_file_exists and file_mtime(absolute_cache_file) < json_file_mtime
 							):
 								# remove wide images, in order not to have blurred thumbnails
 								fixed_height_thumbnail_re = "_" + str(Options.config['media_thumb_size']) + "tf\.jpg$"
@@ -603,10 +606,10 @@ class TreeWalker:
 										message("error deleting fixed height thumbnail", os.path.join(Options.config['cache_path'], cache_file), 1)
 
 							if (
-								not os.path.exists(absolute_cache_file) or
+								not absolute_cache_file_exists or
 								json_file_OK and (
 									file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"] or
-									file_mtime(absolute_cache_file) > file_mtime(json_file)
+									file_mtime(absolute_cache_file) > json_file_mtime
 								) or
 								(Options.config['recreate_reduced_photos'] or Options.config['recreate_thumbnails'])
 							):
@@ -629,12 +632,12 @@ class TreeWalker:
 						if cached_media is None:
 							message("media not cached", "", 4)
 						elif cache_hit:
-							if not os.path.exists(absolute_cache_file):
+							if not absolute_cache_file_exists:
 								message("unexistent reduction/thumbnail", absolute_cache_file, 4)
 							else:
 								if file_mtime(absolute_cache_file) < cached_media._attributes["dateTimeFile"]:
 									message("reduction/thumbnail older than cached media", absolute_cache_file, 4)
-								elif file_mtime(absolute_cache_file) > file_mtime(json_file):
+								elif file_mtime(absolute_cache_file) > json_file_mtime:
 									message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
 
 					if Options.config['recreate_reduced_photos']:

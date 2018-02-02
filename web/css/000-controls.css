@@ -481,12 +481,12 @@ video {
 /****************************/
 /* right menu */
 
-.sort, .day-gps-folders-view {
+ul#right-menu li {
 	padding: 0 .5em;
 	cursor: pointer;
 }
 
-.sort.caption, .sort:not(.active),  .day-gps-folders-view:not(.active) {
+ul#right-menu li.caption, ul#right-menu li:not(.active) {
 	cursor: default;
 }
 
@@ -496,7 +496,7 @@ ul#right-menu {
 	padding: 0;
 	overflow: hidden;
 	float: right;
-	width: 15em;
+	max-width: 15em;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -524,11 +524,14 @@ ul#right-menu li#menu-icon, ul#right-menu.expand li {
 
 ul#right-menu.expand li {
 	display: list-item;
-	text-align: right;
-	opacity: 0.8;
+	text-align: left;
+	opacity: 0.6;
 	font-style: italic;
 }
 
+ul#right-menu.expand li#menu-icon {
+	padding: .3em .7em;
+}
 ul#right-menu.expand li.caption {
 	/*text-align: left;*/
 	padding-right: 2em;
@@ -550,16 +553,21 @@ ul#right-menu li#menu-icon {
 }
 
 ul#right-menu.expand li.selected {
-	background-color: dimgray;
-	color: white;
+	background-image: url(../img/ic_check_circle_black_24dp_1x.png);
+	background-repeat: no-repeat;
+	background-position: right;
 }
 
 ul#right-menu li:not(.active) {
 	color: darkgray;
 }
-ul#right-menu li:not(.caption):hover {
+ul#right-menu li.active:not(.caption):hover {
 	color: black !important;
-	background-color: white !important;
+	background-color: gray !important;
+}
+
+ul#right-menu li:not(.caption) {
+	padding-left: 1.7em;
 }
 
 ul#right-menu.expand li.hidden {

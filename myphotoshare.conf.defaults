@@ -228,9 +228,11 @@ language =
 page_title = My photos
 
 # spacing between thumbnails, pixels (integer)
+# the user can modify this value
 thumb_spacing = 0
 
 # should be used a slide-like style?
+# the user can modify this value
 albums_slide_style = false
 
 # will photos/videos names be shown below the thumbnail in albums?
