@@ -58,9 +58,26 @@ Supported metadata selectors are:
 Section names are case sensitive. Particularly `[DEFAULT]` must be in uppercase. Spaces in sections are part of the name and section names are not trimmed!
 Metadata selectors are not case sensitive and are trimmed for spaces. Metadata values are timmed for spaces too.
 
+### Inheritance for finding metadata values
+
 The scanner supports a 2-levels inheritance to search for metadata values. It searches the metadata selector first into the section named with the name of the media file, and if not found it looks for it in the `[DEFAULT]` section.
 The same principle applies for `[album]` that is searched first and then `[DEFAULT]` if not found.
 If a media is not defined as a section of the `album.ini`, it will inherit metadata from `[DEFAULT]` that applies to all media files in the album.
+
+The algorithm used is:
+```
+  For media metadata:
+    If section [<media_filename>] exists:
+      Search value in section else in [DEFAULT]
+    Else:
+      Search value in [DEFAULT]
+  
+  For album metadata
+    If section [album] exists:
+      Search value in [album] else in [DEFAULT]
+    Else:
+      Search value in [DEFAULT]
+```
 
 A simple way to use the `album.ini` would be:
 1. Define in `[DEFAULT]` section the metadata that apply to all or most media files of the directory. It could be a location or a date, or tags depending on how you manage your media.
