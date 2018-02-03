@@ -15,6 +15,7 @@ except ImportError:
 
 
 def main():
+	# @python2
 	if sys.version_info < (3,):
 		reload(sys)
 		sys.setdefaultencoding("UTF-8")

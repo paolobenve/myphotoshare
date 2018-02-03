@@ -154,6 +154,7 @@ def get_options():
 	# values that have type != string
 	back_level()
 
+	# @python2
 	if sys.version_info < (3, ):
 		if config['index_html_path']:
 			config['index_html_path'] = os.path.abspath(config['index_html_path']).decode(sys.getfilesystemencoding())

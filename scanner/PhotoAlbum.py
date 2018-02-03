@@ -104,6 +104,7 @@ class Album(object):
 			)
 		):
 			if Options.config['subdir_method'] == "md5":
+				# @python2
 				if sys.version_info < (3, ):
 					self._subdir = hashlib.md5(path).hexdigest()[:2]
 				else:
@@ -1618,6 +1619,12 @@ def _set_metadata_from_album_ini(name, attributes, album_ini):
 	# Initialize with album.ini defaults
 	next_level()
 	message("initialize album.ini metadata values", "", 5)
+
+	# With Python2, section names are string. As we retrieve file names as unicode,
+	# we can't find them in the ConfigParser dictionary
+	# @python2
+	if sys.version_info < (3,):
+		name = str(name)
 
 	# Title
 	if album_ini.has_section(name):

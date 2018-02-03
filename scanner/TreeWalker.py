@@ -416,8 +416,10 @@ class TreeWalker:
 			skip_files = True
 			back_level()
 		json_file = os.path.join(Options.config['cache_path'], album_cache_base) + ".json"
-		json_file_mtime = file_mtime(json_file)
 		json_file_exists = os.path.exists(json_file)
+		json_file_mtime = None
+		if json_file_exists:
+			json_file_mtime = file_mtime(json_file)
 		json_file_OK = False
 		album_ini_file = os.path.join(absolute_path, 'album.ini')
 		album_ini_OK = True
@@ -512,6 +514,7 @@ class TreeWalker:
 		photos_without_exif_date_in_dir = []
 		for entry in self.listdir_sorted_by_time(absolute_path):
 			try:
+				# @python2
 				if sys.version_info < (3, ):
 					entry = entry.decode(sys.getfilesystemencoding())
 				else:
@@ -966,6 +969,7 @@ class TreeWalker:
 				back_level()
 				if match:
 					try:
+						# @python2
 						if sys.version_info < (3, ):
 							cache_file = cache_file.decode(sys.getfilesystemencoding())
 						else:
