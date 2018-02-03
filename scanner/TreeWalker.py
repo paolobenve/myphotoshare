@@ -733,6 +733,8 @@ class TreeWalker:
 			self.generate_composite_image(album, max_file_date)
 		back_level()
 
+		report_times(False)
+
 		return [album, album.num_media_in_sub_tree, max_file_date]
 
 	def index_to_coords(self, index, tile_width, px_between_tiles, side_off_set, linear_number_of_tiles):

@@ -894,7 +894,8 @@ class Media(object):
 						longer_size = int(smaller_size / min(start_image_width, start_image_height) * max(start_image_width, start_image_height))
 						width_for_detecting = smaller_size if start_image_width < start_image_height else longer_size
 						height_for_detecting = longer_size if start_image_width < start_image_height else smaller_size
-						message("reducing size for face detetion...", "to " + str(width_for_detecting) + "x" + str(height_for_detecting), 5)
+						sizes_change = "from " + str(start_image_width) + "x" + str(start_image_height) + " to " + str(width_for_detecting) + "x" + str(height_for_detecting)
+						message("reducing size for face detection...", sizes_change, 5)
 						start_image_copy_for_detecting.thumbnail((longer_size, longer_size), Image.ANTIALIAS)
 						next_level()
 						message("size reduced", "", 5)
