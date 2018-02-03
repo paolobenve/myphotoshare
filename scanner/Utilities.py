@@ -128,8 +128,8 @@ def report_times(final):
 	print("                  processed " + ((max_digit - len(_num_video_processed)) * " ") + _num_video_processed)
 	print("- Photos " + ((max_digit - len(_num_photo)) * " ") + _num_photo)
 	print("                  processed " + ((max_digit - len(_num_photo_processed)) * " ") + _num_photo_processed)
-	print("                                  geotagged        " + ((max_digit - len(_num_photo_geotagged)) * " ") + _num_photo_geotagged)
-	print("                                  whithout geotags " + ((max_digit - len(_num_photo_without_geotags)) * " ") + _num_photo_without_geotags)
+	print("                                  geotagged         " + ((max_digit - len(_num_photo_geotagged)) * " ") + _num_photo_geotagged)
+	print("                                  whithout geotags  " + ((max_digit - len(_num_photo_without_geotags)) * " ") + _num_photo_without_geotags)
 	if final and Options.num_photo_processed != Options.num_photo_geotagged:
 		for photo in Options.photos_without_geotag:
 			print("                                      - " + photo)
