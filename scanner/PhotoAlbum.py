@@ -843,7 +843,7 @@ class Media(object):
 			return start_image
 
 		next_level()
-		message("reduction/thumbnail not OK, creating", thumbs_path_with_subdir, 5)
+		message("reduction/thumbnail not OK, creating", "", 5)
 		next_level()
 		if not os.path.exists(thumbs_path_with_subdir):
 			message("unexistent subdir", thumbs_path_with_subdir, 5)
@@ -893,7 +893,7 @@ class Media(object):
 						try_shifting = True
 
 						# detect faces
-						message("opencv: detecting faces...", "", 4)
+						message("opencv: detecting faces...", "from " + str(start_image_width) + "x" + str(start_image_height), 4)
 						# from https://docs.opencv.org/2.4/modules/objdetect/doc/cascade_classification.html:
 						# detectMultiScale(image[, scaleFactor[, minNeighbors[, flags[, minSize[, maxSize]]]]])
 						# - scaleFactor – Parameter specifying how much the image size is reduced at each image scale.
@@ -1091,7 +1091,7 @@ class Media(object):
 			start_image_copy.thumbnail((actual_thumb_size, actual_thumb_size), Image.ANTIALIAS)
 			next_level()
 			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
-				message("reduced size (" + str(original_thumb_size) + ")", "", 4)
+				message("size reduced (" + str(original_thumb_size) + ")", "", 4)
 			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
 				message("thumbed for albums (" + str(original_thumb_size) + ")", "", 4)
 			else:
