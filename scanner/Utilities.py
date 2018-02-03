@@ -94,8 +94,10 @@ def report_times(final):
 	print()
 	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time)
 	print()
-	_num_media		= str(Options.num_video + Options.num_photo)
-	_num_media_processed	= str(Options.num_photo_processed + Options.num_video_processed)
+	num_media = Options.num_video + Options.num_photo
+	_num_media		= str(num_media)
+	num_media_processed = Options.num_photo_processed + Options.num_video_processed
+	_num_media_processed	= str(num_media_processed)
 	_num_photo		= str(Options.num_photo)
 	_num_photo_processed	= str(Options.num_photo_processed)
 	_num_photo_geotagged	= str(Options.num_photo_geotagged)
@@ -106,7 +108,11 @@ def report_times(final):
 	_num_video_processed	= str(Options.num_video_processed)
 	max_digit = len(_num_media)
 	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media)
+	if num_media:
+		print("                                                              " + str(int(total_time / num_media / 100000) / 10) + " media/s")
 	print("                  processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed)
+	if num_media_processed:
+		print("                                                              " + str(int(total_time / num_media_processed / 100000) / 10) + " media/s")
 	print("- Videos " + ((max_digit - len(_num_video)) * " ") + _num_video)
 	print("                  processed " + ((max_digit - len(_num_video_processed)) * " ") + _num_video_processed)
 	print("- Photos " + ((max_digit - len(_num_photo)) * " ") + _num_photo)
@@ -121,3 +127,4 @@ def report_times(final):
 	if final and Options.num_photo_processed != Options.num_photo_with_exif_date:
 		for photo in Options.photos_without_exif_date:
 			print("                                      - " + photo)
+	print()
