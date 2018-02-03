@@ -701,21 +701,21 @@ class Media(object):
 
 		self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 
-	def thumbnail_size_is_smaller_than_size_of_(self, image, thumb_size, thumb_type = ""):
+	def thumbnail_size_is_smaller_than_size_of_(self, image, thumb_size, thumb_type = "", mobile_bigger = False):
 		image_width = image.size[0]
 		image_height = image.size[1]
 		max_image_size = max(image_width, image_height)
+		corrected_thumb_size = int(round(thumb_size * Options.config['mobile_thumbnail_factor'])) if mobile_bigger else thumb_size
 		if (
 			thumb_type == "fixed_height" and
-			(thumb_size == Options.config['media_thumb_size'] or thumb_size == int(round(Options.config['media_thumb_size'] * Options.config['mobile_thumbnail_factor']))) and
 			image_width > image_height
 		):
-			veredict = (thumb_size < image_height)
+			veredict = (corrected_thumb_size < image_height)
 		elif thumb_type == "square":
 			min_image_size = min(image_width, image_height)
-			veredict = (thumb_size < min_image_size)
+			veredict = (corrected_thumb_size < min_image_size)
 		else:
-			veredict = (thumb_size < max_image_size)
+			veredict = (corrected_thumb_size < max_image_size)
 		return veredict
 
 	def generate_all_thumbnails(self, reduced_size_images, photo_path, thumbs_path):
@@ -725,10 +725,10 @@ class Media(object):
 			thumbs_and_reduced_size_images = reduced_size_images[:]
 			for (thumb_size, mobile_bigger) in thumb_sizes:
 				index = -1
-				last_index = len(thumbs_and_reduced_size_images) -1
+				last_index = len(thumbs_and_reduced_size_images) - 1
 				for thumb_or_reduced_size_image in thumbs_and_reduced_size_images:
 					index += 1
-					if index == last_index or self.thumbnail_size_is_smaller_than_size_of_(thumb_or_reduced_size_image, thumb_size, thumb_type):
+					if index == last_index or self.thumbnail_size_is_smaller_than_size_of_(thumb_or_reduced_size_image, thumb_size, thumb_type, mobile_bigger):
 						thumb = self.reduce_size_or_make_thumbnail(thumb_or_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
 						thumbs_and_reduced_size_images = [thumb] + thumbs_and_reduced_size_images
 						break
