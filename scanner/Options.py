@@ -4,6 +4,8 @@ from datetime import datetime
 import os
 import sys
 import json
+
+# @python2
 try:
 	import configparser
 except ImportError:

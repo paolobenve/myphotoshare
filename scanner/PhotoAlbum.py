@@ -21,6 +21,8 @@ import hashlib
 import sys
 from pprint import pprint
 import pprint
+
+# @python2
 try:
 	import configparser
 except ImportError:

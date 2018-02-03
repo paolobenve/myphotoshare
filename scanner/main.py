@@ -7,6 +7,7 @@ import sys
 import Options
 import os
 
+# @python2
 # Builtins removed in Python3
 try:
 	from imp import reload
