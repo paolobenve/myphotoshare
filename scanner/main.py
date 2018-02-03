@@ -7,6 +7,7 @@ import sys
 import Options
 import os
 
+# @python2
 # Builtins removed in Python3
 try:
 	from imp import reload
@@ -15,6 +16,7 @@ except ImportError:
 
 
 def main():
+	# @python2
 	if sys.version_info < (3,):
 		reload(sys)
 		sys.setdefaultencoding("UTF-8")
