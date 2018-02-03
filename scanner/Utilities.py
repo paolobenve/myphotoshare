@@ -109,10 +109,10 @@ def report_times(final):
 	max_digit = len(_num_media)
 	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media)
 	if num_media:
-		print("                                                              " + str(int(total_time / num_media / 100000) / 10) + " media/s")
+		print("                                                              " + str(int(total_time / num_media / 100000) / 10) + " s/media")
 	print("                  processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed)
 	if num_media_processed:
-		print("                                                              " + str(int(total_time / num_media_processed / 100000) / 10) + " media/s")
+		print("                                                              " + str(int(total_time / num_media_processed / 100000) / 10) + " s/media")
 	print("- Videos " + ((max_digit - len(_num_video)) * " ") + _num_video)
 	print("                  processed " + ((max_digit - len(_num_video_processed)) * " ") + _num_video_processed)
 	print("- Photos " + ((max_digit - len(_num_photo)) * " ") + _num_photo)
