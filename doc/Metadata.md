@@ -68,7 +68,7 @@ The algorithm used is:
 ```
   For media metadata:
     If section [<media_filename>] exists:
-      Search value in section else in [DEFAULT]
+      Search value in section [<media_filename>] else in [DEFAULT]
     Else:
       Search value in [DEFAULT]
   
