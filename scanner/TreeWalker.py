@@ -416,8 +416,9 @@ class TreeWalker:
 			skip_files = True
 			back_level()
 		json_file = os.path.join(Options.config['cache_path'], album_cache_base) + ".json"
-		json_file_mtime = file_mtime(json_file)
 		json_file_exists = os.path.exists(json_file)
+		if json_file_exists:
+			json_file_mtime = file_mtime(json_file)
 		json_file_OK = False
 		album_ini_file = os.path.join(absolute_path, 'album.ini')
 		album_ini_OK = True
