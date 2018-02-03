@@ -70,10 +70,10 @@ cache_path =
 # cache subfolder: where the album composite images will be saved
 cache_album_subdir = cache_album
 
-# How many processors shouldn't be used in parallel mode?
+# How many processors shouldn't be used when converting media?
 respected_processors = 1
 
-# the method to use for generating cache 2-charachters subdirs
+# the method to use for generating cache 2-characters subdirs
 # permitted values:
 #    md5	: the leading 2 characters of the md5 of the image/video path relative to albums dir
 #    folder	: the leading 2 characters of the subfolder of the image/video path relative to albums dir
