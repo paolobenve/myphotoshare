@@ -880,7 +880,7 @@ class Media(object):
 			# if opencv is installed, crop it, taking into account the faces
 			if (
 				start_image_width != start_image_height and
-				(min(start_image_width, start_image_height) >= actual_thumb_size or max(start_image_width, start_image_height) >= actual_thumb_size)
+				(max(start_image_width, start_image_height) >= actual_thumb_size)
 			):
 				must_crop = True
 				if cv2_installed:
