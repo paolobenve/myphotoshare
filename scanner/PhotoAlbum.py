@@ -34,6 +34,7 @@ except ImportError:
 import numpy as np
 
 cv2_installed = True
+thumbnail_types_and_sizes_list = None
 try:
 	import cv2
 
@@ -704,34 +705,36 @@ class Media(object):
 
 		self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 
-	def thumbnail_size_is_smaller_than_size_of_(self, image, thumb_size, thumb_type = ""):
+	def thumbnail_size_is_smaller_than_size_of_(self, image, thumb_size, thumb_type = "", mobile_bigger = False):
 		image_width = image.size[0]
 		image_height = image.size[1]
 		max_image_size = max(image_width, image_height)
+		corrected_thumb_size = int(round(thumb_size * Options.config['mobile_thumbnail_factor'])) if mobile_bigger else thumb_size
 		if (
 			thumb_type == "fixed_height" and
-			(thumb_size == Options.config['media_thumb_size'] or thumb_size == int(round(Options.config['media_thumb_size'] * Options.config['mobile_thumbnail_factor']))) and
 			image_width > image_height
 		):
-			veredict = (thumb_size < image_height)
+			veredict = (corrected_thumb_size < image_height)
 		elif thumb_type == "square":
 			min_image_size = min(image_width, image_height)
-			veredict = (thumb_size < min_image_size)
+			veredict = (corrected_thumb_size < min_image_size)
 		else:
-			veredict = (thumb_size < max_image_size)
+			veredict = (corrected_thumb_size < max_image_size)
 		return veredict
 
 	def generate_all_thumbnails(self, reduced_size_images, photo_path, thumbs_path):
-		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
+		global thumbnail_types_and_sizes_list
+		if thumbnail_types_and_sizes_list is None:
+			thumbnail_types_and_sizes_list = list(thumbnail_types_and_sizes().items())
 
-		for thumb_type, thumb_sizes in list(_thumbnail_types_and_sizes.items()):
+		for thumb_type, thumb_sizes in thumbnail_types_and_sizes_list:
 			thumbs_and_reduced_size_images = reduced_size_images[:]
 			for (thumb_size, mobile_bigger) in thumb_sizes:
 				index = -1
-				last_index = len(thumbs_and_reduced_size_images) -1
+				last_index = len(thumbs_and_reduced_size_images) - 1
 				for thumb_or_reduced_size_image in thumbs_and_reduced_size_images:
 					index += 1
-					if index == last_index or self.thumbnail_size_is_smaller_than_size_of_(thumb_or_reduced_size_image, thumb_size, thumb_type):
+					if index == last_index or self.thumbnail_size_is_smaller_than_size_of_(thumb_or_reduced_size_image, thumb_size, thumb_type, mobile_bigger):
 						thumb = self.reduce_size_or_make_thumbnail(thumb_or_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
 						thumbs_and_reduced_size_images = [thumb] + thumbs_and_reduced_size_images
 						break
@@ -846,7 +849,7 @@ class Media(object):
 			return start_image
 
 		next_level()
-		message("reduction/thumbnail not OK, creating", thumbs_path_with_subdir, 5)
+		message("reduction/thumbnail not OK, creating", "", 5)
 		next_level()
 		if not os.path.exists(thumbs_path_with_subdir):
 			message("unexistent subdir", thumbs_path_with_subdir, 5)
@@ -859,7 +862,7 @@ class Media(object):
 		elif not file_mtime(thumb_path) < file_mtime(json_file):
 			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
 		back_level()
-		message("calculations...", "", 5)
+
 		original_thumb_size = actual_thumb_size
 		info_string = str(original_thumb_size)
 		if thumb_type == "square":
@@ -880,14 +883,31 @@ class Media(object):
 			# if opencv is installed, crop it, taking into account the faces
 			if (
 				start_image_width != start_image_height and
-				(min(start_image_width, start_image_height) >= actual_thumb_size or max(start_image_width, start_image_height) >= actual_thumb_size)
+				(max(start_image_width, start_image_height) >= actual_thumb_size)
 			):
 				must_crop = True
 				if cv2_installed:
+					# if the reduced size images were generated in a previous scanner run, start_image is the original image,
+					# and detecting the faces is very very very time consuming, so resize it to an appropriate value before detecting the faces
+					smaller_size = int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor'] * 1.5)
+					start_image_copy_for_detecting = start_image.copy()
+					width_for_detecting = start_image_width
+					height_for_detecting = start_image_height
+					if min(start_image_width, start_image_height) > smaller_size:
+						longer_size = int(smaller_size / min(start_image_width, start_image_height) * max(start_image_width, start_image_height))
+						width_for_detecting = smaller_size if start_image_width < start_image_height else longer_size
+						height_for_detecting = longer_size if start_image_width < start_image_height else smaller_size
+						sizes_change = "from " + str(start_image_width) + "x" + str(start_image_height) + " to " + str(width_for_detecting) + "x" + str(height_for_detecting)
+						message("reducing size for face detection...", sizes_change, 5)
+						start_image_copy_for_detecting.thumbnail((longer_size, longer_size), Image.ANTIALIAS)
+						next_level()
+						message("size reduced", "", 5)
+						back_level()
+
 					# opencv!
 					# see http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html#haar-cascade-detection-in-opencv
 					try:
-						opencv_image = np.array(start_image.convert('RGB'))[:, :, ::-1].copy()
+						opencv_image = np.array(start_image_copy_for_detecting.convert('RGB'))[:, :, ::-1].copy()
 						gray_opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2GRAY)
 					except cv2.error:
 						# this happens with gif's... weird...
@@ -896,7 +916,7 @@ class Media(object):
 						try_shifting = True
 
 						# detect faces
-						message("opencv: detecting faces...", "", 4)
+						message("opencv: detecting faces...", "from " + str(width_for_detecting) + "x" + str(height_for_detecting), 4)
 						# from https://docs.opencv.org/2.4/modules/objdetect/doc/cascade_classification.html:
 						# detectMultiScale(image[, scaleFactor[, minNeighbors[, flags[, minSize[, maxSize]]]]])
 						# - scaleFactor – Parameter specifying how much the image size is reduced at each image scale.
@@ -1094,7 +1114,7 @@ class Media(object):
 			start_image_copy.thumbnail((actual_thumb_size, actual_thumb_size), Image.ANTIALIAS)
 			next_level()
 			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
-				message("reduced size (" + str(original_thumb_size) + ")", "", 4)
+				message("size reduced (" + str(original_thumb_size) + ")", "", 4)
 			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
 				message("thumbed for albums (" + str(original_thumb_size) + ")", "", 4)
 			else:
