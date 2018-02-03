@@ -855,11 +855,11 @@ class Media(object):
 			message("unexistent subdir", thumbs_path_with_subdir, 5)
 		elif not os.path.exists(thumb_path):
 			message("unexistent reduction/thumbnail", thumb_path, 5)
-		elif not file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
+		elif file_mtime(thumb_path) < self._attributes["dateTimeFile"]:
 			message("reduction/thumbnail older than media date time", thumb_path, 5)
 		elif not json_file_exists:
 			message("unexistent json file", json_file, 5)
-		elif not file_mtime(thumb_path) < file_mtime(json_file):
+		elif file_mtime(thumb_path) > file_mtime(json_file):
 			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
 		back_level()
 
