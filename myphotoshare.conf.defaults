@@ -50,7 +50,7 @@ css_minifier = cssmin
 #    web_service : https://javascript-minifier.com/ (Default)
 #    jsmin2 : python-jsmin (https://github.com/tikitu/jsmin)
 #    jsmin3 : python3-jsmin (https://github.com/tikitu/jsmin)
-js_minifier = jsmin2
+js_minifier = jsmin3
 
 
 ###########################################################
