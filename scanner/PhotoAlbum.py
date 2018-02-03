@@ -859,7 +859,7 @@ class Media(object):
 		elif not file_mtime(thumb_path) < file_mtime(json_file):
 			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
 		back_level()
-		message("calculations...", "", 5)
+
 		original_thumb_size = actual_thumb_size
 		info_string = str(original_thumb_size)
 		if thumb_type == "square":
@@ -884,10 +884,26 @@ class Media(object):
 			):
 				must_crop = True
 				if cv2_installed:
+					# if the reduced size images were generated in a previous scanner run, start_image is the original image,
+					# and detecting the faces is very very very time consuming, so resize it to an appropriate value before detecting the faces
+					smaller_size = int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor'] * 1.5)
+					start_image_copy_for_detecting = start_image.copy()
+					width_for_detecting = start_image_width
+					height_for_detecting = start_image_height
+					if min(start_image_width, start_image_height) > smaller_size:
+						longer_size = int(smaller_size / min(start_image_width, start_image_height) * max(start_image_width, start_image_height))
+						width_for_detecting = smaller_size if start_image_width < start_image_height else longer_size
+						height_for_detecting = longer_size if start_image_width < start_image_height else smaller_size
+						message("reducing size for face detetion...", "to " + str(width_for_detecting) + "x" + str(height_for_detecting), 5)
+						start_image_copy_for_detecting.thumbnail((longer_size, longer_size), Image.ANTIALIAS)
+						next_level()
+						message("size reduced", "", 5)
+						back_level()
+
 					# opencv!
 					# see http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html#haar-cascade-detection-in-opencv
 					try:
-						opencv_image = np.array(start_image.convert('RGB'))[:, :, ::-1].copy()
+						opencv_image = np.array(start_image_copy_for_detecting.convert('RGB'))[:, :, ::-1].copy()
 						gray_opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2GRAY)
 					except cv2.error:
 						# this happens with gif's... weird...
@@ -896,7 +912,7 @@ class Media(object):
 						try_shifting = True
 
 						# detect faces
-						message("opencv: detecting faces...", "from " + str(start_image_width) + "x" + str(start_image_height), 4)
+						message("opencv: detecting faces...", "from " + str(width_for_detecting) + "x" + str(height_for_detecting), 4)
 						# from https://docs.opencv.org/2.4/modules/objdetect/doc/cascade_classification.html:
 						# detectMultiScale(image[, scaleFactor[, minNeighbors[, flags[, minSize[, maxSize]]]]])
 						# - scaleFactor – Parameter specifying how much the image size is reduced at each image scale.
