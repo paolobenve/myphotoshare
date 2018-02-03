@@ -85,14 +85,25 @@ def report_times(final):
 		else:
 			_average_time = str(int(round(average_time / 1000000))) + "       s "
 		print((50 - len(category)) * " ", category, (18 - len(_time)) * " ", _time, (15 - len(counter)) * " ", counter, (20 - len(_average_time)) * " ", _average_time)
+
+	seconds = int(round(total_time / 1000000))
 	if total_time <= 1800:
 		_total_time = str(int(round(total_time))) + " μs"
 	elif total_time <= 1800:
 		_total_time = str(int(round(total_time / 1000))) + "    ms"
 	else:
-		_total_time = str(int(round(total_time / 1000000))) + "       s "
+		_total_time = str(seconds) + "       s "
+
+	_total_time_m, _total_time_s = divmod(seconds, 60)
+	_total_time_h, _total_time_m = divmod(_total_time_m, 60)
+
+	_total_time_hours = str(_total_time_h) + "h " if _total_time_h else ""
+	_total_time_minutes = str(_total_time_m) + "m " if _total_time_m else ""
+	_total_time_seconds = str(_total_time_s) + "s" if _total_time_m else ""
+	if _total_time_seconds:
+		_total_time_seconds = "= " + _total_time_seconds
 	print()
-	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time)
+	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time, "     ", _total_time_hours + _total_time_minutes + _total_time_seconds)
 	print()
 	num_media = Options.num_video + Options.num_photo
 	_num_media		= str(num_media)
