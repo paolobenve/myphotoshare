@@ -115,5 +115,6 @@ It is, essentially, a slick and fast, minimal but still well-featured photo gall
 
 As a term of comparizon, on my medium-sized pc, with the images on a NFS mounted NAS partition:
 
-* scanning for the first time a 124 photos directory for a total size of 295 MB takes about 100 seconds (about 1 sec/media, 1 media/sec).
+* scanning without face detection for the first time a 124 photos directory for a total size of 295 MB takes about 100 seconds (about 1 sec/media, 1 media/sec).
+* scanning with face detection for the first time a 124 photos directory for a total size of 295 MB takes about 160 seconds (about 1.6 sec/media, 0.6 media/sec).
 * re-scan of "all OK" tree with 36000 media files for a total size of 87 GB takes about 14 minutes (about 20 ms/media, 50 media/sec).
