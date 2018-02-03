@@ -32,6 +32,7 @@ except ImportError:
 import numpy as np
 
 cv2_installed = True
+thumbnail_types_and_sizes_list = None
 try:
 	import cv2
 
@@ -719,9 +720,11 @@ class Media(object):
 		return veredict
 
 	def generate_all_thumbnails(self, reduced_size_images, photo_path, thumbs_path):
-		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
+		global thumbnail_types_and_sizes_list
+		if thumbnail_types_and_sizes_list is None:
+			thumbnail_types_and_sizes_list = list(thumbnail_types_and_sizes().items())
 
-		for thumb_type, thumb_sizes in list(_thumbnail_types_and_sizes.items()):
+		for thumb_type, thumb_sizes in thumbnail_types_and_sizes_list:
 			thumbs_and_reduced_size_images = reduced_size_images[:]
 			for (thumb_size, mobile_bigger) in thumb_sizes:
 				index = -1
