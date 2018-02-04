@@ -943,7 +943,8 @@ $(document).ready(function() {
 				).show();
 			} else if (
 				populateMedia === true ||
-				populateMedia === "sortMedia"
+				populateMedia == "refreshMedia" ||
+				populateMedia == "refreshBoth"
 			) {
 				media = [];
 				for (i = 0; i < currentAlbum.media.length; ++i) {
@@ -1050,7 +1051,8 @@ $(document).ready(function() {
 					albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 				if (
 					populate === true ||
-					populate === "sortAlbums"
+					populate == "refreshSubalbums" ||
+					populateMedia == "refreshBoth"
 				) {
 					subalbums = [];
 
@@ -2316,7 +2318,7 @@ $(document).ready(function() {
 			setBooleanCookie("albumDateReverseSortRequested", currentAlbum.albumNameReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2329,7 +2331,7 @@ $(document).ready(function() {
 			setBooleanCookie("albumNameReverseSortRequested", currentAlbum.albumDateReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2344,7 +2346,7 @@ $(document).ready(function() {
 					setBooleanCookie("albumDateReverseSortRequested", ! currentAlbum.albumDateReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2357,7 +2359,7 @@ $(document).ready(function() {
 				setBooleanCookie("mediaDateReverseSortRequested", currentAlbum.mediaNameReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
@@ -2370,7 +2372,7 @@ $(document).ready(function() {
 			setBooleanCookie("mediaNameReverseSortRequested", currentAlbum.mediaDateReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
@@ -2386,7 +2388,7 @@ $(document).ready(function() {
 
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
@@ -2400,7 +2402,7 @@ $(document).ready(function() {
 			Options.albums_slide_style = ! Options.albums_slide_style;
 			setBooleanCookie("albums_slide_style", Options.albums_slide_style);
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2414,8 +2416,7 @@ $(document).ready(function() {
 				Options.spacing = Options.spacingSave;
 			setCookie("spacing", Options.spacing);
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
-			showAlbum("sortMedia");
+			showAlbum("refreshBoth");
 			// showAlbum();
 		}
 		return false;
@@ -2427,7 +2428,7 @@ $(document).ready(function() {
 			Options.show_album_names_below_thumbs = ! Options.show_album_names_below_thumbs;
 			setBooleanCookie("show_album_names_below_thumbs", Options.show_album_names_below_thumbs);
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2449,7 +2450,7 @@ $(document).ready(function() {
 			Options.show_media_names_below_thumbs = ! Options.show_media_names_below_thumbs;
 			setBooleanCookie("show_media_names_below_thumbs", Options.show_media_names_below_thumbs);
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
@@ -2460,7 +2461,7 @@ $(document).ready(function() {
 			Options.album_thumb_type = Options.album_thumb_type == "square" ? "fit" : "square";
 			setCookie("album_thumb_type", Options.album_thumb_type);
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2471,7 +2472,7 @@ $(document).ready(function() {
 			Options.media_thumb_type = Options.media_thumb_type == "square" ? "fixed_height" : "square";
 			setCookie("media_thumb_type", Options.media_thumb_type);
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
