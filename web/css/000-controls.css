@@ -433,7 +433,7 @@ video {
 	text-align: center;
 	overflow: hidden;
 	padding: 0 .2em;
-	margin-bottom: 1em;
+	margin-bottom: .2em;
 }
 
 .media-caption.hidden, .album-caption.hidden {
