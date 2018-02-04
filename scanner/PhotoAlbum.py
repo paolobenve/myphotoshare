@@ -4,21 +4,14 @@
 
 import locale
 locale.setlocale(locale.LC_ALL, '')
-from CachePath import *
-from Utilities import *
-from datetime import datetime
-from Geonames import *
+
 import json
 import os
 import os.path
-from PIL import Image
-from PIL.ExifTags import TAGS, GPSTAGS
 import tempfile
-from VideoToolWrapper import *
-import math
-import Options
 import hashlib
 import sys
+from datetime import datetime
 from pprint import pprint
 import pprint
 
@@ -31,7 +24,18 @@ try:
 	from configparser import NoOptionError
 except ImportError:
 	from ConfigParser import NoOptionError
+
+import math
 import numpy as np
+
+from CachePath import remove_album_path, remove_folders_marker, trim_base_custom, checksum, cache_base, thumbnail_types_and_sizes, file_mtime, photo_cache_name, video_cache_name, find, find_in_usr_share
+from Utilities import message, next_level, back_level
+from Geonames import Geonames
+from PIL import Image
+from PIL.ExifTags import TAGS, GPSTAGS
+from VideoToolWrapper import VideoProbeWrapper, VideoTranscodeWrapper
+import Options
+
 
 cv2_installed = True
 try:
@@ -39,14 +43,14 @@ try:
 
 	message("importer", "opencv library available, using it!", 3)
 	next_level()
-	face_config_file = "haarcascade_frontalface_default.xml"
-	message("looking for file...", face_config_file, 5)
-	face_config_file_with_path = find_in_usr_share(face_config_file)
+	FACE_CONFIG_FILE = "haarcascade_frontalface_default.xml"
+	message("looking for file...", FACE_CONFIG_FILE, 5)
+	face_config_file_with_path = find_in_usr_share(FACE_CONFIG_FILE)
 	if not face_config_file_with_path:
-		face_config_file_with_path = find(face_config_file)
+		face_config_file_with_path = find(FACE_CONFIG_FILE)
 	if not face_config_file_with_path:
 		next_level()
-		message("face xml file not found", face_config_file, 5)
+		message("face xml file not found", FACE_CONFIG_FILE, 5)
 		back_level()
 		cv2_installed = False
 	else:
@@ -54,14 +58,14 @@ try:
 		next_level()
 		message("found and initialized:", face_config_file_with_path, 5)
 		back_level()
-		eye_config_file = "haarcascade_eye.xml"
-		message("looking for file...", eye_config_file, 5)
-		eye_config_file_with_path = find_in_usr_share(eye_config_file)
+		EYE_CONFIG_FILE = "haarcascade_eye.xml"
+		message("looking for file...", EYE_CONFIG_FILE, 5)
+		eye_config_file_with_path = find_in_usr_share(EYE_CONFIG_FILE)
 		if not eye_config_file_with_path:
-			eye_config_file_with_path = find(eye_config_file)
+			eye_config_file_with_path = find(EYE_CONFIG_FILE)
 		if not eye_config_file_with_path:
 			next_level()
-			message("eyes xml file not found", eye_config_file, 5)
+			message("eyes xml file not found", EYE_CONFIG_FILE, 5)
 			back_level()
 			cv2_installed = False
 		else:
@@ -86,6 +90,7 @@ class Album(object):
 			path = path[0:-1]
 		self.absolute_path = path
 		self.baseless_path = remove_album_path(path)
+		self.cache_base = ""
 		self.media_list = list()
 		self.albums_list = list()
 		self.media_list_is_sorted = True
@@ -97,6 +102,7 @@ class Album(object):
 		self.album_ini = None
 		self._attributes = {}
 		self._attributes["metadata"] = {}
+		self.json_version = {}
 
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
@@ -132,7 +138,7 @@ class Album(object):
 		return self.baseless_path
 
 	def __str__(self):
-		if hasattr(self, name):
+		if hasattr(self, "name"):
 			return self.name
 		else:
 			return self.path
@@ -156,30 +162,33 @@ class Album(object):
 			return self.media_list[-1].date
 		return max(self.media_list[-1].date, self.albums_list[-1].date)
 
+
 	def __cmp__(self, other):
 		try:
 			return cmp(self.date, other.date)
 		except TypeError:
 			return 1
 
+
 	def __lt__(self, other):
 		try:
-			return (self.date < other.date)
+			return self.date < other.date
 		except TypeError:
 			return True
+
 
 	def read_album_ini(self):
 		"""Read the 'album.ini' file in the directory 'self.absolute_path' to
 		get user defined metadata for the album and pictures.
 		"""
-		self.album_ini = configparser.ConfigParser(allow_no_value = True)
+		self.album_ini = configparser.ConfigParser(allow_no_value=True)
 		message("reading album.ini...", "", 5)
 		self.album_ini.read(os.path.join(self.absolute_path, "album.ini"))
 		next_level()
 		message("album.ini read", os.path.join(self.absolute_path, "album.ini"), 5)
 		back_level()
 
-		_set_metadata_from_album_ini("album", self._attributes, self.album_ini)
+		Metadata.set_metadata_from_album_ini("album", self._attributes, self.album_ini)
 
 
 	def add_media(self, media):
@@ -221,8 +230,8 @@ class Album(object):
 		message("album sorted", self.absolute_path, 4)
 		back_level()
 		message("saving album...", "", 5)
-		with open(json_file_with_path, 'w') as fp:
-			json.dump(self, fp, cls=PhotoAlbumEncoder)
+		with open(json_file_with_path, 'w') as filepath:
+			json.dump(self, filepath, cls=PhotoAlbumEncoder)
 		next_level()
 		message("album saved", json_file_with_path, 3)
 		back_level()
@@ -230,8 +239,8 @@ class Album(object):
 	@staticmethod
 	def from_cache(path, album_cache_base):
 		message("reading album...", "", 5)
-		with open(path, "r") as fp:
-			dictionary = json.load(fp)
+		with open(path, "r") as filepath:
+			dictionary = json.load(filepath)
 		next_level()
 		message("album read", path, 5)
 		back_level()
@@ -254,7 +263,7 @@ class Album(object):
 		else:
 			path = dictionary["path"]
 		# Don't use cache if version has changed
-		if not "jsonVersion" in dictionary or float(dictionary["jsonVersion"]) != Options.json_version:
+		if "jsonVersion" not in dictionary or float(dictionary["jsonVersion"]) != Options.json_version:
 			return None
 		album = Album(os.path.join(Options.config['album_path'], path))
 		album.cache_base = album_cache_base
@@ -377,7 +386,7 @@ class Media(object):
 			dir_mtime = file_mtime(dirname)
 		except KeyboardInterrupt:
 			raise
-		except:
+		except OSError:
 			next_level()
 			message("could not read file or dir mtime", media_path, 5)
 			back_level()
@@ -416,7 +425,6 @@ class Media(object):
 			_cache_base = self.cache_base
 			if distinguish_suffix:
 				_cache_base += "_" + str(distinguish_suffix)
-			cache_name_absent = True
 			if any(_cache_base == _media.cache_base and self.media_file_name != _media.media_file_name for _media in album.media_list):
 				distinguish_suffix += 1
 			else:
@@ -458,12 +466,12 @@ class Media(object):
 
 					# Overwrite with album.ini values when album has been read from file
 					if self.album.album_ini:
-						_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+						Metadata.set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 					back_level()
 			else:
 				# try with video detection
 				self._video_metadata(media_path)
-				if self._attributes["mediaType"] == "video":
+				if self.is_video:
 					self._video_transcode(thumbs_path, media_path)
 					if self.is_valid:
 						self._video_thumbnails(thumbs_path, media_path)
@@ -475,7 +483,7 @@ class Media(object):
 							self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
 							# Overwrite with album.ini values when read from file
 							if self.album.album_ini:
-								_set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+								Metadata.set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 							back_level()
 				else:
 					next_level()
@@ -483,6 +491,16 @@ class Media(object):
 					back_level()
 					self.is_valid = False
 		return
+
+
+	@property
+	def datetime_file(self):
+		return self._attributes["dateTimeFile"]
+
+
+	@property
+	def datetime_dir(self):
+		return self._attributes["dateTimeDir"]
 
 
 	def _photo_metadata(self, image):
@@ -526,15 +544,15 @@ class Media(object):
 
 			if decoded == "GPSInfo":
 				gps_data = {}
-				for t in value:
-					sub_decoded = GPSTAGS.get(t, t)
-					gps_data[sub_decoded] = value[t]
+				for gps_tag in value:
+					sub_decoded = GPSTAGS.get(gps_tag, gps_tag)
+					gps_data[sub_decoded] = value[gps_tag]
 					exif[decoded] = gps_data
 			else:
 				exif[decoded] = value
 
 		if "Orientation" in exif:
-			self._orientation = exif["Orientation"];
+			self._orientation = exif["Orientation"]
 			if self._orientation in range(5, 9):
 				self._attributes["metadata"]["size"] = (self._attributes["metadata"]["size"][1], self._attributes["metadata"]["size"][0])
 			if self._orientation - 1 < len(self._photo_metadata.orientation_list):
@@ -615,14 +633,14 @@ class Media(object):
 			gps_longitude_ref = exif["GPSInfo"].get("GPSLongitudeRef", None)
 
 		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
-			self._attributes["metadata"]["latitude"] = _convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
-			self._attributes["metadata"]["latitudeMS"] = _convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
-			self._attributes["metadata"]["longitude"] = _convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
-			self._attributes["metadata"]["longitudeMS"] = _convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["latitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["longitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 
 		# Overwrite with album.ini values when it has been read from file
 		if self.album.album_ini:
-			_set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+			Metadata.set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
 
 		next_level()
 		message("extracted", "", 5)
@@ -631,7 +649,14 @@ class Media(object):
 
 
 
-	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired",0x5: "Fired, Return not detected",0x7: "Fired, Return detected",0x8: "On, Did not fire",0x9: "On, Fired",0xd: "On, Return not detected",0xf: "On, Return detected",0x10: "Off, Did not fire",0x14: "Off, Did not fire, Return not detected",0x18: "Auto, Did not fire",0x19: "Auto, Fired",0x1d: "Auto, Fired, Return not detected",0x1f: "Auto, Fired, Return detected",0x20: "No flash function",0x30: "Off, No flash function",0x41: "Fired, Red-eye reduction",0x45: "Fired, Red-eye reduction, Return not detected",0x47: "Fired, Red-eye reduction, Return detected",0x49: "On, Red-eye reduction",0x4d: "On, Red-eye reduction, Return not detected",0x4f: "On, Red-eye reduction, Return detected",0x50: "Off, Red-eye reduction",0x58: "Auto, Did not fire, Red-eye reduction",0x59: "Auto, Fired, Red-eye reduction",0x5d: "Auto, Fired, Red-eye reduction, Return not detected",0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
+	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired", 0x5: "Fired, Return not detected", 0x7: "Fired, Return detected",
+		0x8: "On, Did not fire", 0x9: "On, Fired", 0xd: "On, Return not detected", 0xf: "On, Return detected", 0x10: "Off, Did not fire",
+		0x14: "Off, Did not fire, Return not detected", 0x18: "Auto, Did not fire", 0x19: "Auto, Fired", 0x1d: "Auto, Fired, Return not detected",
+		0x1f: "Auto, Fired, Return detected", 0x20: "No flash function", 0x30: "Off, No flash function", 0x41: "Fired, Red-eye reduction",
+		0x45: "Fired, Red-eye reduction, Return not detected", 0x47: "Fired, Red-eye reduction, Return detected", 0x49: "On, Red-eye reduction",
+		0x4d: "On, Red-eye reduction, Return not detected", 0x4f: "On, Red-eye reduction, Return detected", 0x50: "Off, Red-eye reduction",
+		0x58: "Auto, Did not fire, Red-eye reduction", 0x59: "Auto, Fired, Red-eye reduction", 0x5d: "Auto, Fired, Red-eye reduction, Return not detected",
+		0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
 	_photo_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
 	_photo_metadata.metering_list = ["Unknown", "Average", "Center-weighted average", "Spot", "Multi-spot", "Multi-segment", "Partial"]
 	_photo_metadata.exposure_list = ["Not Defined", "Manual", "Program AE", "Aperture-priority AE", "Shutter speed priority AE", "Creative (Slow speed)", "Action (High speed)", "Portrait", "Landscape", "Bulb"]
@@ -642,14 +667,14 @@ class Media(object):
 
 
 	def _video_metadata(self, path, original=True):
-		p = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
-		if p == False:
+		return_code = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
+		if not return_code:
 			next_level()
 			message("error probing video, not a video?", path, 5)
 			back_level()
 			self.is_valid = False
 			return
-		info = json.loads(p.decode(sys.getdefaultencoding()))
+		info = json.loads(return_code.decode(sys.getdefaultencoding()))
 		for s in info["streams"]:
 			if 'codec_type' in s:
 				next_level()
@@ -668,7 +693,7 @@ class Media(object):
 
 		# Video should also contain metadata like GPS information, at least in QuickTime and MP4 files...
 		if self.album.album_ini:
-			_set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+			Metadata.set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
 
 
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
@@ -698,13 +723,14 @@ class Media(object):
 				mirror = image.transpose(Image.ROTATE_90)
 			image = mirror
 		except IOError:
-			# https://github.com/paolobenve/myphotoshare/issues/46 : some image make raise this exception
+			# https://github.com/paolobenve/myphotoshare/issues/46: some image may raise this exception
 			message("WARNING: Photo couldn't be trasposed", photo_path, 2)
-			pass
 
 		self._photo_thumbnails_cascade(image, photo_path, thumbs_path)
 
-	def thumbnail_size_is_smaller_than_size_of_(self, image, thumb_size, thumb_type = ""):
+
+	@staticmethod
+	def _thumbnail_is_smaller_than(image, thumb_size, thumb_type=""):
 		image_width = image.size[0]
 		image_height = image.size[1]
 		max_image_size = max(image_width, image_height)
@@ -713,13 +739,14 @@ class Media(object):
 			(thumb_size == Options.config['media_thumb_size'] or thumb_size == int(round(Options.config['media_thumb_size'] * Options.config['mobile_thumbnail_factor']))) and
 			image_width > image_height
 		):
-			veredict = (thumb_size < image_height)
+			verdict = (thumb_size < image_height)
 		elif thumb_type == "square":
 			min_image_size = min(image_width, image_height)
-			veredict = (thumb_size < min_image_size)
+			verdict = (thumb_size < min_image_size)
 		else:
-			veredict = (thumb_size < max_image_size)
-		return veredict
+			verdict = (thumb_size < max_image_size)
+		return verdict
+
 
 	def generate_all_thumbnails(self, reduced_size_images, photo_path, thumbs_path):
 		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
@@ -731,7 +758,7 @@ class Media(object):
 				last_index = len(thumbs_and_reduced_size_images) -1
 				for thumb_or_reduced_size_image in thumbs_and_reduced_size_images:
 					index += 1
-					if index == last_index or self.thumbnail_size_is_smaller_than_size_of_(thumb_or_reduced_size_image, thumb_size, thumb_type):
+					if index == last_index or Media._thumbnail_is_smaller_than(thumb_or_reduced_size_image, thumb_size, thumb_type):
 						thumb = self.reduce_size_or_make_thumbnail(thumb_or_reduced_size_image, photo_path, thumbs_path, thumb_size, thumb_type, mobile_bigger)
 						thumbs_and_reduced_size_images = [thumb] + thumbs_and_reduced_size_images
 						break
@@ -742,8 +769,6 @@ class Media(object):
 		# this function calls self.reduce_size_or_make_thumbnail() with the proper image self.reduce_size_or_make_thumbnail() needs
 		# so that the thumbnail doesn't get blurred
 		reduced_size_image = image
-		image_width = image.size[0]
-		image_height = image.size[1]
 		reduced_size_images = []
 		for thumb_size in Options.config['reduced_sizes']:
 			reduced_size_image = self.reduce_size_or_make_thumbnail(reduced_size_image, photo_path, thumbs_path, thumb_size)
@@ -751,7 +776,9 @@ class Media(object):
 
 		self.generate_all_thumbnails(reduced_size_images, photo_path, thumbs_path)
 
-	def is_thumbnail(self, thumb_size, thumb_type):
+
+	@staticmethod
+	def is_thumbnail(thumb_type):
 		_is_thumbnail = (thumb_type != "")
 		return _is_thumbnail
 
@@ -809,7 +836,8 @@ class Media(object):
 				else:
 					return np.mean(np.asarray(positions)).tolist()
 
-	def reduce_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type = "", mobile_bigger = False):
+
+	def reduce_size_or_make_thumbnail(self, start_image, original_path, thumbs_path, thumb_size, thumb_type="", mobile_bigger=False):
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
 		if album_prefix == Options.config["cache_folder_separator"]:
 			album_prefix = ""
@@ -825,14 +853,13 @@ class Media(object):
 		# if the reduced image/thumbnail is there and is valid, exit immediately
 		json_file = os.path.join(thumbs_path, self.album.json_file)
 		json_file_exists = os.path.exists(json_file)
-		_is_thumbnail = self.is_thumbnail(thumb_size, thumb_type)
-		is_video = self._attributes["mediaType"] == "video"
+		_is_thumbnail = Media.is_thumbnail(thumb_type)
 		next_level()
 		message("checking reduction/thumbnail", thumb_path, 5)
 		if (
 			os.path.exists(thumbs_path_with_subdir) and
 			os.path.exists(thumb_path) and
-			file_mtime(thumb_path) >= self._attributes["dateTimeFile"] and
+			file_mtime(thumb_path) >= self.datetime_file and
 			(not json_file_exists or file_mtime(thumb_path) < file_mtime(json_file)) and
 			(
 				not _is_thumbnail and not Options.config['recreate_reduced_photos'] or
@@ -852,11 +879,11 @@ class Media(object):
 			message("unexistent subdir", thumbs_path_with_subdir, 5)
 		elif not os.path.exists(thumb_path):
 			message("unexistent reduction/thumbnail", thumb_path, 5)
-		elif not file_mtime(thumb_path) >= self._attributes["dateTimeFile"]:
+		elif file_mtime(thumb_path) < self.datetime_file:
 			message("reduction/thumbnail older than media date time", thumb_path, 5)
 		elif not json_file_exists:
 			message("unexistent json file", json_file, 5)
-		elif not file_mtime(thumb_path) < file_mtime(json_file):
+		elif file_mtime(thumb_path) >= file_mtime(json_file):
 			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
 		back_level()
 		message("calculations...", "", 5)
@@ -908,14 +935,14 @@ class Media(object):
 						faces = face_cascade.detectMultiScale(gray_opencv_image, Options.config['face_cascade_scale_factor'], 5)
 						if len(faces) and Options.config['show_faces']:
 							img = opencv_image
-							for (x,y,w,h) in faces:
-								cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-								roi_gray = gray_opencv_image[y:y+h, x:x+w]
-								roi_color = img[y:y+h, x:x+w]
+							for (x, y, w, h) in faces:
+								cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+								roi_gray = gray_opencv_image[y: y + h, x: x + w]
+								roi_color = img[y: y + h, x: x + w]
 								eyes = eye_cascade.detectMultiScale(roi_gray)
-								for (ex,ey,ew,eh) in eyes:
-									cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
-							cv2.imshow('img',img)
+								for (ex, ey, ew, eh) in eyes:
+									cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2)
+							cv2.imshow('img', img)
 							cv2.waitKey(0)
 							cv2.destroyAllWindows()
 
@@ -977,7 +1004,6 @@ class Media(object):
 									bottom = start_image_height
 									top = start_image_height - start_image_width
 					thumbnail_width = actual_thumb_size
-					thumbnail_height = actual_thumb_size
 				elif max(start_image_width, start_image_height) >= actual_thumb_size:
 					# image smallest size is smaller than the square which would result from cropping
 					# cropped image will not be square
@@ -1002,7 +1028,6 @@ class Media(object):
 									right = start_image_width
 									left = right - actual_thumb_size
 						thumbnail_width = actual_thumb_size
-						thumbnail_height = start_image_height
 					else:
 						# tall image
 						left = 0
@@ -1024,11 +1049,9 @@ class Media(object):
 									bottom = start_image_height
 									top = bottom - actual_thumb_size
 						thumbnail_width = start_image_width
-						thumbnail_height = actual_thumb_size
 			else:
 				# image is square, or is smaller than the square thumbnail, don't crop it
 				thumbnail_width = start_image_width
-				thumbnail_height = start_image_height
 		else:
 			if (
 				original_thumb_size == media_thumb_size and
@@ -1036,15 +1059,12 @@ class Media(object):
 				start_image_width > start_image_height
 			):
 				# the thumbnail size will not be thumb_size, the image will be greater
-				thumbnail_height = original_thumb_size
 				thumbnail_width = int(round(original_thumb_size * start_image_width / float(start_image_height)))
 				actual_thumb_size = thumbnail_width
 			elif start_image_width > start_image_height:
 				thumbnail_width = actual_thumb_size
-				thumbnail_height = int(round(actual_thumb_size * start_image_height / float(start_image_width)))
 			else:
 				thumbnail_width = int(round(actual_thumb_size * start_image_width / float(start_image_height)))
-				thumbnail_height = actual_thumb_size
 
 		# now thumbnail_width and thumbnail_height are the values the thumbnail will get,
 		# and if the thumbnail isn't a square one, their ratio is the same of the original image
@@ -1106,9 +1126,9 @@ class Media(object):
 		if thumb_type == "square" and min(start_image_copy.size[0], start_image_copy.size[1]) < actual_thumb_size:
 			# it's smaller than the square we need: fill it
 			message("small crop: filling...", "background color: " + Options.config['small_square_crops_background_color'], 5)
-			newImage = Image.new('RGBA', (actual_thumb_size, actual_thumb_size), Options.config['small_square_crops_background_color'])
-			newImage.paste(start_image_copy, (int((actual_thumb_size - start_image_copy.size[0]) / 2), int((actual_thumb_size - start_image_copy.size[1]) / 2)))
-			start_image_copy_filled = newImage
+			new_image = Image.new('RGBA', (actual_thumb_size, actual_thumb_size), Options.config['small_square_crops_background_color'])
+			new_image.paste(start_image_copy, (int((actual_thumb_size - start_image_copy.size[0]) / 2), int((actual_thumb_size - start_image_copy.size[1]) / 2)))
+			start_image_copy_filled = new_image
 			next_level()
 			message("filled", "", 5)
 			back_level()
@@ -1125,7 +1145,7 @@ class Media(object):
 			message("FATAL ERROR", thumb_path + " not writable, quitting")
 			sys.exit(-97)
 
-		if self._attributes["mediaType"] == "video":
+		if self.is_video:
 			message("adding video transparency...", "", 5)
 			start_image_copy_for_saving = start_image_copy_filled.copy()
 			transparency_file = os.path.join(os.path.dirname(__file__), "../web/img/play_button_100_62.png")
@@ -1195,9 +1215,10 @@ class Media(object):
 			back_level()
 			return start_image
 
+
 	def _video_thumbnails(self, thumbs_path, original_path):
-		(tfd, tfn) = tempfile.mkstemp();
-		p = VideoTranscodeWrapper().call(
+		(_, tfn) = tempfile.mkstemp()
+		return_code = VideoTranscodeWrapper().call(
 			'-i', original_path,    # original file to extract thumbs from
 			'-f', 'image2',         # extract image
 			'-vsync', '1',          # CRF
@@ -1207,7 +1228,7 @@ class Media(object):
 			'-y',                   # don't prompt for overwrite
 			tfn                     # temporary file to store extracted image
 		)
-		if p == False:
+		if not return_code:
 			next_level()
 			message("couldn't extract video frame", os.path.basename(original_path), 1)
 			back_level()
@@ -1215,9 +1236,6 @@ class Media(object):
 				os.unlink(tfn)
 			except OSError:
 				pass
-			next_level()
-			message("error extracting video frame", path, 5)
-			back_level()
 			self.is_valid = False
 			return
 		try:
@@ -1230,7 +1248,7 @@ class Media(object):
 			raise
 		except:
 			next_level()
-			message("error opening video thumbnail", tfn + " from " + path, 5)
+			message("error opening video thumbnail", tfn + " from " + original_path, 5)
 			back_level()
 			self.is_valid = False
 			try:
@@ -1254,6 +1272,7 @@ class Media(object):
 			os.unlink(tfn)
 		except OSError:
 			pass
+
 
 	def _video_transcode(self, transcode_path, original_path):
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
@@ -1296,18 +1315,18 @@ class Media(object):
 		]
 		filters = []
 		info_string = "mp4, h264, " + Options.config['video_transcode_bitrate'] + " bit/sec, crf=" + str(Options.config['video_crf'])
-		if (
-			os.path.exists(transcode_path) and
-			file_mtime(transcode_path) >= self._attributes["dateTimeFile"]
-		):
+
+		if os.path.exists(transcode_path) and file_mtime(transcode_path) >= self.datetime_file:
 			next_level()
 			message("existent transcoded video", info_string, 4)
 			back_level()
 			self._video_metadata(transcode_path, False)
 			return
+
 		if "originalSize" in self._attributes["metadata"] and self._attributes["metadata"]["originalSize"][1] > 720:
 			transcode_cmd.append('-s')
 			transcode_cmd.append('hd720')
+
 		if "rotate" in self._attributes["metadata"]:
 			if self._attributes["metadata"]["rotate"] == "90":
 				filters.append('transpose=1')
@@ -1315,6 +1334,7 @@ class Media(object):
 				filters.append('vflip,hflip')
 			elif self._attributes["metadata"]["rotate"] == "270":
 				filters.append('transpose=2')
+		
 		if len(filters):
 			transcode_cmd.append('-vf')
 			transcode_cmd.append(','.join(filters))
@@ -1324,15 +1344,15 @@ class Media(object):
 		tmp_transcode_cmd = transcode_cmd[:]
 		transcode_cmd.append(transcode_path)
 		try:
-			p = VideoTranscodeWrapper().call(*transcode_cmd)
-			if p != False:
+			return_code = VideoTranscodeWrapper().call(*transcode_cmd)
+			if return_code != False:
 				next_level()
 				message("transcoded", "", 4)
 				back_level()
 		except KeyboardInterrupt:
 			raise
 
-		if p == False:
+		if not return_code:
 			# add another option, try transcoding again
 			# done to avoid this error;
 			# x264 [error]: baseline profile doesn't support 4:2:2
@@ -1342,15 +1362,15 @@ class Media(object):
 			tmp_transcode_cmd.append('yuv420p')
 			tmp_transcode_cmd.append(transcode_path)
 			try:
-				p = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
-				if p != False:
+				return_code = VideoTranscodeWrapper().call(*tmp_transcode_cmd)
+				if return_code != False:
 					next_level()
 					message("transcoded with yuv420p", "", 2)
 					back_level()
 			except KeyboardInterrupt:
 				raise
 
-			if p == False:
+			if not return_code:
 				next_level()
 				message("transcoding failure", os.path.basename(original_path), 1)
 				back_level()
@@ -1365,6 +1385,7 @@ class Media(object):
 			self._video_metadata(transcode_path, False)
 		back_level()
 
+
 	@property
 	def name(self):
 		return os.path.basename(self.media_file_name)
@@ -1376,6 +1397,14 @@ class Media(object):
 	@property
 	def description(self):
 		return self._attributes["metadata"]["description"]
+
+	@property
+	def size(self):
+		return self._attributes["metadata"]["size"]
+
+	@property
+	def is_video(self):
+		return "mediaType" in self._attributes["metadata"] and self._attributes["metadata"]["mediaType"] == "video"
 
 	def __str__(self):
 		return self.name
@@ -1390,7 +1419,7 @@ class Media(object):
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
 		if album_prefix == Options.config["cache_folder_separator"]:
 			album_prefix = ""
-		if "mediaType" in self._attributes and self._attributes["mediaType"] == "video":
+		if self.is_video:
 			# transcoded video path
 			caches.append(os.path.join(self.album.subdir, album_prefix + video_cache_name(self)))
 		else:
@@ -1423,7 +1452,7 @@ class Media(object):
 
 	@property
 	def date(self):
-		correct_date = None;
+		correct_date = None
 		if not self.is_valid:
 			correct_date = datetime(1900, 1, 1)
 		if "dateTimeOriginal" in self._attributes["metadata"]:
@@ -1483,9 +1512,21 @@ class Media(object):
 	def place_name(self):
 		return self._attributes["geoname"]["place_name"]
 
+	@place_name.setter
+	def place_name(self, value):
+		self._attributes["geoname"]["place_name"] = value
+
 	@property
 	def place_code(self):
 		return self._attributes["geoname"]["place_code"]
+
+	@property
+	def alt_place_name(self):
+		return self._attributes["geoname"]["place_name"]
+
+	@alt_place_name.setter
+	def alt_place_name(self, value):
+		self._attributes["geoname"]["alt_place_name"] = value
 
 	@property
 	def year_album_path(self):
@@ -1570,29 +1611,29 @@ class Media(object):
 
 
 	def to_dict(self):
-		foldersAlbum = Options.config['folders_string']
-		if (self.folders):
-			foldersAlbum = os.path.join(foldersAlbum, self.folders)
+		folders_album = Options.config['folders_string']
+		if self.folders:
+			folders_album = os.path.join(folders_album, self.folders)
 
 		media = self.attributes
-		media["name"]              = self.name
-		media["cacheBase"]         = self.cache_base
-		media["date"]              = self.date
-		# media["yearAlbum"]		= self.year_album_path
-		# media["monthAlbum"]		= self.month_album_path
-		media["dayAlbum"]          = self.day_album_path
+		media["name"] = self.name
+		media["cacheBase"] = self.cache_base
+		media["date"] = self.date
+		# media["yearAlbum"] = self.year_album_path
+		# media["monthAlbum"] = self.month_album_path
+		media["dayAlbum"] = self.day_album_path
 		media["dayAlbumCacheBase"] = cache_base(self.day_album_path, True)
 		if self.gps_album_path:
-			media["gpsAlbum"]          = self.gps_album_path
+			media["gpsAlbum"] = self.gps_album_path
 			media["gpsAlbumCacheBase"] = cache_base(self.gps_album_path, True)
 		if Options.config['checksum']:
-			media["checksum"]          = checksum(os.path.join(Options.config['album_path'], self.media_file_name))
+			media["checksum"] = checksum(os.path.join(Options.config['album_path'], self.media_file_name))
 
 		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
-		media["albumName"]         = self.album_path
-		media["foldersAlbum"]      = foldersAlbum
-		media["foldersCacheBase"]  = self.album.cache_base
-		media["cacheSubdir"]       = self.album.subdir
+		media["albumName"] = self.album_path
+		media["folders_album"] = folders_album
+		media["foldersCacheBase"] = self.album.cache_base
+		media["cacheSubdir"] = self.album.subdir
 		return media
 
 
@@ -1605,215 +1646,228 @@ class PhotoAlbumEncoder(json.JSONEncoder):
 		return json.JSONEncoder.default(self, obj)
 
 
-def _set_metadata_from_album_ini(name, attributes, album_ini):
-	"""Set the 'attributes' dictionnary for album or media named 'name'
-	with the metadata values from the ConfigParser 'album_ini'.
+class Metadata(object):
+	@staticmethod
+	def set_metadata_from_album_ini(name, attributes, album_ini):
+		"""
+		Set the 'attributes' dictionnary for album or media named 'name'
+		with the metadata values from the ConfigParser 'album_ini'.
 
-	The metadata than can be overloaded by values in 'album.ini' file are:
-		* title: the caption of the album or media
-		* description: a long description whose words can be searched.
-		* date: a YYYY-MM-DD date replacing the one from EXIF
-		* latitude: for when the media is not geotagged
-		* longitude: for when the media is not geotagged
-		* tags: a ',' separated list of terms
-	"""
+		The metadata than can be overloaded by values in 'album.ini' file are:
+			* title: the caption of the album or media
+			* description: a long description whose words can be searched.
+			* date: a YYYY-MM-DD date replacing the one from EXIF
+			* latitude: for when the media is not geotagged
+			* longitude: for when the media is not geotagged
+			* tags: a ',' separated list of terms
+		"""
 
-	# Initialize with album.ini defaults
-	next_level()
-	message("initialize album.ini metadata values", "", 5)
+		# Initialize with album.ini defaults
+		next_level()
+		message("initialize album.ini metadata values", "", 5)
 
-	# With Python2, section names are string. As we retrieve file names as unicode,
-	# we can't find them in the ConfigParser dictionary
-	# @python2
-	if sys.version_info < (3,):
-		name = str(name)
+		# With Python2, section names are string. As we retrieve file names as unicode,
+		# we can't find them in the ConfigParser dictionary
+		# @python2
+		if sys.version_info < (3,):
+			name = str(name)
 
-	# Title
-	if album_ini.has_section(name):
-		try:
-			attributes["metadata"]["title"] = album_ini.get(name, "title")
-		except NoOptionError:
-			pass
-	elif "title" in album_ini.defaults():
-		attributes["metadata"]["title"] = album_ini.defaults()["title"]
+		# Title
+		if album_ini.has_section(name):
+			try:
+				attributes["metadata"]["title"] = album_ini.get(name, "title")
+			except NoOptionError:
+				pass
+		elif "title" in album_ini.defaults():
+			attributes["metadata"]["title"] = album_ini.defaults()["title"]
 
-	# Description
-	if album_ini.has_section(name):
-		try:
-			attributes["metadata"]["description"] = album_ini.get(name, "description")
-		except NoOptionError:
-			pass
-	elif "description" in album_ini.defaults():
-		attributes["metadata"]["description"] = album_ini.defaults()["description"]
+		# Description
+		if album_ini.has_section(name):
+			try:
+				attributes["metadata"]["description"] = album_ini.get(name, "description")
+			except NoOptionError:
+				pass
+		elif "description" in album_ini.defaults():
+			attributes["metadata"]["description"] = album_ini.defaults()["description"]
 
-	# Date
-	if album_ini.has_section(name):
-		try:
-			attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.get(name, "date"), "%Y-%m-%d")
-		except ValueError:
-			message("ERROR", "Incorrect date in [" + name + "] in 'album.ini'", 1)
-		except NoOptionError:
-			pass
-	elif "date" in album_ini.defaults():
-		try:
-			attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.defaults()["date"], "%Y-%m-%d")
-		except ValueError:
-			message("ERROR", "Incorrect date in [DEFAULT] in 'album.ini'", 1)
+		# Date
+		if album_ini.has_section(name):
+			try:
+				attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.get(name, "date"), "%Y-%m-%d")
+			except ValueError:
+				message("ERROR", "Incorrect date in [" + name + "] in 'album.ini'", 1)
+			except NoOptionError:
+				pass
+		elif "date" in album_ini.defaults():
+			try:
+				attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.defaults()["date"], "%Y-%m-%d")
+			except ValueError:
+				message("ERROR", "Incorrect date in [DEFAULT] in 'album.ini'", 1)
 
-	# Latitude and longitude
-	gps_latitude = None
-	gps_latitude_ref = None
-	gps_longitude = None
-	gps_longitude_ref = None
-	if album_ini.has_section(name):
-		try:
-			gps_latitude = _create_GPS_struct(abs(album_ini.getfloat(name, "latitude")))
-			gps_latitude_ref = "N" if album_ini.getfloat(name, "latitude") > 0.0 else "S"
-		except ValueError:
-			message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
-		except NoOptionError:
-			pass
-	elif "latitude" in album_ini.defaults():
-		try:
-			gps_latitude = _create_GPS_struct(abs(float(album_ini.defaults()["latitude"])))
-			gps_latitude_ref = "N" if float(album_ini.defaults()["latitude"]) > 0.0 else "S"
-		except ValueError:
-			message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
-	if album_ini.has_section(name):
-		try:
-			gps_longitude = _create_GPS_struct(abs(album_ini.getfloat(name, "longitude")))
-			gps_longitude_ref = "E" if album_ini.getfloat(name, "longitude") > 0.0 else "W"
-		except ValueError:
-			message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
-		except NoOptionError:
-			pass
-	elif "longitude" in album_ini.defaults():
-		try:
-			gps_longitude = _create_GPS_struct(abs(float(album_ini.defaults()["longitude"])))
-			gps_longitude_ref = "E" if float(album_ini.defaults()["longitude"]) > 0.0 else "W"
-		except ValueError:
-			message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
+		# Latitude and longitude
+		gps_latitude = None
+		gps_latitude_ref = None
+		gps_longitude = None
+		gps_longitude_ref = None
+		if album_ini.has_section(name):
+			try:
+				gps_latitude = Metadata.create_gps_struct(abs(album_ini.getfloat(name, "latitude")))
+				gps_latitude_ref = "N" if album_ini.getfloat(name, "latitude") > 0.0 else "S"
+			except ValueError:
+				message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
+			except NoOptionError:
+				pass
+		elif "latitude" in album_ini.defaults():
+			try:
+				gps_latitude = Metadata.create_gps_struct(abs(float(album_ini.defaults()["latitude"])))
+				gps_latitude_ref = "N" if float(album_ini.defaults()["latitude"]) > 0.0 else "S"
+			except ValueError:
+				message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
+		if album_ini.has_section(name):
+			try:
+				gps_longitude = Metadata.create_gps_struct(abs(album_ini.getfloat(name, "longitude")))
+				gps_longitude_ref = "E" if album_ini.getfloat(name, "longitude") > 0.0 else "W"
+			except ValueError:
+				message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
+			except NoOptionError:
+				pass
+		elif "longitude" in album_ini.defaults():
+			try:
+				gps_longitude = Metadata.create_gps_struct(abs(float(album_ini.defaults()["longitude"])))
+				gps_longitude_ref = "E" if float(album_ini.defaults()["longitude"]) > 0.0 else "W"
+			except ValueError:
+				message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
 
-	if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
-		attributes["metadata"]["latitude"] = _convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
-		attributes["metadata"]["latitudeMS"] = _convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
-		attributes["metadata"]["longitude"] = _convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
-		attributes["metadata"]["longitudeMS"] = _convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
+			attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+			attributes["metadata"]["latitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+			attributes["metadata"]["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+			attributes["metadata"]["longitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 
-	# Tags
-	if album_ini.has_section(name):
-		try:
-			attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.get(name, "tags").split(",")]
-		except NoOptionError:
-			pass
-	elif "tags" in album_ini.defaults():
-		attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.defaults()["tags"].split(",")]
+		# Tags
+		if album_ini.has_section(name):
+			try:
+				attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.get(name, "tags").split(",")]
+			except NoOptionError:
+				pass
+		elif "tags" in album_ini.defaults():
+			attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.defaults()["tags"].split(",")]
 
-	back_level()
-
-
-def _set_geoname_from_album_ini(name, attributes, album_ini):
-	"""Set the 'attributes' dictionnary for album or media named 'name'
-	with the geoname values from the ConfigParser 'album_ini'.
-
-	The geoname values that can be set from album.ini are:
-		* country_name: The name of the country
-		* region_name: The name of the region
-		* place_name: The name of the nearest place (town or city) calculated
-		from latitude/longitude getotag.
-	The geonames values that are not visible to the user, like 'country_code'
-	can't be changed. We only overwrite the visible values displayed to the user.
-
-	The geonames values must be overwrittent *after* the 'metadata' values
-	because the geonames are retrieved from _attributes['metadata']['latitude'] and
-	_attributes['metadata']['longitude']. You can use Media.has_gps_data to
-	determine if you can call this procedure.
-	"""
-	# Country_name
-	if album_ini.has_section(name):
-		try:
-			attributes["geoname"]["country_name"] = album_ini.get(name, "country_name")
-		except NoOptionError:
-			pass
-	elif "country_name" in album_ini.defaults():
-		attributes["geoname"]["country_name"] = album_ini.defaults()["country_name"]
-
-	# Region_name
-	if album_ini.has_section(name):
-		try:
-			attributes["geoname"]["region_name"] = album_ini.get(name, "region_name")
-		except NoOptionError:
-			pass
-	elif "region_name" in album_ini.defaults():
-		attributes["geoname"]["region_name"] = album_ini.defaults()["region_name"]
-
-	# Place_name
-	if album_ini.has_section(name):
-		try:
-			attributes["geoname"]["place_name"] = album_ini.get(name, "place_name")
-		except NoOptionError:
-			pass
-	elif "place_name" in album_ini.defaults():
-		attributes["geoname"]["place_name"] = album_ini.defaults()["place_name"]
+		back_level()
 
 
-def _create_GPS_struct(value):
-	"""Helper function to create the data structure returned by the EXIF GPS info
-	from the decimal value entered by the user in a 'album.ini' metadata file.
-	Longitude and latitude metadata are stored as rationals.
-		GPS = ( (deg1, deg2),
-			(min1, min2),
-			(sec1, sec2) )
-	"""
-	frac, deg = math.modf(value)
-	frac, min = math.modf(frac * 60.0)
-	frac, sec = math.modf(frac * 60.0)
-	return ((int(deg), 1), (int(min), 1), (int(sec), 1))
+	@staticmethod
+	def set_geoname_from_album_ini(name, attributes, album_ini):
+		"""
+		Set the 'attributes' dictionnary for album or media named 'name'
+		with the geoname values from the ConfigParser 'album_ini'.
+
+		The geoname values that can be set from album.ini are:
+			* country_name: The name of the country
+			* region_name: The name of the region
+			* place_name: The name of the nearest place (town or city) calculated
+			from latitude/longitude getotag.
+		The geonames values that are not visible to the user, like 'country_code'
+		can't be changed. We only overwrite the visible values displayed to the user.
+
+		The geonames values must be overwrittent *after* the 'metadata' values
+		because the geonames are retrieved from _attributes['metadata']['latitude'] and
+		_attributes['metadata']['longitude']. You can use Media.has_gps_data to
+		determine if you can call this procedure.
+		"""
+		# Country_name
+		if album_ini.has_section(name):
+			try:
+				attributes["geoname"]["country_name"] = album_ini.get(name, "country_name")
+			except NoOptionError:
+				pass
+		elif "country_name" in album_ini.defaults():
+			attributes["geoname"]["country_name"] = album_ini.defaults()["country_name"]
+
+		# Region_name
+		if album_ini.has_section(name):
+			try:
+				attributes["geoname"]["region_name"] = album_ini.get(name, "region_name")
+			except NoOptionError:
+				pass
+		elif "region_name" in album_ini.defaults():
+			attributes["geoname"]["region_name"] = album_ini.defaults()["region_name"]
+
+		# Place_name
+		if album_ini.has_section(name):
+			try:
+				attributes["geoname"]["place_name"] = album_ini.get(name, "place_name")
+			except NoOptionError:
+				pass
+		elif "place_name" in album_ini.defaults():
+			attributes["geoname"]["place_name"] = album_ini.defaults()["place_name"]
 
 
-def _convert_to_degrees_minutes_seconds(value, ref):
-	# Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds
-
-	# Degrees
-	d0 = value[0][0]
-	d1 = value[0][1]
-	d = int(float(d0) / float(d1))
-	# Minutes
-	m0 = value[1][0]
-	m1 = value[1][1]
-	m = int(float(m0) / float(m1))
-	# Seconds
-	s0 = value[2][0]
-	s1 = value[2][1]
-	s = int((float(s0) / float(s1)) * 1000) / 1000.0
-
-	result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
-
-	return result
+	@staticmethod
+	def create_gps_struct(value):
+		"""
+		Helper function to create the data structure returned by the EXIF GPS info
+		from the decimal value entered by the user in a 'album.ini' metadata file.
+		Longitude and latitude metadata are stored as rationals.
+			GPS = ( (deg1, deg2),
+					(min1, min2),
+					(sec1, sec2) )
+		"""
+		frac, deg = math.modf(value)
+		frac, min = math.modf(frac * 60.0)
+		frac, sec = math.modf(frac * 60.0)
+		return ((int(deg), 1), (int(min), 1), (int(sec), 1))
 
 
-def _convert_to_degrees_decimal(value, ref):
-	# Helper function to convert the GPS coordinates stored in the EXIF to degrees in float format
+	@staticmethod
+	def convert_to_degrees_minutes_seconds(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds.
+		"""
 
-	# Degrees
-	d0 = value[0][0]
-	d1 = value[0][1]
-	d = float(d0) / float(d1)
-	# Minutes
-	m0 = value[1][0]
-	m1 = value[1][1]
-	m = float(m0) / float(m1)
-	# Seconds
-	s0 = value[2][0]
-	s1 = value[2][1]
-	s = float(s0) / float(s1)
+		# Degrees
+		d0 = value[0][0]
+		d1 = value[0][1]
+		d = int(float(d0) / float(d1))
+		# Minutes
+		m0 = value[1][0]
+		m1 = value[1][1]
+		m = int(float(m0) / float(m1))
+		# Seconds
+		s0 = value[2][0]
+		s1 = value[2][1]
+		s = int((float(s0) / float(s1)) * 1000) / 1000.0
 
-	result = d + (m / 60.0) + (s / 3600.0)
+		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
 
-	# limit decimal digits to what is needed by openstreetmap
-	six_zeros = 1000000.0
-	result = int(result * six_zeros) / six_zeros
-	if ref == "S" or ref == "W":
-		result = - result
+		return result
 
-	return result
+	@staticmethod
+	def convert_to_degrees_decimal(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees in float format.
+		"""
+
+		# Degrees
+		d0 = value[0][0]
+		d1 = value[0][1]
+		d = float(d0) / float(d1)
+		# Minutes
+		m0 = value[1][0]
+		m1 = value[1][1]
+		m = float(m0) / float(m1)
+		# Seconds
+		s0 = value[2][0]
+		s1 = value[2][1]
+		s = float(s0) / float(s1)
+
+		result = d + (m / 60.0) + (s / 3600.0)
+
+		# limit decimal digits to what is needed by openstreetmap
+		six_zeros = 1000000.0
+		result = int(result * six_zeros) / six_zeros
+		if ref == "S" or ref == "W":
+			result = - result
+
+		return result
+
