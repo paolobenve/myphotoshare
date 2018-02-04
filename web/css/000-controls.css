@@ -573,8 +573,8 @@ ul#right-menu li:not(.active) {
 	color: darkgray;
 }
 ul#right-menu li.active:not(.caption):hover {
-	color: black !important;
 	background-color: gray !important;
+	text-shadow: .5px 0px white;
 }
 
 ul#right-menu li:not(.caption) {
