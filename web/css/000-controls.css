@@ -574,7 +574,7 @@ ul#right-menu li:not(.active) {
 }
 ul#right-menu li.active:not(.caption):hover {
 	background-color: gray !important;
-	text-shadow: 1px 0px white;
+	text-shadow: .15ex 0 white;
 }
 
 ul#right-menu li:not(.caption) {
