@@ -1406,6 +1406,10 @@ class Media(object):
 
 	@property
 	def image_caches(self):
+		global thumbnail_types_and_sizes_list
+		if thumbnail_types_and_sizes_list is None:
+			thumbnail_types_and_sizes_list = list(thumbnail_types_and_sizes().items())
+
 		caches = []
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
 		if album_prefix == Options.config["cache_folder_separator"]:
@@ -1424,8 +1428,7 @@ class Media(object):
 				)
 
 		# album and media thumbnail path
-		_thumbnail_types_and_sizes = thumbnail_types_and_sizes()
-		for thumb_type, thumb_sizes in list(_thumbnail_types_and_sizes.items()):
+		for thumb_type, thumb_sizes in thumbnail_types_and_sizes_list:
 			for (thumb_size, mobile_bigger) in thumb_sizes:
 				caches.append(
 					os.path.join(
