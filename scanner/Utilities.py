@@ -100,10 +100,11 @@ def report_times(final):
 	_total_time_hours = str(_total_time_h) + "h " if _total_time_h else ""
 	_total_time_minutes = str(_total_time_m) + "m " if _total_time_m else ""
 	_total_time_seconds = str(_total_time_s) + "s" if _total_time_m else ""
-	if _total_time_seconds:
-		_total_time_seconds = "= " + _total_time_seconds
+	_total_time_unfolded = _total_time_hours + _total_time_minutes + _total_time_seconds
+	if _total_time_unfolded:
+		_total_time_unfolded = "= " + _total_time_unfolded
 	print()
-	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time, "     ", _total_time_hours + _total_time_minutes + _total_time_seconds)
+	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time, "     ", _total_time_unfolded)
 	print()
 	num_media = Options.num_video + Options.num_photo
 	_num_media		= str(num_media)
