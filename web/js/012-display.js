@@ -1198,7 +1198,8 @@ $(document).ready(function() {
 								html += "\"";
 								html += "style=\"";
 								html += 	"height: " + buttonAndCaptionHeight + "px; " +
-										"margin-right: " + Options.spacing + "px; ";
+										"margin-right: " + Options.spacing + "px; " +
+										"margin-top: " + Options.spacing + "px; ";
 								html +=		"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
 								if (Options.albums_slide_style)
 									html += "background-color: " + Options.album_button_background_color + "; ";
@@ -1213,7 +1214,7 @@ $(document).ready(function() {
 								html += "\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
 											"font-size: " + captionFontSize + "px; " +
-											"height: " + captionHeight + "px; ";
+											"max-height: " + captionHeight + "px; ";
 								var captionColor = Options.album_caption_color;
 								if (Options.albums_slide_style)
 									captionColor = Options.slide_album_caption_color;
@@ -1265,7 +1266,10 @@ $(document).ready(function() {
 		if (currentMedia === null) {
 			$(".thumb-container").removeClass("current-thumb");
 			$("#album-view").removeClass("media-view-container");
-			$("#subalbums").show();
+			if (currentAlbum.albums.length > 0)
+				$("#subalbums").show();
+			else
+				$("#subalbums").hide();
 			$("#media-view").hide();
 			$("#media-view").removeClass("no-bottom-space");
 			$("#album-view").removeClass("no-bottom-space");

@@ -83,13 +83,14 @@ a.title-anchor.mobile {
 
 #subalbums {
 	padding-top: .2em;
+	padding-bottom: 2em;
+	overflow: hidden;
 }
 
 .album-button-and-caption {
 	float: left;
 	height: 200px;
 	width: 240px;
-	margin-bottom: 2em;
 }
 .album-button-and-caption.slide {
 	border: 3px solid gray;
@@ -103,8 +104,12 @@ a.title-anchor.mobile {
 }
 .album-caption {
 	margin: 0 auto;
-	height: 3em;
+	height: auto;
+	color: white;
+	font-size: inherit;
+	padding-top: .2em;
 }
+
 
 .album-caption.hidden {
 	display: none;
@@ -440,10 +445,6 @@ video {
 	display: none;
 	margin-bottom: 0;
 }
-.album-caption {
-	color: white;
-}
-
 .media-caption {
 	font-size: 75%;
 	color: chartreuse;
@@ -452,12 +453,6 @@ video {
 
 .media-caption-coordinates {
 	font-size: 70%;
-}
-
-.album-caption {
-	font-size: inherit;
-	height: 3em;
-	padding-top: .2em;
 }
 
 #thumbs a {
