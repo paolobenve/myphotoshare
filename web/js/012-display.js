@@ -419,6 +419,17 @@ $(document).ready(function() {
 			}
 		}
 
+		if (currentMedia !== null || currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
+			$("ul#right-menu li.media-count").addClass("hidden");
+		} else {
+			$("ul#right-menu li.media-count").removeClass("hidden");
+			if (Options.show_album_media_count) {
+				$("ul#right-menu li.media-count").addClass("selected");
+			} else {
+				$("ul#right-menu li.media-count").removeClass("selected");
+			}
+		}
+
 		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
 			$("ul#right-menu li.media-names").addClass("hidden");
 		} else {
@@ -445,6 +456,7 @@ $(document).ready(function() {
 			$("ul#right-menu li.slide").hasClass("hidden") &&
 			$("ul#right-menu li.spaced").hasClass("hidden") &&
 			$("ul#right-menu li.album-names").hasClass("hidden") &&
+			$("ul#right-menu li.media-count").hasClass("hidden") &&
 			$("ul#right-menu li.media-names").hasClass("hidden") &&
 			$("ul#right-menu li.square-album-thumbnails").hasClass("hidden") &&
 			$("ul#right-menu li.square-media-thumbnails").hasClass("hidden")
@@ -2097,11 +2109,15 @@ $(document).ready(function() {
 						Options.spacing = Options.spacingSave;
 					}
 
-					var showAlbumNamesCookie = getBooleanCookie("show_albums_names");
+					var showAlbumNamesCookie = getBooleanCookie("show_album_names_below_thumbs");
 					if (showAlbumNamesCookie !== null)
 						Options.show_album_names_below_thumbs = showAlbumNamesCookie;
 
-					var showMediaNamesCookie = getBooleanCookie("show_media_names");
+					var showMediaCountCookie = getBooleanCookie("show_album_media_count");
+					if (showMediaCountCookie !== null)
+						Options.show_album_media_count = showMediaCountCookie;
+
+					var showMediaNamesCookie = getBooleanCookie("show_media_names_below_thumbs");
 					if (showMediaNamesCookie !== null)
 						Options.show_media_names_below_thumbs = showMediaNamesCookie;
 
@@ -2409,9 +2425,20 @@ $(document).ready(function() {
 	function toggleAlbumNames(ev) {
 		if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.show_album_names_below_thumbs = ! Options.show_album_names_below_thumbs;
-			setBooleanCookie("show_album_names", Options.show_album_names_below_thumbs);
+			setBooleanCookie("show_album_names_below_thumbs", Options.show_album_names_below_thumbs);
 			modifyMenuButtons();
 			showAlbum("sortAlbums");
+		}
+		return false;
+	}
+
+	$("ul#right-menu li.media-count").on('click', toggleMediaCount);
+	function toggleMediaCount(ev) {
+		if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+			Options.show_album_media_count = ! Options.show_album_media_count;
+			setBooleanCookie("show_album_media_count", Options.show_album_media_count);
+			modifyMenuButtons();
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2420,7 +2447,7 @@ $(document).ready(function() {
 	function toggleMediaNames(ev) {
 		if (currentMedia === null && currentAlbum.media.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.show_media_names_below_thumbs = ! Options.show_media_names_below_thumbs;
-			setBooleanCookie("show_media_names", Options.show_media_names_below_thumbs);
+			setBooleanCookie("show_media_names_below_thumbs", Options.show_media_names_below_thumbs);
 			modifyMenuButtons();
 			showAlbum("sortMedia");
 		}

@@ -203,6 +203,7 @@
 		<li class='ui slide active'></li>
 		<li class='ui spaced active'></li>
 		<li class='ui album-names active'></li>
+		<li class='ui media-count active'></li>
 		<li class='ui media-names active'></li>
 		<li class='ui square-album-thumbnails active'></li>
 		<li class='ui square-media-thumbnails active'></li>
