@@ -1433,11 +1433,12 @@ class Media(object):
 				caches.append(
 					os.path.join(
 						self.album.subdir,
-						album_prefix + photo_cache_name(
-							self,
-							thumb_size,
-							thumb_type,
-							mobile_bigger
+						album_prefix +
+							photo_cache_name(
+											self,
+											thumb_size,
+											thumb_type,
+											mobile_bigger
 						)
 					)
 				)
