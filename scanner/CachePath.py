@@ -67,7 +67,7 @@ def photo_cache_name(photo, size, thumb_type = "", mobile_bigger = False):
 			photo_suffix += "s"
 		elif thumb_type == "fit":
 			photo_suffix += "f"
-	elif size == Options.config['media_thumb_size']:
+	if size == Options.config['media_thumb_size']:
 		photo_suffix += "t"
 		if thumb_type == "square":
 			photo_suffix += "s"
