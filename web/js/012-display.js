@@ -419,7 +419,7 @@ $(document).ready(function() {
 			}
 		}
 
-		if (currentMedia !== null || currentAlbum.media.length == 0) {
+		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
 			$("ul#right-menu li.media-names").addClass("hidden");
 		} else {
 			$("ul#right-menu li.media-names").removeClass("hidden");
@@ -430,7 +430,7 @@ $(document).ready(function() {
 			}
 		}
 
-		if (currentMedia !== null || currentAlbum.media.length == 0) {
+		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
 			$("ul#right-menu li.square-media-thumbnails").addClass("hidden");
 		} else {
 			$("ul#right-menu li.square-media-thumbnails").removeClass("hidden");
