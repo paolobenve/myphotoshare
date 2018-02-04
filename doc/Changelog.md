@@ -5,7 +5,7 @@
 * new debug option `show_faces`: lets the scanner show the faces detected (but read the note in `myphotoshare.conf.default`)
 * new option `face_cascade_scale_factor`: a parameter of `opencv`'s `detectMultiScale` function that detects the faces in the photo
 * UI cleaned putting sort and view switches to a hidden top right menu
-* user can toggle album slide mode, thumbnails spacing, thumbnails types, show album and media names, all with right top corner menu
+* user can toggle album slide mode, thumbnails spacing, thumbnails types, show album and media names, show media count, all with right top corner menu
 * the scanner manages more precisely certain option changes that require regenerating of `json` files, reduced size images, thumbnails
 * new option `slide_album_caption_color`: the color to use with album slide mode
 * Reorganization of documentation:

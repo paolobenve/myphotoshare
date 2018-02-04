@@ -57,6 +57,7 @@ Content (albums and media files) can be shared over some popular social plaforms
 
 - [x] Keyboard navigation: arrows, pageup/down, `[esc]`, `[f]` (fullscreen), `[m]` (metadata).
 - [x] Mouse-wheel support.
+- [x] Various user interface option can be changed by the user.
 - [x] Animations to make the interface feel nice.
 - [x] Separate album view and photo view.
 - [x] Media animation when passing to next/previous media.
