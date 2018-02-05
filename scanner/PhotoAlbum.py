@@ -1545,7 +1545,7 @@ class Media(object):
 
 	@property
 	def alt_place_name(self):
-		return self._attributes["geoname"]["place_name"]
+		return self._attributes["geoname"]["alt_place_name"]
 
 	@alt_place_name.setter
 	def alt_place_name(self, value):
@@ -1893,4 +1893,3 @@ class Metadata(object):
 			result = - result
 
 		return result
-
