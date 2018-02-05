@@ -21,13 +21,13 @@ def remove_album_path(path):
 
 # find a file in file system, from https://stackoverflow.com/questions/1724693/find-a-file-in-python
 def find(name):
-	for root, dirs, files in os.walk('/'):
+	for root, _, files in os.walk('/'):
 		if name in files:
 			return os.path.join(root, name)
 	return False
 
 def find_in_usr_share(name):
-	for root, dirs, files in os.walk('/usr/share/'):
+	for root, _, files in os.walk('/usr/share/'):
 		if name in files:
 			return os.path.join(root, name)
 	return False
@@ -54,7 +54,7 @@ def cache_base(path, filepath=False):
 		path = "root"
 	return path
 
-def photo_cache_name(photo, size, thumb_type = "", mobile_bigger = False):
+def photo_cache_name(photo, size, thumb_type="", mobile_bigger=False):
 	# this function is used for video thumbnails too
 	photo_suffix = "_"
 	actual_size = size
@@ -78,6 +78,7 @@ def photo_cache_name(photo, size, thumb_type = "", mobile_bigger = False):
 
 	return result
 
+
 def video_cache_name(video):
 	return video.cache_base + "_transcoded_" + Options.config['video_transcode_bitrate'] + "_" + str(Options.config['video_crf']) + ".mp4"
 
@@ -98,7 +99,7 @@ def square_thumbnail_sizes():
 	# collect all the square sizes needed
 
 	# album size: square thumbnail are generated anyway, because they are needed by the code that generates composite images for sharing albums
-	# the second element in the tuple il mobile_bigger
+	# the second element in the tuple_arg is `mobile_bigger`.
 	square_sizes = [(Options.config['album_thumb_size'], False)]
 	if Options.config['mobile_thumbnail_factor'] > 1:
 		square_sizes.append((Options.config['album_thumb_size'], True))
@@ -109,8 +110,8 @@ def square_thumbnail_sizes():
 	square_sizes = sorted(square_sizes, key=modified_size, reverse=True)
 	return square_sizes
 
-def modified_size(tuple):
-	(size, mobile_bigger) = tuple
+def modified_size(tuple_arg):
+	(size, mobile_bigger) = tuple_arg
 	if mobile_bigger:
 		return  int(round(size * Options.config['mobile_thumbnail_factor']))
 	else:

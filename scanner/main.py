@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from TreeWalker import TreeWalker
-from Utilities import *
 import sys
-import Options
 import os
 
 # @python2
@@ -13,6 +10,10 @@ try:
 	from imp import reload
 except ImportError:
 	pass
+
+from TreeWalker import TreeWalker
+from Utilities import report_times, message
+import Options
 
 
 def main():

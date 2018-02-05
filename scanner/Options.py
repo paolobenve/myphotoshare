@@ -4,12 +4,14 @@ from datetime import datetime
 import os
 import sys
 import json
+import ast
 
 # @python2
 try:
 	import configparser
 except ImportError:
 	import ConfigParser as configparser
+
 
 config = {}
 date_time_format = "%Y-%m-%d %H:%M:%S"
@@ -35,6 +37,7 @@ options_requiring_thumbnails_regeneration = ['face_cascade_scale_factor', 'small
 # json_version = 2 since checksums have been added
 # json_version = 3 since geotag managing is optional
 json_version = 3
+
 
 def get_options():
 	from Utilities import message, next_level, back_level
@@ -78,7 +81,7 @@ def get_options():
 					config[option] = usr_config.getint('options', option)
 				else:
 					config[option] = ""
-			except:
+			except configparser.Error:
 				next_level()
 				message("WARNING: option " + option + " in user config file", "is not integer, using default value", 2)
 				back_level()
@@ -107,7 +110,7 @@ def get_options():
 				back_level()
 				config[option] = default_config.getboolean('options', option)
 		elif option in ('reduced_sizes', 'map_zoom_levels'):
-			config[option] = eval(usr_config.get('options', option))
+			config[option] = ast.literal_eval(usr_config.get('options', option))
 		elif option in ('mobile_thumbnail_factor', 'face_cascade_scale_factor'):
 			config[option] = usr_config.getfloat('options', option)
 			if config[option] < 1:
@@ -119,16 +122,18 @@ def get_options():
 		option_length = len(option_value)
 		max_length = 40
 		spaces = ""
-		for i in range(max_length - option_length):
+		#pylint
+		for _ in range(max_length - option_length):
 			spaces += " "
 		max_spaces = ""
-		for i in range(max_length):
+		#pylint
+		for _ in range(max_length):
 			max_spaces += " "
 
 		default_option_value = str(default_config.get('options', option))
 		default_option_length = len(default_option_value)
 		default_spaces = ""
-		for i in range(max_length - default_option_length - 2):
+		for _ in range(max_length - default_option_length - 2):
 			default_spaces += " "
 		if default_config.get('options', option) == usr_config.get('options', option):
 			option_value = "  " + option_value + spaces + "[DEFAULT" + max_spaces + "]"
@@ -234,7 +239,7 @@ def get_options():
 	# the album directory must exist and be readable
 	try:
 		os.stat(config['album_path'])
-	except:
+	except OSError:
 		message("FATAL ERROR", config['album_path'] + " doesn't exist or unreadable, quitting", 0)
 		sys.exit(-97)
 
@@ -244,25 +249,25 @@ def get_options():
 		if not os.access(config['cache_path'], os.W_OK):
 			message("FATAL ERROR", config['cache_path'] + " not writable, quitting", 0)
 			sys.exit(-97)
-	except:
+	except OSError:
 		try:
 			os.mkdir(config['cache_path'])
 			message("directory created", config['cache_path'], 4)
 			os.chmod(config['cache_path'], 0o777)
 			message("permissions set", config['cache_path'], 4)
-		except:
+		except OSError:
 			message("FATAL ERROR", config['cache_path'] + " inexistent and couldn't be created, quitting", 0)
 			sys.exit(-97)
 
 	# create the directory where php will put album composite images
-	albumCacheDir = os.path.join(config['cache_path'], config['cache_album_subdir'])
+	album_cache_dir = os.path.join(config['cache_path'], config['cache_album_subdir'])
 	try:
-		os.stat(albumCacheDir)
-	except:
+		os.stat(album_cache_dir)
+	except OSError:
 		try:
-			message("creating cache directory for composite images", albumCacheDir, 4)
-			os.mkdir(albumCacheDir)
-			os.chmod(albumCacheDir, 0o777)
+			message("creating cache directory for composite images", album_cache_dir, 4)
+			os.mkdir(album_cache_dir)
+			os.chmod(album_cache_dir, 0o777)
 		except OSError:
 			message("FATAL ERROR", config['cache_path'] + " not writable, quitting", 0)
 			sys.exit(-97)

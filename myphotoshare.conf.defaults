@@ -32,7 +32,7 @@ max_verbose = 3
 # This is a debug option: it lets the scanner show the faces detected
 # obviously it only make sense when the scanner is run interactively, because the user must close every image with a keystroke
 # I'm getting it working if running in pyCharm, the scanner stops with a segfault if run from terminal. Why????
-show_faces = False
+show_faces = false
 
 
 ###########################################################
@@ -50,7 +50,7 @@ css_minifier = cssmin
 #    web_service : https://javascript-minifier.com/ (Default)
 #    jsmin2 : python-jsmin (https://github.com/tikitu/jsmin)
 #    jsmin3 : python3-jsmin (https://github.com/tikitu/jsmin)
-js_minifier = jsmin2
+js_minifier = jsmin3
 
 
 ###########################################################
@@ -70,10 +70,10 @@ cache_path =
 # cache subfolder: where the album composite images will be saved
 cache_album_subdir = cache_album
 
-# How many processors shouldn't be used in parallel mode?
+# How many processors shouldn't be used when converting media?
 respected_processors = 1
 
-# the method to use for generating cache 2-charachters subdirs
+# the method to use for generating cache 2-characters subdirs
 # permitted values:
 #    md5	: the leading 2 characters of the md5 of the image/video path relative to albums dir
 #    folder	: the leading 2 characters of the subfolder of the image/video path relative to albums dir

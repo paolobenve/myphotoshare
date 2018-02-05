@@ -3,17 +3,21 @@
 # added code from gottengeography project, https://gitlab.com/robru/gottengeography
 # files scanner/geonames/territories.json and scanner/geonames/countries.json from gottengeography project too
 
-import requests
-import json
-import Options
-from CachePath import *
-from Utilities import *
 import math
-import numpy as np
 import random
 import os
 import sys
-import math
+import json
+
+import numpy as np
+import requests
+
+import Options
+#pylint from CachePath import *
+#import CachePath
+#pylint from Utilities import *
+from Utilities import message, next_level, back_level
+
 
 # For information on endpoints and arguments see the geonames
 # API documentation at:
@@ -29,7 +33,7 @@ class Geonames(object):
 	# through this cache many calls to geonames web services are saved
 	geonames_cache = {}
 	# the maximum distance in meters for considering two different coordinates equivalent
-	max_distance_meters = 50
+	MAX_DISTANCE_METERS = 50
 
 	cities = []
 
@@ -78,36 +82,35 @@ class Geonames(object):
 			back_level()
 
 
-
 	def lookup_nearby_place(self, latitude, longitude):
 		"""
 		Looks up places near a specific geographic location
 		"""
 
 		for (c_latitude, c_longitude) in Geonames.geonames_cache:
-			distance = self.distance_between_coordinates(c_latitude, c_longitude, latitude, longitude)
-			if distance < self.max_distance_meters:
+			distance = Geonames._distance_between_coordinates(c_latitude, c_longitude, latitude, longitude)
+			if distance < Geonames.MAX_DISTANCE_METERS:
 				# get it from cache!
 				result = Geonames.geonames_cache[(c_latitude, c_longitude)]
 				next_level()
 				message("geoname got from cache", "", 5)
 				back_level()
-				# add to cache only if not too closed to existing point
-				if distance > self.max_distance_meters / 10.0:
+				# add to cache only if not too close to existing point
+				if distance > Geonames.MAX_DISTANCE_METERS / 10.0:
 					Geonames.geonames_cache[(latitude, longitude)] = result
 				return result
 
 		if Options.config['get_geonames_online']:
 			# get country, region (state for federal countries), and place
 			response = requests.get(self._base_nearby_url.format(str(latitude), str(longitude)))
-			result = self._decode_nearby_place(response.text)
+			result = Geonames._decode_nearby_place(response.text)
 			next_level()
 			message("geoname got from geonames.org online", "", 5)
 			back_level()
 		else:
 			# get country, region (state for federal countries), and place
-			result = min([city for city in self.cities], key=lambda c: self.quick_distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
-			result['distance'] = self.distance_between_coordinates(latitude, longitude, result['latitude'], result['longitude'])
+			result = min([city for city in self.cities], key=lambda c: Geonames.quick_distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
+			result['distance'] = Geonames._distance_between_coordinates(latitude, longitude, result['latitude'], result['longitude'])
 			next_level()
 			message("geoname got from geonames local files", "", 5)
 			back_level()
@@ -117,7 +120,9 @@ class Geonames(object):
 
 		return result
 
-	def _decode_nearby_place(self, response_text):
+
+	@staticmethod
+	def _decode_nearby_place(response_text):
 		"""
 		Decodes the response from the geonames nearby place lookup and
 		returns the properties in a dict.
@@ -139,7 +144,7 @@ class Geonames(object):
 					'distance': 'distance'
 				}
 				for index in correspondence:
-					# vatican places don't have region fields, and perhaps others fields could not exist
+					# Vatican places don't have region fields, and perhaps others fields could not exist
 					if correspondence[index] in geoname:
 						result[index] = geoname[correspondence[index]]
 					else:
@@ -149,80 +154,98 @@ class Geonames(object):
 							result[index] = ''
 		return result
 
-	def recalculate_mean(self, old_mean, old_len, new_value, new_len = 1):
+	@staticmethod
+	def recalculate_mean(old_mean, old_len, new_value, new_len=1):
 		return (old_mean * old_len + new_value * new_len) / (old_len + new_len)
 
 
-	def distance_between_media(self, media1, media2):
+	# TODO: This method is never called in the project...
+	@staticmethod
+	def distance_between_media(media1, media2):
 		# calculate the distance between the media gps coordinates
 		lat1 = media1.latitude
 		lon1 = media1.longitude
 		lat2 = media2.latitude
 		lon2 = media2.longitude
 
-		return self.distance_between_coordinates(lat1, lon1, lat2, lon2)
+		return Geonames._distance_between_coordinates(lat1, lon1, lat2, lon2)
 
-	def distance_between_coordinates(self, lat1, lon1, lat2, lon2):
+
+	@staticmethod
+	def _distance_between_coordinates(lat1, lon1, lat2, lon2):
 		# https://gis.stackexchange.com/questions/61924/python-gdal-degrees-to-meters-without-reprojecting
 		# Calculate the great circle distance in meters between two points on the earth (specified in decimal degrees)
 
 		next_level()
 		message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
 		# convert decimal degrees to radians
-		r_lon1, r_lat1, r_lon2, r_lat2 = list(map(math.radians, [lon1, lat1, lon2, lat2]))
+		r_lat1, r_lon1, r_lat2, r_lon2 = math.radians(lat1), math.radians(lon1), math.radians(lat2), math.radians(lon2)
 		# haversine formula
 		d_r_lon = r_lon2 - r_lon1
 		d_r_lat = r_lat2 - r_lat1
 		a = math.sin(d_r_lat / 2.0) ** 2 + math.cos(r_lat1) * math.cos(r_lat2) * math.sin(d_r_lon / 2.0) ** 2
 		c = 2.0 * math.asin(math.sqrt(a))
-		m = int(6371.0 * c * 1000.0)
+		earth_radius = 6371000.0  # radius of the earth in m
+		dist = int(earth_radius * c)
 		next_level()
-		message("distance between coordinates calculated", str(m) + " meters", 5)
+		message("distance between coordinates calculated", str(dist) + " meters", 5)
 		back_level()
 		back_level()
-		return m
+		return dist
 
-	def quick_distance_between_coordinates(self, lat1, lon1, lat2, lon2):
+
+	@staticmethod
+	def quick_distance_between_coordinates(lat1, lon1, lat2, lon2):
 		# do not output messages in this functions, it is called too many times!
 		# convert decimal degrees to radians
-		r_lon1, r_lat1, r_lon2, r_lat2 = map(math.radians, [lon1, lat1, lon2, lat2])
+		r_lat1, r_lon1, r_lat2, r_lon2 = math.radians(lat1), math.radians(lon1), math.radians(lat2), math.radians(lon2)
 		# equirectangular distance approximation
 		# got from https://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
-		R = 6371000  # radius of the earth in m
+		earth_radius = 6371000.0  # radius of the earth in m
 		x = (r_lon2 - r_lon1) * math.cos(0.5 * (r_lat2 + r_lat1))
 		y = r_lat2 - r_lat1
-		m = int(R * math.sqrt(x*x + y*y))
-		return m
+		dist = int(earth_radius * math.sqrt(x*x + y*y))
+		return dist
+
 
 	# the following functions implement k-means clustering, got from https://datasciencelab.wordpress.com/2013/12/12/clustering-with-k-means-in-python/
-	# the main functino is find_centers
-	def cluster_points(self, media_list, mu):
-		clusters  = {}
+	# the main function is find_centers
+	@staticmethod
+	def cluster_points(media_list, mu):
+		clusters = {}
 		for media in media_list:
 			# bestmukey = min([(i[0], np.linalg.norm(x-mu[i[0]])) for i in enumerate(mu)], key=lambda t:t[1])[0]
-			bestmukey = min([(index_and_point[0], np.linalg.norm(self.coordinates(media) - mu[index_and_point[0]])) for index_and_point in enumerate(mu)], key=lambda t:t[1])[0]
+			bestmukey = min([(index_and_point[0], np.linalg.norm(Geonames.coordinates(media) - mu[index_and_point[0]])) for index_and_point in enumerate(mu)], key=lambda t: t[1])[0]
 			try:
 				clusters[bestmukey].append(media)
 			except KeyError:
 				clusters[bestmukey] = [media]
 		return clusters
 
-	def reevaluate_centers(self, mu, clusters):
+
+	@staticmethod
+	def reevaluate_centers(clusters):
 		newmu = []
 		keys = sorted(clusters.keys())
 		for k in keys:
-			newmu.append(np.mean([self.coordinates(_media) for _media in clusters[k]], axis = 0))
+			newmu.append(np.mean([Geonames.coordinates(_media) for _media in clusters[k]], axis=0))
 		return newmu
 
-	def has_converged(self, mu, oldmu):
+
+	@staticmethod
+	def has_converged(mu, oldmu):
 		return set([tuple(a) for a in mu]) == set([tuple(a) for a in oldmu])
 
-	def coordinates(self, media):
+
+	@staticmethod
+	def coordinates(media):
 		return np.array((media.latitude, media.longitude))
 
-	def find_centers(self, media_list, K):
+
+	@staticmethod
+	def find_centers(media_list, K):
 		# Initialize to K random centers
-		coordinate_list = [self.coordinates(media) for media in media_list]
+		coordinate_list = [Geonames.coordinates(media) for media in media_list]
 		try:
 			oldmu = random.sample(coordinate_list, K)
 		except ValueError:
@@ -232,12 +255,12 @@ class Geonames(object):
 		except ValueError:
 			mu = coordinate_list
 		first_time = True
-		while first_time or not self.has_converged(mu, oldmu):
+		while first_time or not Geonames.has_converged(mu, oldmu):
 			oldmu = mu
 			# Assign all points in media_list to clusters
-			clusters = self.cluster_points(media_list, mu)
+			clusters = Geonames.cluster_points(media_list, mu)
 			# Reevaluate centers
-			mu = self.reevaluate_centers(oldmu, clusters)
+			mu = Geonames.reevaluate_centers(clusters)
 			if first_time:
 				first_time = False
 		cluster_list = [cluster for key, cluster in clusters.items()]

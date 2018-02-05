@@ -5,25 +5,44 @@
 from __future__ import print_function
 
 from datetime import datetime
+
 import Options
 
-max_verbose = 0
 
-def message(category, text, verbose = 0):
-	# verbosity levels:
-	# 0 = fatal errors only
-	# 1 = add non-fatal errors
-	# 2 = add warnings
-	# 3 = add info
-	# 4 = add more info
-	global usrOptions
+def message(category, text, verbose=0):
+	"""
+	Print a line of logging `text` if the `verbose` level is lower than the verbosity level
+	defined in the configuration file. This message is prefixed by the `category` text and
+	timing information.
+
+	The format of the log line is
+	```
+      2220 2018-02-04 17:17:38.517966   |  |--[album saved]     /var/www/html/myphotoshare/cache/_bd-2017-09-24.json
+      ^    ^                                   ^                ^
+	  |    |                                   |                text
+	  |    |                                   indented category
+      |    date and time
+	  microseconds
+	```
+
+	Elapsed time for each category is cumulated and can be printed with `report_times`.
+
+	Verbosity levels:
+	- 0 = fatal errors only
+	- 1 = add non-fatal errors
+	- 2 = add warnings
+	- 3 = add info
+	- 4 = add more info
+	"""
+
 	try:
-		max_verbose = Options.config['max_verbose']
+		message.max_verbose = Options.config['max_verbose']
 	except KeyError:
-		max_verbose = 10
+		message.max_verbose = 10
 	except AttributeError:
-		max_verbose = 0
-	if (verbose <= max_verbose):
+		message.max_verbose = 0
+
+	if verbose <= message.max_verbose:
 		if message.level <= 0:
 			sep = "  "
 		else:
@@ -42,20 +61,46 @@ def message(category, text, verbose = 0):
 				Options.elapsed_times[category] = microseconds
 				Options.elapsed_times_counter[category] = 1
 			microseconds = str(microseconds)
-		#print((9 - len(microseconds)) * " ", microseconds, "%s %s%s[%s]%s%s" % (now.isoformat(' '), max(0, message.level) * "  |", sep, str(category), max(1, (45 - len(str(category)))) * " ", str(text)))
 		print((9 - len(microseconds)) * " ", microseconds, "%s %s%s[%s]%s%s" % (now.isoformat(' '), max(0, message.level) * "  |", sep, str(category), max(1, (45 - len(str(category)))) * " ", str(text)))
 
+
+"""
+The verbosity level as defined by the user in the configuration file.
+"""
+message.max_verbose = 0
+
+
+"""
+The identation level printed by the message function.
+"""
 message.level = 0
 
-def next_level(verbose = 0):
-	if (verbose <= max_verbose):
+
+def next_level(verbose=0):
+	"""
+	Increase the indentation level of log messages.
+	"""
+	if verbose <= message.max_verbose:
 		message.level += 1
 
-def back_level(verbose = 0):
-	if (verbose <= max_verbose):
+
+def back_level(verbose=0):
+	"""
+	Decrease the indentation level of log messages.
+	"""
+	if verbose <= message.max_verbose:
 		message.level -= 1
 
+
 def report_times(final):
+	"""
+	Print a report with the total time spent on each `message()` categories and the number of times
+	each category has been called. This report can be considered a poor man's profiler as it cumulates
+	the number of times the `message()` function has been called instead of the real excution time of
+	the code.
+	The report includes a section at the end with the number of media processed by type and list the
+	albums where media is not geotagged or has no EXIF.
+	"""
 	print()
 	print((50 - len("message")) * " ", "message", (15 - len("total time")) * " ", "total time", (15 - len("counter")) * " ", "counter", (20 - len("average time")) * " ", "average time")
 	print()
@@ -107,17 +152,17 @@ def report_times(final):
 	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time, "     ", _total_time_unfolded)
 	print()
 	num_media = Options.num_video + Options.num_photo
-	_num_media		= str(num_media)
+	_num_media = str(num_media)
 	num_media_processed = Options.num_photo_processed + Options.num_video_processed
-	_num_media_processed	= str(num_media_processed)
-	_num_photo		= str(Options.num_photo)
-	_num_photo_processed	= str(Options.num_photo_processed)
-	_num_photo_geotagged	= str(Options.num_photo_geotagged)
-	_num_photo_with_exif_date	= str(Options.num_photo_with_exif_date)
+	_num_media_processed = str(num_media_processed)
+	_num_photo = str(Options.num_photo)
+	_num_photo_processed = str(Options.num_photo_processed)
+	_num_photo_geotagged = str(Options.num_photo_geotagged)
+	_num_photo_with_exif_date = str(Options.num_photo_with_exif_date)
 	_num_photo_without_geotags = str(Options.num_photo - Options.num_photo_geotagged)
 	_num_photo_without_exif_date = str(Options.num_photo - Options.num_photo_with_exif_date)
-	_num_video		= str(Options.num_video)
-	_num_video_processed	= str(Options.num_video_processed)
+	_num_video = str(Options.num_video)
+	_num_video_processed = str(Options.num_video_processed)
 	max_digit = len(_num_media)
 	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media)
 	if num_media:
