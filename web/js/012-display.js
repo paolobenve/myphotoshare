@@ -408,7 +408,40 @@ $(document).ready(function() {
 			}
 		}
 
-		if (currentMedia !== null || currentAlbum.media.length == 0) {
+		if (currentMedia !== null || currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
+			$("ul#right-menu li.album-names").addClass("hidden");
+		} else {
+			$("ul#right-menu li.album-names").removeClass("hidden");
+			if (Options.show_album_names_below_thumbs) {
+				$("ul#right-menu li.album-names").addClass("selected");
+			} else {
+				$("ul#right-menu li.album-names").removeClass("selected");
+			}
+		}
+
+		if (currentMedia !== null || currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
+			$("ul#right-menu li.media-count").addClass("hidden");
+		} else {
+			$("ul#right-menu li.media-count").removeClass("hidden");
+			if (Options.show_album_media_count) {
+				$("ul#right-menu li.media-count").addClass("selected");
+			} else {
+				$("ul#right-menu li.media-count").removeClass("selected");
+			}
+		}
+
+		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
+			$("ul#right-menu li.media-names").addClass("hidden");
+		} else {
+			$("ul#right-menu li.media-names").removeClass("hidden");
+			if (Options.show_media_names_below_thumbs) {
+				$("ul#right-menu li.media-names").addClass("selected");
+			} else {
+				$("ul#right-menu li.media-names").removeClass("selected");
+			}
+		}
+
+		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
 			$("ul#right-menu li.square-media-thumbnails").addClass("hidden");
 		} else {
 			$("ul#right-menu li.square-media-thumbnails").removeClass("hidden");
@@ -422,6 +455,9 @@ $(document).ready(function() {
 		if (
 			$("ul#right-menu li.slide").hasClass("hidden") &&
 			$("ul#right-menu li.spaced").hasClass("hidden") &&
+			$("ul#right-menu li.album-names").hasClass("hidden") &&
+			$("ul#right-menu li.media-count").hasClass("hidden") &&
+			$("ul#right-menu li.media-names").hasClass("hidden") &&
 			$("ul#right-menu li.square-album-thumbnails").hasClass("hidden") &&
 			$("ul#right-menu li.square-media-thumbnails").hasClass("hidden")
 		)
@@ -907,7 +943,8 @@ $(document).ready(function() {
 				).show();
 			} else if (
 				populateMedia === true ||
-				populateMedia === "sortMedia"
+				populateMedia == "refreshMedia" ||
+				populateMedia == "refreshBoth"
 			) {
 				media = [];
 				for (i = 0; i < currentAlbum.media.length; ++i) {
@@ -1014,7 +1051,8 @@ $(document).ready(function() {
 					albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 				if (
 					populate === true ||
-					populate === "sortAlbums"
+					populate == "refreshSubalbums" ||
+					populateMedia == "refreshBoth"
 				) {
 					subalbums = [];
 
@@ -1174,7 +1212,8 @@ $(document).ready(function() {
 								html += "\"";
 								html += "style=\"";
 								html += 	"height: " + buttonAndCaptionHeight + "px; " +
-										"margin-right: " + Options.spacing + "px; ";
+										"margin-right: " + Options.spacing + "px; " +
+										"margin-top: " + Options.spacing + "px; ";
 								html +=		"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
 								if (Options.albums_slide_style)
 									html += "background-color: " + Options.album_button_background_color + "; ";
@@ -1183,22 +1222,27 @@ $(document).ready(function() {
 								theImage.wrap(html);
 
 
-								html = "<div class=\"album-caption\"";
-								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
-										"font-size: " + captionFontSize + "px; " +
-										"height: " + captionHeight + "px; ";
-								html += 	"color: " + Options.album_caption_color + "; ";
+								html = "<div class=\"album-caption";
 								if (PhotoFloat.isFolderAlbum(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
-									html +=	"display: none; ";
+									html += " hidden";
+								html += "\"";
+								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
+											"font-size: " + captionFontSize + "px; " +
+											"max-height: " + captionHeight + "px; ";
+								var captionColor = Options.album_caption_color;
+								if (Options.albums_slide_style)
+									captionColor = Options.slide_album_caption_color;
+								html += 	"color: " + captionColor + ";";
 								html += "\"";
 								html += ">" + folder ;
 								html += "</div>";
-								html += "<div class=\"album-caption-count\"";
+								html += "<div class=\"album-caption-count";
+								if (PhotoFloat.isFolderAlbum(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
+									html += " hidden";
+								html += "\"";
 								html += 	"style=\"font-size: " + Math.round((captionFontSize / 1.5)) + "px;" +
 										"height: " + Math.round(captionHeight / 2) + "px; ";
-								html += 	"color: " + Options.album_caption_color + ";";
-								if (PhotoFloat.isFolderAlbum(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
-									html +=	" display: none;";
+								html += 	"color: " + captionColor + ";";
 								html += 	"\"";
 								html += ">(";
 								html +=		subalbum.numMediaInSubTree;
@@ -1236,7 +1280,10 @@ $(document).ready(function() {
 		if (currentMedia === null) {
 			$(".thumb-container").removeClass("current-thumb");
 			$("#album-view").removeClass("media-view-container");
-			$("#subalbums").show();
+			if (currentAlbum.albums.length > 0)
+				$("#subalbums").show();
+			else
+				$("#subalbums").hide();
 			$("#media-view").hide();
 			$("#media-view").removeClass("no-bottom-space");
 			$("#album-view").removeClass("no-bottom-space");
@@ -1821,11 +1868,18 @@ $(document).ready(function() {
 		});
 		$("#media-name").css("color", Options.title_image_name_color);
 		$(".thumb-and-caption-container").css("margin-right", Options.spacing.toString() + "px");
-		if (Options.show_media_names_below_thumbs)
-			$(".thumb-and-caption-container").css('margin-bottom', '1em')
+
+		if (currentMedia !== null || ! Options.show_media_names_below_thumbs)
+			$(".media-caption").addClass("hidden");
+		else {
+			$(".media-caption").removeClass("hidden");
+		}
 
 		if (! Options.show_album_media_count)
-			$("#title-count").hide();
+			$("#title-count").addClass("hidden");
+		else {
+			$("#title-count").removeClass("hidden");
+		}
 
 	}
 
@@ -1989,10 +2043,6 @@ $(document).ready(function() {
 		}
 		populateAlbum = previousAlbum !== currentAlbum || previousMedia !== currentMedia;
 		showAlbum(populateAlbum);
-		if (currentMedia !== null || ! Options.show_media_names_below_thumbs)
-			$(".media-caption").hide();
-		else
-			$(".media-caption").show();
 		// options function must be called again in order to set elements previously absent
 		setOptions();
 		if (currentMedia !== null) {
@@ -2060,6 +2110,18 @@ $(document).ready(function() {
 					} else {
 						Options.spacing = Options.spacingSave;
 					}
+
+					var showAlbumNamesCookie = getBooleanCookie("show_album_names_below_thumbs");
+					if (showAlbumNamesCookie !== null)
+						Options.show_album_names_below_thumbs = showAlbumNamesCookie;
+
+					var showMediaCountCookie = getBooleanCookie("show_album_media_count");
+					if (showMediaCountCookie !== null)
+						Options.show_album_media_count = showMediaCountCookie;
+
+					var showMediaNamesCookie = getBooleanCookie("show_media_names_below_thumbs");
+					if (showMediaNamesCookie !== null)
+						Options.show_media_names_below_thumbs = showMediaNamesCookie;
 
 					var squareAlbumsCookie = getCookie("album_thumb_type");
 					if (squareAlbumsCookie !== null)
@@ -2256,7 +2318,7 @@ $(document).ready(function() {
 			setBooleanCookie("albumDateReverseSortRequested", currentAlbum.albumNameReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2269,7 +2331,7 @@ $(document).ready(function() {
 			setBooleanCookie("albumNameReverseSortRequested", currentAlbum.albumDateReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2284,7 +2346,7 @@ $(document).ready(function() {
 					setBooleanCookie("albumDateReverseSortRequested", ! currentAlbum.albumDateReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2297,7 +2359,7 @@ $(document).ready(function() {
 				setBooleanCookie("mediaDateReverseSortRequested", currentAlbum.mediaNameReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
@@ -2310,7 +2372,7 @@ $(document).ready(function() {
 			setBooleanCookie("mediaNameReverseSortRequested", currentAlbum.mediaDateReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
@@ -2326,7 +2388,7 @@ $(document).ready(function() {
 
 			sortAlbumsMedia();
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
@@ -2335,19 +2397,17 @@ $(document).ready(function() {
 
 
 	$("ul#right-menu li.slide").on('click', toggleSlideMode);
-
 	function toggleSlideMode(ev) {
 		if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.albums_slide_style = ! Options.albums_slide_style;
 			setBooleanCookie("albums_slide_style", Options.albums_slide_style);
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
 
 	$("ul#right-menu li.spaced").on('click', toggleSpacing);
-
 	function toggleSpacing(ev) {
 		if ((currentAlbum.albums.length || currentAlbum.media.length) && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			if (Options.spacing)
@@ -2356,9 +2416,41 @@ $(document).ready(function() {
 				Options.spacing = Options.spacingSave;
 			setCookie("spacing", Options.spacing);
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
-			showAlbum("sortMedia");
+			showAlbum("refreshBoth");
 			// showAlbum();
+		}
+		return false;
+	}
+
+	$("ul#right-menu li.album-names").on('click', toggleAlbumNames);
+	function toggleAlbumNames(ev) {
+		if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+			Options.show_album_names_below_thumbs = ! Options.show_album_names_below_thumbs;
+			setBooleanCookie("show_album_names_below_thumbs", Options.show_album_names_below_thumbs);
+			modifyMenuButtons();
+			showAlbum("refreshSubalbums");
+		}
+		return false;
+	}
+
+	$("ul#right-menu li.media-count").on('click', toggleMediaCount);
+	function toggleMediaCount(ev) {
+		if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+			Options.show_album_media_count = ! Options.show_album_media_count;
+			setBooleanCookie("show_album_media_count", Options.show_album_media_count);
+			modifyMenuButtons();
+			showAlbum("refreshSubalbums");
+		}
+		return false;
+	}
+
+	$("ul#right-menu li.media-names").on('click', toggleMediaNames);
+	function toggleMediaNames(ev) {
+		if (currentMedia === null && currentAlbum.media.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+			Options.show_media_names_below_thumbs = ! Options.show_media_names_below_thumbs;
+			setBooleanCookie("show_media_names_below_thumbs", Options.show_media_names_below_thumbs);
+			modifyMenuButtons();
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}
@@ -2369,7 +2461,7 @@ $(document).ready(function() {
 			Options.album_thumb_type = Options.album_thumb_type == "square" ? "fit" : "square";
 			setCookie("album_thumb_type", Options.album_thumb_type);
 			modifyMenuButtons();
-			showAlbum("sortAlbums");
+			showAlbum("refreshSubalbums");
 		}
 		return false;
 	}
@@ -2380,7 +2472,7 @@ $(document).ready(function() {
 			Options.media_thumb_type = Options.media_thumb_type == "square" ? "fixed_height" : "square";
 			setCookie("media_thumb_type", Options.media_thumb_type);
 			modifyMenuButtons();
-			showAlbum("sortMedia");
+			showAlbum("refreshMedia");
 		}
 		return false;
 	}

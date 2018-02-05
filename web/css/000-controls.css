@@ -25,6 +25,9 @@ a:hover {
 	opacity: 0.7;
 	filter: alpha(opacity=70); /* For IE8 and earlier */
 }
+#title-count.hidden {
+	display: none;
+}
 #title, #title:hover {
 	padding: 0.4em;
 	font-weight: bold;
@@ -80,13 +83,14 @@ a.title-anchor.mobile {
 
 #subalbums {
 	padding-top: .2em;
+	padding-bottom: 2em;
+	overflow: hidden;
 }
 
 .album-button-and-caption {
 	float: left;
 	height: 200px;
 	width: 240px;
-	margin-bottom: 2em;
 }
 .album-button-and-caption.slide {
 	border: 3px solid gray;
@@ -100,7 +104,15 @@ a.title-anchor.mobile {
 }
 .album-caption {
 	margin: 0 auto;
-	height: 3em;
+	height: auto;
+	color: white;
+	font-size: inherit;
+	padding-top: .2em;
+}
+
+
+.album-caption.hidden {
+	display: none;
 }
 
 .album-caption a {
@@ -112,6 +124,10 @@ a.title-anchor.mobile {
 	text-align: center;
 	opacity: 0.7;
 	filter: alpha(opacity=70); /* For IE8 and earlier */
+}
+
+.album-caption-count.hidden {
+	display: none;
 }
 
 /* this class is needed in order to get the thumbnails vertically centered,
@@ -422,12 +438,13 @@ video {
 	text-align: center;
 	overflow: hidden;
 	padding: 0 .2em;
+	margin-bottom: .2em;
 }
 
-.album-caption {
-	color: white;
+.media-caption.hidden, .album-caption.hidden {
+	display: none;
+	margin-bottom: 0;
 }
-
 .media-caption {
 	font-size: 75%;
 	color: chartreuse;
@@ -436,12 +453,6 @@ video {
 
 .media-caption-coordinates {
 	font-size: 70%;
-}
-
-.album-caption {
-	font-size: inherit;
-	height: 3em;
-	padding-top: .2em;
 }
 
 #thumbs a {
@@ -496,7 +507,7 @@ ul#right-menu {
 	padding: 0;
 	overflow: hidden;
 	float: right;
-	max-width: 15em;
+	max-width: 20em;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -562,12 +573,13 @@ ul#right-menu li:not(.active) {
 	color: darkgray;
 }
 ul#right-menu li.active:not(.caption):hover {
-	color: black !important;
 	background-color: gray !important;
+	text-shadow: .15ex 0 white;
 }
 
 ul#right-menu li:not(.caption) {
 	padding-left: 1.7em;
+	padding-right: 2em;
 }
 
 ul#right-menu.expand li.hidden {

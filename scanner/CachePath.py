@@ -67,7 +67,7 @@ def photo_cache_name(photo, size, thumb_type="", mobile_bigger=False):
 			photo_suffix += "s"
 		elif thumb_type == "fit":
 			photo_suffix += "f"
-	elif size == Options.config['media_thumb_size']:
+	if size == Options.config['media_thumb_size']:
 		photo_suffix += "t"
 		if thumb_type == "square":
 			photo_suffix += "s"
@@ -99,15 +99,13 @@ def square_thumbnail_sizes():
 	# collect all the square sizes needed
 
 	# album size: square thumbnail are generated anyway, because they are needed by the code that generates composite images for sharing albums
-	# the second element in the tuple_arg il mobile_bigger
+	# the second element in the tuple_arg is `mobile_bigger`.
 	square_sizes = [(Options.config['album_thumb_size'], False)]
-	if Options.config['album_thumb_type'] == "square":
-		if Options.config['mobile_thumbnail_factor'] > 1:
-			square_sizes.append((Options.config['album_thumb_size'], True))
-	if Options.config['media_thumb_type'] == "square":
-		square_sizes.append((Options.config['media_thumb_size'], False))
-		if Options.config['mobile_thumbnail_factor'] > 1:
-			square_sizes.append((Options.config['media_thumb_size'], True))
+	if Options.config['mobile_thumbnail_factor'] > 1:
+		square_sizes.append((Options.config['album_thumb_size'], True))
+	square_sizes.append((Options.config['media_thumb_size'], False))
+	if Options.config['mobile_thumbnail_factor'] > 1 and (Options.config['media_thumb_size'], True) not in square_sizes:
+		square_sizes.append((Options.config['media_thumb_size'], True))
 	# sort sizes descending
 	square_sizes = sorted(square_sizes, key=modified_size, reverse=True)
 	return square_sizes

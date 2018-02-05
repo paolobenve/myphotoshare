@@ -4,12 +4,14 @@ from datetime import datetime
 import os
 import sys
 import json
+import ast
 
 # @python2
 try:
 	import configparser
 except ImportError:
 	import ConfigParser as configparser
+
 
 config = {}
 date_time_format = "%Y-%m-%d %H:%M:%S"
@@ -35,6 +37,7 @@ options_requiring_thumbnails_regeneration = ['face_cascade_scale_factor', 'small
 # json_version = 2 since checksums have been added
 # json_version = 3 since geotag managing is optional
 json_version = 3
+
 
 def get_options():
 	from Utilities import message, next_level, back_level
@@ -107,7 +110,7 @@ def get_options():
 				back_level()
 				config[option] = default_config.getboolean('options', option)
 		elif option in ('reduced_sizes', 'map_zoom_levels'):
-			config[option] = eval(usr_config.get('options', option))
+			config[option] = ast.literal_eval(usr_config.get('options', option))
 		elif option in ('mobile_thumbnail_factor', 'face_cascade_scale_factor'):
 			config[option] = usr_config.getfloat('options', option)
 			if config[option] < 1:

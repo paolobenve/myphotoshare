@@ -13,7 +13,7 @@ from datetime import datetime
 from PIL import Image
 
 from CachePath import cache_base, remove_album_path, file_mtime, trim_base_custom, remove_folders_marker
-from Utilities import message, next_level, back_level
+from Utilities import message, next_level, back_level, report_times
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from Geonames import Geonames
 import Options
@@ -735,6 +735,8 @@ class TreeWalker:
 			self.generate_composite_image(album, max_file_date)
 		back_level()
 
+		report_times(False)
+
 		return [album, album.num_media_in_sub_tree, max_file_date]
 
 
@@ -874,8 +876,8 @@ class TreeWalker:
 		next_level()
 		message("composite image generated", "", 5)
 		back_level()
-
 		back_level()
+
 
 	def save_all_media_json(self):
 		media_list = []
@@ -891,12 +893,12 @@ class TreeWalker:
 		message("media path list built", "", 5)
 		back_level()
 		message("caching all media path list...", "", 4)
-		with open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w') as fp:
-			json.dump(media_list, fp, cls=PhotoAlbumEncoder)
+		with open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w') as all_media_file:
+			json.dump(media_list, all_media_file, cls=PhotoAlbumEncoder)
 		next_level()
 		message("all media path list cached", "", 5)
 		back_level()
-		fp.close()
+
 
 	@staticmethod
 	def _save_json_options():
@@ -908,11 +910,12 @@ class TreeWalker:
 			if key not in Options.options_not_to_be_saved:
 				options_to_save[key] = value
 
-		with open(json_options_file, 'w') as fp:
-			json.dump(options_to_save, fp)
+		with open(json_options_file, 'w') as options_file:
+			json.dump(options_to_save, options_file)
 		next_level()
 		message("saved json options file", "", 5)
 		back_level()
+
 
 	def remove_stale(self, subdir=""):
 		if not subdir:

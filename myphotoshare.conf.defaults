@@ -239,6 +239,7 @@ albums_slide_style = false
 show_media_names_below_thumbs = false
 
 # will album names be shown below the thumbnail?
+# this option is not followed for virtual (date and gps) folders
 show_album_names_below_thumbs = true
 
 # should we show the media count in the album thumbnails and in the title?
@@ -263,8 +264,11 @@ background_color = #222222
 # the album buttons background color (this is a dirty white, in order to be like an old slide)
 album_button_background_color = Cornsilk
 
-# the album buttons background color
+# the album buttons background color for no-slide mode
 album_caption_color = white
+
+# the album buttons background color for slide mode (this is lighter black)
+slide_album_caption_color = #303030
 
 # The colors for the top right button which switches between folder and date view
 switch_button_background_color = black
