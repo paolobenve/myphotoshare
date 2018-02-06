@@ -2327,7 +2327,7 @@ $(document).ready(function() {
 		window.location = bySearchViewLink;
 		return false;
 	});
-	$('#search').keypress(function(e){
+	$('#search-field').keypress(function(e){
 		if (e.which == 13){//Enter key pressed
 			$('#search-button').click();//Trigger search button click event
 		}
