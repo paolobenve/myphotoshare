@@ -25,12 +25,35 @@
 
 	<?php if (!$options['debug_js']) { ?>
 		<script type="text/javascript" src="js/scripts.min.js"></script>
-	<?php } else { ?>
+	<?php } else {
+			// Debian/Ubuntu system: use system wide jQuery
+			if (file_exists("/usr/share/javascript/jquery/jquery.js")) { ?>
+		<script type="text/javascript" src="/javascript/jquery/jquery.js"></script>
+	<?php		} else { ?>
 		<script type="text/javascript" src="js/000-jquery-1.12.4.js"></script>
+	<?php		} ?>
+
+	<?php		// jQuery-hashchange should be in Debian! ?>
 		<script type="text/javascript" src="js/001-hashchange.js"></script>
+
 		<script type="text/javascript" src="js/002-preloadimages.js"></script>
+
+	<?php
+			// Debian/Ubuntu system: use system wide jQuery-mousewheel
+			if (file_exists("/usr/share/javascript/jquery-mousewheel/jquery.mousewheel.js")) { ?>
+		<script type="text/javascript" src="/javascript/jquery-mousewheel/jquery.mousewheel.js"></script>
+	<?php		} else { ?>
 		<script type="text/javascript" src="js/003-mousewheel.js"></script>
+	<?php		} ?>
+
+	<?php
+			// Debian/Ubuntu system: use system wide jQuery-fullscreen
+			if (file_exists("/usr/share/javascript/jquery-fullscreen/jquery.fullscreen.js")) { ?>
+		<script type="text/javascript" src="/javascript/jquery-fullscreen/jquery.fullscreen.js"></script>
+	<?php		} else { ?>
 		<script type="text/javascript" src="js/004-fullscreen.js"></script>
+	<?php		} ?>
+
 		<script type="text/javascript" src="js/005-modernizr.js"></script>
 		<script type="text/javascript" src="js/008-social.js"></script>
 		<script type="text/javascript" src="js/009-translations.js"></script>
