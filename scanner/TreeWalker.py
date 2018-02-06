@@ -429,6 +429,8 @@ class TreeWalker:
 		name = os.path.splitext(phrase)[0].replace('_', ' ').replace('-', ' ').replace('.', ' ').replace(',', ' ').replace('  ', ' ')
 		name = re.sub(r'[0-9]', '', name)
 		name = re.sub(r' +$', '', name)
+		name = re.sub(r'^ +', '', name)
+		name = name.lower()
 		return name.split(' ')
 
 
