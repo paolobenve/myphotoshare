@@ -92,25 +92,6 @@ $(document).ready(function() {
 				}
 			}
 		}
-
-		// for (var albumOrMedia in ['album', 'media']) {
-		// 	var reverseNameSort = albumOrMedia + "NameReverseSort";
-		// 	var reverseDateSort = albumOrMedia + "DateReverseSort";
-		// 	var nameSort = albumOrMedia + "NameSort";
-		// 	var sortReverseClass = "." + albumOrMedia + "-sort-reverse";
-		// 	var sortNormalClass = "." + albumOrMedia + "-sort-normal";
-		// 	var sort = "." + albumOrMedia + "-sort";
-		// 	var sortNameClass = sort + "-name";
-		// 	var sortDateClass = sort + "-date";
-		// 	var sortReverseNameClass = sortNameClass + sortReverseClass;
-		// 	var sortReverseDateClass = sortDateClass + sortReverseClass;
-		// 	var sortNormalNameClass = sortNameClass + sortNormalClass;
-		// 	var sortNormalDateClass = sortDateClass + sortNormalClass;			$(sortReverseNameClass).html(_t(sort) + _t(".by-name") + _t(".sort-reverse"));
-		// 	$(sortReverseDateClass).html(_t(sort) + _t(".by-date") + _t(".sort-reverse"));
-		// 	$(sortNormalNameClass).html(_t(sort) + _t(".by-name"));
-		// 	$(sortNormalDateClass).html(_t(sort) + _t(".by-date"));
-		// }
-
 	}
 
 	function getLanguage() {
