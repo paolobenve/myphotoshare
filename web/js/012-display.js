@@ -59,7 +59,7 @@ $(document).ready(function() {
 	var numSubAlbumsReady;
 	var fromEscKey = false;
 	var firstEscKey = true;
-	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
+	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "", savedLink = "";
 		// set the map zooms for country, region, place, and photo
 		// they have been chosen in order to fit to Europe distances
 
@@ -1034,8 +1034,17 @@ $(document).ready(function() {
 					firstEscKey = true;
 				}
 				albumLink = "";
-				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
-					albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
+				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
+					if (currentMedia === null && currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0) {
+						if (savedLink)
+							albumLink = savedLink;
+						else {
+							albumLink = "#!/";
+						}
+					} else
+						albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
+				}
+
 				if (
 					populate === true ||
 					populate == "refreshSubalbums" ||
@@ -2179,7 +2188,7 @@ $(document).ready(function() {
 
 
 	$(document).on('keydown', function(e) {
-		if (! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+		if (e.target.tagName.toLowerCase() != 'input' && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
 				//            arrow right                  n
 				swipeLeft(nextLink);
@@ -2323,15 +2332,17 @@ $(document).ready(function() {
 	// binds the click events to the sort buttons
 
 	$('#search-button').on("click", function() {
+		// save current hash in order to come back there when exiting from search
+		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
 		bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + $("#search-field").val();
 		window.location = bySearchViewLink;
 		return false;
 	});
-	$('#search-field').keypress(function(e){
-		if (e.which == 13){//Enter key pressed
-			$('#search-button').click();//Trigger search button click event
+	$('#search-field').keypress(function(ev) {
+		if (ev.which == 13) {
+			//Enter key pressed, trigger search button click event
+			$('#search-button').click();
 		}
-		return false;
 	});
 
 	// albums
