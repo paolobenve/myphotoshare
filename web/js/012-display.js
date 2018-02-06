@@ -2123,9 +2123,6 @@ $(document).ready(function() {
 					// options.json is in this directory
 					Options.server_cache_path = 'cache';
 
-					byDateRegex = "^" + Options.by_date_string + "\/";
-					byGpsRegex = "^" + Options.by_gps_string + "\/";
-
 					maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
 
 					// override according to user selections
