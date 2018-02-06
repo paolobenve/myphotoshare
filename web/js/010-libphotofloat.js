@@ -105,7 +105,7 @@
 		PhotoFloat.byGpsStringWithTrailingSeparator = Options.by_gps_string + Options.cache_folder_separator;
 		PhotoFloat.bySearchStringWithTrailingSeparator = Options.by_search_string + Options.cache_folder_separator;
 
-		var hashParts, lastSlashPosition, slashNumber, albumHash, mediaHash = null, foldersHash = null, media = null;
+		var hashParts, lastSlashPosition, slashCount, albumHash, mediaHash = null, foldersHash = null, media = null;
 		$("#error-too-many-images").hide();
 		hash = PhotoFloat.cleanHash(hash);
 		// count the number of slashes in hash, by date hashes have 2, folders ones 1
@@ -114,17 +114,17 @@
 			mediaHash = null;
 		} else {
 			hashParts = hash.split("/");
-			slashNumber = hashParts.length -1;
+			slashCount = hashParts.length -1;
 			lastSlashPosition = hash.lastIndexOf("/");
 
-			if (slashNumber == 1) {
+			if (slashCount == 1) {
 				// folders hash: album and media
 				albumHash = hashParts[0];
 				mediaHash = hashParts[1];
-			} else if (slashNumber == 0) {
+			} else if (slashCount == 0) {
 				// folders or by date hash: album only
 				albumHash = hash;
-			} else if (slashNumber == 2) {
+			} else if (slashCount == 2) {
 				// by date hash: by date album, folders album, media
 				albumHash = hashParts[0];
 				mediaHash = hashParts[2];
