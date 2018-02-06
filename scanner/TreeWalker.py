@@ -201,6 +201,8 @@ class TreeWalker:
 		by_search_max_file_date = None
 		message("working with word albums...", "", 5)
 		for word, media in self.tree_by_search.items():
+			next_level()
+			message("working with word album...", word + ", n=" + str(len(media)), 5)
 			word_path = os.path.join(by_search_path, str(word))
 			word_album = Album(word_path)
 			word_album.parent = by_search_album
@@ -226,6 +228,7 @@ class TreeWalker:
 			self.generate_composite_image(word_album, word_max_file_date)
 			next_level()
 			message("word album worked out", word, 4)
+			back_level()
 			back_level()
 		self.all_albums.append(by_search_album)
 		if by_search_album.num_media_in_sub_tree > 0:
