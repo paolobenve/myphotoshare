@@ -2334,9 +2334,9 @@ $(document).ready(function() {
 	$('#search-button').on("click", function() {
 		// save current hash in order to come back there when exiting from search
 		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
-		bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + $("#search-field").val();
+		searchTerms = $("#search-field").val().trim().replace(' ', '_');
+		bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + searchTerms;
 		window.location = bySearchViewLink;
-		return false;
 	});
 	$('#search-field').keypress(function(ev) {
 		if (ev.which == 13) {

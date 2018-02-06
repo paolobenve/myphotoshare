@@ -3,9 +3,11 @@
 	function PhotoFloat() {
 		this.albumCache = [];
 		this.geotaggedPhotosFound = null;
+		this.searchesCount = 0;
 	}
 
 	/* public member functions */
+
 	PhotoFloat.prototype.getAlbum = function(subalbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
 
@@ -98,6 +100,20 @@
 			this.getAlbum(subalbum, nextAlbum, error);
 	};
 
+	PhotoFloat.prototype.intersect = function(a, b) {
+		if (b.length > a.length) {
+			// indexOf to loop over shorter
+			var t;
+			t = b, b = a, a = t;
+		}
+		return a.filter(function (e) {
+			for (var i = 0; i < b.length; i ++)
+				if (b[i].albumName == e.albumName)
+					return true;
+			return false;
+		});
+	};
+
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		// this vars are defined here and not at the beginning of the file because the options must have been read
 		PhotoFloat.foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
@@ -105,7 +121,7 @@
 		PhotoFloat.byGpsStringWithTrailingSeparator = Options.by_gps_string + Options.cache_folder_separator;
 		PhotoFloat.bySearchStringWithTrailingSeparator = Options.by_search_string + Options.cache_folder_separator;
 
-		var hashParts, lastSlashPosition, slashCount, albumHash, mediaHash = null, foldersHash = null, media = null;
+		var hashParts, lastSlashPosition, slashCount, albumHash, albumHashes, mediaHash = null, foldersHash = null, media = null, i;
 		$("#error-too-many-images").hide();
 		hash = PhotoFloat.cleanHash(hash);
 		// count the number of slashes in hash, by date hashes have 2, folders ones 1
@@ -131,41 +147,87 @@
 				foldersHash = hashParts[1];
 			}
 		}
-		if (albumHash)
+
+		albumHashes = [];
+		if (albumHash) {
 			albumHash = decodeURI(albumHash);
+			if (slashCount == 0 && albumHash.indexOf(Options.by_search_string) === 0) {
+				var wordsString = albumHash.substring(Options.by_search_string.length + 1);
+				if (wordsString.indexOf('_', 1) != -1) {
+					// there may be more words, decode
+					albumHashes = wordsString.split('_');
+					for (i = 0; i < albumHashes.length; i ++)
+						albumHashes[i] = Options.by_search_string + Options.cache_folder_separator + albumHashes[i];
+				}
+			}
+		}
 		if (mediaHash)
 			mediaHash = decodeURI(mediaHash);
 		if (foldersHash)
 			foldersHash = decodeURI(foldersHash);
-		this.getAlbum(
-			albumHash,
-			function(theAlbum) {
-				var i = -1;
-				if (mediaHash !== null) {
-					for (i = 0; i < theAlbum.media.length; ++i) {
-						if (
-							theAlbum.media[i].cacheBase === mediaHash &&
-							(foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash)
-						) {
-							media = theAlbum.media[i];
-							break;
+
+		if (albumHash && albumHashes.length > 0) {
+			var searchResultsAlbum = "";
+			this.searchesCount = 0;
+			self = this;
+			for (i = 0; i < albumHashes.length; i ++) {
+				this.getAlbum(
+					albumHashes[i],
+					function(theAlbum) {
+						var i;
+						if (searchResultsAlbum === "") {
+							searchResultsAlbum = theAlbum;
+						} else {
+							for (i = 0; i < theAlbum.media.length; i ++)
+								delete theAlbum.media[i].parent;
+							searchResultsAlbum.media = self.intersect(searchResultsAlbum.media, theAlbum.media);
+						}
+						self.searchesCount ++;
+						if (self.searchesCount == albumHashes.length) {
+							var searchTerms = location.hash.substring(("#!/" + Options.by_search_string + Options.cache_folder_separator).length);
+							searchResultsAlbum.numMediaInAlbum = searchResultsAlbum.media.length;
+							searchResultsAlbum.numMediaInSubTree = searchResultsAlbum.media.length;
+							searchResultsAlbum.cacheBase = Options.by_search_string + Options.cache_folder_separator + searchTerms;
+							searchResultsAlbum.path = PhotoFloat.pathJoin([Options.by_search_string, searchTerms]);
+							searchResultsAlbum.physicalPath = searchResultsAlbum.path;
+							searchResultsAlbum.ancestorsCacheBase[searchResultsAlbum.ancestorsCacheBase.length - 1] = searchResultsAlbum.cacheBase;
+							callback(searchResultsAlbum, null, -1);
+						}
+					},
+					error
+				);
+			}
+		} else
+			this.getAlbum(
+				albumHash,
+				function(theAlbum) {
+					var i = -1;
+					if (mediaHash !== null) {
+						for (i = 0; i < theAlbum.media.length; ++i) {
+							if (
+								theAlbum.media[i].cacheBase === mediaHash &&
+								(foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash)
+							) {
+								media = theAlbum.media[i];
+								break;
+							}
+						}
+						if (i >= theAlbum.media.length) {
+							$("#album-view").fadeOut(200);
+							$("#media-view").fadeOut(200);
+							$("#album-view").fadeIn(3500);
+							$("#error-text-image").fadeIn(200);
+							$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
+							window.location.hash = theAlbum.cacheBase;
+							i = -1;
 						}
 					}
-					if (i >= theAlbum.media.length) {
-						$("#album-view").fadeOut(200);
-						$("#media-view").fadeOut(200);
-						$("#album-view").fadeIn(3500);
-						$("#error-text-image").fadeIn(200);
-						$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
-						window.location.hash = theAlbum.cacheBase;
-						i = -1;
-					}
-				}
-				callback(theAlbum, media, i);
-			},
-			error
-		);
+					callback(theAlbum, media, i);
+				},
+				error
+			);
 	};
+
 	PhotoFloat.prototype.authenticate = function(password, result) {
 		var ajaxOptions = {
 			type: "GET",
