@@ -159,6 +159,7 @@ mobile_thumbnail_factor = 2
 folders_string = _f
 by_date_string = _bd
 by_gps_string = _bg
+by_search_string = _bs
 cache_folder_separator = -
 
 # The language you want to get the geonames features

@@ -109,7 +109,8 @@ class Album(object):
 			Options.config['subdir_method'] in ("md5", "folder") and
 			(
 				self.baseless_path.find(Options.config['by_date_string']) != 0 or
-				self.baseless_path.find(Options.config['by_gps_string']) != 0
+				self.baseless_path.find(Options.config['by_gps_string']) != 0 or
+				self.baseless_path.find(Options.config['by_search_string']) != 0
 			)
 		):
 			if Options.config['subdir_method'] == "md5":
@@ -319,6 +320,7 @@ class Album(object):
 		folder_position = path_to_dict.find(Options.config['folders_string'])
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
 		by_gps_position = path_to_dict.find(Options.config['by_gps_string'])
+		by_search_position = path_to_dict.find(Options.config['by_search_string'])
 		if path_to_dict and by_date_position == -1 and by_gps_position == -1 and self.cache_base != "root" and folder_position != 0:
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
 
@@ -1412,11 +1414,24 @@ class Media(object):
 
 	@property
 	def title(self):
-		return self._attributes["metadata"]["title"]
+		if 'metadata' in self._attributes and 'title' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["title"]
+		else:
+			return ''
 
 	@property
 	def description(self):
-		return self._attributes["metadata"]["description"]
+		if 'metadata' in self._attributes and 'description' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["description"]
+		else:
+			return ''
+
+	@property
+	def tags(self):
+		if 'metadata' in self._attributes and 'tags' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["tags"]
+		else:
+			return ''
 
 	@property
 	def size(self):

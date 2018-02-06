@@ -33,6 +33,7 @@ class TreeWalker:
 		self.all_albums = list()
 		self.tree_by_date = {}
 		self.tree_by_geonames = {}
+		self.tree_by_search = {}
 		self.media_with_geonames_list = list()
 		self.all_media = list()
 		self.all_album_composite_images = list()
@@ -90,6 +91,15 @@ class TreeWalker:
 				if by_geonames_album is not None and not by_geonames_album.empty:
 					self.all_cache_entries.append(Options.config['by_gps_string'] + ".json")
 					self.origin_album.add_album(by_geonames_album)
+
+			message("generating by search albums...", "", 4)
+			by_search_album = self.generate_by_search_albums(self.origin_album)
+			next_level()
+			message("by search albums generated", "", 5)
+			back_level()
+			if by_search_album is not None and not by_search_album.empty:
+				self.all_cache_entries.append(Options.config['by_search_string'] + ".json")
+				self.origin_album.add_album(by_search_album)
 
 			message("saving all albums to json files...", "", 4)
 			next_level()
@@ -179,6 +189,49 @@ class TreeWalker:
 			self.generate_composite_image(by_date_album, by_date_max_file_date)
 		back_level()
 		return by_date_album
+
+	def generate_by_search_albums(self, origin_album):
+		next_level()
+		# convert the temporary structure where media are organized by words to a set of albums
+
+		by_search_path = os.path.join(Options.config['album_path'], Options.config['by_search_string'])
+		by_search_album = Album(by_search_path)
+		by_search_album.parent = origin_album
+		by_search_album.cache_base = cache_base(by_search_path)
+		by_search_max_file_date = None
+		message("working with word albums...", "", 5)
+		for word, media in self.tree_by_search.items():
+			word_path = os.path.join(by_search_path, str(word))
+			word_album = Album(word_path)
+			word_album.parent = by_search_album
+			word_album.cache_base = cache_base(word_path)
+			word_max_file_date = None
+			by_search_album.add_album(word_album)
+			for single_media in media:
+				word_album.add_media(single_media)
+				word_album.num_media_in_sub_tree += 1
+				word_album.num_media_in_album += 1
+				by_search_album.add_media(single_media)
+				by_search_album.num_media_in_sub_tree += 1
+				single_media_date = max(single_media.datetime_file, single_media.datetime_dir)
+				if word_max_file_date:
+					word_max_file_date = max(word_max_file_date, single_media_date)
+				else:
+					word_max_file_date = single_media_date
+				if by_search_max_file_date:
+					by_search_max_file_date = max(by_search_max_file_date, single_media_date)
+				else:
+					by_search_max_file_date = single_media_date
+			self.all_albums.append(word_album)
+			self.generate_composite_image(word_album, word_max_file_date)
+			next_level()
+			message("word album worked out", word, 4)
+			back_level()
+		self.all_albums.append(by_search_album)
+		if by_search_album.num_media_in_sub_tree > 0:
+			self.generate_composite_image(by_search_album, by_search_max_file_date)
+		back_level()
+		return by_search_album
 
 
 	def generate_geonames_albums(self, origin_album):
@@ -369,6 +422,27 @@ class TreeWalker:
 		if not any(media.media_file_name == _media.media_file_name for _media in self.tree_by_date[media.year][media.month][media.day]):
 		#~ if not media in self.tree_by_date[media.year][media.month][media.day]:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
+
+	@staticmethod
+	def normalize_and_split(phrase):
+		# normalize the name without extension and remove the numbers
+		name = os.path.splitext(phrase)[0].replace('_', ' ').replace('-', ' ').replace('.', ' ').replace(',', ' ').replace('  ', ' ')
+		name = re.sub(r'[0-9]', '', name)
+		name = re.sub(r' +$', '', name)
+		return name.split(' ')
+
+
+	def add_media_to_tree_by_search(self, media):
+		# add the given media to a temporary structure where media are organized by search terms
+		# works on the words in the file name and in album.ini's description, title, tags
+		words = self.normalize_and_split(media.name) + self.normalize_and_split(media.title) + self.normalize_and_split(media.description) + media.tags.split(',')
+
+		for word in words:
+			if word:
+				if word not in list(self.tree_by_search.keys()):
+					self.tree_by_search[word] = list()
+				if not media in self.tree_by_search[word]:
+					self.tree_by_search[word].append(media)
 
 	def add_media_to_tree_by_geonames(self, media):
 		# add the given media to a temporary structure where media are organized by country, region/state, place
@@ -704,7 +778,13 @@ class TreeWalker:
 						message("added media to by geonames tree", "", 5)
 						back_level()
 
+					message("adding media to search tree...", "", 5)
 					# the following function has a check on media already present
+					self.add_media_to_tree_by_search(media)
+					next_level()
+					message("media added to search tree", "", 5)
+					back_level()
+
 				elif not media.is_valid:
 					next_level()
 					message("not image nor video", entry_with_path, 1)

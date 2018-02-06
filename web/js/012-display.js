@@ -503,6 +503,7 @@ $(document).ready(function() {
 
 		dateTitle = (components.length > 1 && components[1] == Options.by_date_string);
 		gpsTitle = (components.length > 1 && components[1] == Options.by_gps_string);
+		searchTitle = (components.length > 1 && components[1] == Options.by_search_string);
 
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
 		var textComponents = [];
@@ -558,6 +559,9 @@ $(document).ready(function() {
 					title += "(" + _t("#by-date") + ")";
 				else if (i == 1 && gpsTitle)
 					title += "(" + _t("#by-gps") + ")";
+				else if (i == 1 && searchTitle)
+					title += "(" + _t("#by-search") + ")";
+
 				else {
 					if (gpsTitle && i >= 2 && i <= 4) {
 						// i == 2 corresponds to the country, i == 4 to the place,
@@ -649,6 +653,8 @@ $(document).ready(function() {
 					documentTitle += " (" + _t("#by-date") + ")";
 				else if (gpsTitle)
 					documentTitle += " (" + _t("#by-gps") + ")";
+				else if (searchTitle)
+					documentTitle += " (" + _t("#by-search") + ")";
 			} else if (i > 1) {
 				if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
 					documentTitle = gpsName + documentTitle;
@@ -930,7 +936,7 @@ $(document).ready(function() {
 			thumbnailSize = Options.media_thumb_size;
 
 			populateMedia = populate;
-			virtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0);
+			virtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_search_string) == 0 );
 			tooBig = currentAlbum.path.split("/").length < 4 && currentAlbum.media.length > Options.big_virtual_folders_threshold;
 			if (populateMedia === true && virtualAlbum)
 				populateMedia = populateMedia && ! tooBig;
@@ -1318,6 +1324,16 @@ $(document).ready(function() {
 					return false;
 				});
 				$("#by-gps-view").removeClass("active").addClass("selected").off("click");
+			} else if (currentAlbum.cacheBase == Options.by_search_string) {
+				$("#folders-view").on("click", function(ev) {
+					window.location = foldersViewLink;
+					return false;
+				});
+				$("#by-date-view").on("click", function(ev) {
+					window.location = byDateViewLink;
+					return false;
+				});
+				photoFloat.AddClickToByGpsButton(byGpsViewLink);
 			} else {
 				$(".day-gps-folders-view").addClass("hidden");
 			}
@@ -1761,6 +1777,24 @@ $(document).ready(function() {
 			});
 			// by gps album: change to folder or by day view
 			$("#by-gps-view").removeClass("active").addClass("selected").off("click");
+		} else if (currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0) {
+			// by search album: change to folder or by gps or by view
+			$("#folders-view").on("click", function(ev) {
+				window.location = foldersViewLink;
+				return false;
+			});
+			$("#by-date-view").on("click", function(ev) {
+				window.location = byDateViewLink;
+				return false;
+			});
+			if (! hasGpsData(currentMedia)) {
+				$("#by-gps-view").addClass("hidden");
+			} else {
+				$("#by-gps-view").on("click", function(ev) {
+					window.location = byGpsViewLink;
+					return false;
+				});
+			}
 		}
 
 		$('#metadata tr.gps').off('click');

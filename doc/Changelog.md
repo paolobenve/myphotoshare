@@ -8,6 +8,8 @@
 * user can toggle album slide mode, thumbnails spacing, thumbnails types, show album and media names, show media count, all with right top corner menu
 * the scanner manages more precisely certain option changes that require regenerating of `json` files, reduced size images, thumbnails
 * new option `slide_album_caption_color`: the color to use with album slide mode
+* implemented search function: media can be searched by file name, title, description, tags
+  * new option `by_search_string`: the string used for search albums
 * Reorganization of documentation:
   * Creation of `doc` and `doc/img` folders.
   * `README.md` split into individual files.
