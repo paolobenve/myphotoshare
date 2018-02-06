@@ -1715,6 +1715,7 @@ $(document).ready(function() {
 									encodeURIComponent(currentMedia.cacheBase)
 								]);
 
+
 		$(".day-gps-folders-view").addClass("active").removeClass("hidden").removeClass("selected").off("click");
 		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
 			// folder album: change to by date or by gps view
@@ -2321,9 +2322,20 @@ $(document).ready(function() {
 
 	// binds the click events to the sort buttons
 
+	$('#search-button').on("click", function() {
+		bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + $("#search-field").val();
+		window.location = bySearchViewLink;
+		return false;
+	});
+	$('#search').keypress(function(e){
+		if (e.which == 13){//Enter key pressed
+			$('#search-button').click();//Trigger search button click event
+		}
+		return false;
+	});
+
 	// albums
 	$("li.album-sort.by-date").on('click', sortAlbumsByDate);
-
 	function sortAlbumsByDate(ev) {
 		if (currentMedia === null && currentAlbum.albums.length > 1 && currentAlbum.albumNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			setBooleanCookie("albumNameSortRequested", false);
@@ -2404,9 +2416,6 @@ $(document).ready(function() {
 		}
 		return false;
 	}
-
-
-
 
 	$("ul#right-menu li.slide").on('click', toggleSlideMode);
 	function toggleSlideMode(ev) {

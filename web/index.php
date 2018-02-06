@@ -187,6 +187,13 @@
 
 	<ul id="right-menu">
 		<li id="menu-icon"> ☰ </li>
+		<li class="search caption"></li>
+		<li class="search">
+			<form>
+				<input type="text" id="search-field" />
+				<input type="button" id="search-button" value="s" />
+			</form>
+		</li>
 		<li class="day-gps-folders-view caption"></li>
 		<li id="folders-view" class="day-gps-folders-view"></li>
 		<li id="by-date-view" class="day-gps-folders-view"></li>
