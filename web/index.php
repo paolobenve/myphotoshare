@@ -14,7 +14,7 @@
 			echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
-	<?php if (!$options['debug_css']) { ?>
+	<?php if (strcasecmp($options['debug_css'], "false") == 0) { ?>
 		<link href="css/styles.min.css" rel="stylesheet" type="text/css" />
 	<?php } else { ?>
 		<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
@@ -23,7 +23,7 @@
 		<link href="css/003-social.css" rel="stylesheet" type="text/css" />
 	<?php } ?>
 
-	<?php if (!$options['debug_js']) { ?>
+	<?php if (strcasecmp($options['debug_js'], "false") == 0) { ?>
 		<script type="text/javascript" src="js/scripts.min.js"></script>
 	<?php } else {
 			// Debian/Ubuntu system: use system wide jQuery
