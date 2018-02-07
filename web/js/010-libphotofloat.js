@@ -55,7 +55,7 @@
 			if (this.geotaggedPhotosFound) {
 				$("#by-gps-view").off("click");
 				$("#by-gps-view").removeClass("hidden").addClass("active").on("click", function(ev) {
-					window.location = link;
+					window.location.href = link;
 					return false;
 				});
 			} else {
