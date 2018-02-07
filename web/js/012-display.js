@@ -60,8 +60,6 @@ $(document).ready(function() {
 	var fromEscKey = false;
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "", savedLink = "";
-		// set the map zooms for country, region, place, and photo
-		// they have been chosen in order to fit to Europe distances
 
 	/* Displays */
 
