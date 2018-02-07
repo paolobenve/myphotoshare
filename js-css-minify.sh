@@ -59,6 +59,13 @@ case $MINIFY_JS in
 			exit 1
 		fi
 	;;
+	uglifyjs)
+		uglifyjs -V > /dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			echo "'uglifyjs' is not installed. Look for package 'node-uglifyjs' or 'http://lisperator.net/uglifyjs/'"
+			echo "Aborting..."
+			exit 1
+		fi
 esac
 
 case $MINIFY_CSS in
@@ -100,6 +107,10 @@ ls -1 *.js | grep -Ev "min.js$" | while read jsfile; do
 
 		jsmin3)
 			python3 -m jsmin $jsfile > $newfile
+		;;
+
+		uglifyjs)
+			uglifyjs -o $newfile $jsfile
 		;;
 
 		*)
