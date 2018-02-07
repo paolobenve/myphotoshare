@@ -53,6 +53,7 @@
 		// this function returns true if the root album has the by gps subalbum
 		if (this.geotaggedPhotosFound !== null) {
 			if (this.geotaggedPhotosFound) {
+				$("#by-gps-view").off("click");
 				$("#by-gps-view").removeClass("hidden").addClass("active").on("click", function(ev) {
 					window.location = link;
 					return false;

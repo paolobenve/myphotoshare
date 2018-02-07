@@ -1290,12 +1290,14 @@ $(document).ready(function() {
 			$(".day-gps-folders-view").removeClass("selected").addClass("active").removeClass("hidden").off("click");
 			if (currentAlbum.cacheBase == Options.folders_string) {
 				$("#folders-view").removeClass("active").addClass("selected").off("click");
+				$("#by-date-view").off("click");
 				$("#by-date-view").on("click", function(ev) {
 					window.location = byDateViewLink;
 					return false;
 				});
 				photoFloat.AddClickToByGpsButton(byGpsViewLink);
 			} else if (currentAlbum.cacheBase == Options.by_date_string) {
+				$("#folders-view").off("click");
 				$("#folders-view").on("click", function(ev) {
 					window.location = foldersViewLink;
 					return false;
@@ -1303,20 +1305,24 @@ $(document).ready(function() {
 				$("#by-date-view").removeClass("active").addClass("selected").off("click");
 				photoFloat.AddClickToByGpsButton(byGpsViewLink);
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
+				$("#folders-view").off("click");
 				$("#folders-view").on("click", function(ev) {
 					window.location = foldersViewLink;
 					return false;
 				});
+				$("#by-date-view").off("click");
 				$("#by-date-view").on("click", function(ev) {
 					window.location = byDateViewLink;
 					return false;
 				});
 				$("#by-gps-view").removeClass("active").addClass("selected").off("click");
 			} else if (currentAlbum.cacheBase == Options.by_search_string) {
+				$("#folders-view").off("click");
 				$("#folders-view").on("click", function(ev) {
 					window.location = foldersViewLink;
 					return false;
 				});
+				$("#by-date-view").off("click");
 				$("#by-date-view").on("click", function(ev) {
 					window.location = byDateViewLink;
 					return false;
@@ -1727,6 +1733,7 @@ $(document).ready(function() {
 		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
 			// folder album: change to by date or by gps view
 			$("#folders-view").removeClass("active").addClass("selected").off("click");
+			$("#by-date-view").off("click");
 			$("#by-date-view").on("click", function(ev) {
 				window.location = byDateViewLink;
 				return false;
@@ -1735,6 +1742,7 @@ $(document).ready(function() {
 			if (! hasGpsData(currentMedia)) {
 				$("#by-gps-view").addClass("hidden");
 			} else {
+				$("#by-gps-view").off("click");
 				$("#by-gps-view").on("click", function(ev) {
 					window.location = byGpsViewLink;
 					return false;
@@ -1742,6 +1750,7 @@ $(document).ready(function() {
 			}
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0) {
 			// by date album: change to folder or by gps view
+			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
 				window.location = foldersViewLink;
 				return false;
@@ -1750,16 +1759,19 @@ $(document).ready(function() {
 			if (! hasGpsData(currentMedia)) {
 				$("#by-gps-view").addClass("hidden");
 			} else {
+				$("#by-gps-view").off("click");
 				$("#by-gps-view").on("click", function(ev) {
 					window.location = byGpsViewLink;
 					return false;
 				});
 			}
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0) {
+			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
 				window.location = foldersViewLink;
 				return false;
 			});
+			$("#by-date-view").off("click");
 			$("#by-date-view").on("click", function(ev) {
 				window.location = byDateViewLink;
 				return false;
@@ -1768,10 +1780,12 @@ $(document).ready(function() {
 			$("#by-gps-view").removeClass("active").addClass("selected").off("click");
 		} else if (currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0) {
 			// by search album: change to folder or by gps or by view
+			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
 				window.location = foldersViewLink;
 				return false;
 			});
+			$("#by-date-view").off("click");
 			$("#by-date-view").on("click", function(ev) {
 				window.location = byDateViewLink;
 				return false;
@@ -1779,6 +1793,7 @@ $(document).ready(function() {
 			if (! hasGpsData(currentMedia)) {
 				$("#by-gps-view").addClass("hidden");
 			} else {
+				$("#by-gps-view").off("click");
 				$("#by-gps-view").on("click", function(ev) {
 					window.location = byGpsViewLink;
 					return false;
