@@ -67,8 +67,11 @@
 				Options.by_gps_string,
 				function() {
 					self.geotaggedPhotosFound = true;
-					$("#by-gps-view").addClass("hidden");
-					window.location = link;
+					$("#by-gps-view").off("click");
+					$("#by-gps-view").removeClass("hidden").addClass("active").on("click", function(ev) {
+						window.location.href = link;
+						return false;
+					});
 				},
 				function() {
 					$("#by-gps-view").addClass("hidden");
