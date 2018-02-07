@@ -187,11 +187,10 @@
 
 	<ul id="right-menu">
 		<li id="menu-icon"> ☰ </li>
-		<li class="search caption"></li>
 		<li class="search">
 			<form>
 				<input type="text" id="search-field" />
-				<input type="button" id="search-button" value="s" />
+				<img id="search-button" src="img/ic_search_black_48dp_2x.png" />
 			</form>
 		</li>
 		<li class="day-gps-folders-view caption"></li>

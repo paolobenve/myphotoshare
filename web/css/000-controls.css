@@ -563,6 +563,14 @@ ul#right-menu li#menu-icon {
 	font-style: normal;
 }
 
+ul#right-menu img#search-button {
+	width: 1.7em;
+	height: 1.7em;
+	cursor: pointer;
+	position: relative;
+	top: 7px;
+}
+
 ul#right-menu.expand li.selected {
 	background-image: url(../img/ic_check_circle_black_24dp_1x.png);
 	background-repeat: no-repeat;
