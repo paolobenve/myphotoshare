@@ -292,6 +292,26 @@ default_media_date_reverse_sort = false
 # if set to 1, no correction is made
 min_album_thumbnail = 3
 
+# Which social icons to display
+# Possible values are:
+# - none: No share icons displayed
+# - facebook: Facebook icon
+# - twitter: Twitter icon
+# - google: Google+
+# - pinterest: Pinterest icon
+# - tumblr: Tumblr icon
+# - vk: VK icon
+# - whatsapp: Whatsapp icon
+# - buffer: Buffer icon
+# - email: Send by email
+# You can combine social sites in a list like
+# social = [facebook, email]
+social = [facebook, email]
+
+# Social colored icons or gray ones
+social_color = false
+
+
 # Google analytics id
 # it has the form UA-XXXXXXX-1
 google_analytics_id =

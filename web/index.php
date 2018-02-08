@@ -132,7 +132,7 @@
 ";
 	?>
 	<div id="social">
-		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-sm">
+		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-sm <?php if (strcasecmp($options['social_color'], "false") == 0 || $options['social_color'] == "0") { echo("ssk-grayscale"); } ?>">
 			<a href="" class="ssk ssk-facebook"></a>
 			<a href="" class="ssk ssk-whatsapp"></a>
 			<a href="" class="ssk ssk-twitter"></a>
