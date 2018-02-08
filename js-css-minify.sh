@@ -3,16 +3,16 @@
 if [ -z "$1" ]; then
 	# The script must be launched with the user's config file
 	echo
-	echo Usage: ./js-css-minify.sh MYPHOTOSHARE_CONFIG_FILE
+	echo "Usage: ./$0 MYPHOTOSHARE_CONFIG_FILE"
 	echo
-	echo Quitting
-	exit
+	echo "Quitting"
+	exit 1
 elif [ ! -f "$1" ]; then
 	echo
-	echo Error: file "$1" do not exist
+	echo "Error: file '$1' does not exist"
 	echo
-	echo Quitting
-	exit
+	echo "Quitting"
+	exit 1
 fi
 
 # Parse which minifiers to use from configuration file
