@@ -92,10 +92,49 @@ cd web/js
 echo
 echo == Minifying js files in js directory ==
 echo
+CAT_LIST=""
 rm -f *.min.js
-ls -1 *.js | grep -Ev "min.js$" | while read jsfile; do
+while read jsfile; do
 	newfile="${jsfile%.*}.min.js"
 	echo "minifying $jsfile"
+
+	# Check if minified versions are provided by the system (Debian/Ubuntu)
+	case $jsfile in
+		000-jquery-*)
+		if [ -e /usr/share/javascript/jquery/jquery.min.js ]; then
+			CAT_LIST="$CAT_LIST /usr/share/javascript/jquery/jquery.min.js"
+			echo "... Found system jquery; using it."
+			continue
+		fi
+		;;
+		
+		003-mousewheel*)
+		if [ -e /usr/share/javascript/jquery-mousewheel/jquery.mousewheel.min.js ]; then
+			CAT_LIST="$CAT_LIST /usr/share/javascript/jquery-mousewheel/jquery.mousewheel.min.js"
+			echo "... Found system jquery-mousewheel; using it."
+			continue
+		fi
+		;;
+		
+		004-fullscreen*)
+		# Currently, there is no minified library in the Debian package... So this test is
+		# be skipped and will be used in future Debian versions
+		if [ -e /usr/share/javascript/jquery-fullscreen/jquery.fullscreen.min.js ]; then
+			CAT_LIST="$CAT_LIST /usr/share/javascript/jquery-fullscreen/jquery.fullscreen.min.js"
+			echo "... Found system jquery-fullscreen; using it."
+			continue
+		fi
+
+		;;
+		005-modernizr*)
+		if [ -e /usr/share/javascript/modernizr/modernizr.min.js ]; then
+			CAT_LIST="$CAT_LIST /usr/share/javascript/modernizr/modernizr.min.js"
+			echo "... Found system modernizr; using it."
+			continue
+		fi
+		;;
+	esac
+
 	case $MINIFY_JS in
 		web_service)
 			curl -X POST -s --data-urlencode "input@$jsfile" https://javascript-minifier.com/raw > $newfile
@@ -116,12 +155,16 @@ ls -1 *.js | grep -Ev "min.js$" | while read jsfile; do
 		*)
 			echo "Unsupported Javascript minifier: $MINIFY_JS. Check option 'js_minifier' in '$CONF'"
 			echo "Doing nothing on file $jsfile"
+			newfile=$jsfile
 	esac
-done
+	CAT_LIST="$CAT_LIST $newfile"
+done << EOF
+$(ls -1 *.js | grep -Ev "min.js$")
+EOF
 
 # merge all into one single file
 rm -f scripts.min.js
-cat *.min.js > scripts.min.js
+cat $CAT_LIST > scripts.min.js
 
 
 # minify all .css-files
