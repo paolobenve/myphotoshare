@@ -429,11 +429,13 @@ class TreeWalker:
 	@staticmethod
 	def normalize_and_split(phrase):
 		# normalize the name without extension and remove the numbers
-		name = os.path.splitext(phrase)[0].replace('_', ' ').replace('-', ' ').replace('.', ' ').replace(',', ' ').replace('  ', ' ')
-		name = re.sub(r'[0-9]', '', name)
-		name = re.sub(r' +$', '', name)
-		name = re.sub(r'^ +', '', name)
-		name = name.lower()
+		name = os.path.splitext(phrase)[0]
+		# convert non-alphanumeric characters to space
+		name = "".join([c if c.isalnum() else " " for c in name])
+		# convert digits to ""
+		name = "".join(["" if c.isnumeric() else c for c in name])
+		name = name.strip().lower()
+
 		return name.split(' ')
 
 
