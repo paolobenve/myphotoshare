@@ -302,6 +302,7 @@ min_album_thumbnail = 3
 # - tumblr: Tumblr icon
 # - vk: VK icon
 # - whatsapp: Whatsapp icon
+# - linkedin: LinkedIn icon
 # - buffer: Buffer icon
 # - email: Send by email
 # You can combine social sites in a list like

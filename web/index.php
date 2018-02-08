@@ -67,6 +67,16 @@
 				echo "$linkTag\n";
 			}
 		}
+
+		// Check if an option is true or 1
+		function is_option_set($option_name) {
+			return strcasecmp($options[$option_name], "true") == 0 || $options[$option_name] == "1";
+		}
+
+		// Check if an option as a list contains a given value
+		function has_option_value($option_name, $option_value) {
+			return stristr($options[$option_name], $option_value) !== false;
+		}
 	?>
 
 	<?php if ($options['piwik_server'] && $options['piwik_id']) { ?>
@@ -131,14 +141,33 @@
 	</script>
 ";
 	?>
+	<?php var_dump($options); ?>
 	<div id="social">
-		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-sm <?php if (strcasecmp($options['social_color'], "false") == 0 || $options['social_color'] == "0") { echo("ssk-grayscale"); } ?>">
+	<?php if (!has_option_value('social', 'none')) { ?>
+		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-sm <?php if (!is_option_set('social_color')) { echo("ssk-grayscale"); } ?>">
+		<?php echo "has facebook=" . has_option_value('social', 'facebook'); if (has_option_value('social', 'facebook')) { ?>
 			<a href="" class="ssk ssk-facebook"></a>
+		<?php } if (has_option_value('social', 'whatsapp')) { ?>
 			<a href="" class="ssk ssk-whatsapp"></a>
+		<?php } if (has_option_value('social', 'twitter')) { ?>
 			<a href="" class="ssk ssk-twitter"></a>
+		<?php } if (has_option_value('social', 'google')) { ?>
 			<a href="" class="ssk ssk-google-plus"></a>
+		<?php } if (has_option_value('social', 'linkedin')) { ?>
+			<a href="" class="ssk ssk-linkedin"></a>
+		<?php } if (has_option_value('social', 'pinterest')) { ?>
+			<a href="" class="ssk ssk-pinterest"></a>
+		<?php } if (has_option_value('social', 'tumblr')) { ?>
+			<a href="" class="ssk ssk-tumblr"></a>
+		<?php } if (has_option_value('social', 'vk')) { ?>
+			<a href="" class="ssk ssk-vk"></a>
+		<?php } if (has_option_value('social', 'buffer')) { ?>
+			<a href="" class="ssk ssk-buffer"></a>
+		<?php } if (has_option_value('social', 'email')) { ?>
 			<a href="" class="ssk ssk-email"></a>
+		<?php } ?>
 		</div>
+	<?php } ?>
 	</div>
 
 	<div id="title-container">
