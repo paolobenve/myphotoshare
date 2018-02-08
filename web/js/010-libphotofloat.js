@@ -8,17 +8,17 @@
 
 	/* public member functions */
 
-	PhotoFloat.prototype.getAlbum = function(subalbum, callback, error) {
+	PhotoFloat.prototype.getAlbum = function(album, callback, error) {
 		var cacheKey, ajaxOptions, self;
 
-		if (typeof subalbum.media !== "undefined" && subalbum.media !== null) {
-			callback(subalbum);
+		if (typeof album.media !== "undefined" && album.media !== null) {
+			callback(album);
 			return;
 		}
-		if (Object.prototype.toString.call(subalbum).slice(8, -1) === "String")
-			cacheKey = subalbum;
+		if (Object.prototype.toString.call(album).slice(8, -1) === "String")
+			cacheKey = album;
 		else
-			cacheKey = subalbum.cacheBase;
+			cacheKey = album.cacheBase;
 
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
@@ -30,15 +30,15 @@
 			type: "GET",
 			dataType: "json",
 			url: cacheFile,
-			success: function(album) {
+			success: function(theAlbum) {
 				var i;
-				for (i = 0; i < album.albums.length; ++i)
-					album.albums[i].parent = album;
-				for (i = 0; i < album.media.length; ++i)
-					album.media[i].parent = album;
-				self.albumCache[cacheKey] = album;
+				for (i = 0; i < theAlbum.albums.length; ++i)
+					theAlbum.albums[i].parent = theAlbum;
+				for (i = 0; i < theAlbum.media.length; ++i)
+					theAlbum.media[i].parent = theAlbum;
+				self.albumCache[cacheKey] = theAlbum;
 
-				callback(album);
+				callback(theAlbum);
 			}
 		};
 		if (typeof error !== "undefined" && error !== null) {
