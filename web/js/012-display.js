@@ -2347,7 +2347,8 @@ $(document).ready(function() {
 	$('#search-button').on("click", function() {
 		// save current hash in order to come back there when exiting from search
 		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
-		searchTerms = $("#search-field").val().trim().replace(/ /g, '_');
+		searchTerms = $("#search-field").val().trim().replace(/  /g, ' ');
+		searchTerms = searchTerms.replace(/ /g, '_');
 		bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + searchTerms;
 		window.location.href = bySearchViewLink;
 	});

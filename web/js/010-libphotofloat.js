@@ -157,7 +157,11 @@
 			albumHash = decodeURI(albumHash);
 			if (slashCount == 0 && albumHash.indexOf(Options.by_search_string) === 0) {
 				var wordsString = albumHash.substring(Options.by_search_string.length + 1);
-				if (wordsString.indexOf('_', 1) > -1) {
+				$("ul#right-menu").addClass("expand");
+				$("ul#right-menu #search-field").attr("value", wordsString.replace(/_/g, ' '));
+				if (wordsString.indexOf('_', 1) == -1) {
+					albumHashes = [albumHash];
+				} else {
 					// there may be more words, decode
 					albumHashes = wordsString.split('_');
 					for (i = 0; i < albumHashes.length; i ++)
