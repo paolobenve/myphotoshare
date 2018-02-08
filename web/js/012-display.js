@@ -2190,16 +2190,6 @@ $(document).ready(function() {
 
 	/* Event listeners */
 
-	$(window).hashchange(function() {
-		$("#loading").show();
-		$("link[rel=image_src]").remove();
-		$("link[rel=video_src]").remove();
-		$("ul#right-menu").removeClass("expand");
-		getOptions(parseHash);
-	});
-	$(window).hashchange();
-
-
 	$(document).on('keydown', function(e) {
 		if (e.target.tagName.toLowerCase() != 'input' && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
@@ -2553,6 +2543,15 @@ $(document).ready(function() {
 		modifyMenuButtons();
 		return false;
 	});
+
+	$(window).hashchange(function() {
+		$("#loading").show();
+		$("link[rel=image_src]").remove();
+		$("link[rel=video_src]").remove();
+		$("ul#right-menu").removeClass("expand");
+		getOptions(parseHash);
+	});
+	$(window).hashchange();
 
 	$("#auth-form").submit(function() {
 		var password = $("#password");
