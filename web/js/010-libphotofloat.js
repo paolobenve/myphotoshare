@@ -22,31 +22,31 @@
 
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
-			return;
-		}
-		var cacheFile = PhotoFloat.pathJoin([Options.server_cache_path, cacheKey + ".json"]);
-		self = this;
-		ajaxOptions = {
-			type: "GET",
-			dataType: "json",
-			url: cacheFile,
-			success: function(theAlbum) {
-				var i;
-				for (i = 0; i < theAlbum.albums.length; ++i)
-					theAlbum.albums[i].parent = theAlbum;
-				for (i = 0; i < theAlbum.media.length; ++i)
-					theAlbum.media[i].parent = theAlbum;
-				self.albumCache[cacheKey] = theAlbum;
+		} else {
+			var cacheFile = PhotoFloat.pathJoin([Options.server_cache_path, cacheKey + ".json"]);
+			self = this;
+			ajaxOptions = {
+				type: "GET",
+				dataType: "json",
+				url: cacheFile,
+				success: function(theAlbum) {
+					var i;
+					for (i = 0; i < theAlbum.albums.length; ++i)
+						theAlbum.albums[i].parent = theAlbum;
+					for (i = 0; i < theAlbum.media.length; ++i)
+						theAlbum.media[i].parent = theAlbum;
+					self.albumCache[cacheKey] = theAlbum;
 
-				callback(theAlbum);
-			}
-		};
-		if (typeof error !== "undefined" && error !== null) {
-			ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
-				error(jqXHR.status);
+					callback(theAlbum);
+				}
 			};
+			if (typeof error !== "undefined" && error !== null) {
+				ajaxOptions.error = function(jqXHR, textStatus, errorThrown) {
+					error(jqXHR.status);
+				};
+			}
+			$.ajax(ajaxOptions);
 		}
-		$.ajax(ajaxOptions);
 	};
 
 	PhotoFloat.prototype.AddClickToByGpsButton = function(link) {
