@@ -4,21 +4,42 @@
 		this.albumCache = [];
 		this.geotaggedPhotosFound = null;
 		this.searchesCount = 0;
-	}
+		this.searchWords = [];
+		// expose variable
+		window.searchWords = this.searchWords;	}
 
 	/* public member functions */
 
 	PhotoFloat.prototype.getAlbum = function(album, callback, error) {
+		var self;
+		if (this.searchWords.length == 0 && album != Options.by_search_string) {
+			self = this;
+			// get search root album before every album
+			this.getAlbumSuccess(
+				Options.by_search_string,
+				function() {
+					self.getAlbumSuccess(album, callback, error)
+				},
+				error
+			);
+		} else {
+			this.getAlbumSuccess(album, callback, error);
+		}
+
+
+	};
+
+	PhotoFloat.prototype.getAlbumSuccess = function(thisAlbum, callback, error) {
 		var cacheKey, ajaxOptions, self;
 
-		if (typeof album.media !== "undefined" && album.media !== null) {
-			callback(album);
+		if (typeof thisAlbum.media !== "undefined" && thisAlbum.media !== null) {
+			callback(thisAlbum);
 			return;
 		}
-		if (Object.prototype.toString.call(album).slice(8, -1) === "String")
-			cacheKey = album;
+		if (Object.prototype.toString.call(thisAlbum).slice(8, -1) === "String")
+			cacheKey = thisAlbum;
 		else
-			cacheKey = album.cacheBase;
+			cacheKey = thisAlbum.cacheBase;
 
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
 			callback(this.albumCache[cacheKey]);
@@ -31,10 +52,17 @@
 				url: cacheFile,
 				success: function(theAlbum) {
 					var i;
-					for (i = 0; i < theAlbum.albums.length; ++i)
-						theAlbum.albums[i].parent = theAlbum;
-					for (i = 0; i < theAlbum.media.length; ++i)
-						theAlbum.media[i].parent = theAlbum;
+					if (cacheKey == Options.by_search_string) {
+						// root of search albums: build the word list
+						for (i = 0; i < theAlbum.albums.length; ++i)
+							self.searchWords.push(theAlbum.albums[i].path);
+					} else {
+						for (i = 0; i < theAlbum.albums.length; ++i)
+							theAlbum.albums[i].parent = theAlbum;
+						for (i = 0; i < theAlbum.media.length; ++i)
+							theAlbum.media[i].parent = theAlbum;
+					}
+
 					self.albumCache[cacheKey] = theAlbum;
 
 					callback(theAlbum);
@@ -47,7 +75,7 @@
 			}
 			$.ajax(ajaxOptions);
 		}
-	};
+	}
 
 	PhotoFloat.prototype.AddClickToByGpsButton = function(link) {
 		// this function returns true if the root album has the by gps subalbum

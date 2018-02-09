@@ -2330,7 +2330,18 @@ $(document).ready(function() {
 		}
 	}
 
+	function checkResult(searchTerms) {
+		var found = true;
+		var arrayWords = searchTerms.split('_');
 
+		for (var i = 0; i < arrayWords.length; i ++) {
+			if (window.searchWords.indexOf(arrayWords[i]) == -1) {
+				found = false;
+				break;
+			}
+		}
+		return found;
+	}
 
 	// binds the click events to the sort buttons
 
@@ -2339,8 +2350,10 @@ $(document).ready(function() {
 		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
 		searchTerms = $("#search-field").val().trim().replace(/  /g, ' ');
 		searchTerms = searchTerms.replace(/ /g, '_');
-		bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + searchTerms;
-		window.location.href = bySearchViewLink;
+		if (checkResult(searchTerms)) {
+			bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + searchTerms;
+			window.location.href = bySearchViewLink;
+		}
 	});
 	$('#search-field').keypress(function(ev) {
 		if (ev.which == 13) {
