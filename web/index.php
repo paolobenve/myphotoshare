@@ -9,6 +9,18 @@
 	<?php
 		$jsonString = file_get_contents('cache/options.json');
 		$options = json_decode($jsonString, true);
+
+		// Check if an option is true or 1
+		function is_option_set($option_name) {
+			global $options;
+			return strcasecmp($options[$option_name], "true") == 0 || $options[$option_name] == "1";
+		}
+
+		// Check if an option as a list contains a given value
+		function has_option_value($option_name, $option_value) {
+			global $options;
+			return stripos($options[$option_name], $option_value) !== false;
+		}
 	?>
 	<title><?php if ($options['page_title'])
 			echo $options['page_title']; ?></title>
@@ -66,16 +78,6 @@
 				$linkTag .= '>';
 				echo "$linkTag\n";
 			}
-		}
-
-		// Check if an option is true or 1
-		function is_option_set($option_name) {
-			return strcasecmp($options[$option_name], "true") == 0 || $options[$option_name] == "1";
-		}
-
-		// Check if an option as a list contains a given value
-		function has_option_value($option_name, $option_value) {
-			return stristr($options[$option_name], $option_value) !== false;
 		}
 	?>
 
@@ -141,11 +143,10 @@
 	</script>
 ";
 	?>
-	<?php var_dump($options); ?>
 	<div id="social">
 	<?php if (!has_option_value('social', 'none')) { ?>
-		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-sm <?php if (!is_option_set('social_color')) { echo("ssk-grayscale"); } ?>">
-		<?php echo "has facebook=" . has_option_value('social', 'facebook'); if (has_option_value('social', 'facebook')) { ?>
+		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center <?php switch(strtolower($options['social_size'])) { case "small": echo " ssk-xs"; break; case "large": echo " ssk-lg"; break; default: echo " ssk-sm"; } if (!is_option_set('social_color')) { echo(" ssk-grayscale"); } ?>">
+		<?php if (has_option_value('social', 'facebook')) { ?>
 			<a href="" class="ssk ssk-facebook"></a>
 		<?php } if (has_option_value('social', 'whatsapp')) { ?>
 			<a href="" class="ssk ssk-whatsapp"></a>

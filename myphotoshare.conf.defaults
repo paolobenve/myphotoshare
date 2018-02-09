@@ -295,22 +295,29 @@ min_album_thumbnail = 3
 # Which social icons to display
 # Possible values are:
 # - none: No share icons displayed
-# - facebook: Facebook icon
-# - twitter: Twitter icon
-# - google: Google+
-# - pinterest: Pinterest icon
-# - tumblr: Tumblr icon
-# - vk: VK icon
-# - whatsapp: Whatsapp icon
-# - linkedin: LinkedIn icon
-# - buffer: Buffer icon
-# - email: Send by email
-# You can combine social sites in a list like
-# social = [facebook, email]
-social = [facebook, email]
+# - facebook: Facebook icon (1)
+# - whatsapp: Whatsapp icon (2)
+# - twitter: Twitter icon (3)
+# - google: Google+ (4)
+# - linkedin: LinkedIn icon (5)
+# - pinterest: Pinterest icon (6)
+# - tumblr: Tumblr icon (7)
+# - vk: VK icon (8)
+# - buffer: Buffer icon (9)
+# - email: Send by email (10)
+# List the social icons you want to display in a string between spaces or commas.
+# The order of items in the list does not change the order the social icons are displayed (shown
+# in parenthesis in the possible values).
+social = "facebook, twitter, google, email"
 
 # Social colored icons or gray ones
 social_color = false
+
+# Social icon size
+# - small
+# - medium (Default)
+# - large
+social_size = medium
 
 
 # Google analytics id
