@@ -26,26 +26,26 @@
 			echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
-	<?php if (strcasecmp($options['debug_css'], "false") == 0 || $options['debug_css'] == "0") { ?>
+	<?php	if (strcasecmp($options['debug_css'], "false") == 0 || $options['debug_css'] == "0") { ?>
 		<link href="css/styles.min.css" rel="stylesheet" type="text/css" />
-	<?php } else { ?>
+	<?php	} else { ?>
 		<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 		<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 		<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
 		<link href="css/003-social.css" rel="stylesheet" type="text/css" />
-	<?php } ?>
-
-	<?php if (strcasecmp($options['debug_js'], "false") == 0 || $options['debug_js'] == "0") { ?>
+	<?php	}
+	
+			if (strcasecmp($options['debug_js'], "false") == 0 || $options['debug_js'] == "0") { ?>
 		<script type="text/javascript" src="js/scripts.min.js"></script>
-	<?php } else {
+	<?php	} else {
 			// Use system wide jQuery if available
 			if (file_exists("/usr/share/javascript/jquery/jquery.js")) { ?>
 		<script type="text/javascript" src="/javascript/jquery/jquery.js"></script>
 	<?php	} else { ?>
 		<script type="text/javascript" src="js/000-jquery-1.12.4.js"></script>
-	<?php	} ?>
+	<?php	}
 
-	<?php		// jQuery-hashchange should be in Debian! ?>
+		// jQuery-hashchange should be in Debian! ?>
 		<script type="text/javascript" src="js/001-hashchange.js"></script>
 
 		<script type="text/javascript" src="js/002-preloadimages.js"></script>
@@ -56,17 +56,15 @@
 		<script type="text/javascript" src="/javascript/jquery-mousewheel/jquery.mousewheel.js"></script>
 	<?php	} else { ?>
 		<script type="text/javascript" src="js/003-mousewheel.js"></script>
-	<?php	} ?>
+	<?php	}
 
-	<?php
 			// Use system wide jQuery-fullscreen if available
 			if (file_exists("/usr/share/javascript/jquery-fullscreen/jquery.fullscreen.js")) { ?>
 		<script type="text/javascript" src="/javascript/jquery-fullscreen/jquery.fullscreen.js"></script>
 	<?php	} else { ?>
 		<script type="text/javascript" src="js/004-fullscreen.js"></script>
-	<?php	} ?>
-
-	<?php
+	<?php	}
+	
 			// Use system wide modernizr if available
 			if (file_exists("/usr/share/javascript/modernizr/modernizr.min.js")) { ?>
 		<script type="text/javascript" src="/javascript/modernizr/modernizr.min.js"></script>
