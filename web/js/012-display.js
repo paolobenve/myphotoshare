@@ -2413,16 +2413,19 @@ $(document).ready(function() {
 		// save current hash in order to come back there when exiting from search
 
 		var savedLink = location.hash ? '#' + location.hash.substring(1) : "";
-		var searchTerms = $("#search-field").val().trim().replace(/  /g, ' ');
-		searchTerms = searchTerms.replace(/ /g, '_');
-		selectedSearchWords = checkResult(searchTerms)
-		if (selectedSearchWords.length > 0) {
-			$("li#no-results").addClass("hidden");
-			bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + searchTerms;
-			window.location.href = bySearchViewLink;
-		} else {
-			$("li#no-results").removeClass("hidden");
+		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
+		bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + searchTerms;
+		if (Options.search_regex)
+			bySearchViewLink += Options.cache_folder_separator + 'r'
+		else {
+			if (Options.search_inside_)
+				bySearchViewLink += Options.cache_folder_separator + 'i'
+			if (Options.search_any_word)
+				bySearchViewLink += Options.cache_folder_separator + 'a'
+			if (Options.search_case_sensitive)
+				bySearchViewLink += Options.cache_folder_separator + 'c'
 		}
+		window.location.href = bySearchViewLink;
 	});
 	$('#search-field').keypress(function(ev) {
 		if (ev.which == 13) {
