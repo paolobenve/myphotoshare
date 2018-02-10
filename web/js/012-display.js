@@ -2418,7 +2418,7 @@ $(document).ready(function() {
 		if (Options.search_regex)
 			bySearchViewLink += Options.cache_folder_separator + 'r'
 		else {
-			if (Options.search_inside_)
+			if (Options.search_inside_words)
 				bySearchViewLink += Options.cache_folder_separator + 'i'
 			if (Options.search_any_word)
 				bySearchViewLink += Options.cache_folder_separator + 'a'
