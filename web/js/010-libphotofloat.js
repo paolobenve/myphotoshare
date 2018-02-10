@@ -147,6 +147,20 @@
 		});
 	};
 
+	// PhotoFloat.prototype.union = function(a, b) {
+	// 	if (b.length > a.length) {
+	// 		// indexOf to loop over shorter
+	// 		var t;
+	// 		t = b, b = a, a = t;
+	// 	}
+	// 	return a.filter(function (e) {
+	// 		for (var i = 0; i < b.length; i ++)
+	// 			if (b[i].albumName == e.albumName)
+	// 				return true;
+	// 		return false;
+	// 	});
+	// };
+
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		// this vars are defined here and not at the beginning of the file because the options must have been read
 		PhotoFloat.foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
