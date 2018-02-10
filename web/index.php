@@ -34,7 +34,7 @@
 		<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
 		<link href="css/003-social.css" rel="stylesheet" type="text/css" />
 	<?php	}
-	
+
 			if (strcasecmp($options['debug_js'], "false") == 0 || $options['debug_js'] == "0") { ?>
 		<script type="text/javascript" src="js/scripts.min.js"></script>
 	<?php	} else {
@@ -64,7 +64,7 @@
 	<?php	} else { ?>
 		<script type="text/javascript" src="js/004-fullscreen.js"></script>
 	<?php	}
-	
+
 			// Use system wide modernizr if available
 			if (file_exists("/usr/share/javascript/modernizr/modernizr.min.js")) { ?>
 		<script type="text/javascript" src="/javascript/modernizr/modernizr.min.js"></script>
@@ -252,8 +252,8 @@
 			</form>
 		</li>
 		<li id="no-results" class="search hidden"></li>
-		<li id="all-words" class="search active"></li>
 		<li id="inside-words" class="search active"></li>
+		<li id="all-words" class="search active"></li>
 		<li id="case-sensitive" class="search active"></li>
 		<li id="regex" class="search active"></li>
 		<li class="day-gps-folders-view caption"></li>

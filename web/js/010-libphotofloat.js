@@ -57,7 +57,7 @@
 						// root of search albums: build the word list
 						for (i = 0; i < theAlbum.albums.length; ++i)
 							self.searchWords.push(theAlbum.albums[i].path);
-					} else {
+					} else if (cacheKey.indexOf(Options.by_search_string) == -1) {
 						for (i = 0; i < theAlbum.albums.length; ++i)
 							theAlbum.albums[i].parent = theAlbum;
 						for (i = 0; i < theAlbum.media.length; ++i)
@@ -203,21 +203,13 @@
 				$("ul#right-menu").addClass("expand");
 				$("ul#right-menu #search-field").attr("value", wordsString.replace(/_/g, ' '));
 				if (selectedSearchWords.length == 0) {
-					if (wordsString.indexOf('_', 1) == -1) {
-						albumHashes = [albumHash];
-					} else {
-						// there may be more words, decode
-						albumHashes = wordsString.split('_');
-						for (i = 0; i < albumHashes.length; i ++)
-							albumHashes[i] = Options.by_search_string + Options.cache_folder_separator + albumHashes[i];
-					}
+					selectedSearchWords = wordsString.split('_');
 				}
+				for (i = 0; i < selectedSearchWords.length; i ++)
+					albumHashes[i] = Options.by_search_string + Options.cache_folder_separator + selectedSearchWords[i];
 				if (Options.search_all_words) {
 					// getting the first album is enough, media that do not match the other words will be escluded later
-					albumHashes = [Options.by_search_string + Options.cache_folder_separator + selectedSearchWords[0]];
-				} else {
-					for (i = 0; i < selectedSearchWords.length; i ++)
-						albumHashes[i] = Options.by_search_string + Options.cache_folder_separator + selectedSearchWords[i];
+					albumHashes = [albumHashes[0]];
 				}
 			}
 		}
@@ -244,13 +236,13 @@
 						}
 						self.searchesCount ++;
 						if (self.searchesCount == albumHashes.length) {
-							if (Options.search_all_words) {
+							if (Options.search_all_words && albumHashes.length > 1) {
 								// we still have to filter out media that do not match the words after the first
 								var matchingMedia = [];
 								for (j = 0; j < searchResultsAlbum.media.length; j ++) {
 									for (i = 1; i < selectedSearchWords.length; i ++) {
 										if (Options.search_inside_words) {
-											if (searchResultsAlbum.media[j].albumName.indexOf(selectedSearchWords[i]) != -1) {
+											if (searchResultsAlbum.media[j].name.indexOf(selectedSearchWords[i]) != -1) {
 												matchingMedia.push(searchResultsAlbum.media[j]);
 												break;
 											}

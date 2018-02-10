@@ -433,11 +433,26 @@ $(document).ready(function() {
 
 		if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
 			$("ul#right-menu li#inside-words").removeClass("hidden");
+			$("ul#right-menu li#all-words").removeClass("hidden");
+			$("ul#right-menu li#case-sensitive").removeClass("hidden");
+			$("ul#right-menu li#regex").removeClass("hidden");
 			Options.search_inside_words ?
 				$("ul#right-menu li#inside-words").addClass("selected") :
 				$("ul#right-menu li#inside-words").removeClass("selected");
+			Options.search_all_words ?
+				$("ul#right-menu li#all-words").addClass("selected") :
+				$("ul#right-menu li#all-words").removeClass("selected");
+			Options.search_case_sensitive ?
+				$("ul#right-menu li#case-sensitive").addClass("selected") :
+				$("ul#right-menu li#case-sensitive").removeClass("selected");
+			Options.search_regex ?
+				$("ul#right-menu li#regex").addClass("selected") :
+				$("ul#right-menu li#regex").removeClass("selected");
 		} else {
 			$("ul#right-menu li#inside-words").addClass("hidden");
+			$("ul#right-menu li#all-words").addClass("hidden");
+			$("ul#right-menu li#case-sensitive").addClass("hidden");
+			$("ul#right-menu li#regex").addClass("hidden");
 		}
 	}
 
@@ -2161,15 +2176,25 @@ $(document).ready(function() {
 					if (squareMediaCookie !== null)
 						Options.media_thumb_type = squareMediaCookie;
 
+					Options.search_inside_words = false;
+					var searchInsideWordsCookie = getBooleanCookie("search_inside_words");
+					if (searchInsideWordsCookie !== null)
+						Options.search_inside_words = searchInsideWordsCookie;
+
 					Options.search_all_words = true;
-					var searchAllWordsCookie = getCookie("search_all_words");
+					var searchAllWordsCookie = getBooleanCookie("search_all_words");
 					if (searchAllWordsCookie !== null)
 						Options.search_all_words = searchAllWordsCookie;
 
-					Options.search_inside_words = false;
-					var searchInsideWordsCookie = getCookie("search_inside_words");
-					if (searchInsideWordsCookie !== null)
-						Options.search_inside_words = searchInsideWordsCookie;
+					Options.search_case_sensitive = true;
+					var searchCaseSensitiveCookie = getBooleanCookie("search_case_sensitive");
+					if (searchCaseSensitiveCookie !== null)
+						Options.search_case_sensitive = searchCaseSensitiveCookie;
+
+					Options.search_regex = true;
+					var searchRegexCookie = getBooleanCookie("search_regex");
+					if (searchRegexCookie !== null)
+						Options.search_regex = searchRegexCookie;
 
 					callback(location.hash, hashParsed, die);
 				},
@@ -2405,7 +2430,32 @@ $(document).ready(function() {
 
 	$("li#inside-words").on('click', toggleInsideWordsSearch);
 	function toggleInsideWordsSearch(ev) {
-		Options.search_inside_words ? setBooleanCookie("insideWordsSearch", true) : setBooleanCookie("insideWordsSearch", false);
+		Options.search_inside_words = ! Options.search_inside_words;
+		setBooleanCookie("search_inside_words", Options.search_inside_words);
+		modifyMenuButtons();
+		$('#search-button').click();
+	}
+
+	$("li#all-words").on('click', toggleAllWordsSearch);
+	function toggleAllWordsSearch(ev) {
+		Options.search_all_words = ! Options.search_all_words;
+		setBooleanCookie("search_all_words", Options.search_all_words);
+		modifyMenuButtons();
+		$('#search-button').click();
+	}
+
+	$("li#case-sensitive").on('click', toggleCaseSensitiveSearch);
+	function toggleCaseSensitiveSearch(ev) {
+		Options.search_case_sensitive = ! Options.search_case_sensitive;
+		setBooleanCookie("search_case_sensitive", Options.search_case_sensitive);
+		modifyMenuButtons();
+		$('#search-button').click();
+	}
+
+	$("li#regex").on('click', toggleRegexSearch);
+	function toggleRegexSearch(ev) {
+		Options.search_regex = ! Options.search_regex;
+		setBooleanCookie("search_regex", Options.search_regex);
 		modifyMenuButtons();
 		$('#search-button').click();
 	}
@@ -2455,7 +2505,7 @@ $(document).ready(function() {
 	function sortMediaByDate(ev) {
 		if (currentMedia === null && currentAlbum.media.length > 1 && currentAlbum.mediaNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			setBooleanCookie("mediaNameSortRequested", false);
-				setBooleanCookie("mediaDateReverseSortRequested", currentAlbum.mediaNameReverseSort);
+			setBooleanCookie("mediaDateReverseSortRequested", currentAlbum.mediaNameReverseSort);
 			sortAlbumsMedia();
 			modifyMenuButtons();
 			showAlbum("refreshMedia");
