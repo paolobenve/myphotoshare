@@ -284,11 +284,11 @@
 	};
 
 	PhotoFloat.isByDateAlbum = function(string) {
-		return string.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0;
+		return string == Options.by_date_string || string.indexOf(PhotoFloat.byDateStringWithTrailingSeparator) === 0;
 	};
 
 	PhotoFloat.isByGpsAlbum = function(string) {
-		return string.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0;
+		return string == Options.by_gps_string || string.indexOf(PhotoFloat.byGpsStringWithTrailingSeparator) === 0;
 	};
 
 	PhotoFloat.isFolderAlbum = function(string) {
