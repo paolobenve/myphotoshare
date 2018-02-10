@@ -1,7 +1,7 @@
 # Changelog
 
 * add options `social`, `social_size` and `social_color` for tuning display of social icons.
-* use Debian/Ubuntu system-wide JavaScript packages if available.
+* use Debian/Ubuntu system-wide JavaScript packages if available (you might need to run `sudo a2enconf javascript-common` on the server to enable the use of `/javascript` virtual directory).
 * added support for `uglifyjs` JavaScript minifier
 * new option `small_square_crops_background_color` for filling the background of small square crops
 * bug fixes
