@@ -6,7 +6,8 @@
 		this.searchesCount = 0;
 		this.searchWords = [];
 		// expose variable
-		window.searchWords = this.searchWords;	}
+		window.searchWords = this.searchWords;
+	}
 
 	/* public member functions */
 
