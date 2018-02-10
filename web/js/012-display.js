@@ -21,6 +21,8 @@ var isMobile = {
 };
 // this variable permits to take into account the real mobile device pixels when deciding the size of reduced size image which is going to be loaded
 var screenRatio = window.devicePixelRatio || 1;
+// this variable permetis to pass to libphotofloat the search albums corresponding to search
+var selectedSearchWords = [];
 
 $(document).ready(function() {
 
@@ -425,9 +427,18 @@ $(document).ready(function() {
 			$("ul#right-menu li.media-names").hasClass("hidden") &&
 			$("ul#right-menu li.square-album-thumbnails").hasClass("hidden") &&
 			$("ul#right-menu li.square-media-thumbnails").hasClass("hidden")
-		)
+		) {
 			$("ul#right-menu li.ui").addClass("hidden");
+		}
 
+		if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
+			$("ul#right-menu li#inside-words").removeClass("hidden");
+			Options.search_inside_words ?
+				$("ul#right-menu li#inside-words").addClass("selected") :
+				$("ul#right-menu li#inside-words").removeClass("selected");
+		} else {
+			$("ul#right-menu li#inside-words").addClass("hidden");
+		}
 	}
 
 	function transformAltPlaceName(altPlaceName) {
@@ -2150,6 +2161,16 @@ $(document).ready(function() {
 					if (squareMediaCookie !== null)
 						Options.media_thumb_type = squareMediaCookie;
 
+					Options.search_all_words = true;
+					var searchAllWordsCookie = getCookie("search_all_words");
+					if (searchAllWordsCookie !== null)
+						Options.search_all_words = searchAllWordsCookie;
+
+					Options.search_inside_words = false;
+					var searchInsideWordsCookie = getCookie("search_inside_words");
+					if (searchInsideWordsCookie !== null)
+						Options.search_inside_words = searchInsideWordsCookie;
+
 					callback(location.hash, hashParsed, die);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -2315,28 +2336,64 @@ $(document).ready(function() {
 	}
 
 	function checkResult(searchTerms) {
-		var found = true;
+		var found, i, j;
 		var arrayWords = searchTerms.split('_');
-
-		for (var i = 0; i < arrayWords.length; i ++) {
-			if (window.searchWords.indexOf(arrayWords[i]) == -1) {
-				found = false;
-				break;
+		var arraySearchAlbums = [];
+		if (Options.search_all_words) {
+			// AND search
+			for (i = 0; i < arrayWords.length; i ++) {
+				if (! Options.search_inside_words) {
+					if (window.searchWords.indexOf(arrayWords[i]) > -1) {
+						arraySearchAlbums.push(arrayWords[i]);
+					} else {
+						break;
+					}
+				} else {
+					// search inside words
+					for (j = 0; j < window.searchWords.length; j ++) {
+						if (window.searchWords[j].includes(arrayWords[i])) {
+							arraySearchAlbums.push(window.searchWords[j]);
+						}
+					}
+				}
+			}
+		} else {
+			// OR search
+			// still to be worked
+			found = false;
+			for (i = 0; i < arrayWords.length; i ++) {
+				if (! Options.search_inside_words && window.searchWords.indexOf(arrayWords[i]) != -1) {
+					found = true;
+					break;
+				} else if (Options.search_inside_words) {
+					for (j = 0; j < window.searchWords.length; j ++) {
+						if (window.searchWords[j].includes(arrayWords[i])) {
+							found = true;
+							break;
+						}
+					}
+				}
 			}
 		}
-		return found;
+		return arraySearchAlbums;
 	}
 
 	// binds the click events to the sort buttons
 
+	// search
 	$('#search-button').on("click", function() {
 		// save current hash in order to come back there when exiting from search
-		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
-		searchTerms = $("#search-field").val().trim().replace(/  /g, ' ');
+
+		var savedLink = location.hash ? '#' + location.hash.substring(1) : "";
+		var searchTerms = $("#search-field").val().trim().replace(/  /g, ' ');
 		searchTerms = searchTerms.replace(/ /g, '_');
-		if (checkResult(searchTerms)) {
+		selectedSearchWords = checkResult(searchTerms)
+		if (selectedSearchWords.length > 0) {
+			$("li#no-results").addClass("hidden");
 			bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + searchTerms;
 			window.location.href = bySearchViewLink;
+		} else {
+			$("li#no-results").removeClass("hidden");
 		}
 	});
 	$('#search-field').keypress(function(ev) {
@@ -2345,6 +2402,13 @@ $(document).ready(function() {
 			$('#search-button').click();
 		}
 	});
+
+	$("li#inside-words").on('click', toggleInsideWordsSearch);
+	function toggleInsideWordsSearch(ev) {
+		Options.search_inside_words ? setBooleanCookie("insideWordsSearch", true) : setBooleanCookie("insideWordsSearch", false);
+		modifyMenuButtons();
+		$('#search-button').click();
+	}
 
 	// albums
 	$("li.album-sort.by-date").on('click', sortAlbumsByDate);

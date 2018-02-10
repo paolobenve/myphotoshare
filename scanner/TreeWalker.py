@@ -443,7 +443,9 @@ class TreeWalker:
 		# add the given media to a temporary structure where media are organized by search terms
 		# works on the words in the file name and in album.ini's description, title, tags
 		words = self.normalize_and_split(media.name) + self.normalize_and_split(media.title) + self.normalize_and_split(media.description) + media.tags.split(',')
-
+		# remove empty elements
+		words = [x for x in words if x]
+		media.words = words
 		for word in words:
 			if word:
 				if word not in list(self.tree_by_search.keys()):
