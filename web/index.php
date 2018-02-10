@@ -9,29 +9,69 @@
 	<?php
 		$jsonString = file_get_contents('cache/options.json');
 		$options = json_decode($jsonString, true);
+
+		// Check if an option is true or 1
+		function is_option_set($option_name) {
+			global $options;
+			return strcasecmp($options[$option_name], "true") == 0 || $options[$option_name] == "1";
+		}
+
+		// Check if an option as a list contains a given value
+		function has_option_value($option_name, $option_value) {
+			global $options;
+			return stripos($options[$option_name], $option_value) !== false;
+		}
 	?>
 	<title><?php if ($options['page_title'])
 			echo $options['page_title']; ?></title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
-	<?php if (!$options['debug_css']) { ?>
+	<?php	if (strcasecmp($options['debug_css'], "false") == 0 || $options['debug_css'] == "0") { ?>
 		<link href="css/styles.min.css" rel="stylesheet" type="text/css" />
-	<?php } else { ?>
+	<?php	} else { ?>
 		<link href="css/000-controls.css" rel="stylesheet" type="text/css" />
 		<link href="css/001-fonts.css" rel="stylesheet" type="text/css" />
 		<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
 		<link href="css/003-social.css" rel="stylesheet" type="text/css" />
-	<?php } ?>
-
-	<?php if (!$options['debug_js']) { ?>
+	<?php	}
+	
+			if (strcasecmp($options['debug_js'], "false") == 0 || $options['debug_js'] == "0") { ?>
 		<script type="text/javascript" src="js/scripts.min.js"></script>
-	<?php } else { ?>
+	<?php	} else {
+			// Use system wide jQuery if available
+			if (file_exists("/usr/share/javascript/jquery/jquery.js")) { ?>
+		<script type="text/javascript" src="/javascript/jquery/jquery.js"></script>
+	<?php	} else { ?>
 		<script type="text/javascript" src="js/000-jquery-1.12.4.js"></script>
+	<?php	}
+
+		// jQuery-hashchange should be in Debian! ?>
 		<script type="text/javascript" src="js/001-hashchange.js"></script>
+
 		<script type="text/javascript" src="js/002-preloadimages.js"></script>
+
+	<?php
+			// Use system wide jQuery-mousewheel if available
+			if (file_exists("/usr/share/javascript/jquery-mousewheel/jquery.mousewheel.js")) { ?>
+		<script type="text/javascript" src="/javascript/jquery-mousewheel/jquery.mousewheel.js"></script>
+	<?php	} else { ?>
 		<script type="text/javascript" src="js/003-mousewheel.js"></script>
+	<?php	}
+
+			// Use system wide jQuery-fullscreen if available
+			if (file_exists("/usr/share/javascript/jquery-fullscreen/jquery.fullscreen.js")) { ?>
+		<script type="text/javascript" src="/javascript/jquery-fullscreen/jquery.fullscreen.js"></script>
+	<?php	} else { ?>
 		<script type="text/javascript" src="js/004-fullscreen.js"></script>
+	<?php	}
+	
+			// Use system wide modernizr if available
+			if (file_exists("/usr/share/javascript/modernizr/modernizr.min.js")) { ?>
+		<script type="text/javascript" src="/javascript/modernizr/modernizr.min.js"></script>
+	<?php	} else { ?>
 		<script type="text/javascript" src="js/005-modernizr.js"></script>
+	<?php	} ?>
+
 		<script type="text/javascript" src="js/008-social.js"></script>
 		<script type="text/javascript" src="js/009-translations.js"></script>
 		<script type="text/javascript" src="js/010-libphotofloat.js"></script>
@@ -132,13 +172,31 @@
 ";
 	?>
 	<div id="social">
-		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center ssk-sm">
+	<?php if (!has_option_value('social', 'none')) { ?>
+		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center <?php switch(strtolower($options['social_size'])) { case "small": echo " ssk-xs"; break; case "large": echo " ssk-lg"; break; default: echo " ssk-sm"; } if (!is_option_set('social_color')) { echo(" ssk-grayscale"); } ?>">
+		<?php if (has_option_value('social', 'facebook')) { ?>
 			<a href="" class="ssk ssk-facebook"></a>
+		<?php } if (has_option_value('social', 'whatsapp')) { ?>
 			<a href="" class="ssk ssk-whatsapp"></a>
+		<?php } if (has_option_value('social', 'twitter')) { ?>
 			<a href="" class="ssk ssk-twitter"></a>
+		<?php } if (has_option_value('social', 'google')) { ?>
 			<a href="" class="ssk ssk-google-plus"></a>
+		<?php } if (has_option_value('social', 'linkedin')) { ?>
+			<a href="" class="ssk ssk-linkedin"></a>
+		<?php } if (has_option_value('social', 'pinterest')) { ?>
+			<a href="" class="ssk ssk-pinterest"></a>
+		<?php } if (has_option_value('social', 'tumblr')) { ?>
+			<a href="" class="ssk ssk-tumblr"></a>
+		<?php } if (has_option_value('social', 'vk')) { ?>
+			<a href="" class="ssk ssk-vk"></a>
+		<?php } if (has_option_value('social', 'buffer')) { ?>
+			<a href="" class="ssk ssk-buffer"></a>
+		<?php } if (has_option_value('social', 'email')) { ?>
 			<a href="" class="ssk ssk-email"></a>
+		<?php } ?>
 		</div>
+	<?php } ?>
 	</div>
 
 	<div id="title-container">
