@@ -207,7 +207,7 @@
 				}
 				for (i = 0; i < selectedSearchWords.length; i ++)
 					albumHashes[i] = Options.by_search_string + Options.cache_folder_separator + selectedSearchWords[i];
-				if (Options.search_all_words) {
+				if (! Options.search_any_word) {
 					// getting the first album is enough, media that do not match the other words will be escluded later
 					albumHashes = [albumHashes[0]];
 				}
@@ -236,7 +236,7 @@
 						}
 						self.searchesCount ++;
 						if (self.searchesCount == albumHashes.length) {
-							if (Options.search_all_words && albumHashes.length > 1) {
+							if (! Options.search_any_word && albumHashes.length > 1) {
 								// we still have to filter out media that do not match the words after the first
 								var matchingMedia = [];
 								for (j = 0; j < searchResultsAlbum.media.length; j ++) {

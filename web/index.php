@@ -253,7 +253,7 @@
 		</li>
 		<li id="no-results" class="search hidden"></li>
 		<li id="inside-words" class="search active"></li>
-		<li id="all-words" class="search active"></li>
+		<li id="any-word" class="search"></li>
 		<li id="case-sensitive" class="search active"></li>
 		<li id="regex" class="search active"></li>
 		<li class="day-gps-folders-view caption"></li>

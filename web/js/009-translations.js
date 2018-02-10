@@ -41,7 +41,7 @@ var translations =
 			"#by-date-view": "by date",
 			"#by-gps-view": "by location",
 			"#folders-view": "by album",
-			"#all-words": "all words",
+			"#any-word": "any word",
 			"#no-results": "no result",
 			"#inside-words": "inside words",
 			"#case-sensitive": "case sentitive",

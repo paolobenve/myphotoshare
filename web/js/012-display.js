@@ -433,15 +433,15 @@ $(document).ready(function() {
 
 		if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
 			$("ul#right-menu li#inside-words").removeClass("hidden");
-			$("ul#right-menu li#all-words").removeClass("hidden");
+			$("ul#right-menu li#any-word").removeClass("hidden");
 			$("ul#right-menu li#case-sensitive").removeClass("hidden");
 			$("ul#right-menu li#regex").removeClass("hidden");
 			Options.search_inside_words ?
 				$("ul#right-menu li#inside-words").addClass("selected") :
 				$("ul#right-menu li#inside-words").removeClass("selected");
-			Options.search_all_words ?
-				$("ul#right-menu li#all-words").addClass("selected") :
-				$("ul#right-menu li#all-words").removeClass("selected");
+			Options.search_any_word ?
+				$("ul#right-menu li#any-word").addClass("selected") :
+				$("ul#right-menu li#any-word").removeClass("selected");
 			Options.search_case_sensitive ?
 				$("ul#right-menu li#case-sensitive").addClass("selected") :
 				$("ul#right-menu li#case-sensitive").removeClass("selected");
@@ -450,7 +450,7 @@ $(document).ready(function() {
 				$("ul#right-menu li#regex").removeClass("selected");
 		} else {
 			$("ul#right-menu li#inside-words").addClass("hidden");
-			$("ul#right-menu li#all-words").addClass("hidden");
+			$("ul#right-menu li#any-word").addClass("hidden");
 			$("ul#right-menu li#case-sensitive").addClass("hidden");
 			$("ul#right-menu li#regex").addClass("hidden");
 		}
@@ -2181,10 +2181,10 @@ $(document).ready(function() {
 					if (searchInsideWordsCookie !== null)
 						Options.search_inside_words = searchInsideWordsCookie;
 
-					Options.search_all_words = true;
-					var searchAllWordsCookie = getBooleanCookie("search_all_words");
-					if (searchAllWordsCookie !== null)
-						Options.search_all_words = searchAllWordsCookie;
+					Options.search_any_word = true;
+					var searchAnyWordCookie = getBooleanCookie("search_any_word");
+					if (searchAnyWordCookie !== null)
+						Options.search_any_word = searchAnyWordCookie;
 
 					Options.search_case_sensitive = true;
 					var searchCaseSensitiveCookie = getBooleanCookie("search_case_sensitive");
@@ -2364,7 +2364,7 @@ $(document).ready(function() {
 		var found, i, j;
 		var arrayWords = searchTerms.split('_');
 		var arraySearchAlbums = [];
-		if (Options.search_all_words) {
+		if (! Options.search_any_word) {
 			// AND search
 			for (i = 0; i < arrayWords.length; i ++) {
 				if (! Options.search_inside_words) {
@@ -2436,10 +2436,10 @@ $(document).ready(function() {
 		$('#search-button').click();
 	}
 
-	$("li#all-words").on('click', toggleAllWordsSearch);
-	function toggleAllWordsSearch(ev) {
-		Options.search_all_words = ! Options.search_all_words;
-		setBooleanCookie("search_all_words", Options.search_all_words);
+	$("li#any-word").on('click', toggleAnyWordSearch);
+	function toggleAnyWordSearch(ev) {
+		Options.search_any_word = ! Options.search_any_word;
+		setBooleanCookie("search_any_word", Options.search_any_word);
 		modifyMenuButtons();
 		$('#search-button').click();
 	}
