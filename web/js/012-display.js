@@ -2362,22 +2362,25 @@ $(document).ready(function() {
 
 	function checkResult(searchTerms) {
 		var found, i, j;
-		var arrayWords = searchTerms.split('_');
+		var arrayWordsFromUser = searchTerms.split(' ');
 		var arraySearchAlbums = [];
 		if (! Options.search_any_word) {
 			// AND search
-			for (i = 0; i < arrayWords.length; i ++) {
+			for (i = 0; i < arrayWordsFromUser.length; i ++) {
 				if (! Options.search_inside_words) {
-					if (window.searchWords.indexOf(arrayWords[i]) > -1) {
-						arraySearchAlbums.push(arrayWords[i]);
+					if (window.searchWordsFromJsonFile.indexOf(arrayWordsFromUser[i]) > -1) {
+						arraySearchAlbums.push(arrayWordsFromUser[i]);
 					} else {
 						break;
 					}
 				} else {
 					// search inside words
-					for (j = 0; j < window.searchWords.length; j ++) {
-						if (window.searchWords[j].includes(arrayWords[i])) {
-							arraySearchAlbums.push(window.searchWords[j]);
+					found = false;
+					for (j = 0; j < window.searchWordsFromJsonFile.length; j ++) {
+						if (window.searchWordsFromJsonFile[j].includes(arrayWordsFromUser[i])) {
+
+						} else {
+							found = false;
 						}
 					}
 				}
@@ -2386,13 +2389,13 @@ $(document).ready(function() {
 			// OR search
 			// still to be worked
 			found = false;
-			for (i = 0; i < arrayWords.length; i ++) {
-				if (! Options.search_inside_words && window.searchWords.indexOf(arrayWords[i]) != -1) {
-					found = true;
-					break;
+			for (i = 0; i < arrayWordsFromUser.length; i ++) {
+				if (! Options.search_inside_words) {
+					if (window.searchWordsFromJsonFile.indexOf(arrayWordsFromUser[i]) > -1)
+						arraySearchAlbums.push(arrayWordsFromUser[i]);
 				} else if (Options.search_inside_words) {
-					for (j = 0; j < window.searchWords.length; j ++) {
-						if (window.searchWords[j].includes(arrayWords[i])) {
+					for (j = 0; j < window.searchWordsFromJsonFile.length; j ++) {
+						if (window.searchWordsFromJsonFile[j].includes(arrayWordsFromUser[i])) {
 							found = true;
 							break;
 						}

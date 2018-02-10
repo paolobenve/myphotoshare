@@ -4,16 +4,16 @@
 		this.albumCache = [];
 		this.geotaggedPhotosFound = null;
 		this.searchesCount = 0;
-		this.searchWords = [];
+		this.searchWordsFromJsonFile = [];
 		// expose variable
-		window.searchWords = this.searchWords;
+		window.searchWordsFromJsonFile = this.searchWordsFromJsonFile;
 	}
 
 	/* public member functions */
 
 	PhotoFloat.prototype.getAlbum = function(album, callback, error) {
 		var self;
-		if (this.searchWords.length == 0 && album != Options.by_search_string) {
+		if (this.searchWordsFromJsonFile.length == 0 && album != Options.by_search_string) {
 			self = this;
 			// get search root album before every album
 			this.getAlbumSuccess(
@@ -56,7 +56,7 @@
 					if (cacheKey == Options.by_search_string) {
 						// root of search albums: build the word list
 						for (i = 0; i < theAlbum.albums.length; ++i)
-							self.searchWords.push(theAlbum.albums[i].path);
+							self.searchWordsFromJsonFile.push(theAlbum.albums[i].path);
 					} else if (cacheKey.indexOf(Options.by_search_string) == -1) {
 						for (i = 0; i < theAlbum.albums.length; ++i)
 							theAlbum.albums[i].parent = theAlbum;
