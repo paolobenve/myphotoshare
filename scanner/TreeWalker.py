@@ -434,7 +434,7 @@ class TreeWalker:
 		name = "".join([c if c.isalnum() else " " for c in name])
 		# convert digits to ""
 		name = "".join(["" if c.isnumeric() else c for c in name])
-		name = name.strip().lower()
+		name = name.strip()
 
 		return name.split(' ')
 
