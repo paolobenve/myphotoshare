@@ -41,15 +41,16 @@ show_faces = false
 
 # CSS minifier
 # permitted values:
-#    web_service : https://cssminifier.com/ (Default)
-#    cssmin : cssmin (https://github.com/zacharyvoase/cssmin)
+#    web_service : https://cssminifier.com/
+#    cssmin : cssmin (https://github.com/zacharyvoase/cssmin) (Default)
 css_minifier = cssmin
 
 # JavaScript minifier
 # permitted values:
-#    web_service : https://javascript-minifier.com/ (Default)
+#    web_service : https://javascript-minifier.com/
 #    jsmin2 : python-jsmin (https://github.com/tikitu/jsmin)
-#    jsmin3 : python3-jsmin (https://github.com/tikitu/jsmin)
+#    jsmin3 : python3-jsmin (https://github.com/tikitu/jsmin) (Default)
+#    uglifyjs: node-uglify (http://lisperator.net/uglifyjs/)
 js_minifier = jsmin3
 
 

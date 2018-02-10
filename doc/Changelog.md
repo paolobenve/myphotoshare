@@ -1,5 +1,7 @@
 # Changelog
 
+* use Debian/Ubuntu system-wide JavaScript packages if available.
+* added support for `uglifyjs` JavaScript minifier
 * new option `small_square_crops_background_color` for filling the background of small square crops
 * bug fixes
 * new debug option `show_faces`: lets the scanner show the faces detected (but read the note in `myphotoshare.conf.default`)
