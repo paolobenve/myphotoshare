@@ -21,8 +21,6 @@ var isMobile = {
 };
 // this variable permits to take into account the real mobile device pixels when deciding the size of reduced size image which is going to be loaded
 var screenRatio = window.devicePixelRatio || 1;
-// this variable permetis to pass to libphotofloat the search albums corresponding to search
-var selectedSearchWords = [];
 
 $(document).ready(function() {
 
@@ -357,7 +355,7 @@ $(document).ready(function() {
 
 		$("ul#right-menu li.ui").removeClass("hidden");
 
-		if (currentMedia !== null || currentAlbum.albums.length == 0) {
+		if (currentMedia !== null || currentAlbum !== null && currentAlbum.albums.length == 0) {
 			$("ul#right-menu li.slide").addClass("hidden");
 		} else {
 			$("ul#right-menu li.slide").removeClass("hidden");
@@ -366,7 +364,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.slide").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum.albums.length <= 1 && currentAlbum.media.length <= 1) {
+		if (currentMedia !== null || currentAlbum !== null && currentAlbum.albums.length <= 1 && currentAlbum.media.length <= 1) {
 			$("ul#right-menu li.spaced").addClass("hidden");
 		} else {
 			$("ul#right-menu li.spaced").removeClass("hidden");
@@ -374,7 +372,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.spaced").addClass("selected") :
 				$("ul#right-menu li.spaced").removeClass("selected");
 		}
-		if (currentMedia !== null || currentAlbum.albums.length == 0) {
+		if (currentMedia !== null || currentAlbum !== null && currentAlbum.albums.length == 0) {
 			$("ul#right-menu li.square-album-thumbnails").addClass("hidden");
 		} else {
 			$("ul#right-menu li.square-album-thumbnails").removeClass("hidden");
@@ -383,7 +381,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.square-album-thumbnails").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
+		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase))) {
 			$("ul#right-menu li.album-names").addClass("hidden");
 		} else {
 			$("ul#right-menu li.album-names").removeClass("hidden");
@@ -392,7 +390,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.album-names").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
+		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase))) {
 			$("ul#right-menu li.media-count").addClass("hidden");
 		} else {
 			$("ul#right-menu li.media-count").removeClass("hidden");
@@ -401,7 +399,12 @@ $(document).ready(function() {
 				$("ul#right-menu li.media-count").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
+		if (
+			currentMedia !== null ||
+			currentAlbum !== null && (
+				currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold
+			)
+		) {
 			$("ul#right-menu li.media-names").addClass("hidden");
 		} else {
 			$("ul#right-menu li.media-names").removeClass("hidden");
@@ -410,7 +413,12 @@ $(document).ready(function() {
 				$("ul#right-menu li.media-names").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
+		if (
+			currentMedia !== null ||
+			currentAlbum !== null && (
+				currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold
+			)
+		) {
 			$("ul#right-menu li.square-media-thumbnails").addClass("hidden");
 		} else {
 			$("ul#right-menu li.square-media-thumbnails").removeClass("hidden");
@@ -431,23 +439,35 @@ $(document).ready(function() {
 			$("ul#right-menu li.ui").addClass("hidden");
 		}
 
-		if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
+		if (
+			currentAlbum !== null && PhotoFloat.isSearchAlbum(currentAlbum.cacheBase) ||
+			Options.search_regex ||
+			Options.search_inside_words ||
+			Options.search_any_word ||
+			Options.search_case_sensitive ||
+			! $("ul#right-menu li#no-results").hasClass("hidden")
+		) {
 			$("ul#right-menu li#inside-words").removeClass("hidden");
 			$("ul#right-menu li#any-word").removeClass("hidden");
 			$("ul#right-menu li#case-sensitive").removeClass("hidden");
 			$("ul#right-menu li#regex").removeClass("hidden");
-			Options.search_inside_words ?
-				$("ul#right-menu li#inside-words").addClass("selected") :
-				$("ul#right-menu li#inside-words").removeClass("selected");
-			Options.search_any_word ?
-				$("ul#right-menu li#any-word").addClass("selected") :
-				$("ul#right-menu li#any-word").removeClass("selected");
-			Options.search_case_sensitive ?
-				$("ul#right-menu li#case-sensitive").addClass("selected") :
-				$("ul#right-menu li#case-sensitive").removeClass("selected");
-			Options.search_regex ?
-				$("ul#right-menu li#regex").addClass("selected") :
+			if (Options.search_regex) {
+				$("ul#right-menu li#regex").addClass("selected");
+				$("ul#right-menu li#inside-words").addClass("hidden");
+				$("ul#right-menu li#any-word").addClass("hidden");
+				$("ul#right-menu li#case-sensitive").addClass("hidden");
+			} else {
 				$("ul#right-menu li#regex").removeClass("selected");
+				Options.search_inside_words ?
+					$("ul#right-menu li#inside-words").addClass("selected") :
+					$("ul#right-menu li#inside-words").removeClass("selected");
+				Options.search_any_word ?
+					$("ul#right-menu li#any-word").addClass("selected") :
+					$("ul#right-menu li#any-word").removeClass("selected");
+				Options.search_case_sensitive ?
+					$("ul#right-menu li#case-sensitive").addClass("selected") :
+					$("ul#right-menu li#case-sensitive").removeClass("selected");
+			}
 		} else {
 			$("ul#right-menu li#inside-words").addClass("hidden");
 			$("ul#right-menu li#any-word").addClass("hidden");
@@ -2181,17 +2201,17 @@ $(document).ready(function() {
 					if (searchInsideWordsCookie !== null)
 						Options.search_inside_words = searchInsideWordsCookie;
 
-					Options.search_any_word = true;
+					Options.search_any_word = false;
 					var searchAnyWordCookie = getBooleanCookie("search_any_word");
 					if (searchAnyWordCookie !== null)
 						Options.search_any_word = searchAnyWordCookie;
 
-					Options.search_case_sensitive = true;
+					Options.search_case_sensitive = false;
 					var searchCaseSensitiveCookie = getBooleanCookie("search_case_sensitive");
 					if (searchCaseSensitiveCookie !== null)
 						Options.search_case_sensitive = searchCaseSensitiveCookie;
 
-					Options.search_regex = true;
+					Options.search_regex = false;
 					var searchRegexCookie = getBooleanCookie("search_regex");
 					if (searchRegexCookie !== null)
 						Options.search_regex = searchRegexCookie;
@@ -2360,52 +2380,6 @@ $(document).ready(function() {
 		}
 	}
 
-	function checkResult(searchTerms) {
-		var found, i, j;
-		var arrayWordsFromUser = searchTerms.split(' ');
-		var arraySearchAlbums = [];
-		if (! Options.search_any_word) {
-			// AND search
-			for (i = 0; i < arrayWordsFromUser.length; i ++) {
-				if (! Options.search_inside_words) {
-					if (window.searchWordsFromJsonFile.indexOf(arrayWordsFromUser[i]) > -1) {
-						arraySearchAlbums.push(arrayWordsFromUser[i]);
-					} else {
-						break;
-					}
-				} else {
-					// search inside words
-					found = false;
-					for (j = 0; j < window.searchWordsFromJsonFile.length; j ++) {
-						if (window.searchWordsFromJsonFile[j].includes(arrayWordsFromUser[i])) {
-
-						} else {
-							found = false;
-						}
-					}
-				}
-			}
-		} else {
-			// OR search
-			// still to be worked
-			found = false;
-			for (i = 0; i < arrayWordsFromUser.length; i ++) {
-				if (! Options.search_inside_words) {
-					if (window.searchWordsFromJsonFile.indexOf(arrayWordsFromUser[i]) > -1)
-						arraySearchAlbums.push(arrayWordsFromUser[i]);
-				} else if (Options.search_inside_words) {
-					for (j = 0; j < window.searchWordsFromJsonFile.length; j ++) {
-						if (window.searchWordsFromJsonFile[j].includes(arrayWordsFromUser[i])) {
-							found = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-		return arraySearchAlbums;
-	}
-
 	// binds the click events to the sort buttons
 
 	// search
@@ -2414,7 +2388,7 @@ $(document).ready(function() {
 
 		var savedLink = location.hash ? '#' + location.hash.substring(1) : "";
 		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
-		bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator + searchTerms;
+		bySearchViewLink = "#!/" + Options.by_search_string;
 		if (Options.search_regex)
 			bySearchViewLink += Options.cache_folder_separator + 'r'
 		else {
@@ -2425,6 +2399,7 @@ $(document).ready(function() {
 			if (Options.search_case_sensitive)
 				bySearchViewLink += Options.cache_folder_separator + 'c'
 		}
+		bySearchViewLink += Options.cache_folder_separator + searchTerms;
 		window.location.href = bySearchViewLink;
 	});
 	$('#search-field').keypress(function(ev) {
@@ -2439,7 +2414,8 @@ $(document).ready(function() {
 		Options.search_inside_words = ! Options.search_inside_words;
 		setBooleanCookie("search_inside_words", Options.search_inside_words);
 		modifyMenuButtons();
-		$('#search-button').click();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
 	}
 
 	$("li#any-word").on('click', toggleAnyWordSearch);
@@ -2447,7 +2423,8 @@ $(document).ready(function() {
 		Options.search_any_word = ! Options.search_any_word;
 		setBooleanCookie("search_any_word", Options.search_any_word);
 		modifyMenuButtons();
-		$('#search-button').click();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
 	}
 
 	$("li#case-sensitive").on('click', toggleCaseSensitiveSearch);
@@ -2455,7 +2432,8 @@ $(document).ready(function() {
 		Options.search_case_sensitive = ! Options.search_case_sensitive;
 		setBooleanCookie("search_case_sensitive", Options.search_case_sensitive);
 		modifyMenuButtons();
-		$('#search-button').click();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
 	}
 
 	$("li#regex").on('click', toggleRegexSearch);
@@ -2463,7 +2441,8 @@ $(document).ready(function() {
 		Options.search_regex = ! Options.search_regex;
 		setBooleanCookie("search_regex", Options.search_regex);
 		modifyMenuButtons();
-		$('#search-button').click();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
 	}
 
 	// albums
