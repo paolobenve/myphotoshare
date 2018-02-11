@@ -254,11 +254,11 @@
 												} else {
 													// not inside words
 													if (
-														Options.search_case_sensitive &&
-														// see https://stackoverflow.com/questions/38811421/check-if-an-array-is-subset-of-another-array
-														SearchWordsFromUser.every(val => searchResultsAlbumFinal.media[k].words.indexOf(val) >= 0) ||
 														! Options.search_case_sensitive &&
-														PhotoFloat.arrayToLowerCase(SearchWordsFromUser).every(val => PhotoFloat.arrayToLowerCase(searchResultsAlbumFinal.media[k].words).indexOf(val) >= 0)
+														// see https://stackoverflow.com/questions/38811421/check-if-an-array-is-subset-of-another-array
+														SearchWordsFromUser.every(val => PhotoFloat.arrayToLowerCase(searchResultsAlbumFinal.media[k].words).indexOf(val) >= 0) ||
+														Options.search_case_sensitive &&
+														SearchWordsFromUser.every(val => searchResultsAlbumFinal.media[k].words.indexOf(val) >= 0)
 													) {
 														matchingMedia.push(searchResultsAlbumFinal.media[k]);
 													}
@@ -330,7 +330,10 @@
 		}
 		return a.filter(function (e) {
 			for (var i = 0; i < b.length; i ++)
-				if (b[i].albumName == e.albumName)
+				if (
+					Options.search_case_sensitive && b[i].albumName == e.albumName ||
+					! Options.search_case_sensitive && b[i].albumName.toLowerCase() == e.albumName.toLowerCase()
+				)
 					return true;
 			return false;
 		});
@@ -341,7 +344,8 @@
 		for (var i = 0; i < b.length; i ++)
 			if (! a.some(
 				function (e) {
-					return b[i].albumName == e.albumName;
+					Options.search_case_sensitive && b[i].albumName == e.albumName ||
+					! Options.search_case_sensitive && b[i].albumName.toLowerCase() == e.albumName.toLowerCase()
 				})
 			)
 				union.push(b[i]);
