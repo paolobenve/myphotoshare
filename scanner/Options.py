@@ -36,7 +36,8 @@ options_requiring_thumbnails_regeneration = ['face_cascade_scale_factor', 'small
 # json_version = 1 since ...
 # json_version = 2 since checksums have been added
 # json_version = 3 since geotag managing is optional
-json_version = 3
+# json_version = 4 since search feature added
+json_version = 4
 
 
 def get_options():
