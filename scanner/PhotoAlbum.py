@@ -10,6 +10,7 @@ import os
 import os.path
 import tempfile
 import hashlib
+import unicodedata
 import sys
 from datetime import datetime
 from pprint import pprint
@@ -28,7 +29,7 @@ except ImportError:
 import math
 import numpy as np
 
-from CachePath import remove_album_path, remove_folders_marker, trim_base_custom, checksum, cache_base, thumbnail_types_and_sizes, file_mtime, photo_cache_name, video_cache_name, find, find_in_usr_share
+from CachePath import remove_album_path, remove_folders_marker, trim_base_custom, checksum, thumbnail_types_and_sizes, file_mtime, photo_cache_name, video_cache_name, find, find_in_usr_share
 from Utilities import message, next_level, back_level
 from Geonames import Geonames
 from PIL import Image
@@ -372,6 +373,46 @@ class Album(object):
 				return media
 		return None
 
+	def generate_cache_base(self, subalbum_or_media_path, media_file_name=None):
+		# this method calculate the cache base for a subalbum or a media in self album
+		# for a media, the parameter media_file_name has to be given; in this case subalbum_or_media_path is the media file name without any path info
+		# result only has ascii characters
+
+		# respect alphanumeric characters, substitute non-alphanumeric (but not slashes) with underscore
+		subalbum_or_media_path = "".join([c if c.isalnum() or c == '/' else "_" for c in subalbum_or_media_path])
+
+		# convert slashes
+		subalbum_or_media_path = subalbum_or_media_path.replace('/', Options.config['cache_folder_separator']).lower()
+
+		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
+		subalbum_or_media_path = ''.join(c for c in unicodedata.normalize('NFD', subalbum_or_media_path) if unicodedata.category(c) != 'Mn')
+
+		while subalbum_or_media_path.find("__") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace("__", "_")
+		while subalbum_or_media_path.find("-_") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace('-_', '-')
+		while subalbum_or_media_path.find("_-") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace('_-', '-')
+		while subalbum_or_media_path.find("--") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace("--", "-")
+
+		if media_file_name is None and hasattr(self, "albums_list") or media_file_name is not None and hasattr(self, "media_list"):
+			# let's avoid that different album/media with equivalent names have the same cache base
+			distinguish_suffix = 0
+			while True:
+				_path = subalbum_or_media_path
+				if distinguish_suffix:
+					_path += "_" + str(distinguish_suffix)
+				if (
+					media_file_name is None     and any(_path == _album.cache_base and self.absolute_path != _album.absolute_path   for _album in self.albums_list) or
+					media_file_name is not None and any(_path == _media.cache_base and media_file_name    != _media.media_file_name for _media in self.media_list)
+				):
+					distinguish_suffix += 1
+				else:
+					subalbum_or_media_path = _path
+					break
+
+		return subalbum_or_media_path
 
 class Media(object):
 	def __init__(self, album, media_path, thumbs_path=None, attributes=None):
@@ -380,6 +421,7 @@ class Media(object):
 		dirname = os.path.dirname(media_path)
 		self.folders = remove_album_path(dirname)
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
+		self.cache_base = album.generate_cache_base(trim_base_custom(media_path, album.absolute_path), self.media_file_name)
 
 		self.is_valid = True
 
@@ -420,19 +462,6 @@ class Media(object):
 		self._attributes["dateTimeFile"] = mtime
 		self._attributes["dateTimeDir"] = dir_mtime
 		self._attributes["mediaType"] = "photo"
-		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
-
-		# let's avoid that different media names have the same cache base
-		distinguish_suffix = 0
-		while True:
-			_cache_base = self.cache_base
-			if distinguish_suffix:
-				_cache_base += "_" + str(distinguish_suffix)
-			if any(_cache_base == _media.cache_base and self.media_file_name != _media.media_file_name for _media in album.media_list):
-				distinguish_suffix += 1
-			else:
-				self.cache_base = _cache_base
-				break
 
 		try:
 			image = Image.open(media_path)
@@ -1660,10 +1689,10 @@ class Media(object):
 		# media["yearAlbum"] = self.year_album_path
 		# media["monthAlbum"] = self.month_album_path
 		media["dayAlbum"] = self.day_album_path
-		media["dayAlbumCacheBase"] = cache_base(self.day_album_path, True)
+		media["dayAlbumCacheBase"] = self.day_album_cache_base
 		if self.gps_album_path:
 			media["gpsAlbum"] = self.gps_album_path
-			media["gpsAlbumCacheBase"] = cache_base(self.gps_album_path, True)
+			media["gpsAlbumCacheBase"] = self.gps_album_cache_base
 		media["words"] = self.words
 		if Options.config['checksum']:
 			media["checksum"] = checksum(os.path.join(Options.config['album_path'], self.media_file_name))

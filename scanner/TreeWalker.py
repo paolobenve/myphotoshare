@@ -8,11 +8,12 @@ import re
 import time
 import random
 import math
+import unicodedata
 from datetime import datetime
 
 from PIL import Image
 
-from CachePath import cache_base, remove_album_path, file_mtime, trim_base_custom, remove_folders_marker
+from CachePath import remove_album_path, file_mtime, trim_base_custom, remove_folders_marker
 from Utilities import message, next_level, back_level, report_times
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from Geonames import Geonames
@@ -51,10 +52,9 @@ class TreeWalker:
 
 		self.origin_album = Album(Options.config['album_path'])
 		# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parente of the root physical tree and of the virtual albums
-		self.origin_album.cache_base = cache_base(Options.config['album_path'])
-		album_cache_base = Options.config['folders_string']
+		self.origin_album.cache_base = "root"
 		next_level()
-		[folders_album, num, _] = self.walk(Options.config['album_path'], album_cache_base, self.origin_album)
+		[folders_album, num, _] = self.walk(Options.config['album_path'], Options.config['folders_string'], self.origin_album)
 		back_level()
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
@@ -124,20 +124,20 @@ class TreeWalker:
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		by_date_album.parent = origin_album
-		by_date_album.cache_base = cache_base(by_date_path)
+		by_date_album.cache_base = Options.config['by_date_string']
 		by_date_max_file_date = None
 		for year, _ in self.tree_by_date.items():
 			year_path = os.path.join(by_date_path, str(year))
 			year_album = Album(year_path)
 			year_album.parent = by_date_album
-			year_album.cache_base = cache_base(year_path)
+			year_album.cache_base = by_date_album.cache_base + Options.config['cache_folder_separator'] + year
 			year_max_file_date = None
 			by_date_album.add_album(year_album)
 			for month, _ in self.tree_by_date[year].items():
 				month_path = os.path.join(year_path, str(month))
 				month_album = Album(month_path)
 				month_album.parent = year_album
-				month_album.cache_base = cache_base(month_path)
+				month_album.cache_base = year_album.cache_base + Options.config['cache_folder_separator'] + month
 				month_max_file_date = None
 				year_album.add_album(month_album)
 				for day, media in self.tree_by_date[year][month].items():
@@ -145,10 +145,11 @@ class TreeWalker:
 					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
 					day_album.parent = month_album
-					day_album.cache_base = cache_base(day_path)
+					day_album.cache_base = month_album.cache_base + Options.config['cache_folder_separator'] + day
 					day_max_file_date = None
 					month_album.add_album(day_album)
 					for single_media in media:
+						single_media.day_album_cache_base = day_album.cache_base
 						day_album.add_media(single_media)
 						day_album.num_media_in_sub_tree += 1
 						day_album.num_media_in_album += 1
@@ -197,7 +198,7 @@ class TreeWalker:
 		by_search_path = os.path.join(Options.config['album_path'], Options.config['by_search_string'])
 		by_search_album = Album(by_search_path)
 		by_search_album.parent = origin_album
-		by_search_album.cache_base = cache_base(by_search_path)
+		by_search_album.cache_base = Options.config['by_search_string']
 		by_search_max_file_date = None
 		message("working with word albums...", "", 5)
 		for word, media in self.tree_by_search.items():
@@ -206,7 +207,7 @@ class TreeWalker:
 			word_path = os.path.join(by_search_path, str(word))
 			word_album = Album(word_path)
 			word_album.parent = by_search_album
-			word_album.cache_base = cache_base(word_path)
+			word_album.cache_base = by_search_album.generate_cache_base(os.path.join(by_search_album.cache_base, word))
 			word_max_file_date = None
 			by_search_album.add_album(word_album)
 			for single_media in media:
@@ -244,14 +245,14 @@ class TreeWalker:
 		by_geonames_path = os.path.join(Options.config['album_path'], Options.config['by_gps_string'])
 		by_geonames_album = Album(by_geonames_path)
 		by_geonames_album.parent = origin_album
-		by_geonames_album.cache_base = cache_base(by_geonames_path)
+		by_geonames_album.cache_base = Options.config['by_gps_string']
 		by_geonames_max_file_date = None
 		for country_code, _ in self.tree_by_geonames.items():
 			country_path = os.path.join(by_geonames_path, str(country_code))
 			country_album = Album(country_path)
 			country_album.center = {}
 			country_album.parent = by_geonames_album
-			country_album.cache_base = cache_base(country_path)
+			country_album.cache_base = by_geonames_album.generate_cache_base(os.path.join(by_geonames_album.cache_base, country_code))
 			country_max_file_date = None
 			by_geonames_album.add_album(country_album)
 			for region_code, _ in self.tree_by_geonames[country_code].items():
@@ -259,7 +260,7 @@ class TreeWalker:
 				region_album = Album(region_path)
 				region_album.center = {}
 				region_album.parent = country_album
-				region_album.cache_base = cache_base(region_path)
+				region_album.cache_base = country_album.generate_cache_base(os.path.join(country_album.cache_base, region_code))
 				region_max_file_date = None
 				country_album.add_album(region_album)
 				for place_code, media_list in self.tree_by_geonames[country_code][region_code].items():
@@ -268,7 +269,7 @@ class TreeWalker:
 					message("working with place album...", media_list[0].country_name + "-" + media_list[0].region_name + "-" + place_name, 4)
 					next_level()
 					message("sorting media...", "", 5)
-					media_list.sort(key=lambda m: m.latitude + m.longitude)
+					media_list.sort(key=lambda m: m.latitude)
 					next_level()
 					message("media sorted", "", 5)
 					back_level()
@@ -328,10 +329,11 @@ class TreeWalker:
 						place_album = Album(place_path)
 						place_album.center = {}
 						place_album.parent = region_album
-						place_album.cache_base = cache_base(place_path)
+						place_album.cache_base = region_album.generate_cache_base(os.path.join(region_album.cache_base, place_code))
 						place_max_file_date = None
 						region_album.add_album(place_album)
 						for j, single_media in enumerate(cluster):
+							single_media.gps_album_cache_base = place_album.cache_base
 							cluster[j].gps_path = remove_album_path(place_path)
 							cluster[j].place_name = place_name
 							cluster[j].alt_place_name = alt_place_name
@@ -432,9 +434,12 @@ class TreeWalker:
 		name = os.path.splitext(phrase)[0]
 		# convert non-alphanumeric characters to space
 		name = "".join([c if c.isalnum() else " " for c in name])
-		# convert digits to ""
+		# remove digits
 		name = "".join(["" if c.isnumeric() else c for c in name])
+		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
+		name = ''.join(c for c in unicodedata.normalize('NFD', name) if unicodedata.category(c) != 'Mn')
 		name = name.strip()
+		name = name.lower()
 
 		return name.split(' ')
 
@@ -634,18 +639,7 @@ class TreeWalker:
 				trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 				entry_for_cache_base = os.path.join(Options.config['folders_string'], trimmed_path, entry)
 				message("determining cache base...", "", 5)
-				next_album_cache_base = cache_base(entry_for_cache_base, True)
-				# let's avoid that different album names have the same cache base
-				distinguish_suffix = 0
-				while True:
-					_next_album_cache_base = next_album_cache_base
-					if distinguish_suffix:
-						_next_album_cache_base += "_" + str(distinguish_suffix)
-					if any(_next_album_cache_base == _album.cache_base and absolute_path != _album.absolute_path for _album in album.albums_list):
-						distinguish_suffix += 1
-					else:
-						next_album_cache_base = _next_album_cache_base
-						break
+				next_album_cache_base = album.generate_cache_base(entry_for_cache_base)
 				next_level()
 				message("cache base determined", "", 5)
 				back_level()
