@@ -429,17 +429,33 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
 
 	@staticmethod
-	def normalize_and_split(phrase):
+	def minimal_normalize(phrase):
 		# normalize the name without extension and remove the numbers
+
 		name = os.path.splitext(phrase)[0]
 		# convert non-alphanumeric characters to space
 		name = "".join([c if c.isalnum() else " " for c in name])
 		# remove digits
 		name = "".join(["" if c.isnumeric() else c for c in name])
+
+		name = name.strip()
+
+		return name
+
+	@staticmethod
+	def normalize_and_split_for_album_name(phrase):
+		name = TreeWalker.minimal_normalize(phrase)
 		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
 		name = ''.join(c for c in unicodedata.normalize('NFD', name) if unicodedata.category(c) != 'Mn')
-		name = name.strip()
 		name = name.lower()
+
+		return name.split(' ')
+
+	@staticmethod
+	def normalize_and_split_for_word_list(phrase):
+		# normalize the name without extension and remove the numbers
+		name = TreeWalker.minimal_normalize(phrase)
+		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
 
 		return name.split(' ')
 
@@ -447,11 +463,25 @@ class TreeWalker:
 	def add_media_to_tree_by_search(self, media):
 		# add the given media to a temporary structure where media are organized by search terms
 		# works on the words in the file name and in album.ini's description, title, tags
-		words = self.normalize_and_split(media.name) + self.normalize_and_split(media.title) + self.normalize_and_split(media.description) + media.tags.split(',')
+		phrase = media.name + " " + media.title + " " + media.description + " " + media.tags
+
+		# media word list has the words with there case and accents
+		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
+		# get unique values
+		words_for_word_list = list(set(words_for_word_list))
 		# remove empty elements
-		words = [x for x in words if x]
-		media.words = words
-		for word in words:
+		words_for_word_list = [x for x in words_for_word_list if x]
+
+		media.words = words_for_word_list
+
+		# words for album names are lower case and accentless
+		words_for_album_name = self.normalize_and_split_for_album_name(phrase)
+		# get unique values
+		words_for_album_name = list(set(words_for_album_name))
+		# remove empty elements
+		words_for_album_name = [x for x in words_for_album_name if x]
+
+		for word in words_for_album_name:
 			if word:
 				if word not in list(self.tree_by_search.keys()):
 					self.tree_by_search[word] = list()
