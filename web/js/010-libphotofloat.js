@@ -321,22 +321,19 @@
 												}
 												searchResultsAlbumFinal.media = matchingMedia;
 											}
+											if (! searchResultsAlbumFinal.media.length) {
+												PhotoFloat.noResults();
+											} else {
+												$("#album-view").removeClass("hidden");
+												searchResultsAlbumFinal.numMediaInAlbum = searchResultsAlbumFinal.media.length;
+												searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
+												searchResultsAlbumFinal.cacheBase = Options.by_search_string + Options.cache_folder_separator + wordsWithOptionsString;
+												searchResultsAlbumFinal.path = PhotoFloat.pathJoin([Options.by_search_string, wordsWithOptionsString]);
+												searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
+												searchResultsAlbumFinal.ancestorsCacheBase[searchResultsAlbumFinal.ancestorsCacheBase.length - 1] = searchResultsAlbumFinal.cacheBase;
+											}
+											callback(searchResultsAlbumFinal, null, -1);
 										}
-
-										if (! searchResultsAlbumFinal.media.length) {
-											PhotoFloat.noResults();
-										} else {
-											$("#album-view").removeClass("hidden");
-											$("#no-results").addClass("hidden");
-											searchResultsAlbumFinal.numMediaInAlbum = searchResultsAlbumFinal.media.length;
-											searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
-											searchResultsAlbumFinal.cacheBase = Options.by_search_string + Options.cache_folder_separator + wordsWithOptionsString;
-											searchResultsAlbumFinal.path = PhotoFloat.pathJoin([Options.by_search_string, wordsWithOptionsString]);
-											searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
-											searchResultsAlbumFinal.ancestorsCacheBase[searchResultsAlbumFinal.ancestorsCacheBase.length - 1] = searchResultsAlbumFinal.cacheBase;
-
-										}
-										callback(searchResultsAlbumFinal, null, -1);
 									},
 									error,
 									indexWords,
