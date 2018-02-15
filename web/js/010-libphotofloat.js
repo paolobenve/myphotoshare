@@ -209,7 +209,8 @@
 					searchResultsAlbumFinal.media = [];
 					searchResultsAlbumFinal.albums = [];
 					searchResultsAlbumFinal.cacheBase = albumHash;
-					searchResultsAlbumFinal.ancestorsCacheBase = bySearchRootAlbum.ancestorsCacheBase + [wordsStringOriginal];
+					searchResultsAlbumFinal.ancestorsCacheBase = bySearchRootAlbum.ancestorsCacheBase;
+					searchResultsAlbumFinal.ancestorsCacheBase.push(wordsStringOriginal);
 					searchResultsAlbumFinal.path = albumHash.replace(Options.cache_folder_separator, "/");
 					if (! Options.search_any_word)
 						// getting the first album is enough, media that do not match the other words will be escluded later
@@ -279,7 +280,7 @@
 
 										numSearchAlbumsReady ++;
 
-										if (numSearchAlbumsReady == numSubAlbumsToGet) {
+										if (numSearchAlbumsReady >= numSubAlbumsToGet) {
 											// all the albums have been got, we can merge the results
 											searchResultsAlbumFinal = searchResultsAlbum[0];
 											for (indexWords1 = 1; indexWords1 <= last_index; indexWords1 ++) {
@@ -332,6 +333,7 @@
 												searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
 												searchResultsAlbumFinal.ancestorsCacheBase[searchResultsAlbumFinal.ancestorsCacheBase.length - 1] = searchResultsAlbumFinal.cacheBase;
 											}
+											self.albumCache[searchResultsAlbumFinal.cacheBase] = searchResultsAlbumFinal;
 											callback(searchResultsAlbumFinal, null, -1);
 										}
 									},
@@ -515,7 +517,7 @@
 
 	PhotoFloat.mediaHashURIEncoded = function(album, media) {
 		var hash;
-		if (PhotoFloat.isByDateAlbum(album.cacheBase) || PhotoFloat.isByGpsAlbum(album.cacheBase))
+		if (PhotoFloat.isByDateAlbum(album.cacheBase) || PhotoFloat.isByGpsAlbum(album.cacheBase) || PhotoFloat.isSearchAlbum(album.cacheBase))
 			hash = PhotoFloat.pathJoin([
 				encodeURIComponent(album.cacheBase),
 				encodeURIComponent(media.foldersCacheBase),
