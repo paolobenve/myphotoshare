@@ -13,11 +13,13 @@
 * new option `slide_album_caption_color`: the color to use with album slide mode
 * implemented search function: media can be searched by file name, title, description, tags
   * new option `by_search_string`: the string used for search albums
-* Reorganization of documentation:
-  * Creation of `doc` and `doc/img` folders.
-  * `README.md` split into individual files.
-  * Explained how to use advanced features like geonames or face detection.
-  * Created a gallery of screenshots.
+* reorganization of documentation:
+  * creation of `doc` and `doc/img` folders
+  * `README.md` split into individual files
+  * explained how to use advanced features like geonames or face detection
+  * created a gallery of screenshots
+* Reduced images and thumbnail naming schema is now more robust
+* cache files names are now made of only lower case ascii characters
 
 
 ### version 3.3 (January 22, 2018)
