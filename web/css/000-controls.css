@@ -68,6 +68,10 @@ a.title-anchor.mobile {
 	padding: .5em;
 }
 
+#album-view.hidden {
+	display: none;
+}
+
 #thumbs {
 	clear: both;
 }

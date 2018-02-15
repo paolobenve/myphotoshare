@@ -445,19 +445,20 @@ $(document).ready(function() {
 			Options.search_inside_words ||
 			Options.search_any_word ||
 			Options.search_case_sensitive ||
+			Options.search_accent_sensitive ||
 			! $("ul#right-menu li#no-results").hasClass("hidden")
 		) {
 			$("ul#right-menu li#inside-words").removeClass("hidden");
 			$("ul#right-menu li#any-word").removeClass("hidden");
 			$("ul#right-menu li#case-sensitive").removeClass("hidden");
-			$("ul#right-menu li#regex").removeClass("hidden");
+			$("ul#right-menu li#regex-word").removeClass("hidden");
 			if (Options.search_regex) {
-				$("ul#right-menu li#regex").addClass("selected");
+				$("ul#right-menu li#regex-word").addClass("selected");
 				$("ul#right-menu li#inside-words").addClass("hidden");
 				$("ul#right-menu li#any-word").addClass("hidden");
 				$("ul#right-menu li#case-sensitive").addClass("hidden");
 			} else {
-				$("ul#right-menu li#regex").removeClass("selected");
+				$("ul#right-menu li#regex-word").removeClass("selected");
 				Options.search_inside_words ?
 					$("ul#right-menu li#inside-words").addClass("selected") :
 					$("ul#right-menu li#inside-words").removeClass("selected");
@@ -467,12 +468,16 @@ $(document).ready(function() {
 				Options.search_case_sensitive ?
 					$("ul#right-menu li#case-sensitive").addClass("selected") :
 					$("ul#right-menu li#case-sensitive").removeClass("selected");
+				Options.search_accent_sensitive ?
+					$("ul#right-menu li#accent-sensitive").addClass("selected") :
+					$("ul#right-menu li#accent-sensitive").removeClass("selected");
 			}
 		} else {
 			$("ul#right-menu li#inside-words").addClass("hidden");
 			$("ul#right-menu li#any-word").addClass("hidden");
 			$("ul#right-menu li#case-sensitive").addClass("hidden");
-			$("ul#right-menu li#regex").addClass("hidden");
+			$("ul#right-menu li#accent-sensitive").addClass("hidden");
+			$("ul#right-menu li#regex-word").addClass("hidden");
 		}
 	}
 
@@ -499,6 +504,8 @@ $(document).ready(function() {
 		var mediaForNames = null;
 		var gpsHtmlTitle;
 
+		modifyMenuButtons();
+		
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
 		else
@@ -933,7 +940,7 @@ $(document).ready(function() {
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 0, margin, imgTitle;
-		var tooBig = false, virtualAlbum = false;
+		var tooBig = false, isVirtualAlbum = false;
 		var mapLinkIcon;
 
 		PhotoFloat.subalbumIndex = 0;
@@ -947,12 +954,12 @@ $(document).ready(function() {
 			thumbnailSize = Options.media_thumb_size;
 
 			populateMedia = populate;
-			virtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_search_string) == 0 );
+			isVirtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_search_string) == 0 );
 			tooBig = currentAlbum.path.split("/").length < 4 && currentAlbum.media.length > Options.big_virtual_folders_threshold;
-			if (populateMedia === true && virtualAlbum)
+			if (populateMedia === true && isVirtualAlbum)
 				populateMedia = populateMedia && ! tooBig;
 
-			if (virtualAlbum && tooBig) {
+			if (isVirtualAlbum && tooBig) {
 				$("#thumbs").empty();
 				$("#error-too-many-images").html(
 					"<span id=\"too-many-images\">" + _t('#too-many-images') + "</span>: " + currentAlbum.media.length +
@@ -2211,6 +2218,11 @@ $(document).ready(function() {
 					if (searchCaseSensitiveCookie !== null)
 						Options.search_case_sensitive = searchCaseSensitiveCookie;
 
+					Options.search_accent_sensitive = false;
+					var searchAccentSensitiveCookie = getBooleanCookie("search_accent_sensitive");
+					if (searchAccentSensitiveCookie !== null)
+						Options.search_accent_sensitive = searchAccentSensitiveCookie;
+
 					Options.search_regex = false;
 					var searchRegexCookie = getBooleanCookie("search_regex");
 					if (searchRegexCookie !== null)
@@ -2395,9 +2407,11 @@ $(document).ready(function() {
 			if (Options.search_inside_words)
 				bySearchViewLink += Options.cache_folder_separator + 'i'
 			if (Options.search_any_word)
-				bySearchViewLink += Options.cache_folder_separator + 'a'
+				bySearchViewLink += Options.cache_folder_separator + 'w'
 			if (Options.search_case_sensitive)
 				bySearchViewLink += Options.cache_folder_separator + 'c'
+			if (Options.search_accent_sensitive)
+				bySearchViewLink += Options.cache_folder_separator + 'a'
 		}
 		bySearchViewLink += Options.cache_folder_separator + searchTerms;
 		window.location.href = bySearchViewLink;
@@ -2436,7 +2450,16 @@ $(document).ready(function() {
 			$('#search-button').click();
 	}
 
-	$("li#regex").on('click', toggleRegexSearch);
+	$("li#accent-sensitive").on('click', toggleAccentSensitiveSearch);
+	function toggleAccentSensitiveSearch(ev) {
+		Options.search_accent_sensitive = ! Options.search_accent_sensitive;
+		setBooleanCookie("search_accent_sensitive", Options.search_accent_sensitive);
+		modifyMenuButtons();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
+	}
+
+	$("li#regex-word").on('click', toggleRegexSearch);
 	function toggleRegexSearch(ev) {
 		Options.search_regex = ! Options.search_regex;
 		setBooleanCookie("search_regex", Options.search_regex);

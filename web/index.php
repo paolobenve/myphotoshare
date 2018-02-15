@@ -72,6 +72,7 @@
 		<script type="text/javascript" src="js/005-modernizr.js"></script>
 	<?php	} ?>
 
+		<script type="text/javascript" src="js/006-latinize.js"></script>
 		<script type="text/javascript" src="js/008-social.js"></script>
 		<script type="text/javascript" src="js/009-translations.js"></script>
 		<script type="text/javascript" src="js/010-libphotofloat.js"></script>
@@ -253,9 +254,10 @@
 		</li>
 		<li id="no-results" class="search hidden"></li>
 		<li id="inside-words" class="search active"></li>
-		<li id="any-word" class="search"></li>
+		<li id="any-word" class="search active"></li>
 		<li id="case-sensitive" class="search active"></li>
-		<li id="regex" class="search active"></li>
+		<li id="accent-sensitive" class="search active"></li>
+		<li id="regex-word" class="search active"></li>
 		<li class="day-gps-folders-view caption"></li>
 		<li id="folders-view" class="day-gps-folders-view"></li>
 		<li id="by-date-view" class="day-gps-folders-view"></li>
