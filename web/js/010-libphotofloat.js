@@ -128,7 +128,8 @@
 	}
 
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
-		var hashParts, lastSlashPosition, slashCount, albumHash, albumHashes, mediaHash = null, foldersHash = null, media = null, i, SearchWordsFromUser, SearchWordsFromUserNormalized;
+		var hashParts, lastSlashPosition, slashCount, albumHash, albumHashes, mediaHash = null, foldersHash = null, media = null, i;
+		var SearchWordsFromUser, SearchWordsFromUserNormalized;
 		var indexWords, indexAlbums;
 		// this vars are defined here and not at the beginning of the file because the options must have been read
 		PhotoFloat.foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
@@ -171,6 +172,7 @@
 				var wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
 				var wordsAndOptions = wordsWithOptionsString.split(Options.cache_folder_separator);
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
+				var wordsStringOriginal = wordsString.replace(/_/g, ' ');
 				// the normalized words are needed in order to compare with the search cache json files names, which are normalized
 				var wordsStringNormalized = PhotoFloat.removeAccents(wordsString.toLowerCase());
 				if (wordsAndOptions.length > 1) {
@@ -182,7 +184,7 @@
 					Options.search_accent_sensitive = searchOptions.indexOf('a') > -1;
 				}
 
-				$("ul#right-menu #search-field").attr("value", wordsString.replace(/_/g, ' '));
+				$("ul#right-menu #search-field").attr("value", wordsStringOriginal);
 				wordsString = PhotoFloat.normalize(wordsString);
 				$("ul#right-menu").addClass("expand");
 				SearchWordsFromUser = wordsString.split('_');
@@ -207,7 +209,8 @@
 					searchResultsAlbumFinal.media = [];
 					searchResultsAlbumFinal.albums = [];
 					searchResultsAlbumFinal.cacheBase = albumHash;
-					searchResultsAlbumFinal.path = albumHash;
+					searchResultsAlbumFinal.ancestorsCacheBase = bySearchRootAlbum.ancestorsCacheBase + [wordsStringOriginal];
+					searchResultsAlbumFinal.path = albumHash.replace(Options.cache_folder_separator, "/");
 					if (! Options.search_any_word)
 						// getting the first album is enough, media that do not match the other words will be escluded later
 						last_index = 0;

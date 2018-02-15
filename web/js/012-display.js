@@ -495,7 +495,7 @@ $(document).ready(function() {
 	}
 
 	function setTitle() {
-		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle;
+		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle, optionsAndSearchWords, searchWords;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, m;
 		// gpsLevelNumber is the number of levels for the by gps tree
 		// current levels are country, region, place => 3
@@ -505,7 +505,7 @@ $(document).ready(function() {
 		var gpsHtmlTitle;
 
 		modifyMenuButtons();
-		
+
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
 		else
@@ -522,6 +522,13 @@ $(document).ready(function() {
 		dateTitle = (components.length > 1 && components[1] == Options.by_date_string);
 		gpsTitle = (components.length > 1 && components[1] == Options.by_gps_string);
 		searchTitle = (components.length > 1 && components[1] == Options.by_search_string);
+
+		if (searchTitle && components.length == 3) {
+			// the last element in components is the options and the search words
+			optionsAndSearchWords = components[components.length - 1].split(Options.cache_folder_separator);
+			searchWords = optionsAndSearchWords[optionsAndSearchWords.length -1].replace(/_/g, ' ');
+			components[components.length - 1] = searchWords;
+		}
 
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
 		var textComponents = [];
