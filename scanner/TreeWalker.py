@@ -1109,6 +1109,7 @@ class TreeWalker:
 					next_level()
 					message("not a stale cache file, keeping it", cache_file, 2)
 					back_level()
+					back_level()
 					continue
 				back_level()
 		if not subdir:
