@@ -299,7 +299,7 @@
 														} else {
 															// inside words
 															matchMediaWord = false;
-															for (indexMediaWords = 0; indexMediaWords < searchResultsAlbumFinal.media.words.length; indexMediaWords ++) {
+															for (indexMediaWords = 0; indexMediaWords < searchResultsAlbumFinal.media[indexMedia].words.length; indexMediaWords ++) {
 																if (PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words[indexMediaWords]).indexOf(SearchWordsFromUser[indexWordsLeft]) > -1) {
 																	matchMediaWord = true;
 																	break;
