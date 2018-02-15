@@ -747,17 +747,25 @@ $(document).ready(function() {
 		// album properties reflect the current sorting of album and media objects
 		// json files have albums and media sorted by date not reversed
 
-		if (currentAlbum.albumNameSort === undefined)
+		if (currentAlbum.albumNameSort === undefined) {
 			currentAlbum.albumNameSort = false;
-		if (currentAlbum.albumDateReverseSort === undefined)
+			if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase))
+				currentAlbum.albums = sortByDate(currentAlbum.albums);
+		}
+		if (currentAlbum.albumDateReverseSort === undefined){
 			currentAlbum.albumDateReverseSort = false;
-		if (currentAlbum.albumNameReverseSort === undefined)
+		}
+		if (currentAlbum.albumNameReverseSort === undefined){
 			currentAlbum.albumNameReverseSort = false;
-
-		if (currentAlbum.mediaNameSort === undefined)
+		}
+		if (currentAlbum.mediaNameSort === undefined) {
 			currentAlbum.mediaNameSort = false;
-		if (currentAlbum.mediaDateReverseSort === undefined)
+			if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase))
+				currentAlbum.media = sortByDate(currentAlbum.media);
+		}
+		if (currentAlbum.mediaDateReverseSort === undefined){
 			currentAlbum.mediaDateReverseSort = false;
+		}
 		if (currentAlbum.mediaNameReverseSort === undefined)
 			currentAlbum.mediaNameReverseSort = false;
 
