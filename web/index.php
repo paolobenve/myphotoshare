@@ -244,6 +244,7 @@
 		</div>
 	</div>
 
+	<div id="no-results" class="error"></div>
 	<ul id="right-menu">
 		<li id="menu-icon"> ☰ </li>
 		<li class="search">
@@ -252,12 +253,12 @@
 				<img id="search-button" src="img/ic_search_black_48dp_2x.png" />
 			</form>
 		</li>
-		<li id="no-results" class="search hidden"></li>
 		<li id="inside-words" class="search active"></li>
 		<li id="any-word" class="search active"></li>
 		<li id="case-sensitive" class="search active"></li>
 		<li id="accent-sensitive" class="search active"></li>
-		<li id="regex-word" class="search active"></li>
+		<!-- <li id="regex-word" class="search active"></li> -->
+
 		<li class="day-gps-folders-view caption"></li>
 		<li id="folders-view" class="day-gps-folders-view"></li>
 		<li id="by-date-view" class="day-gps-folders-view"></li>
@@ -281,10 +282,11 @@
 	</ul>
 
 	<div id="error-overlay"></div>
-	<div id="error-options-file"></div>
-	<div id="error-text-folder"></div>
-	<div id="error-root-folder"></div>
-	<div id="error-text-image"></div>
+	<div id="error-options-file" class="error"></div>
+	<div id="error-text-folder" class="error"></div>
+	<div id="error-root-folder" class="error"></div>
+	<div id="error-text-image" class="error"></div>
+
 	<div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form></div>
 </body>
 </html>

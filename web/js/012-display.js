@@ -2062,7 +2062,7 @@ $(document).ready(function() {
 		$("body, html").css("overflow", "hidden");
 	}
 	function undie() {
-		$("#error-text, #error-overlay, #auth-text").fadeOut(500);
+		$(".error, #error-overlay, #auth-text").fadeOut(500);
 		$("body, html").css("overflow", "auto");
 	}
 

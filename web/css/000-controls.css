@@ -373,7 +373,7 @@ video {
 	color: #FFAD27;
 	margin-top: 20px;
 }
-#error-overlay, #error-text-folder, #error-root-folder, #error-text-image, #error-options-file, #auth-text {
+.error, #error-overlay, #auth-text {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -381,16 +381,27 @@ video {
 	height: 100%;
 	display: none;
 }
-#error-overlay {
-	background-color: #000000;
-}
-#error-text-folder, #error-root-folder, #error-text-image, #error-options-file, #auth-text {
+.error, #auth-text {
 	position: fixed;
 	padding-top: 20%;
 	text-align: center;
 }
-#error-text-folder, #error-root-folder, #error-text-image, #error-options-file {
+
+.error {
 	font-size: 4em;
+	font-weight: bold;
+	font-style: italic;
+}
+
+#error-overlay {
+	background-color: #000000;
+}
+#auth-text input {
+	color: rgb(0, 0, 0);
+	background-color: rgb(200, 200, 200);
+	border: 0;
+	font-family: inherit;
+	font-size: 2em;
 	font-weight: bold;
 	font-style: italic;
 }
@@ -406,16 +417,6 @@ video {
 	background-position: top center;
 	background-repeat: no-repeat;
 	padding-top: 96px;
-}
-
-#auth-text input {
-	color: rgb(0, 0, 0);
-	background-color: rgb(200, 200, 200);
-	border: 0;
-	font-family: inherit;
-	font-size: 2em;
-	font-weight: bold;
-	font-style: italic;
 }
 
 #media-name {

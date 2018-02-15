@@ -122,7 +122,9 @@
 	PhotoFloat.noResults = function() {
 		// no media found, show the "no results line below search field"
 		$("#album-view").addClass("hidden");
-		$("#no-results").removeClass("hidden").fadeIn(200);
+		$("#no-results").fadeIn(2000);
+		// $("#error-options-file, #error-overlay, #auth-text").fadeOut(2500);
+		// $("#error-overlay").fadeTo(500, 0.8);
 	}
 
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
