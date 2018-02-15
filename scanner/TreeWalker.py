@@ -23,8 +23,8 @@ import Options
 class TreeWalker:
 	def __init__(self):
 		random.seed()
-		self.all_cache_entries = ["options.json"]
-		self.all_cache_entries_by_subdir = {}
+		self.all_json_files = ["options.json"]
+		self.all_json_files_by_subdir = {}
 
 		message("method", "cascade thumbnail generation", 4)
 		# be sure reduced_sizes array is correctly sorted
@@ -67,11 +67,11 @@ class TreeWalker:
 			message("all media json file saved", "", 5)
 			back_level()
 
-			self.all_cache_entries.append("all_media.json")
+			self.all_json_files.append("all_media.json")
 
 			folders_album.num_media_in_sub_tree = num
 			self.origin_album.add_album(folders_album)
-			self.all_cache_entries.append(Options.config['folders_string'] + ".json")
+			self.all_json_files.append(Options.config['folders_string'] + ".json")
 
 			message("generating by date albums...", "", 4)
 			by_date_album = self.generate_date_albums(self.origin_album)
@@ -79,7 +79,7 @@ class TreeWalker:
 			message("by date albums generated", "", 5)
 			back_level()
 			if by_date_album is not None and not by_date_album.empty:
-				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
+				self.all_json_files.append(Options.config['by_date_string'] + ".json")
 				self.origin_album.add_album(by_date_album)
 
 			if self.tree_by_geonames:
@@ -89,7 +89,7 @@ class TreeWalker:
 				message("by geonames albums generated", "", 5)
 				back_level()
 				if by_geonames_album is not None and not by_geonames_album.empty:
-					self.all_cache_entries.append(Options.config['by_gps_string'] + ".json")
+					self.all_json_files.append(Options.config['by_gps_string'] + ".json")
 					self.origin_album.add_album(by_geonames_album)
 
 			message("generating by search albums...", "", 4)
@@ -98,7 +98,7 @@ class TreeWalker:
 			message("by search albums generated", "", 5)
 			back_level()
 			if by_search_album is not None and not by_search_album.empty:
-				self.all_cache_entries.append(Options.config['by_search_string'] + ".json")
+				self.all_json_files.append(Options.config['by_search_string'] + ".json")
 				self.origin_album.add_album(by_search_album)
 
 			message("saving all albums to json files...", "", 4)
@@ -1030,16 +1030,16 @@ class TreeWalker:
 			next_level()
 			message("building stale list...", "", 4)
 			for album in self.all_albums:
-				self.all_cache_entries.append(album.json_file)
+				self.all_json_files.append(album.json_file)
 			for media in self.all_media:
 				album_subdir = media.album.subdir
 				for entry in media.image_caches:
 					entry_without_subdir = entry[len(album_subdir) + 1:]
 					try:
-						self.all_cache_entries_by_subdir[album_subdir].append(entry_without_subdir)
+						self.all_json_files_by_subdir[album_subdir].append(entry_without_subdir)
 					except KeyError:
-						self.all_cache_entries_by_subdir[album_subdir] = list()
-						self.all_cache_entries_by_subdir[album_subdir].append(entry_without_subdir)
+						self.all_json_files_by_subdir[album_subdir] = list()
+						self.all_json_files_by_subdir[album_subdir].append(entry_without_subdir)
 			next_level()
 			message("stale list built", "", 5)
 			back_level()
@@ -1049,9 +1049,9 @@ class TreeWalker:
 			info = "in subdir " + subdir
 			# reduced sizes, thumbnails, old style thumbnails
 			if subdir == Options.config['cache_album_subdir']:
-				self.all_cache_entries_by_subdir[subdir] = list()
+				self.all_json_files_by_subdir[subdir] = list()
 				for path in self.all_album_composite_images:
-					self.all_cache_entries_by_subdir[subdir].append(path)
+					self.all_json_files_by_subdir[subdir].append(path)
 				deletable_files_suffixes_re = r"\.jpg$"
 			else:
 				deletable_files_suffixes_re = r"_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
@@ -1092,12 +1092,12 @@ class TreeWalker:
 					#~ except:
 						#~ pass
 					if subdir:
-						if subdir in self.all_cache_entries_by_subdir:
-							cache_list = self.all_cache_entries_by_subdir[subdir]
+						if subdir in self.all_json_files_by_subdir:
+							cache_list = self.all_json_files_by_subdir[subdir]
 						else:
 							cache_list = list()
 					else:
-						cache_list = self.all_cache_entries
+						cache_list = self.all_json_files
 					if cache_file not in cache_list:
 						message("removing stale cache file...", cache_file, 3)
 						file_to_delete = os.path.join(Options.config['cache_path'], subdir, cache_file)
