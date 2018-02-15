@@ -478,7 +478,7 @@
 		return result;
 	};
 	PhotoFloat.mediaPath = function(album, media, size) {
-		var suffix = "_", hash, rootString = "root-";
+		var suffix = Options.cache_folder_separator, hash, rootString = "root-";
 		if (
 			media.mediaType == "photo" ||
 			media.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1

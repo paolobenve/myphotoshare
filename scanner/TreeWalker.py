@@ -932,7 +932,7 @@ class TreeWalker:
 					Options.config['cache_path'],
 					random_media.album.subdir,
 					folder_prefix + random_media.cache_base
-				) + "_" + str(Options.config['album_thumb_size']) + "as.jpg"
+				) + Options.config['cache_folder_separator'] + str(Options.config['album_thumb_size']) + "as.jpg"
 			if os.path.exists(thumbnail):
 				random_thumbnails.append(thumbnail)
 				i += 1
@@ -1054,8 +1054,8 @@ class TreeWalker:
 					self.all_json_files_by_subdir[subdir].append(path)
 				deletable_files_suffixes_re = r"\.jpg$"
 			else:
-				deletable_files_suffixes_re = r"_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
-				deletable_files_suffixes_re += r"|_[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
+				deletable_files_suffixes_re = r"(" + Options.config['cache_folder_separator'] + "|_)transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
+				deletable_files_suffixes_re += r"|(" + Options.config['cache_folder_separator'] + "|_)[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
 		message("searching for stale cache files", info, 4)
 
 		for cache_file in sorted(os.listdir(os.path.join(Options.config['cache_path'], subdir))):
