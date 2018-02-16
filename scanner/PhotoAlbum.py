@@ -1159,9 +1159,9 @@ class Media(object):
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reducing size...", info_string, 5)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums...", info_string, 5)
+				message("thumbing for albums...", "", 5)
 			else:
-				message("thumbing for media...", info_string, 5)
+				message("thumbing for media...", "", 5)
 			start_image_copy.thumbnail((actual_thumb_size, actual_thumb_size), Image.ANTIALIAS)
 			next_level()
 			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
@@ -1210,7 +1210,7 @@ class Media(object):
 		else:
 			start_image_copy_for_saving = start_image_copy_filled
 
-		message("saving...", info_string, 5)
+		message("saving...", "", 5)
 		try:
 			jpeg_quality = Options.config['jpeg_quality']
 			if thumb_type:
