@@ -1219,11 +1219,11 @@ class Media(object):
 			start_image_copy_for_saving.save(thumb_path, "JPEG", quality=jpeg_quality)
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("saved reduced", thumb_path, 4)
+				message("reduced size image saved ", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("saved for albums", thumb_path, 4)
+				message("album thumbnail salved", "", 4)
 			else:
-				message("saved for media", thumb_path, 4)
+				message("media thumbnail saved", "", 4)
 			back_level()
 			back_level()
 			back_level()

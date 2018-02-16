@@ -743,12 +743,12 @@ class TreeWalker:
 						# TODO: We can't execute the code below as cache_hit = False...
 						elif cache_hit:
 							if not absolute_cache_file_exists:
-								message("unexistent reduction/thumbnail", absolute_cache_file, 4)
+								message("unexistent reduction/thumbnail", "", 4)
 							else:
 								if file_mtime(absolute_cache_file) < cached_media.datetime_file:
-									message("reduction/thumbnail older than cached media", absolute_cache_file, 4)
+									message("reduction/thumbnail older than cached media", "", 4)
 								elif file_mtime(absolute_cache_file) > json_file_mtime:
-									message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
+									message("reduction/thumbnail newer than json file", "", 4)
 
 					if Options.config['recreate_reduced_photos']:
 						message("reduced photo recreation requested", "", 4)
