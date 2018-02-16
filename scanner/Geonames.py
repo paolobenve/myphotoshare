@@ -177,7 +177,7 @@ class Geonames(object):
 		# Calculate the great circle distance in meters between two points on the earth (specified in decimal degrees)
 
 		next_level()
-		message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
+		message("calculating distance between coordinates...", '(' + str(lat1) + ', ' + str(lon1) + ') - (' + str(lat2) + ', ' + str(lon2) + ')', 5)
 		# convert decimal degrees to radians
 		r_lat1, r_lon1, r_lat2, r_lon2 = math.radians(lat1), math.radians(lon1), math.radians(lat2), math.radians(lon2)
 		# haversine formula

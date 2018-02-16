@@ -580,7 +580,7 @@ class TreeWalker:
 								hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
 							):
 								next_level()
-								message("json file is OK", "  " + json_message, 4)
+								message("json file is OK", "", 4)
 								back_level()
 								json_file_OK = True
 								album = cached_album
@@ -596,7 +596,7 @@ class TreeWalker:
 								back_level()
 							else:
 								next_level()
-								message("json file invalid (old or invalid path)", json_message, 4)
+								message("json file invalid (old or invalid path)", "", 4)
 								back_level()
 								cached_album = None
 			except KeyboardInterrupt:
@@ -814,7 +814,7 @@ class TreeWalker:
 
 				elif not media.is_valid:
 					next_level()
-					message("not image nor video", entry_with_path, 1)
+					message("not image nor video", "", 1)
 					back_level()
 				back_level()
 		if num_photo_in_dir:

@@ -245,7 +245,7 @@ class Album(object):
 		with open(path, "r") as filepath:
 			dictionary = json.load(filepath)
 		next_level()
-		message("album read", path, 5)
+		message("album read", "", 5)
 		back_level()
 		# generate the album from the json file loaded
 		# subalbums are not generated yet
@@ -519,7 +519,7 @@ class Media(object):
 							back_level()
 				else:
 					next_level()
-					message("error transcodind, not a video?", media_path, 5)
+					message("error transcodind, not a video?", "", 5)
 					back_level()
 					self.is_valid = False
 		return
