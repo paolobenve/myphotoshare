@@ -204,14 +204,17 @@
 				// success:
 				function(bySearchRootAlbum) {
 					var last_index, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0;
-					var searchResultsAlbum = [];
+					var searchResultsMedia = [];
 					var searchResultsAlbumFinal = {};
 					searchResultsAlbumFinal.media = [];
 					searchResultsAlbumFinal.subalbums = [];
+					searchResultsAlbumFinal.numMediaInAlbum = 0;
+					searchResultsAlbumFinal.numMediaInSubTree = 0;
 					searchResultsAlbumFinal.cacheBase = albumHash;
 					searchResultsAlbumFinal.ancestorsCacheBase = bySearchRootAlbum.ancestorsCacheBase.slice();
 					searchResultsAlbumFinal.ancestorsCacheBase.push(wordsWithOptionsString);
-					searchResultsAlbumFinal.path = albumHash.replace(Options.cache_folder_separator, "/");
+					searchResultsAlbumFinal.path = searchResultsAlbumFinal.cacheBase.replace(Options.cache_folder_separator, "/");
+					searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
 					if (! Options.search_any_word)
 						// getting the first album is enough, media that do not match the other words will be escluded later
 						last_index = 0;
@@ -273,20 +276,19 @@
 										}
 										resultAlbum.media = matchingMedia;
 
-										if (! (thisIndexWords in searchResultsAlbum)) {
-											searchResultsAlbum[thisIndexWords] = resultAlbum;
-											searchResultsAlbum[thisIndexWords].media = resultAlbum.media;
+										if (! (thisIndexWords in searchResultsMedia)) {
+											searchResultsMedia[thisIndexWords] = resultAlbum.media;
 										} else {
-											searchResultsAlbum[thisIndexWords].media = PhotoFloat.union(searchResultsAlbum[thisIndexWords].media, resultAlbum.media);
+											searchResultsMedia[thisIndexWords] = PhotoFloat.union(searchResultsMedia[thisIndexWords], resultAlbum.media);
 										}
 
 										if (++ numSearchAlbumsReady >= numSubAlbumsToGet) {
 											// all the albums have been got, we can merge the results
-											searchResultsAlbumFinal = searchResultsAlbum[0];
+											searchResultsAlbumFinal.media = searchResultsMedia[0];
 											for (indexWords1 = 1; indexWords1 <= last_index; indexWords1 ++) {
 												searchResultsAlbumFinal.media = Options.search_any_word ?
-													PhotoFloat.union(searchResultsAlbumFinal.media, searchResultsAlbum[indexWords1].media):
-													PhotoFloat.intersect(searchResultsAlbumFinal.media, searchResultsAlbum[indexWords1].media);
+													PhotoFloat.union(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]):
+													PhotoFloat.intersect(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]);
 											}
 
 											if (last_index != SearchWordsFromUser.length - 1) {
@@ -328,10 +330,10 @@
 												$("#album-view").removeClass("hidden");
 												searchResultsAlbumFinal.numMediaInAlbum = searchResultsAlbumFinal.media.length;
 												searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
-												searchResultsAlbumFinal.cacheBase = Options.by_search_string + Options.cache_folder_separator + wordsWithOptionsString;
-												searchResultsAlbumFinal.path = PhotoFloat.pathJoin([Options.by_search_string, wordsWithOptionsString]);
-												searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
-												searchResultsAlbumFinal.ancestorsCacheBase[searchResultsAlbumFinal.ancestorsCacheBase.length - 1] = searchResultsAlbumFinal.cacheBase;
+												// searchResultsAlbumFinal.cacheBase = Options.by_search_string + Options.cache_folder_separator + wordsWithOptionsString;
+												// searchResultsAlbumFinal.path = searchResultsAlbumFinal.cacheBase.replace(Options.cache_folder_separator, "/");
+												// searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
+												// searchResultsAlbumFinal.ancestorsCacheBase[searchResultsAlbumFinal.ancestorsCacheBase.length - 1] = searchResultsAlbumFinal.cacheBase;
 											}
 											self.albumCache[searchResultsAlbumFinal.cacheBase] = searchResultsAlbumFinal;
 											callback(searchResultsAlbumFinal, null, -1);
