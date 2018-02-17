@@ -1343,43 +1343,30 @@ $(document).ready(function() {
 			byGpsViewLink = "#!/" + encodeURIComponent(Options.by_gps_string);
 			$(".day-gps-folders-view").removeClass("selected").addClass("active").removeClass("hidden").off("click");
 			if (currentAlbum.cacheBase == Options.folders_string) {
-				$("#folders-view").removeClass("active").addClass("selected").off("click");
-				$("#by-date-view").off("click");
+				$("#folders-view").removeClass("active").addClass("selected");
 				$("#by-date-view").on("click", function(ev) {
 					window.location.href = byDateViewLink;
-					return false;
 				});
 				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			} else if (currentAlbum.cacheBase == Options.by_date_string) {
-				$("#folders-view").off("click");
 				$("#folders-view").on("click", function(ev) {
 					window.location.href = foldersViewLink;
-					return false;
 				});
-				$("#by-date-view").removeClass("active").addClass("selected").off("click");
+				$("#by-date-view").removeClass("active").addClass("selected");
 				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
-				$("#folders-view").off("click");
 				$("#folders-view").on("click", function(ev) {
 					window.location.href = foldersViewLink;
-					return false;
 				});
-				$("#by-date-view").off("click");
 				$("#by-date-view").on("click", function(ev) {
 					window.location.href = byDateViewLink;
-					return false;
 				});
-				$("#by-gps-view").removeClass("active").addClass("selected").off("click");
 			} else if (currentAlbum.cacheBase == Options.by_search_string) {
-				$("#folders-view").off("click");
 				$("#folders-view").on("click", function(ev) {
 					window.location.href = foldersViewLink;
-					return false;
 				});
-				$("#by-date-view").off("click");
 				$("#by-date-view").on("click", function(ev) {
 					window.location.href = byDateViewLink;
-					return false;
 				});
 				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			} else {

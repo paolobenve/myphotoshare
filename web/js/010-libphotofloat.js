@@ -9,7 +9,6 @@
 	}
 
 	/* public member functions */
-
 	PhotoFloat.prototype.getAlbum = function(thisAlbum, callback, error, thisIndexWords, thisIndexAlbums) {
 		var cacheKey, ajaxOptions, self;
 
@@ -123,8 +122,6 @@
 		// no media found, show the "no results line below search field"
 		$("#album-view").addClass("hidden");
 		$("#no-results").fadeIn(2000);
-		// $("#error-options-file, #error-overlay, #auth-text").fadeOut(2500);
-		// $("#error-overlay").fadeTo(500, 0.8);
 	}
 
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
