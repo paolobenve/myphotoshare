@@ -94,9 +94,9 @@ class Album(object):
 		self.baseless_path = remove_album_path(path)
 		self.cache_base = ""
 		self.media_list = list()
-		self.albums_list = list()
+		self.subalbums_list = list()
 		self.media_list_is_sorted = True
-		self.albums_list_is_sorted = True
+		self.subalbums_list_is_sorted = True
 		self._subdir = ""
 		self.num_media_in_sub_tree = 0
 		self.num_media_in_album = 0
@@ -133,8 +133,8 @@ class Album(object):
 		return self.media_list
 
 	@property
-	def albums(self):
-		return self.albums_list
+	def subalbums(self):
+		return self.subalbums_list
 
 	@property
 	def path(self):
@@ -157,13 +157,13 @@ class Album(object):
 	@property
 	def date(self):
 		self.sort_subalbums_and_media()
-		if len(self.media_list) == 0 and len(self.albums_list) == 0:
+		if len(self.media_list) == 0 and len(self.subalbums_list) == 0:
 			return datetime(1900, 1, 1)
 		elif len(self.media_list) == 0:
-			return self.albums_list[-1].date
-		elif len(self.albums_list) == 0:
+			return self.subalbums_list[-1].date
+		elif len(self.subalbums_list) == 0:
 			return self.media_list[-1].date
-		return max(self.media_list[-1].date, self.albums_list[-1].date)
+		return max(self.media_list[-1].date, self.subalbums_list[-1].date)
 
 
 	def __cmp__(self, other):
@@ -200,24 +200,24 @@ class Album(object):
 			self.media_list_is_sorted = False
 
 	def add_album(self, album):
-		self.albums_list.append(album)
-		self.albums_list_is_sorted = False
+		self.subalbums_list.append(album)
+		self.subalbums_list_is_sorted = False
 
 	def sort_subalbums_and_media(self):
 		if not self.media_list_is_sorted:
 			self.media_list.sort()
 			self.media_list_is_sorted = True
-		if not self.albums_list_is_sorted:
-			self.albums_list.sort()
-			self.albums_list_is_sorted = True
+		if not self.subalbums_list_is_sorted:
+			self.subalbums_list.sort()
+			self.subalbums_list_is_sorted = True
 
 	@property
 	def empty(self):
 		if len(self.media_list) != 0:
 			return False
-		if len(self.albums_list) == 0:
+		if len(self.subalbums_list) == 0:
 			return True
-		for album in self.albums_list:
+		for album in self.subalbums_list:
 			if not album.empty:
 				return False
 		return True
@@ -278,7 +278,7 @@ class Album(object):
 
 		if not cripple:
 			# it looks like the following code is never executed
-			for subalbum in dictionary["albums"]:
+			for subalbum in dictionary["subalbums"]:
 				album.add_album(Album.from_dict(subalbum, cripple))
 		album.sort_subalbums_and_media()
 
@@ -289,31 +289,31 @@ class Album(object):
 		self.sort_subalbums_and_media()
 		subalbums = []
 		if cripple:
-			for sub in self.albums_list:
-				if not sub.empty:
-					path_to_dict = trim_base_custom(sub.path, self.baseless_path)
+			for subalbum in self.subalbums_list:
+				if not subalbum.empty:
+					path_to_dict = trim_base_custom(subalbum.path, self.baseless_path)
 					if path_to_dict == "":
 						path_to_dict = Options.config['folders_string']
 
 					sub_dict = {
 						"path": path_to_dict,
-						"cacheBase": sub.cache_base,
-						"date": sub.date,
-						"numMediaInSubTree": sub.num_media_in_sub_tree
+						"cacheBase": subalbum.cache_base,
+						"date": subalbum.date,
+						"numMediaInSubTree": subalbum.num_media_in_sub_tree
 					}
-					if hasattr(sub, "center"):
-						sub_dict["center"] = sub.center
-					if hasattr(sub, "name"):
-						sub_dict["name"] = sub.name
-					if hasattr(sub, "alt_name"):
-						sub_dict["alt_name"] = sub.alt_name
+					if hasattr(subalbum, "center"):
+						sub_dict["center"] = subalbum.center
+					if hasattr(subalbum, "name"):
+						sub_dict["name"] = subalbum.name
+					if hasattr(subalbum, "alt_name"):
+						sub_dict["alt_name"] = subalbum.alt_name
 					subalbums.append(sub_dict)
 
 		else:
 			# it looks like the following code is never executed
-			for sub in self.albums_list:
-				if not sub.empty:
-					subalbums.append(sub)
+			for subalbum in self.subalbums_list:
+				if not subalbum.empty:
+					subalbums.append(subalbum)
 
 		path_without_folders_marker = remove_folders_marker(self.path)
 
@@ -344,7 +344,7 @@ class Album(object):
 			"path": path_to_dict,
 			"cacheSubdir": self._subdir,
 			"date": self.date,
-			"albums": subalbums,
+			"subalbums": subalbums,
 			"media": self.media_list,
 			"cacheBase": self.cache_base,
 			"ancestorsCacheBase": ancestors_cache_base,
@@ -396,7 +396,7 @@ class Album(object):
 		while subalbum_or_media_path.find("--") != -1:
 			subalbum_or_media_path = subalbum_or_media_path.replace("--", "-")
 
-		if media_file_name is None and hasattr(self, "albums_list") or media_file_name is not None and hasattr(self, "media_list"):
+		if media_file_name is None and hasattr(self, "subalbums_list") or media_file_name is not None and hasattr(self, "media_list"):
 			# let's avoid that different album/media with equivalent names have the same cache base
 			distinguish_suffix = 0
 			while True:
@@ -404,7 +404,7 @@ class Album(object):
 				if distinguish_suffix:
 					_path += "_" + str(distinguish_suffix)
 				if (
-					media_file_name is None     and any(_path == _album.cache_base and self.absolute_path != _album.absolute_path   for _album in self.albums_list) or
+					media_file_name is None     and any(_path == _album.cache_base and self.absolute_path != _album.absolute_path   for _album in self.subalbums_list) or
 					media_file_name is not None and any(_path == _media.cache_base and media_file_name    != _media.media_file_name for _media in self.media_list)
 				):
 					distinguish_suffix += 1
@@ -1159,7 +1159,7 @@ class Media(object):
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reducing size...", info_string, 5)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums...", "", 5)
+				message("thumbing for subalbums...", "", 5)
 			else:
 				message("thumbing for media...", "", 5)
 			start_image_copy.thumbnail((actual_thumb_size, actual_thumb_size), Image.ANTIALIAS)
@@ -1167,7 +1167,7 @@ class Media(object):
 			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
 				message("size reduced (" + str(original_thumb_size) + ")", "", 4)
 			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
-				message("thumbed for albums (" + str(original_thumb_size) + ")", "", 4)
+				message("thumbed for subalbums (" + str(original_thumb_size) + ")", "", 4)
 			else:
 				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
 			back_level()
@@ -1242,7 +1242,7 @@ class Media(object):
 				if original_thumb_size > Options.config['album_thumb_size']:
 					message("saved reduced (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				elif original_thumb_size == Options.config['album_thumb_size']:
-					message("saved for albums (2nd try, " + str(original_thumb_size) + ")", "", 2)
+					message("saved for subalbums (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				else:
 					message("saved for media (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				back_level()

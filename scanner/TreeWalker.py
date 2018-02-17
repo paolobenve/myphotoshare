@@ -104,7 +104,7 @@ class TreeWalker:
 
 			message("saving all albums to json files...", "", 4)
 			next_level()
-			for sub_album in self.origin_album.albums_list:
+			for sub_album in self.origin_album.subalbums_list:
 				self.all_albums_to_json_file(sub_album)
 			message("all albums saved to json files", "", 5)
 			back_level()
@@ -114,7 +114,7 @@ class TreeWalker:
 		message("complete", "", 4)
 
 	def all_albums_to_json_file(self, album):
-		for sub_album in album.albums_list:
+		for sub_album in album.subalbums_list:
 			self.all_albums_to_json_file(sub_album)
 		album.to_json_file()
 
@@ -860,7 +860,7 @@ class TreeWalker:
 			return [album.media_list[random_number], random_number]
 		else:
 			random_number -= len(album.media_list)
-			for subalbum in album.albums_list:
+			for subalbum in album.subalbums_list:
 				if random_number < subalbum.num_media_in_sub_tree:
 					[picked_image, random_number] = self.pick_random_image(subalbum, random_number)
 					if picked_image:

@@ -38,11 +38,11 @@
 					var i;
 					if (cacheKey == Options.by_search_string) {
 						// root of search albums: build the word list
-						for (i = 0; i < theAlbum.albums.length; ++i)
-							self.searchWordsFromJsonFile.push(theAlbum.albums[i].path);
+						for (i = 0; i < theAlbum.subalbums.length; ++i)
+							self.searchWordsFromJsonFile.push(theAlbum.subalbums[i].path);
 					} else if (cacheKey.indexOf(Options.by_search_string) !== 0) {
-						for (i = 0; i < theAlbum.albums.length; ++i)
-							theAlbum.albums[i].parent = theAlbum;
+						for (i = 0; i < theAlbum.subalbums.length; ++i)
+							theAlbum.subalbums[i].parent = theAlbum;
 						for (i = 0; i < theAlbum.media.length; ++i)
 							theAlbum.media[i].parent = theAlbum;
 					}
@@ -103,13 +103,13 @@
 			var index = Math.floor(Math.random() * (album.numMediaInSubTree));
 			if (index >= album.media.length) {
 				index -= album.media.length;
-				for (var i = 0; i < album.albums.length; i ++) {
-					if (index >= album.albums[i].numMediaInSubTree)
-						index -= album.albums[i].numMediaInSubTree;
+				for (var i = 0; i < album.subalbums.length; i ++) {
+					if (index >= album.subalbums[i].numMediaInSubTree)
+						index -= album.subalbums[i].numMediaInSubTree;
 					else
 						break;
 				}
-				self.getAlbum(album.albums[i], nextAlbum, error);
+				self.getAlbum(album.subalbums[i], nextAlbum, error);
 			} else
 				callback(album, album.media[index], container, subalbum);
 		};
@@ -207,7 +207,7 @@
 					var searchResultsAlbum = [];
 					var searchResultsAlbumFinal = {};
 					searchResultsAlbumFinal.media = [];
-					searchResultsAlbumFinal.albums = [];
+					searchResultsAlbumFinal.subalbums = [];
 					searchResultsAlbumFinal.cacheBase = albumHash;
 					searchResultsAlbumFinal.ancestorsCacheBase = bySearchRootAlbum.ancestorsCacheBase;
 					searchResultsAlbumFinal.ancestorsCacheBase.push(wordsStringOriginal);
