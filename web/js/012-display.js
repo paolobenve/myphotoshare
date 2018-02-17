@@ -1361,7 +1361,11 @@ $(document).ready(function() {
 				$("#by-date-view").on("click", function(ev) {
 					window.location.href = byDateViewLink;
 				});
-			} else if (currentAlbum.cacheBase == Options.by_search_string) {
+				$("#by-gps-view").removeClass("active").addClass("selected");
+			} else if (
+				currentAlbum.cacheBase == Options.by_search_string ||
+				currentAlbum.cacheBase.indexOf(Options.by_search_string) > -1 && currentAlbum.media.length == 0 && currentAlbum.subalbums.length == 0
+			) {
 				$("#folders-view").on("click", function(ev) {
 					window.location.href = foldersViewLink;
 				});
