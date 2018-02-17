@@ -64,7 +64,7 @@
 		}
 	}
 
-	PhotoFloat.prototype.AddClickToByGpsButton = function(link) {
+	PhotoFloat.prototype.addClickToByGpsButton = function(link) {
 		// this function returns true if the root album has the by gps subalbum
 		if (this.geotaggedPhotosFound !== null) {
 			if (this.geotaggedPhotosFound) {

@@ -1349,7 +1349,7 @@ $(document).ready(function() {
 					window.location.href = byDateViewLink;
 					return false;
 				});
-				photoFloat.AddClickToByGpsButton(byGpsViewLink);
+				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			} else if (currentAlbum.cacheBase == Options.by_date_string) {
 				$("#folders-view").off("click");
 				$("#folders-view").on("click", function(ev) {
@@ -1357,7 +1357,7 @@ $(document).ready(function() {
 					return false;
 				});
 				$("#by-date-view").removeClass("active").addClass("selected").off("click");
-				photoFloat.AddClickToByGpsButton(byGpsViewLink);
+				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
 				$("#folders-view").off("click");
 				$("#folders-view").on("click", function(ev) {
@@ -1381,7 +1381,7 @@ $(document).ready(function() {
 					window.location.href = byDateViewLink;
 					return false;
 				});
-				photoFloat.AddClickToByGpsButton(byGpsViewLink);
+				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			} else {
 				$(".day-gps-folders-view").addClass("hidden");
 			}
