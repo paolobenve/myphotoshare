@@ -23,6 +23,7 @@ import Options
 class TreeWalker:
 	def __init__(self):
 		random.seed()
+		geonames = Geonames()
 		self.all_json_files = ["options.json"]
 		self.all_json_files_by_subdir = {}
 

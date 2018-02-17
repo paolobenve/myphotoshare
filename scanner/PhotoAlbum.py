@@ -485,21 +485,9 @@ class Media(object):
 				if self.has_gps_data:
 					next_level()
 					message("looking for geonames...", media_path, 5)
-					geoname = Geonames()
-					self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
-					# self._attributes["geoname"] is a dictionary with this data:
-					#  'country_name': the country name in given language
-					#  'country_code': the ISO country code
-					#  'region_name': the administrative name (the region in normal states, the state in federative states) in given language
-					#  'region_code': the corresponding geonames code
-					#  'place_name': the nearby place name
-					#  'place_code': the nearby place geonames id
-					#  'distance': the distance between given coordinates and nearby place geonames coordinates
-
-					# Overwrite with album.ini values when album has been read from file
-					if self.album.album_ini:
-						Metadata.set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+					self.get_geonames()
 					back_level()
+
 			else:
 				# try with video detection
 				self._video_metadata(media_path)
@@ -511,11 +499,7 @@ class Media(object):
 						if self.has_gps_data:
 							next_level()
 							message("looking for geonames...", media_path, 5)
-							geoname = Geonames()
-							self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
-							# Overwrite with album.ini values when read from file
-							if self.album.album_ini:
-								Metadata.set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+							self.get_geonames()
 							back_level()
 				else:
 					next_level()
@@ -533,6 +517,22 @@ class Media(object):
 	@property
 	def datetime_dir(self):
 		return self._attributes["dateTimeDir"]
+
+
+	def get_geonames(self):
+		self._attributes["geoname"] = Geonames.lookup_nearby_place(self.latitude, self.longitude)
+		# self._attributes["geoname"] is a dictionary with this data:
+		#  'country_name': the country name in given language
+		#  'country_code': the ISO country code
+		#  'region_name': the administrative name (the region in normal states, the state in federative states) in given language
+		#  'region_code': the corresponding geonames code
+		#  'place_name': the nearby place name
+		#  'place_code': the nearby place geonames id
+		#  'distance': the distance between given coordinates and nearby place geonames coordinates
+
+		# Overwrite with album.ini values when album has been read from file
+		if self.album.album_ini:
+			Metadata.set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 
 
 	def _photo_metadata(self, image):

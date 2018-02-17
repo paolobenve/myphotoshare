@@ -39,7 +39,7 @@ class Geonames(object):
 
 	def __init__(self):
 		if Options.config['get_geonames_online']:
-			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}&featureClass=P&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
+			Geonames._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}&featureClass=P&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
 		elif self.cities == []:
 			next_level()
 			message("reading and processing local geonames files", "", 5)
@@ -82,7 +82,8 @@ class Geonames(object):
 			back_level()
 
 
-	def lookup_nearby_place(self, latitude, longitude):
+	@staticmethod
+	def lookup_nearby_place(latitude, longitude):
 		"""
 		Looks up places near a specific geographic location
 		"""
@@ -112,7 +113,7 @@ class Geonames(object):
 			# get country, region (state for federal countries), and place
 			try_number = 0
 			while True:
-				response = requests.get(self._base_nearby_url.format(str(latitude), str(longitude)))
+				response = requests.get(Geonames._base_nearby_url.format(str(latitude), str(longitude)))
 				try:
 					# the json.loads() function insidi _decode_nearby_place() one time throwed the error:
 					# json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
@@ -138,7 +139,7 @@ class Geonames(object):
 		if not got:
 			# get country, region (state for federal countries), and place
 			message("getting geonames from local files...", "", 5)
-			result = min([city for city in self.cities], key=lambda c: Geonames.quick_distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
+			result = min([city for city in Geonames.cities], key=lambda c: Geonames.quick_distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
 			result['distance'] = Geonames._distance_between_coordinates(latitude, longitude, result['latitude'], result['longitude'])
 			next_level()
 			message("geonames got from local files", "", 5)
