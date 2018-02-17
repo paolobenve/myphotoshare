@@ -69,6 +69,8 @@
 			if (this.geotaggedPhotosFound) {
 				$("#by-gps-view").off("click");
 				$("#by-gps-view").removeClass("hidden").addClass("active").on("click", function(ev) {
+					$("#no-results").hide();
+					$("#album-view").removeClass("hidden");
 					window.location.href = link;
 					return false;
 				});
@@ -83,6 +85,8 @@
 					self.geotaggedPhotosFound = true;
 					$("#by-gps-view").off("click");
 					$("#by-gps-view").removeClass("hidden").addClass("active").on("click", function(ev) {
+						$("#no-results").hide();
+						$("#album-view").removeClass("hidden");
 						window.location.href = link;
 						return false;
 					});
@@ -244,6 +248,7 @@
 						callback(searchResultsAlbumFinal, null, -1);
 					} else {
 						$("#album-view").removeClass("hidden");
+						$("#no-results").hide();
 						for (indexWords = 0; indexWords <= last_index; indexWords ++) {
 							for (indexAlbums = 0; indexAlbums < albumHashes[indexWords].length; indexAlbums ++) {
 								// getAlbum is called here with 2 more parameters, indexAlbums and indexWords, in order to know their ValueError
@@ -325,6 +330,7 @@
 												PhotoFloat.noResults();
 											} else {
 												$("#album-view").removeClass("hidden");
+												$("#no-results").hide();
 												searchResultsAlbumFinal.numMediaInAlbum = searchResultsAlbumFinal.media.length;
 												searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
 												// searchResultsAlbumFinal.cacheBase = Options.by_search_string + Options.cache_folder_separator + wordsWithOptionsString;

@@ -373,7 +373,7 @@ video {
 	color: #FFAD27;
 	margin-top: 20px;
 }
-.error, #error-overlay, #auth-text {
+.error, #error-overlay, #auth-text, #no-results {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -381,13 +381,12 @@ video {
 	height: 100%;
 	display: none;
 }
-.error, #auth-text {
-	position: fixed;
+.error, #auth-text, #no-results {
 	padding-top: 20%;
 	text-align: center;
 }
 
-.error {
+.error, #no-results {
 	font-size: 4em;
 	font-weight: bold;
 	font-style: italic;

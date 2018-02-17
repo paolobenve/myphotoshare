@@ -1367,9 +1367,13 @@ $(document).ready(function() {
 				currentAlbum.cacheBase.indexOf(Options.by_search_string) > -1 && currentAlbum.media.length == 0 && currentAlbum.subalbums.length == 0
 			) {
 				$("#folders-view").on("click", function(ev) {
+					$("#album-view").removeClass("hidden");
+					$("#no-results").hide();
 					window.location.href = foldersViewLink;
 				});
 				$("#by-date-view").on("click", function(ev) {
+					$("#no-results").hide();
+					$("#album-view").removeClass("hidden");
 					window.location.href = byDateViewLink;
 				});
 				photoFloat.addClickToByGpsButton(byGpsViewLink);
@@ -2099,6 +2103,7 @@ $(document).ready(function() {
 		$("#error-overlay").fadeTo(500, 0.8);
 		$("body, html").css("overflow", "hidden");
 	}
+
 	function undie() {
 		$(".error, #error-overlay, #auth-text").fadeOut(500);
 		$("body, html").css("overflow", "auto");
