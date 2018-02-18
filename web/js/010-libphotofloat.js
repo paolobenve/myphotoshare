@@ -127,6 +127,7 @@
 		$("#album-view").addClass("hidden");
 		if (typeof id === "undefined")
 			id = 'no-results';
+		$(".search-failed").hide();
 		$("#" + id).fadeIn(2000);
 	}
 
