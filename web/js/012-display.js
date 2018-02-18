@@ -2108,7 +2108,7 @@ $(document).ready(function() {
 	}
 
 	function undie() {
-		$(".error, #error-overlay, #auth-text").fadeOut(500);
+		$(".error, #error-overlay, #auth-text", ".search-failed").fadeOut(500);
 		$("body, html").css("overflow", "auto");
 	}
 
@@ -2118,6 +2118,7 @@ $(document).ready(function() {
 
 	function hashParsed(album, media, mediaIndex) {
 		var populateAlbum;
+
 		undie();
 		$("#loading").hide();
 		numSubAlbumsReady = 0;
@@ -2710,6 +2711,7 @@ $(document).ready(function() {
 
 	$(window).hashchange(function() {
 		$("#loading").show();
+		$("#album-view").removeClass("hidden");
 		$("link[rel=image_src]").remove();
 		$("link[rel=video_src]").remove();
 		$("ul#right-menu").removeClass("expand");

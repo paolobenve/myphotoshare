@@ -45,8 +45,6 @@ img.thumbnail-img {
 	padding: 0 .5em;
 }
 
-}
-
 #title, #title:hover {
 	line-height: 1.3em;
 }
@@ -379,7 +377,7 @@ video {
 	display: none;
 }
 .error, #auth-text, .search-failed {
-	padding-top: 20%;
+	margin-top: 20%;
 	text-align: center;
 }
 
