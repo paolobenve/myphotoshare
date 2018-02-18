@@ -565,19 +565,20 @@ $(document).ready(function() {
 
 			if (i != 1 || components[i] != Options.folders_string) {
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (i != 0 || ! (dateTitle || gpsTitle)) {
-						if (i == 1 && (dateTitle || gpsTitle)) {
-							title = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>" + title;
-							anchorOpened = true;
+					if (i != 0 || ! (dateTitle || gpsTitle || searchTitle)) {
+						if (i == 1 && (dateTitle || gpsTitle || searchTitle)) {
+							title = "<a class='" + titleAnchorClasses + "' href='#!/" + (searchTitle ? "" : encodeURI(currentAlbum.ancestorsCacheBase[i])) + "'>" + title;
 						} else {
 							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
 							if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
 								titleAdd += " title='" + _t("#place-icon-title") + gpsName + _t("#place-icon-title-end") + "'";
 							title += titleAdd + ">";
-							anchorOpened = true;
 						}
+						anchorOpened = true;
 					}
 				} else {
+					if (spanOpened)
+						title += "</span>";
 					title += "<span class='title-no-anchor'>";
 					spanOpened = true;
 				}
@@ -586,8 +587,7 @@ $(document).ready(function() {
 				else if (i == 1 && gpsTitle)
 					title += "(" + _t("#by-gps") + ")";
 				else if (i == 1 && searchTitle)
-					title += "(" + _t("#by-search") + ")";
-
+					title += _t("#by-search");
 				else {
 					if (gpsTitle && i >= 2 && i <= 4) {
 						// i == 2 corresponds to the country, i == 4 to the place,
@@ -615,7 +615,7 @@ $(document).ready(function() {
 				}
 
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (! (i == 0 && (dateTitle || gpsTitle))) {
+					if (! (i == 0 && (dateTitle || gpsTitle || searchTitle))) {
 						if (anchorOpened)
 							title += "</a>";
 						anchorOpened = false;
@@ -626,16 +626,16 @@ $(document).ready(function() {
 						if (dateTitle || gpsTitle || searchTitle) {
 							title += currentAlbum.media.length + " ";
 							title += _t(".title-media") + " ";
-							if (gpsTitle) {
-								if (components.length >= gpsLevelNumber + 2)
-									title += _t("#title-in-gps-album");
-								else
-									title += _t("#title-in-gpss-album");
-							} else if (dateTitle) {
+							if (dateTitle) {
 							 	if (components.length >= 5)
 									title += _t("#title-in-day-album");
 								else
 									title += _t("#title-in-date-album");
+							} else if (gpsTitle) {
+								if (components.length >= gpsLevelNumber + 2)
+									title += _t("#title-in-gps-album");
+								else
+									title += _t("#title-in-gpss-album");
 							} else if (searchTitle) {
 								title += _t("#title-in-search-album");
 							}
@@ -667,6 +667,16 @@ $(document).ready(function() {
 			}
 			if (i == 0 && (dateTitle || gpsTitle))
 				title += " ";
+			else if (searchTitle) {
+				if (i == 0) {
+					title += "</a>&raquo;<span class='title-no-anchor'>";
+					anchorOpened = false;
+					spanOpened = true;
+				} else if (i == 1) {
+					title += "</span>&raquo;";
+					spanOpened = false;
+				}
+			}
 			else if ((i < components.length - 1 || currentMedia !== null) &&
 				(i == components.length - 1 || components[i + 1] != Options.folders_string))
 				title += "&raquo;";
