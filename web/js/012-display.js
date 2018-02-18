@@ -621,9 +621,9 @@ $(document).ready(function() {
 						anchorOpened = false;
 					}
 				} else {
-					if (! isMobile.any() && currentAlbum.numMediaInSubTree) {
+					if (! isMobile.any()) {
 						title += " <span id=\"title-count\">(";
-						if (dateTitle || gpsTitle) {
+						if (dateTitle || gpsTitle || searchTitle) {
 							title += currentAlbum.media.length + " ";
 							title += _t(".title-media") + " ";
 							if (gpsTitle) {
@@ -636,6 +636,8 @@ $(document).ready(function() {
 									title += _t("#title-in-day-album");
 								else
 									title += _t("#title-in-date-album");
+							} else if (searchTitle) {
+								title += _t("#title-in-search-album");
 							}
 						} else {
 							var numMediaInSubAlbums = currentAlbum.numMediaInSubTree - currentAlbum.media.length;
