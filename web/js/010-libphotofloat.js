@@ -236,7 +236,7 @@
 						}
 					} else {
 						// whole words
-						for (i = 0; i < SearchWordsFromUser.length; i ++)
+						for (i = 0; i <= last_index; i ++)
 							if (searchWordsFromJsonFile.indexOf(SearchWordsFromUserNormalized[i]) > -1) {
 								albumHashes.push([Options.by_search_string + Options.cache_folder_separator + encodeURIComponent(SearchWordsFromUserNormalized[i])]);
 								numSubAlbumsToGet ++;
