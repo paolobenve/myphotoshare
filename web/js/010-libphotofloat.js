@@ -341,7 +341,6 @@
 												PhotoFloat.noResults();
 											} else if (searchResultsAlbumFinal.media.length > Options.big_virtual_folders_threshold) {
 												PhotoFloat.noResults('search-too-wide');
-												callback(searchResultsAlbumFinal, null, -1);
 											} else {
 												$("#album-view").removeClass("hidden");
 												$(".search-failed").hide();
