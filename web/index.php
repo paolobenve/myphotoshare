@@ -201,8 +201,6 @@
 	</div>
 
 	<div id="title-container">
-		<div id="buttons-container">
-		</div>
 		<div id="title">
 			<span id="title-string"></span>
 		</div>

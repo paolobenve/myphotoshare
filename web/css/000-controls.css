@@ -45,12 +45,9 @@ img.thumbnail-img {
 	padding: 0 .5em;
 }
 
-#buttons-container {
-	float: right;
-	margin-left: .5em;
 }
 
-#title, #title:hover, #buttons-container {
+#title, #title:hover {
 	line-height: 1.3em;
 }
 
