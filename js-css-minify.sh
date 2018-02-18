@@ -15,11 +15,11 @@ elif [ ! -f "$1" ]; then
 	exit 1
 fi
 
-# Parse which minifiers to use from configuration file
-DEFAULT_CONF="$(dirname $(realpath $0))/myphotoshare.conf.defaults"
-CONF="$1"
+PROJECT_DIR="$(dirname $(realpath $0))"
 
-echo "DEFAULT_CONF = $DEFAULT_CONF"
+# Parse which minifiers to use from configuration file
+DEFAULT_CONF="$PROJECT_DIR/myphotoshare.conf.defaults"
+CONF="$1"
 
 MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
 DEFAULT_MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $DEFAULT_CONF)"
@@ -90,12 +90,16 @@ case $MINIFY_CSS in
 esac
 
 # minify all .js-files
-cd web/js
+cd "$PROJECT_DIR/web/js"
 echo
 echo == Minifying js files in js directory ==
 echo
 CAT_LIST=""
 rm -f *.min.js
+if [ $? -ne 0 ]; then
+	echo "Can't write files. Aborting..."
+	exit 1
+fi
 while read jsfile; do
 	newfile="${jsfile%.*}.min.js"
 	echo "minifying $jsfile"
@@ -165,16 +169,19 @@ $(ls -1 *.js | grep -Ev "min.js$")
 EOF
 
 # merge all into one single file
-rm -f scripts.min.js
 cat $CAT_LIST > scripts.min.js
 
 
 # minify all .css-files
-cd ../css
+cd "$PROJECT_DIR/web/css"
 echo
 echo == Minifying css files in css directory ==
 echo
 rm -f *.min.css
+if [ $? -ne 0 ]; then
+	echo "Can't write files. Aborting..."
+	exit 1
+fi
 ls -1 *.css | grep -Ev "min.css$" | while read cssfile; do
 	newfile="${cssfile%.*}.min.css"
 	echo "minifying $cssfile"
@@ -194,7 +201,6 @@ ls -1 *.css | grep -Ev "min.css$" | while read cssfile; do
 done
 
 # merge all into one single file
-rm -f styles.min.css
 cat *.min.css > styles.min.css
 
 echo
