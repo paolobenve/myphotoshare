@@ -298,6 +298,10 @@
 												searchResultsAlbumFinal.media = Options.search_any_word ?
 													PhotoFloat.union(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]):
 													PhotoFloat.intersect(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]);
+												if (searchResultsAlbumFinal.media.length > Options.big_virtual_folders_threshold) {
+													PhotoFloat.noResults('search-too-wide');
+													callback(searchResultsAlbumFinal, null, -1);
+												}
 											}
 
 											if (last_index != SearchWordsFromUser.length - 1) {
@@ -335,6 +339,9 @@
 											}
 											if (! searchResultsAlbumFinal.media.length) {
 												PhotoFloat.noResults();
+											} else if (searchResultsAlbumFinal.media.length > Options.big_virtual_folders_threshold) {
+												PhotoFloat.noResults('search-too-wide');
+												callback(searchResultsAlbumFinal, null, -1);
 											} else {
 												$("#album-view").removeClass("hidden");
 												$(".search-failed").hide();
