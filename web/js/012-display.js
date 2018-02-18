@@ -621,7 +621,7 @@ $(document).ready(function() {
 						anchorOpened = false;
 					}
 				} else {
-					if (! isMobile.any()) {
+					if (! isMobile.any() && currentAlbum.media.length) {
 						title += " <span id=\"title-count\">(";
 						if (dateTitle || gpsTitle) {
 							title += currentAlbum.media.length + " ";
