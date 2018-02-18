@@ -284,7 +284,8 @@
 											searchResultsMedia[thisIndexWords] = PhotoFloat.union(searchResultsMedia[thisIndexWords], resultAlbum.media);
 										}
 
-										if (++ numSearchAlbumsReady >= numSubAlbumsToGet) {
+										numSearchAlbumsReady ++;
+										if (numSearchAlbumsReady >= numSubAlbumsToGet) {
 											// all the albums have been got, we can merge the results
 											searchResultsAlbumFinal.media = searchResultsMedia[0];
 											for (indexWords1 = 1; indexWords1 <= last_index; indexWords1 ++) {
