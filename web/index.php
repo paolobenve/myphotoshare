@@ -244,7 +244,8 @@
 		</div>
 	</div>
 
-	<div id="no-results"></div>
+	<div id="no-results" class="search-failed"></div>
+	<div id="search-too-wide" class="search-failed"></div>
 	<ul id="right-menu">
 		<li id="menu-icon"> ☰ </li>
 		<li class="search">

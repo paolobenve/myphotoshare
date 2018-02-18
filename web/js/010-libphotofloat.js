@@ -69,7 +69,7 @@
 			if (this.geotaggedPhotosFound) {
 				$("#by-gps-view").off("click");
 				$("#by-gps-view").removeClass("hidden").addClass("active").on("click", function(ev) {
-					$("#no-results").hide();
+					$(".search-failed").hide();
 					$("#album-view").removeClass("hidden");
 					window.location.href = link;
 					return false;
@@ -85,7 +85,7 @@
 					self.geotaggedPhotosFound = true;
 					$("#by-gps-view").off("click");
 					$("#by-gps-view").removeClass("hidden").addClass("active").on("click", function(ev) {
-						$("#no-results").hide();
+						$(".search-failed").hide();
 						$("#album-view").removeClass("hidden");
 						window.location.href = link;
 						return false;
@@ -122,10 +122,12 @@
 			this.getAlbum(subalbum, nextAlbum, error);
 	};
 
-	PhotoFloat.noResults = function() {
-		// no media found, show the "no results line below search field"
+	PhotoFloat.noResults = function(id) {
+		// no media found, show the "no results" line
 		$("#album-view").addClass("hidden");
-		$("#no-results").fadeIn(2000);
+		if (typeof id === "undefined")
+			id = 'no-results';
+		$("#" + id).fadeIn(2000);
 	}
 
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
@@ -246,9 +248,12 @@
 					if (albumHashes.length == 0){
 						PhotoFloat.noResults();
 						callback(searchResultsAlbumFinal, null, -1);
+					} else if (numSubAlbumsToGet > Options.big_virtual_folders_threshold) {
+						PhotoFloat.noResults('search-too-wide');
+						callback(searchResultsAlbumFinal, null, -1);
 					} else {
 						$("#album-view").removeClass("hidden");
-						$("#no-results").hide();
+						$(".search-failed").hide();
 						for (indexWords = 0; indexWords <= last_index; indexWords ++) {
 							for (indexAlbums = 0; indexAlbums < albumHashes[indexWords].length; indexAlbums ++) {
 								// getAlbum is called here with 2 more parameters, indexAlbums and indexWords, in order to know their ValueError
@@ -331,7 +336,7 @@
 												PhotoFloat.noResults();
 											} else {
 												$("#album-view").removeClass("hidden");
-												$("#no-results").hide();
+												$(".search-failed").hide();
 												searchResultsAlbumFinal.numMediaInAlbum = searchResultsAlbumFinal.media.length;
 												searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
 												// searchResultsAlbumFinal.cacheBase = Options.by_search_string + Options.cache_folder_separator + wordsWithOptionsString;

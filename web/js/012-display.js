@@ -446,7 +446,8 @@ $(document).ready(function() {
 			Options.search_any_word ||
 			Options.search_case_sensitive ||
 			Options.search_accent_sensitive ||
-			! $("ul#right-menu li#no-results").hasClass("hidden")
+			$("ul#right-menu li#no-results").is(":visible") ||
+			$("ul#right-menu li#search-too-wide").is(":visible")
 		) {
 			$("ul#right-menu li#inside-words").removeClass("hidden");
 			$("ul#right-menu li#any-word").removeClass("hidden");
@@ -1368,11 +1369,11 @@ $(document).ready(function() {
 			) {
 				$("#folders-view").on("click", function(ev) {
 					$("#album-view").removeClass("hidden");
-					$("#no-results").hide();
+					$(".search-failed").hide();
 					window.location.href = foldersViewLink;
 				});
 				$("#by-date-view").on("click", function(ev) {
-					$("#no-results").hide();
+					$(".search-failed").hide();
 					$("#album-view").removeClass("hidden");
 					window.location.href = byDateViewLink;
 				});
