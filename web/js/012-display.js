@@ -2450,7 +2450,7 @@ $(document).ready(function() {
 			if (Options.search_inside_words)
 				bySearchViewLink += Options.cache_folder_separator + 'i'
 			if (Options.search_any_word)
-				bySearchViewLink += Options.cache_folder_separator + 'w'
+				bySearchViewLink += Options.cache_folder_separator + 'n'
 			if (Options.search_case_sensitive)
 				bySearchViewLink += Options.cache_folder_separator + 'c'
 			if (Options.search_accent_sensitive)

@@ -180,7 +180,7 @@
 					var searchOptions = wordsAndOptions.slice(0, -1);
 					Options.search_regex = searchOptions.indexOf('r') > -1;
 					Options.search_inside_words = searchOptions.indexOf('i') > -1;
-					Options.search_any_word = searchOptions.indexOf('w') > -1;
+					Options.search_any_word = searchOptions.indexOf('n') > -1;
 					Options.search_case_sensitive = searchOptions.indexOf('c') > -1;
 					Options.search_accent_sensitive = searchOptions.indexOf('a') > -1;
 				}
