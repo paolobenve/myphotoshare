@@ -16,8 +16,10 @@ elif [ ! -f "$1" ]; then
 fi
 
 # Parse which minifiers to use from configuration file
-DEFAULT_CONF=myphotoshare.conf.defaults
+DEFAULT_CONF="$(dirname $(realpath $0))/myphotoshare.conf.defaults"
 CONF="$1"
+
+echo "DEFAULT_CONF = $DEFAULT_CONF"
 
 MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
 DEFAULT_MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $DEFAULT_CONF)"
