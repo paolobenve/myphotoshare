@@ -245,7 +245,7 @@
 							}
 					}
 
-					if (albumHashes.length == 0){
+					if (numSubAlbumsToGet == 0) {
 						PhotoFloat.noResults();
 						callback(searchResultsAlbumFinal, null, -1);
 					} else if (numSubAlbumsToGet > Options.big_virtual_folders_threshold) {
