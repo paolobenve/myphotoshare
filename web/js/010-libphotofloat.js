@@ -217,7 +217,7 @@
 					searchResultsAlbumFinal.path = searchResultsAlbumFinal.cacheBase.replace(Options.cache_folder_separator, "/");
 					searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
 					if (! Options.search_any_word)
-						// getting the first album is enough, media that do not match the other words will be escluded later
+						// when serching all the words, getting the first album is enough, media that do not match the other words will be escluded later
 						last_index = 0;
 					else
 						last_index = SearchWordsFromUser.length - 1;
