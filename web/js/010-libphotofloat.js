@@ -417,55 +417,6 @@
 	};
 
 
-	PhotoFloat.checkResult = function(searchStringFromUser) {
-		var found, i, j;
-		var arrayWordsFromUser = searchStringFromUser.split(' ');
-		var arraySearchAlbums = [];
-		if (! Options.search_any_word) {
-			// AND search
-			for (i = 0; i < arrayWordsFromUser.length; i ++) {
-				if (! Options.search_inside_words) {
-					if (window.searchWordsFromJsonFile.indexOf(arrayWordsFromUser[i]) > -1) {
-						arraySearchAlbums.push(arrayWordsFromUser[i]);
-					} else {
-						arraySearchAlbums = [];
-						break;
-					}
-				} else {
-					// search inside words
-					found = false;
-					for (j = 0; j < window.searchWordsFromJsonFile.length; j ++) {
-						if (window.searchWordsFromJsonFile[j].includes(arrayWordsFromUser[i])) {
-
-						} else {
-							found = false;
-						}
-					}
-					if (! found)
-						arraySearchAlbums.push(window.searchWordsFromJsonFile[j]);
-				}
-			}
-		} else {
-			// OR search
-			// still to be worked
-			found = false;
-			for (i = 0; i < arrayWordsFromUser.length; i ++) {
-				if (! Options.search_inside_words) {
-					if (window.searchWordsFromJsonFile.indexOf(arrayWordsFromUser[i]) > -1)
-						arraySearchAlbums.push(arrayWordsFromUser[i]);
-				} else if (Options.search_inside_words) {
-					for (j = 0; j < window.searchWordsFromJsonFile.length; j ++) {
-						if (window.searchWordsFromJsonFile[j].includes(arrayWordsFromUser[i])) {
-							found = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-		return arraySearchAlbums;
-	}
-
 	PhotoFloat.normalize = function(object) {
 		var string = object;
 		if (typeof object === "object")
