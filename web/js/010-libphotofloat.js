@@ -61,9 +61,10 @@
 			}
 			$.ajax(ajaxOptions);
 		}
-	}
+	};
 
 	PhotoFloat.prototype.addClickToByGpsButton = function(link) {
+		var self;
 		// this function returns true if the root album has the by gps subalbum
 		if (this.geotaggedPhotosFound !== null) {
 			if (this.geotaggedPhotosFound) {
@@ -97,7 +98,7 @@
 				}
 			);
 		}
-	}
+	};
 
 	PhotoFloat.prototype.pickRandomMedia = function(subalbum, container, callback, error) {
 		var nextAlbum, self;
@@ -129,10 +130,10 @@
 			id = 'no-results';
 		$(".search-failed").hide();
 		$("#" + id).fadeIn(2000);
-	}
+	};
 
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
-		var hashParts, lastSlashPosition, slashCount, albumHash, albumHashes, mediaHash = null, foldersHash = null, media = null, i;
+		var hashParts, lastSlashPosition, slashCount, albumHash, albumHashes, mediaHash = null, foldersHash = null, media = null;
 		var SearchWordsFromUser, SearchWordsFromUserNormalized;
 		var indexWords, indexAlbums;
 		// this vars are defined here and not at the beginning of the file because the options must have been read
@@ -156,7 +157,7 @@
 				// folders hash: album and media
 				albumHash = hashParts[0];
 				mediaHash = hashParts[1];
-			} else if (slashCount == 0) {
+			} else if (slashCount === 0) {
 				// folders or by date hash: album only
 				albumHash = hash;
 			} else if (slashCount == 2) {
@@ -172,7 +173,7 @@
 		SearchWordsFromUserNormalized = [];
 		if (albumHash) {
 			albumHash = decodeURI(albumHash);
-			if (slashCount == 0 && albumHash.indexOf(Options.by_search_string) === 0 && albumHash != Options.by_search_string) {
+			if (slashCount === 0 && albumHash.indexOf(Options.by_search_string) === 0 && albumHash != Options.by_search_string) {
 				var wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
 				var wordsAndOptions = wordsWithOptionsString.split(Options.cache_folder_separator);
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
@@ -207,7 +208,7 @@
 				Options.by_search_string,
 				// success:
 				function(bySearchRootAlbum) {
-					var last_index, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0;
+					var last_index, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0, normalizedWords;
 					var searchResultsMedia = [];
 					var searchResultsAlbumFinal = {};
 					searchResultsAlbumFinal.media = [];
@@ -246,7 +247,7 @@
 							}
 					}
 
-					if (numSubAlbumsToGet == 0) {
+					if (numSubAlbumsToGet === 0) {
 						PhotoFloat.noResults();
 						callback(searchResultsAlbumFinal, null, -1);
 					} else if (numSubAlbumsToGet > Options.max_search_album_number) {
@@ -263,7 +264,7 @@
 									albumHashes[indexWords][indexAlbums],
 									// success:
 									function(theAlbum, thisIndexWords, thisIndexAlbums) {
-										var matchingMedia = [], match, matchMediaWord, mediaNameFromSearch, arrayWordsFromMedia, indexMedia, indexWordsLeft, resultAlbum;
+										var matchingMedia = [], match, indexMedia, indexWordsLeft, resultAlbum, indexWords1;
 
 										resultAlbum = PhotoFloat.cloneObject(theAlbum);
 										// media in the album still has to be filtered according to search criteria
@@ -394,7 +395,7 @@
 
 	PhotoFloat.cloneObject = function(object) {
 		return Object.assign({}, object);
-	}
+	};
 
 	PhotoFloat.intersect = function(a, b) {
 		if (b.length > a.length) {
@@ -442,11 +443,11 @@
 			object = string;
 
 		return object;
-	}
+	};
 
 	PhotoFloat.removeAccents = function(string) {
 		return string.latinise();
-	}
+	};
 
 	PhotoFloat.prototype.authenticate = function(password, result) {
 		var ajaxOptions = {
@@ -525,9 +526,9 @@
 			media.mediaType == "photo" ||
 			media.mediaType == "video" && [Options.album_thumb_size, Options.media_thumb_size].indexOf(size) != -1
 		) {
-			actualSize = size;
-			albumThumbSize = Options.album_thumb_size;
-			mediaThumbSize = Options.media_thumb_size;
+			var actualSize = size;
+			var albumThumbSize = Options.album_thumb_size;
+			var mediaThumbSize = Options.media_thumb_size;
 			if ((size == albumThumbSize || size == mediaThumbSize) && screenRatio > 1) {
 				actualSize = Math.round(actualSize * Options.mobile_thumbnail_factor);
 				albumThumbSize = Math.round(albumThumbSize * Options.mobile_thumbnail_factor);
