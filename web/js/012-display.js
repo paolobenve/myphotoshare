@@ -54,8 +54,6 @@ $(document).ready(function() {
 	var fullScreenStatus = false;
 	var photoSrc, videoSrc;
 	var language;
-	var byDateRegex;
-	var byGpsRegex;
 	var numSubAlbumsReady;
 	var fromEscKey = false;
 	var firstEscKey = true;
@@ -146,7 +144,7 @@ $(document).ready(function() {
 					direc = "u";
 			}
 
-			if (direc != "") {
+			if (direc !== "") {
 				if(typeof callback == 'function')
 					callback(el,direc);
 			}
@@ -302,7 +300,7 @@ $(document).ready(function() {
 	}
 
 	function removeFolderMarker(cacheBase) {
-		if (cacheBase.indexOf(Options.folders_string) == 0) {
+		if (cacheBase.indexOf(Options.folders_string) === 0) {
 			cacheBase = cacheBase.substring(Options.folders_string.length);
 			if (cacheBase.length > 0)
 				cacheBase = cacheBase.substring(1);
@@ -355,7 +353,7 @@ $(document).ready(function() {
 
 		$("ul#right-menu li.ui").removeClass("hidden");
 
-		if (currentMedia !== null || currentAlbum !== null && currentAlbum.subalbums.length == 0) {
+		if (currentMedia !== null || currentAlbum !== null && currentAlbum.subalbums.length === 0) {
 			$("ul#right-menu li.slide").addClass("hidden");
 		} else {
 			$("ul#right-menu li.slide").removeClass("hidden");
@@ -372,7 +370,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.spaced").addClass("selected") :
 				$("ul#right-menu li.spaced").removeClass("selected");
 		}
-		if (currentMedia !== null || currentAlbum !== null && currentAlbum.subalbums.length == 0) {
+		if (currentMedia !== null || currentAlbum !== null && currentAlbum.subalbums.length === 0) {
 			$("ul#right-menu li.square-album-thumbnails").addClass("hidden");
 		} else {
 			$("ul#right-menu li.square-album-thumbnails").removeClass("hidden");
@@ -381,7 +379,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.square-album-thumbnails").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase))) {
+		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length === 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase))) {
 			$("ul#right-menu li.album-names").addClass("hidden");
 		} else {
 			$("ul#right-menu li.album-names").removeClass("hidden");
@@ -390,7 +388,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.album-names").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase))) {
+		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length === 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase))) {
 			$("ul#right-menu li.media-count").addClass("hidden");
 		} else {
 			$("ul#right-menu li.media-count").removeClass("hidden");
@@ -402,7 +400,7 @@ $(document).ready(function() {
 		if (
 			currentMedia !== null ||
 			currentAlbum !== null && (
-				currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold
+				currentAlbum.media.length === 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold
 			)
 		) {
 			$("ul#right-menu li.media-names").addClass("hidden");
@@ -416,7 +414,7 @@ $(document).ready(function() {
 		if (
 			currentMedia !== null ||
 			currentAlbum !== null && (
-				currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold
+				currentAlbum.media.length === 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold
 			)
 		) {
 			$("ul#right-menu li.square-media-thumbnails").addClass("hidden");
@@ -483,12 +481,12 @@ $(document).ready(function() {
 	}
 
 	function transformAltPlaceName(altPlaceName) {
-		underscoreIndex = altPlaceName.lastIndexOf('_');
+		var underscoreIndex = altPlaceName.lastIndexOf('_');
 		if (underscoreIndex != -1) {
-			number = altPlaceName.substring(underscoreIndex + 1);
+			var number = altPlaceName.substring(underscoreIndex + 1);
 			while (number.indexOf('0') === 0)
 				number = number.substr(1);
-			base = altPlaceName.substring(0, underscoreIndex);
+			var base = altPlaceName.substring(0, underscoreIndex);
 			return base + ' (' + _t('.subalbum') + number + ')';
 		} else {
 			return altPlaceName;
@@ -497,7 +495,7 @@ $(document).ready(function() {
 
 	function setTitle() {
 		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle, optionsAndSearchWords, searchWords;
-		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, m;
+		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, latitude, longitude, arrayCoordinates;
 		// gpsLevelNumber is the number of levels for the by gps tree
 		// current levels are country, region, place => 3
 		var gpsLevelNumber = 3;
@@ -522,7 +520,7 @@ $(document).ready(function() {
 
 		dateTitle = (components.length > 1 && components[1] == Options.by_date_string);
 		gpsTitle = (components.length > 1 && components[1] == Options.by_gps_string);
-		searchTitle = (components.length > 1 && components[1] == Options.by_search_string);
+		var searchTitle = (components.length > 1 && components[1] == Options.by_search_string);
 
 		if (searchTitle && components.length == 3) {
 			// the last element in components is the options and the search words
@@ -558,14 +556,14 @@ $(document).ready(function() {
 						gpsName = mediaForNames.geoname.place_name;
 				}
 
-				if (gpsName == '')
+				if (gpsName === '')
 					gpsName = _t('.not-specified');
 				gpsHtmlTitle = _t("#place-icon-title") + gpsName;
 			}
 
 			if (i != 1 || components[i] != Options.folders_string) {
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (i != 0 || ! (dateTitle || gpsTitle || searchTitle)) {
+					if (i !== 0 || ! (dateTitle || gpsTitle || searchTitle)) {
 						if (i == 1 && (dateTitle || gpsTitle || searchTitle)) {
 							title = "<a class='" + titleAnchorClasses + "' href='#!/" + (searchTitle ? "" : encodeURI(currentAlbum.ancestorsCacheBase[i])) + "'>" + title;
 						} else {
@@ -597,8 +595,8 @@ $(document).ready(function() {
 							longitude = currentMedia.metadata.longitude;
 						} else {
 							 arrayCoordinates = currentAlbum.ancestorsCenter[i];
-							 latitude = arrayCoordinates["latitude"];
-							 longitude = arrayCoordinates["longitude"];
+							 latitude = arrayCoordinates.latitude;
+							 longitude = arrayCoordinates.longitude;
 						}
 						if (anchorOpened) {
 							title += "</a>";
@@ -615,7 +613,7 @@ $(document).ready(function() {
 				}
 
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (! (i == 0 && (dateTitle || gpsTitle || searchTitle))) {
+					if (! (i === 0 && (dateTitle || gpsTitle || searchTitle))) {
 						if (anchorOpened)
 							title += "</a>";
 						anchorOpened = false;
@@ -665,10 +663,10 @@ $(document).ready(function() {
 					title += "</span>";
 				}
 			}
-			if (i == 0 && (dateTitle || gpsTitle))
+			if (i === 0 && (dateTitle || gpsTitle))
 				title += " ";
 			else if (searchTitle) {
-				if (i == 0) {
+				if (i === 0) {
 					title += "</a>&raquo;<span class='title-no-anchor'>";
 					anchorOpened = false;
 					spanOpened = true;
@@ -682,7 +680,7 @@ $(document).ready(function() {
 				title += "&raquo;";
 
 			// build the html page title
-			if (i == 0) {
+			if (i === 0) {
 				documentTitle += components[0];
 				if (components.length > 2 || currentMedia !== null)
 					documentTitle = " \u00ab " + documentTitle;
@@ -808,6 +806,8 @@ $(document).ready(function() {
 		// album properties reflect the current sorting of album and media objects
 		// json files have subalbums and media sorted by date not reversed
 
+		var m;
+
 		$("li.album-sort").removeClass("selected");
 		if (needAlbumNameSort()) {
 			currentAlbum.subalbums = sortByPath(currentAlbum.subalbums);
@@ -882,23 +882,13 @@ $(document).ready(function() {
 	}
 
 
-	function cacheBaseToCoordinateArray(cacheBase) {
-		array = cacheBase.split(Options.cache_folder_separator).slice(1);
-		for (var i = 0; i < array.length; i++) {
-			array[i] = array[i].split('_');
-			for (var j = 0; j < 2; j++)
-					array[i][j] = parseFloat(array[i][j]);
-		}
-		return array;
-	}
-
 	// see https://stackoverflow.com/questions/1069666/sorting-javascript-object-by-property-value
 	function sortByName(mediaList) {
 		return sortBy(mediaList, 'name');
 	}
 
 	function sortByPath(albumList) {
-		if (albumList[0].cacheBase.indexOf(Options.by_gps_string) == 0)
+		if (albumList[0].cacheBase.indexOf(Options.by_gps_string) === 0)
 			return sortBy(albumList, 'name');
 		else
 			return sortBy(albumList, 'path');
@@ -982,7 +972,7 @@ $(document).ready(function() {
 			thumbnailSize = Options.media_thumb_size;
 
 			populateMedia = populate;
-			isVirtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_search_string) == 0 );
+			isVirtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0 || currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0 );
 			tooBig = currentAlbum.path.split("/").length < 4 && currentAlbum.media.length > Options.big_virtual_folders_threshold;
 			if (populateMedia === true && isVirtualAlbum)
 				populateMedia = populateMedia && ! tooBig;
@@ -1156,7 +1146,7 @@ $(document).ready(function() {
 						subalbums.push(link);
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
-								var htmlText, height;
+								var htmlText;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								var heightfactor = 1.6;
@@ -1227,7 +1217,7 @@ $(document).ready(function() {
 									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
 									var folderName = '';
 									var folderTitle = '';
-									if (level == 0)
+									if (level === 0)
 										folderName = randomAlbum.media[0].geoname.country_name;
 									else if (level == 1)
 										folderName = randomAlbum.media[0].geoname.region_name;
@@ -1236,7 +1226,7 @@ $(document).ready(function() {
 											folderName = transformAltPlaceName(randomAlbum.media[0].geoname.alt_place_name);
 										else
 											folderName = randomAlbum.media[0].geoname.place_name;
-									if (folderName == '')
+									if (folderName === '')
 										folderName = _t('.not-specified');
 									folderTitle = _t('#place-icon-title') + folderName;
 
@@ -1257,7 +1247,6 @@ $(document).ready(function() {
 								// get the value in style sheet (element with that class doesn't exist in DOM
 								var $el = $('<div class="album-caption"></div>');
 								$($el).appendTo('body');
-								var paddingTop = parseInt($($el).css('padding-top'));
 								$($el).remove();
 
 								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
@@ -1265,7 +1254,7 @@ $(document).ready(function() {
 								if (PhotoFloat.isFolderAlbum(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
 									heightfactor = 0;
 								else if (! Options.show_album_media_count)
-									heightfactor = 1.1
+									heightfactor = 1.1;
 								buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
@@ -1351,9 +1340,9 @@ $(document).ready(function() {
 			$("#media-box-inner").empty();
 			$("#media-box").hide();
 			$("#thumbs").show();
-			foldersViewLink = "#!/" + encodeURIComponent(Options.folders_string);
-			byDateViewLink = "#!/" + encodeURIComponent(Options.by_date_string);
-			byGpsViewLink = "#!/" + encodeURIComponent(Options.by_gps_string);
+			var foldersViewLink = "#!/" + encodeURIComponent(Options.folders_string);
+			var byDateViewLink = "#!/" + encodeURIComponent(Options.by_date_string);
+			var byGpsViewLink = "#!/" + encodeURIComponent(Options.by_gps_string);
 			$(".day-gps-folders-view").removeClass("selected").addClass("active").removeClass("hidden").off("click");
 			if (currentAlbum.cacheBase == Options.folders_string) {
 				$("#folders-view").removeClass("active").addClass("selected");
@@ -1377,7 +1366,7 @@ $(document).ready(function() {
 				$("#by-gps-view").removeClass("active").addClass("selected");
 			} else if (
 				currentAlbum.cacheBase == Options.by_search_string ||
-				currentAlbum.cacheBase.indexOf(Options.by_search_string) > -1 && currentAlbum.media.length == 0 && currentAlbum.subalbums.length == 0
+				currentAlbum.cacheBase.indexOf(Options.by_search_string) > -1 && currentAlbum.media.length === 0 && currentAlbum.subalbums.length === 0
 			) {
 				$("#folders-view").on("click", function(ev) {
 					$("#album-view").removeClass("hidden");
@@ -1535,7 +1524,7 @@ $(document).ready(function() {
 		chosenMedia = PhotoFloat.originalMediaPath(media);
 		maxSize = 0;
 
-		if (container == null) {
+		if (container === null) {
 			// try with what is more probable to be the container
 			if (fullScreenStatus)
 				container = $(window);
@@ -1574,9 +1563,8 @@ $(document).ready(function() {
 
 	function showMedia(album) {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
-		var prevMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
+		var prevMedia, nextMedia, text, thumbnailSize, i, linkTag, triggerLoad, videoOK = true;
 		var nextReducedPhoto, prevReducedPhoto;
-		var link;
 
 		mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentMedia);
 		firstEscKey = true;
@@ -1678,7 +1666,7 @@ $(document).ready(function() {
 					PhotoFloat.pathJoin([currentAlbum.media[currentMediaIndex].dayAlbum, currentAlbum.media[currentMediaIndex].name]);
 				currentAlbum.media[currentMediaIndex].byGpsName =
 						PhotoFloat.pathJoin([currentAlbum.media[currentMediaIndex].gpsAlbum, currentAlbum.media[currentMediaIndex].name]);
-				if (i == 0)
+				if (i === 0)
 					i = currentAlbum.media.length - 1;
 				else
 					i --;
@@ -1720,7 +1708,7 @@ $(document).ready(function() {
 				albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "";
 			prevLink = "";
-			$("#media-view").css('cursor', 'default')
+			$("#media-view").css('cursor', 'default');
 		} else {
 			albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
@@ -1775,16 +1763,16 @@ $(document).ready(function() {
 			$('#menu-map-divider').hide();
 		}
 
-		foldersViewLink = "#!/" + PhotoFloat.pathJoin([
+		var foldersViewLink = "#!/" + PhotoFloat.pathJoin([
 									encodeURIComponent(currentMedia.foldersCacheBase),
 									encodeURIComponent(currentMedia.cacheBase)
 								]);
-		byDateViewLink = "#!/" + PhotoFloat.pathJoin([
+		var byDateViewLink = "#!/" + PhotoFloat.pathJoin([
 									encodeURIComponent(currentMedia.dayAlbumCacheBase),
 									encodeURIComponent(currentMedia.foldersCacheBase),
 									encodeURIComponent(currentMedia.cacheBase)
 								]);
-		byGpsViewLink = "#!/" + PhotoFloat.pathJoin([
+		var byGpsViewLink = "#!/" + PhotoFloat.pathJoin([
 									encodeURIComponent(currentMedia.gpsAlbumCacheBase),
 									encodeURIComponent(currentMedia.foldersCacheBase),
 									encodeURIComponent(currentMedia.cacheBase)
@@ -1930,6 +1918,7 @@ $(document).ready(function() {
 	}
 
 	function mapLink(latitude, longitude, zoom) {
+		var link;
 		if (Options.map_service == 'openstreetmap') {
 			link = 'http://www.openstreetmap.org/#map=' + zoom + '/' + latitude + '/' + longitude;
 		}
@@ -2210,8 +2199,6 @@ $(document).ready(function() {
 				url: optionsFile,
 				success: function(data) {
 					// for map zoom levels, see http://wiki.openstreetmap.org/wiki/Zoom_levels
-					// levelZeroSpecificDistance is the specific distance (m/pixel) for zoom level 0
-					var levelZeroSpecificDistance = 156412;
 
 					for (var key in data)
 						if (data.hasOwnProperty(key))
@@ -2455,20 +2442,19 @@ $(document).ready(function() {
 	$('#search-button').on("click", function() {
 		// save current hash in order to come back there when exiting from search
 
-		var savedLink = location.hash ? '#' + location.hash.substring(1) : "";
 		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
-		bySearchViewLink = "#!/" + Options.by_search_string;
+		var bySearchViewLink = "#!/" + Options.by_search_string;
 		if (Options.search_regex)
-			bySearchViewLink += Options.cache_folder_separator + 'r'
+			bySearchViewLink += Options.cache_folder_separator + 'r';
 		else {
 			if (Options.search_inside_words)
-				bySearchViewLink += Options.cache_folder_separator + 'i'
+				bySearchViewLink += Options.cache_folder_separator + 'i';
 			if (Options.search_any_word)
-				bySearchViewLink += Options.cache_folder_separator + 'n'
+				bySearchViewLink += Options.cache_folder_separator + 'n';
 			if (Options.search_case_sensitive)
-				bySearchViewLink += Options.cache_folder_separator + 'c'
+				bySearchViewLink += Options.cache_folder_separator + 'c';
 			if (Options.search_accent_sensitive)
-				bySearchViewLink += Options.cache_folder_separator + 'a'
+				bySearchViewLink += Options.cache_folder_separator + 'a';
 		}
 		bySearchViewLink += Options.cache_folder_separator + searchTerms;
 		window.location.href = bySearchViewLink;
