@@ -270,19 +270,20 @@
 
 										resultAlbum = PhotoFloat.cloneObject(theAlbum);
 										// media in the album still has to be filtered according to search criteria
-										for (indexMedia = 0; indexMedia < theAlbum.media.length; indexMedia ++) {
-											if (! Options.search_inside_words) {
-												// whole word
+										if (! Options.search_inside_words) {
+											// whole word
+											for (indexMedia = 0; indexMedia < theAlbum.media.length; indexMedia ++) {
 												if (PhotoFloat.normalize(theAlbum.media[indexMedia].words).indexOf(SearchWordsFromUser[thisIndexWords]) > -1)
 													matchingMedia.push(theAlbum.media[indexMedia]);
-											} else {
-												// inside words
-												for (indexMediaWords = 0; indexMediaWords < theAlbum.media[indexMedia].words.length; indexMediaWords ++) {
-													if (PhotoFloat.normalize(theAlbum.media[indexMedia].words[indexMediaWords]).indexOf(SearchWordsFromUser[thisIndexWords]) > -1) {
-														matchingMedia.push(theAlbum.media[indexMedia]);
-														break;
-													}
-												}
+											}
+										} else {
+											// inside words
+											for (indexMedia = 0; indexMedia < theAlbum.media.length; indexMedia ++) {
+												normalizedWords = PhotoFloat.normalize(theAlbum.media[indexMedia].words);
+												if (normalizedWords.some(function(element) {
+													return element.indexOf(SearchWordsFromUser[thisIndexWords]) > -1;
+												}))
+													matchingMedia.push(theAlbum.media[indexMedia]);
 											}
 										}
 										resultAlbum.media = matchingMedia;
@@ -290,7 +291,7 @@
 										if (! (thisIndexWords in searchResultsMedia)) {
 											searchResultsMedia[thisIndexWords] = resultAlbum.media;
 										} else {
-											searchResultsMedia[thisIndexWords] = PhotoFloat.union(searchResultsMedia[thisIndexWords], resultAlbum.media);
+											// searchResultsMedia[thisIndexWords] = PhotoFloat.union(searchResultsMedia[thisIndexWords], resultAlbum.media);
 										}
 										// the following instruction makes me see that numSearchAlbumsReady never reaches numSubAlbumsToGet when numSubAlbumsToGet is > 1000,
 										// numSearchAlbumsReady remains < 1000
@@ -312,29 +313,26 @@
 												matchingMedia = [];
 												for (indexMedia = 0; indexMedia < searchResultsAlbumFinal.media.length; indexMedia ++) {
 													match = true;
-													for (indexWordsLeft = last_index + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
-														if (! Options.search_inside_words) {
-															// whole word
-															if (PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words).indexOf(SearchWordsFromUser[indexWordsLeft]) == -1) {
-																match = false;
-																break;
-															}
-														} else {
-															// inside words
-															matchMediaWord = false;
-															for (indexMediaWords = 0; indexMediaWords < searchResultsAlbumFinal.media[indexMedia].words.length; indexMediaWords ++) {
-																if (PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words[indexMediaWords]).indexOf(SearchWordsFromUser[indexWordsLeft]) > -1) {
-																	matchMediaWord = true;
-																	break;
-																}
-															}
-															if (! matchMediaWord) {
+													if (! Options.search_inside_words) {
+														// whole word
+														normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words);
+														if (SearchWordsFromUser.some(function(element, index) {
+															return index > last_index && normalizedWords.indexOf(element) == -1;
+														}))
+															match = false;
+													} else {
+														// inside words
+														for (indexWordsLeft = last_index + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
+															normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words);
+															if (! normalizedWords.every(function(element) {
+																return normalizedWords.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
+															})) {
 																match = false;
 																break;
 															}
 														}
 													}
-													if (match)
+													if (match && matchingMedia.indexOf(searchResultsAlbumFinal.media[indexMedia]) == -1)
 														matchingMedia.push(searchResultsAlbumFinal.media[indexMedia]);
 												}
 												searchResultsAlbumFinal.media = matchingMedia;
