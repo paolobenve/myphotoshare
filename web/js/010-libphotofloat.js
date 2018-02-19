@@ -346,10 +346,6 @@
 											} else {
 												$("#album-view").removeClass("hidden");
 												$(".search-failed").hide();
-												// searchResultsAlbumFinal.cacheBase = Options.by_search_string + Options.cache_folder_separator + wordsWithOptionsString;
-												// searchResultsAlbumFinal.path = searchResultsAlbumFinal.cacheBase.replace(Options.cache_folder_separator, "/");
-												// searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
-												// searchResultsAlbumFinal.ancestorsCacheBase[searchResultsAlbumFinal.ancestorsCacheBase.length - 1] = searchResultsAlbumFinal.cacheBase;
 											}
 											searchResultsAlbumFinal.numMediaInAlbum = searchResultsAlbumFinal.media.length;
 											searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
