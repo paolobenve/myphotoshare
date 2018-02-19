@@ -249,7 +249,7 @@
 					if (numSubAlbumsToGet == 0) {
 						PhotoFloat.noResults();
 						callback(searchResultsAlbumFinal, null, -1);
-					} else if (numSubAlbumsToGet > Options.big_virtual_folders_threshold / 10) {
+					} else if (numSubAlbumsToGet > Options.max_search_album_number) {
 						PhotoFloat.noResults('search-too-wide');
 						callback(searchResultsAlbumFinal, null, -1);
 					} else {

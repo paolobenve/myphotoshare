@@ -71,6 +71,7 @@ def get_options():
 				'album_thumb_size',
 				'media_thumb_size',
 				'big_virtual_folders_threshold',
+				'max_search_album_number',
 				'respected_processors',
 				'max_album_share_thumbnails_number',
 				'min_album_thumbnail',

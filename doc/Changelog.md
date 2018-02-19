@@ -20,6 +20,7 @@
   * created a gallery of screenshots
 * Reduced images and thumbnail naming schema is now more robust
 * cache files names are now made of only lower case ascii characters
+* new option `max_search_album_number`: the maximum number of search album that will be loaded
 
 
 ### version 3.3 (January 22, 2018)
