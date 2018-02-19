@@ -218,7 +218,8 @@ map_zoom_levels = [6, 9, 15]
 photo_map_zoom_level = 16
 
 # The maximum number of search album that will be loaded
-max_search_album_number = 99
+# A value of 200 seems acceptable on a pc, 100 is more sure
+max_search_album_number = 100
 
 ###########################################################
 # user interface options
