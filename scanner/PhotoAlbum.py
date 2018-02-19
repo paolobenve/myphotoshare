@@ -129,6 +129,31 @@ class Album(object):
 						self._subdir += "_"
 
 	@property
+	def album_name(self):
+		return os.path.basename(self.baseless_path)
+
+	@property
+	def title(self):
+		if 'metadata' in self._attributes and 'title' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["title"]
+		else:
+			return ''
+
+	@property
+	def description(self):
+		if 'metadata' in self._attributes and 'description' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["description"]
+		else:
+			return ''
+
+	@property
+	def tags(self):
+		if 'metadata' in self._attributes and 'tags' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["tags"]
+		else:
+			return ''
+
+	@property
 	def media(self):
 		return self.media_list
 

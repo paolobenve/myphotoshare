@@ -202,16 +202,16 @@ class TreeWalker:
 		by_search_album.cache_base = Options.config['by_search_string']
 		by_search_max_file_date = None
 		message("working with word albums...", "", 5)
-		for word, media in self.tree_by_search.items():
+		for word, media_and_album_words in self.tree_by_search.items():
 			next_level()
-			message("working with word album...", word + ", n=" + str(len(media)), 5)
+			message("working with word album...", word + ", n=" + str(len(media_and_album_words)), 5)
 			word_path = os.path.join(by_search_path, str(word))
 			word_album = Album(word_path)
 			word_album.parent = by_search_album
 			word_album.cache_base = by_search_album.generate_cache_base(os.path.join(by_search_album.cache_base, word))
 			word_max_file_date = None
 			by_search_album.add_album(word_album)
-			for single_media in media:
+			for single_media in media_and_album_words["media_words"]:
 				word_album.add_media(single_media)
 				word_album.num_media_in_sub_tree += 1
 				word_album.num_media_in_album += 1
@@ -226,6 +226,20 @@ class TreeWalker:
 					by_search_max_file_date = max(by_search_max_file_date, single_media_date)
 				else:
 					by_search_max_file_date = single_media_date
+			for single_album in media_and_album_words["album_words"]:
+				word_album.add_album(single_album)
+				word_album.num_media_in_sub_tree += single_album.num_media_in_sub_tree
+				word_album.num_media_in_album += 1
+				by_search_album.add_album(single_album)
+				by_search_album.num_media_in_sub_tree += single_album.num_media_in_sub_tree
+				if word_max_file_date:
+					word_max_file_date = max(word_max_file_date, single_album.date)
+				else:
+					word_max_file_date = single_album.date
+				if by_search_max_file_date:
+					by_search_max_file_date = max(by_search_max_file_date, single_album.date)
+				else:
+					by_search_max_file_date = single_album.date
 			self.all_albums.append(word_album)
 			self.generate_composite_image(word_album, word_max_file_date)
 			next_level()
@@ -462,32 +476,51 @@ class TreeWalker:
 
 
 	def add_media_to_tree_by_search(self, media):
-		# add the given media to a temporary structure where media are organized by search terms
-		# works on the words in the file name and in album.ini's description, title, tags
-		phrase = media.name + " " + media.title + " " + media.description + " " + media.tags
+		words_for_search_album_name = self.prepare_for_tree_by_search(media)
+		for word in words_for_search_album_name:
+			if word:
+				if word not in list(self.tree_by_search.keys()):
+					self.tree_by_search[word] = {"media_words": [], "album_words": []}
+				if not media in self.tree_by_search[word]["media_words"]:
+					self.tree_by_search[word]["media_words"].append(media)
 
-		# media word list has the words with there case and accents
+	def add_album_to_tree_by_search(self, album):
+		words_for_search_album_name = self.prepare_for_tree_by_search(album)
+		for word in words_for_search_album_name:
+			if word:
+				if word not in list(self.tree_by_search.keys()):
+					self.tree_by_search[word] = {"media_words": [], "album_words": []}
+				if not album in self.tree_by_search[word]["album_words"]:
+					self.tree_by_search[word]["album_words"].append(album)
+
+	def prepare_for_tree_by_search(self, media_or_album):
+		# add the given media or album to a temporary structure where media or albums are organized by search terms
+		# works on the words in the file/directory name and in album.ini's description, title, tags
+
+		if isinstance(media_or_album, Album):
+			name = media_or_album.album_name
+		elif isinstance(media_or_album, Media):
+			name = media_or_album.name
+		phrase = name + " " + media_or_album.title + " " + media_or_album.description + " " + media_or_album.tags
+
+		# media or album word list has the words with there case and accents
 		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
 		# get unique values
 		words_for_word_list = list(set(words_for_word_list))
 		# remove empty elements
 		words_for_word_list = [x for x in words_for_word_list if x]
 
-		media.words = words_for_word_list
+		media_or_album.words = words_for_word_list
 
-		# words for album names are lower case and accentless
-		words_for_album_name = self.normalize_and_split_for_album_name(phrase)
+		# words for search album names are lower case and accentless
+		words_for_search_album_name = self.normalize_and_split_for_album_name(phrase)
 		# get unique values
-		words_for_album_name = list(set(words_for_album_name))
+		words_for_search_album_name = list(set(words_for_search_album_name))
 		# remove empty elements
-		words_for_album_name = [x for x in words_for_album_name if x]
+		words_for_search_album_name = [x for x in words_for_search_album_name if x]
 
-		for word in words_for_album_name:
-			if word:
-				if word not in list(self.tree_by_search.keys()):
-					self.tree_by_search[word] = list()
-				if not media in self.tree_by_search[word]:
-					self.tree_by_search[word].append(media)
+		return words_for_search_album_name
+
 
 	def add_media_to_tree_by_geonames(self, media):
 		# add the given media to a temporary structure where media are organized by country, region/state, place
@@ -679,6 +712,7 @@ class TreeWalker:
 					max_file_date = max(max_file_date, sub_max_file_date)
 					album.num_media_in_sub_tree += num
 					album.add_album(next_walked_album)
+					self.add_album_to_tree_by_search(album)
 			elif os.path.isfile(entry_with_path):
 				if skip_files:
 					continue
