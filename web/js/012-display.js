@@ -1090,7 +1090,7 @@ $(document).ready(function() {
 				}
 				albumLink = "";
 				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
-					if (currentMedia === null && currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0) {
+					if (currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0) {
 						albumLink = savedLink ? savedLink : "#!/";
 					} else
 						albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
@@ -2438,6 +2438,7 @@ $(document).ready(function() {
 	$('#search-button').on("click", function() {
 		// save current hash in order to come back there when exiting from search
 
+		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
 		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
 		var bySearchViewLink = "#!/" + Options.by_search_string;
 		if (Options.search_regex)
