@@ -210,6 +210,7 @@
 				function(bySearchRootAlbum) {
 					var last_index, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0, normalizedWords;
 					var searchResultsMedia = [];
+					var searchResultsSubalbums = [];
 					var searchResultsAlbumFinal = {};
 					searchResultsAlbumFinal.media = [];
 					searchResultsAlbumFinal.subalbums = [];
@@ -266,7 +267,7 @@
 									albumHashes[indexWords][indexAlbums],
 									// success:
 									function(theAlbum, thisIndexWords, thisIndexAlbums) {
-										var matchingMedia = [], match, indexMedia, indexWordsLeft, resultAlbum, indexWords1;
+										var matchingMedia = [], matchingSubalbums = [], match, indexMedia, indexSubalbums, indexWordsLeft, resultAlbum, indexWords1;
 
 										resultAlbum = PhotoFloat.cloneObject(theAlbum);
 										// media in the album still has to be filtered according to search criteria
@@ -275,6 +276,10 @@
 											for (indexMedia = 0; indexMedia < theAlbum.media.length; indexMedia ++) {
 												if (PhotoFloat.normalize(theAlbum.media[indexMedia].words).indexOf(SearchWordsFromUser[thisIndexWords]) > -1)
 													matchingMedia.push(theAlbum.media[indexMedia]);
+											}
+											for (indexSubalbums = 0; indexSubalbums < theAlbum.subalbums.length; indexSubalbums ++) {
+												if (PhotoFloat.normalize(theAlbum.subalbums[indexSubalbums].words).indexOf(SearchWordsFromUser[thisIndexWords]) > -1)
+													matchingSubalbums.push(theAlbum.subalbums[indexSubalbums]);
 											}
 										} else {
 											// inside words
@@ -285,11 +290,20 @@
 												}))
 													matchingMedia.push(theAlbum.media[indexMedia]);
 											}
+											for (indexSubalbums = 0; indexSubalbums < theAlbum.subalbums.length; indexSubalbums ++) {
+												normalizedWords = PhotoFloat.normalize(theAlbum.subalbums[indexSubalbums].words);
+												if (normalizedWords.some(function(element) {
+													return element.indexOf(SearchWordsFromUser[thisIndexWords]) > -1;
+												}))
+													matchingSubalbums.push(theAlbum.subalbums[indexSubalbums]);
+											}
 										}
 										resultAlbum.media = matchingMedia;
+										resultAlbum.subalbums = matchingSubalbums;
 
 										if (! (thisIndexWords in searchResultsMedia)) {
 											searchResultsMedia[thisIndexWords] = resultAlbum.media;
+											searchResultsSubalbums[thisIndexWords] = resultAlbum.subalbums;
 										} else {
 											// searchResultsMedia[thisIndexWords] = PhotoFloat.union(searchResultsMedia[thisIndexWords], resultAlbum.media);
 										}
@@ -301,10 +315,14 @@
 										if (numSearchAlbumsReady >= numSubAlbumsToGet) {
 											// all the albums have been got, we can merge the results
 											searchResultsAlbumFinal.media = searchResultsMedia[0];
+											searchResultsAlbumFinal.subalbums = searchResultsSubalbums[0];
 											for (indexWords1 = 1; indexWords1 <= last_index; indexWords1 ++) {
 												searchResultsAlbumFinal.media = Options.search_any_word ?
-													PhotoFloat.union(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]):
+													PhotoFloat.union(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]) :
 													PhotoFloat.intersect(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]);
+												searchResultsAlbumFinal.subalbums = Options.search_any_word ?
+													PhotoFloat.union(searchResultsAlbumFinal.subalbums, searchResultsSubalbums[indexWords1]) :
+													PhotoFloat.intersect(searchResultsAlbumFinal.subalbums, searchResultsSubalbums[indexWords1]);
 											}
 
 											if (last_index != SearchWordsFromUser.length - 1) {
@@ -336,8 +354,35 @@
 														matchingMedia.push(searchResultsAlbumFinal.media[indexMedia]);
 												}
 												searchResultsAlbumFinal.media = matchingMedia;
+
+												matchingSubalbums = [];
+												for (indexSubalbums = 0; indexSubalbums < searchResultsAlbumFinal.subalbums.length; indexSubalbums ++) {
+													match = true;
+													if (! Options.search_inside_words) {
+														// whole word
+														normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
+														if (SearchWordsFromUser.some(function(element, index) {
+															return index > last_index && normalizedWords.indexOf(element) == -1;
+														}))
+															match = false;
+													} else {
+														// inside words
+														for (indexWordsLeft = last_index + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
+															normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
+															if (! normalizedWords.every(function(element) {
+																return normalizedWords.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
+															})) {
+																match = false;
+																break;
+															}
+														}
+													}
+													if (match && matchingSubalbums.indexOf(searchResultsAlbumFinal.subalbums[indexSubalbums]) == -1)
+														matchingSubalbums.push(searchResultsAlbumFinal.subalbums[indexSubalbums]);
+												}
+												searchResultsAlbumFinal.subalbums = matchingSubalbums;
 											}
-											if (! searchResultsAlbumFinal.media.length) {
+											if (searchResultsAlbumFinal.media.length === 0 && searchResultsAlbumFinal.subalbums.length === 0) {
 												PhotoFloat.noResults();
 											} else if (searchResultsAlbumFinal.media.length > Options.big_virtual_folders_threshold) {
 												PhotoFloat.noResults('search-too-wide');
