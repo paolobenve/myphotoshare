@@ -715,7 +715,7 @@ class TreeWalker:
 					max_file_date = max(max_file_date, sub_max_file_date)
 					album.num_media_in_sub_tree += num
 					album.add_album(next_walked_album)
-					self.add_album_to_tree_by_search(album)
+					self.add_album_to_tree_by_search(next_walked_album)
 			elif os.path.isfile(entry_with_path):
 				if skip_files:
 					continue
