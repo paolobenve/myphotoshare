@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# @python2
+from __future__ import unicode_literals
+
 import os
 import os.path
 import sys
