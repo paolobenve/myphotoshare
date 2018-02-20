@@ -500,11 +500,7 @@ class TreeWalker:
 		# add the given media or album to a temporary structure where media or albums are organized by search terms
 		# works on the words in the file/directory name and in album.ini's description, title, tags
 
-		if isinstance(media_or_album, Album):
-			name = media_or_album.name
-		elif isinstance(media_or_album, Media):
-			name = media_or_album.name
-		phrase = name + " " + media_or_album.title + " " + media_or_album.description + " " + media_or_album.tags
+		phrase = media_or_album.name + " " + media_or_album.title + " " + media_or_album.description + " " + media_or_album.tags
 
 		# media or album word list has the words with there case and accents
 		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
