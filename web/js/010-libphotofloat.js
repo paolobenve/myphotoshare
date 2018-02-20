@@ -39,7 +39,7 @@
 						// root of search albums: build the word list
 						for (i = 0; i < theAlbum.subalbums.length; ++i)
 							self.searchWordsFromJsonFile.push(theAlbum.subalbums[i].path);
-					} else if (cacheKey.indexOf(Options.by_search_string) !== 0) {
+					} else if (! PhotoFloat.isSearchAlbum(cacheKey)) {
 						for (i = 0; i < theAlbum.subalbums.length; ++i)
 							theAlbum.subalbums[i].parent = theAlbum;
 						for (i = 0; i < theAlbum.media.length; ++i)
@@ -173,7 +173,7 @@
 		SearchWordsFromUserNormalized = [];
 		if (albumHash) {
 			albumHash = decodeURI(albumHash);
-			if (slashCount === 0 && albumHash.indexOf(Options.by_search_string) === 0 && albumHash != Options.by_search_string) {
+			if (slashCount === 0 && PhotoFloat.isSearchAlbum(albumHash) && albumHash != Options.by_search_string) {
 				var wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
 				var wordsAndOptions = wordsWithOptionsString.split(Options.cache_folder_separator);
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];

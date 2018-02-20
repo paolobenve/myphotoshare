@@ -300,7 +300,7 @@ $(document).ready(function() {
 	}
 
 	function removeFolderMarker(cacheBase) {
-		if (cacheBase.indexOf(Options.folders_string) === 0) {
+		if (PhotoFloat.isFolderAlbum(cacheBase)) {
 			cacheBase = cacheBase.substring(Options.folders_string.length);
 			if (cacheBase.length > 0)
 				cacheBase = cacheBase.substring(1);
@@ -888,7 +888,7 @@ $(document).ready(function() {
 	}
 
 	function sortByPath(albumList) {
-		if (albumList[0].cacheBase.indexOf(Options.by_gps_string) === 0)
+		if (PhotoFloat.isByGpsAlbum(albumList[0].cacheBase))
 			return sortBy(albumList, 'name');
 		else
 			return sortBy(albumList, 'path');
@@ -972,7 +972,7 @@ $(document).ready(function() {
 			thumbnailSize = Options.media_thumb_size;
 
 			populateMedia = populate;
-			isVirtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0 || currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0 );
+			isVirtualAlbum = (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) || PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase) || PhotoFloat.isSearchAlbum(currentAlbum.cacheBase) );
 			tooBig = currentAlbum.path.split("/").length < 4 && currentAlbum.media.length > Options.big_virtual_folders_threshold;
 			if (populateMedia === true && isVirtualAlbum)
 				populateMedia = populateMedia && ! tooBig;
@@ -1090,7 +1090,7 @@ $(document).ready(function() {
 				}
 				albumLink = "";
 				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
-					if (currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0) {
+					if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
 						albumLink = savedLink ? savedLink : "#!/";
 					} else
 						albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
@@ -1168,10 +1168,10 @@ $(document).ready(function() {
 									thumbHeight = correctedAlbumThumbSize;
 								}
 
-								if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
+								if (PhotoFloat.isByDateAlbum(currentAlbum.path)) {
 									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]).substr(Options.by_date_string.length + 1);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.dayAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
-								} else if (currentAlbum.path.indexOf(Options.by_gps_string) === 0) {
+								} else if (PhotoFloat.isByGpsAlbum(currentAlbum.path)) {
 									titleName = PhotoFloat.pathJoin([randomMedia.gpsAlbum, randomMedia.name]).substr(Options.by_gps_string.length + 1);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.gpsAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else {
@@ -1200,7 +1200,7 @@ $(document).ready(function() {
 										">";
 								theImage.html(htmlText);
 
-								if (originalAlbum.path.indexOf(Options.by_date_string) === 0) {
+								if (PhotoFloat.isByDateAlbum(originalAlbum.path)) {
 									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator);
 									folder = "";
 									if (folderArray.length >= 2)
@@ -1209,7 +1209,7 @@ $(document).ready(function() {
 										folder += "-" + folderArray[2];
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
-								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
+								} else if (PhotoFloat.isByGpsAlbum(originalAlbum.path)) {
 									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
 									var folderName = '';
 									var folderTitle = '';
@@ -1361,8 +1361,7 @@ $(document).ready(function() {
 				});
 				$("#by-gps-view").removeClass("active").addClass("selected");
 			} else if (
-				currentAlbum.cacheBase == Options.by_search_string ||
-				currentAlbum.cacheBase.indexOf(Options.by_search_string) > -1 && currentAlbum.media.length === 0 && currentAlbum.subalbums.length === 0
+				PhotoFloat.isSearchAlbum(currentAlbum.cacheBase) && currentAlbum.media.length === 0 && currentAlbum.subalbums.length === 0
 			) {
 				$("#folders-view").on("click", function(ev) {
 					$("#album-view").removeClass("hidden");
@@ -1776,7 +1775,7 @@ $(document).ready(function() {
 
 
 		$(".day-gps-folders-view").addClass("active").removeClass("hidden").removeClass("selected").off("click");
-		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
+		if (PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
 			// folder album: change to by date or by gps view
 			$("#folders-view").removeClass("active").addClass("selected").off("click");
 			$("#by-date-view").off("click");
@@ -1794,7 +1793,7 @@ $(document).ready(function() {
 					return false;
 				});
 			}
-		} else if (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0) {
+		} else if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase)) {
 			// by date album: change to folder or by gps view
 			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
@@ -1811,7 +1810,7 @@ $(document).ready(function() {
 					return false;
 				});
 			}
-		} else if (currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0) {
+		} else if (PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase)) {
 			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
 				window.location.href = foldersViewLink;
@@ -1824,7 +1823,7 @@ $(document).ready(function() {
 			});
 			// by gps album: change to folder or by day view
 			$("#by-gps-view").removeClass("active").addClass("selected").off("click");
-		} else if (currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0) {
+		} else if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
 			// by search album: change to folder or by gps or by view
 			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
@@ -2126,7 +2125,7 @@ $(document).ready(function() {
 			currentAlbum = null;
 
 		previousAlbum = currentAlbum;
-		if (currentAlbum && currentAlbum.path.indexOf(Options.by_date_string) === 0 && media !== null) {
+		if (currentAlbum && PhotoFloat.isByDateAlbum(currentAlbum.path) && media !== null) {
 			previousMedia = media;
 		}
 		else {
