@@ -1699,8 +1699,15 @@ $(document).ready(function() {
 			albumLink = "";
 			if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
 				albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
-			else
-				albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
+			else {
+				if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
+					if (currentAlbum.ancestorsCacheBase.length <= 3)
+						albumLink = "#!";
+					else
+						albumLink = "#!" + Options.cache_folder_separator.join(currentAlbum.ancestorsCacheBase.slice(1));
+				} else
+					albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
+			}
 			nextLink = "";
 			prevLink = "";
 			$("#media-view").css('cursor', 'default');
