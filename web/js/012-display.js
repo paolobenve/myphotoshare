@@ -1091,11 +1091,7 @@ $(document).ready(function() {
 				albumLink = "";
 				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
 					if (currentMedia === null && currentAlbum.cacheBase.indexOf(Options.by_search_string) === 0) {
-						if (savedLink)
-							albumLink = savedLink;
-						else {
-							albumLink = "#!/";
-						}
+						albumLink = savedLink ? savedLink : "#!/";
 					} else
 						albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
 				}
