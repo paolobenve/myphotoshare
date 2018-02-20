@@ -365,7 +365,7 @@ class TreeWalker:
 							if place_album.center == {}:
 								place_album.center['latitude'] = single_media.latitude
 								place_album.center['longitude'] = single_media.longitude
-								place_album.name = place_name
+								place_album._name = place_name
 								place_album.alt_name = alt_place_name
 							else:
 								place_album.center['latitude'] = Geonames.recalculate_mean(place_album.center['latitude'], len(place_album.media_list), single_media.latitude)
@@ -374,7 +374,7 @@ class TreeWalker:
 							if region_album.center == {}:
 								region_album.center['latitude'] = single_media.latitude
 								region_album.center['longitude'] = single_media.longitude
-								region_album.name = single_media.region_name
+								region_album._name = single_media.region_name
 							else:
 								region_album.center['latitude'] = Geonames.recalculate_mean(region_album.center['latitude'], len(region_album.media_list), single_media.latitude)
 								region_album.center['longitude'] = Geonames.recalculate_mean(region_album.center['longitude'], len(region_album.media_list), single_media.longitude)
@@ -382,7 +382,7 @@ class TreeWalker:
 							if country_album.center == {}:
 								country_album.center['latitude'] = single_media.latitude
 								country_album.center['longitude'] = single_media.longitude
-								country_album.name = single_media.country_name
+								country_album._name = single_media.country_name
 							else:
 								country_album.center['latitude'] = Geonames.recalculate_mean(country_album.center['latitude'], len(country_album.media_list), single_media.latitude)
 								country_album.center['longitude'] = Geonames.recalculate_mean(country_album.center['longitude'], len(country_album.media_list), single_media.longitude)
@@ -498,7 +498,7 @@ class TreeWalker:
 		# works on the words in the file/directory name and in album.ini's description, title, tags
 
 		if isinstance(media_or_album, Album):
-			name = media_or_album.album_name
+			name = media_or_album.name
 		elif isinstance(media_or_album, Media):
 			name = media_or_album.name
 		phrase = name + " " + media_or_album.title + " " + media_or_album.description + " " + media_or_album.tags

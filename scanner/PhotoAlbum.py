@@ -129,8 +129,11 @@ class Album(object):
 						self._subdir += "_"
 
 	@property
-	def album_name(self):
-		return os.path.basename(self.baseless_path)
+	def name(self):
+		if hasattr(self, "_name"):
+			return self._name
+		else:
+			return os.path.basename(self.baseless_path)
 
 	@property
 	def title(self):
