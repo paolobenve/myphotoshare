@@ -335,6 +335,8 @@ class Album(object):
 						sub_dict["name"] = subalbum.name
 					if hasattr(subalbum, "alt_name"):
 						sub_dict["alt_name"] = subalbum.alt_name
+					if hasattr(subalbum, "words"):
+						sub_dict["words"] = subalbum.words
 					subalbums.append(sub_dict)
 
 		else:
@@ -388,6 +390,8 @@ class Album(object):
 			dictionary["name"] = self.name
 		if hasattr(self, "alt_name"):
 			dictionary["alt_name"] = self.alt_name
+		if hasattr(self, "words"):
+			dictionary["words"] = self.words
 
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base
