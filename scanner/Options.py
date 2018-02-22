@@ -42,7 +42,7 @@ json_version = 4
 
 def get_options():
 	from Utilities import message, next_level, back_level
-	project_dir = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..")
+	project_dir = os.path.dirname(os.path.abspath(os.path.join(os.path.realpath(sys.argv[0]), "..")))
 	default_config_file = os.path.join(project_dir, "myphotoshare.conf.defaults")
 	default_config = configparser.ConfigParser()
 	default_config.readfp(open(default_config_file))
