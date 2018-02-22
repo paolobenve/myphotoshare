@@ -1232,7 +1232,7 @@ $(document).ready(function() {
 																		"' title='" + folderName +
 																		"' target='_blank'" +
 																">" +
-															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/world.png' />" +
+															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/ic_place_white_24dp_2x' />" +
 														"</a>" +
 													"</span>";
 								}
