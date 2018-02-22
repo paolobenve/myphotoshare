@@ -34,7 +34,7 @@
 		<link href="css/002-mobile.css" rel="stylesheet" type="text/css" />
 		<link href="css/003-social.css" rel="stylesheet" type="text/css" />
 	<?php	}
-	
+
 			if (strcasecmp($options['debug_js'], "false") == 0 || $options['debug_js'] == "0") { ?>
 		<script type="text/javascript" src="js/scripts.min.js"></script>
 	<?php	} else {
@@ -64,7 +64,7 @@
 	<?php	} else { ?>
 		<script type="text/javascript" src="js/004-fullscreen.js"></script>
 	<?php	}
-	
+
 			// Use system wide modernizr if available
 			if (file_exists("/usr/share/javascript/modernizr/modernizr.min.js")) { ?>
 		<script type="text/javascript" src="/javascript/modernizr/modernizr.min.js"></script>
@@ -72,6 +72,7 @@
 		<script type="text/javascript" src="js/005-modernizr.js"></script>
 	<?php	} ?>
 
+		<script type="text/javascript" src="js/006-latinize.js"></script>
 		<script type="text/javascript" src="js/008-social.js"></script>
 		<script type="text/javascript" src="js/009-translations.js"></script>
 		<script type="text/javascript" src="js/010-libphotofloat.js"></script>
@@ -171,6 +172,8 @@
 	</script>
 ";
 	?>
+	<div id="no-results" class="search-failed"></div>
+	<div id="search-too-wide" class="search-failed"></div>
 	<div id="social">
 	<?php if (!has_option_value('social', 'none')) { ?>
 		<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center <?php switch(strtolower($options['social_size'])) { case "small": echo " ssk-xs"; break; case "large": echo " ssk-lg"; break; default: echo " ssk-sm"; } if (!is_option_set('social_color')) { echo(" ssk-grayscale"); } ?>">
@@ -200,8 +203,6 @@
 	</div>
 
 	<div id="title-container">
-		<div id="buttons-container">
-		</div>
 		<div id="title">
 			<span id="title-string"></span>
 		</div>
@@ -245,6 +246,18 @@
 
 	<ul id="right-menu">
 		<li id="menu-icon"> ☰ </li>
+		<li class="search">
+			<form>
+				<input type="text" id="search-field" />
+				<img id="search-button" src="img/ic_search_black_48dp_2x.png" />
+			</form>
+		</li>
+		<li id="inside-words" class="search active"></li>
+		<li id="any-word" class="search active"></li>
+		<li id="case-sensitive" class="search active"></li>
+		<li id="accent-sensitive" class="search active"></li>
+		<!-- <li id="regex-word" class="search active"></li> -->
+
 		<li class="day-gps-folders-view caption"></li>
 		<li id="folders-view" class="day-gps-folders-view"></li>
 		<li id="by-date-view" class="day-gps-folders-view"></li>
@@ -268,10 +281,11 @@
 	</ul>
 
 	<div id="error-overlay"></div>
-	<div id="error-options-file"></div>
-	<div id="error-text-folder"></div>
-	<div id="error-root-folder"></div>
-	<div id="error-text-image"></div>
+	<div id="error-options-file" class="error"></div>
+	<div id="error-text-folder" class="error"></div>
+	<div id="error-root-folder" class="error"></div>
+	<div id="error-text-image" class="error"></div>
+
 	<div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form></div>
 </body>
 </html>

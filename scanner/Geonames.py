@@ -31,7 +31,7 @@ class Geonames(object):
 	"""
 	GEONAMES_API = "http://api.geonames.org/"
 	# through this cache many calls to geonames web services are saved
-	geonames_cache = {}
+	geonames_cache = []
 	# the maximum distance in meters for considering two different coordinates equivalent
 	MAX_DISTANCE_METERS = 50
 
@@ -39,7 +39,7 @@ class Geonames(object):
 
 	def __init__(self):
 		if Options.config['get_geonames_online']:
-			self._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}&featureClass=P&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
+			Geonames._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}&featureClass=P&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
 		elif self.cities == []:
 			next_level()
 			message("reading and processing local geonames files", "", 5)
@@ -82,41 +82,77 @@ class Geonames(object):
 			back_level()
 
 
-	def lookup_nearby_place(self, latitude, longitude):
+	@staticmethod
+	def lookup_nearby_place(latitude, longitude):
 		"""
 		Looks up places near a specific geographic location
 		"""
 
-		for (c_latitude, c_longitude) in Geonames.geonames_cache:
+		next_level()
+		message("looking for geonames in cache...", "", 5)
+		for _ in range(len(Geonames.geonames_cache) -1, -1, -1):
+			((c_latitude, c_longitude), result) = Geonames.geonames_cache[_]
 			distance = Geonames._distance_between_coordinates(c_latitude, c_longitude, latitude, longitude)
 			if distance < Geonames.MAX_DISTANCE_METERS:
-				# get it from cache!
-				result = Geonames.geonames_cache[(c_latitude, c_longitude)]
+				# ok with value from cache!
 				next_level()
 				message("geoname got from cache", "", 5)
 				back_level()
-				# add to cache only if not too close to existing point
-				if distance > Geonames.MAX_DISTANCE_METERS / 10.0:
-					Geonames.geonames_cache[(latitude, longitude)] = result
+				back_level()
+				# # add to cache only if not too close to existing point
+				# if distance > Geonames.MAX_DISTANCE_METERS / 2.0:
+				# 	Geonames.geonames_cache[(latitude, longitude)] = result
 				return result
+		next_level()
+		message("geonames not found in cache", "", 5)
+		back_level()
 
+		got = False
 		if Options.config['get_geonames_online']:
+			message("getting geonames online...", "", 5)
 			# get country, region (state for federal countries), and place
-			response = requests.get(self._base_nearby_url.format(str(latitude), str(longitude)))
-			result = Geonames._decode_nearby_place(response.text)
-			next_level()
-			message("geoname got from geonames.org online", "", 5)
-			back_level()
-		else:
+			try_number = 0
+			while True:
+				response = requests.get(Geonames._base_nearby_url.format(str(latitude), str(longitude)))
+				try:
+					# the json.loads() function insidi _decode_nearby_place() one time throwed the error:
+					# json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+					result = Geonames._decode_nearby_place(response.text)
+					got = True
+					next_level()
+					message("geonames got from geonames.org online", "", 5)
+					back_level()
+					break
+				except json.decoder.JSONDecodeError:
+					# error decoding
+					try_number += 1
+					if try_number <= 3:
+						next_level()
+						message("geonames.org response decode error, retrying...", "", 5)
+						back_level()
+					else:
+						next_level()
+						message("3 geonames.org response decode errors!", "", 5)
+						back_level()
+						break
+
+		if not got:
 			# get country, region (state for federal countries), and place
-			result = min([city for city in self.cities], key=lambda c: Geonames.quick_distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
+			message("getting geonames from local files...", "", 5)
+			result = min([city for city in Geonames.cities], key=lambda c: Geonames.quick_distance_between_coordinates(c['latitude'], c['longitude'], latitude, longitude))
 			result['distance'] = Geonames._distance_between_coordinates(latitude, longitude, result['latitude'], result['longitude'])
 			next_level()
-			message("geoname got from geonames local files", "", 5)
+			message("geonames got from local files", "", 5)
 			back_level()
 
 		# add to cache
-		Geonames.geonames_cache[(latitude, longitude)] = result
+		message("adding geonames to cache...", "", 5)
+		Geonames.geonames_cache.append(((latitude, longitude), result))
+		next_level()
+		message("geonames added to cache", "", 5)
+		back_level()
+
+		back_level()
 
 		return result
 
@@ -177,7 +213,7 @@ class Geonames(object):
 		# Calculate the great circle distance in meters between two points on the earth (specified in decimal degrees)
 
 		next_level()
-		message("calculating distance between coordinates...", str(lat1) + ' ' + str(lon1) + ' ' + str(lat2) + ' ' + str(lon2), 5)
+		message("calculating distance between coordinates...", '(' + str(lat1) + ', ' + str(lon1) + ') - (' + str(lat2) + ', ' + str(lon2) + ')', 5)
 		# convert decimal degrees to radians
 		r_lat1, r_lon1, r_lat2, r_lon2 = math.radians(lat1), math.radians(lon1), math.radians(lat2), math.radians(lon2)
 		# haversine formula

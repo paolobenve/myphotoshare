@@ -11,11 +11,17 @@
 * user can toggle album slide mode, thumbnails spacing, thumbnails types, show album and media names, show media count, all with right top corner menu
 * the scanner manages more precisely certain option changes that require regenerating of `json` files, reduced size images, thumbnails
 * new option `slide_album_caption_color`: the color to use with album slide mode
-* Reorganization of documentation:
-  * Creation of `doc` and `doc/img` folders.
-  * `README.md` split into individual files.
-  * Explained how to use advanced features like geonames or face detection.
-  * Created a gallery of screenshots.
+* implemented search function: media and albums can be searched by file name, title, description, tags
+  * new option `by_search_string`: the string used for search albums
+  * new option `max_search_album_number`: the maximum number of search album that will be loaded
+* reorganization of documentation:
+  * creation of `doc` and `doc/img` folders
+  * `README.md` split into individual files
+  * explained how to use advanced features like geonames or face detection
+  * created a gallery of screenshots
+* Reduced images and thumbnail naming schema is now more robust
+* cache files names are now made of only lower case ascii characters
+
 
 
 ### version 3.3 (January 22, 2018)

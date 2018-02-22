@@ -54,14 +54,10 @@ $(document).ready(function() {
 	var fullScreenStatus = false;
 	var photoSrc, videoSrc;
 	var language;
-	var byDateRegex;
-	var byGpsRegex;
 	var numSubAlbumsReady;
 	var fromEscKey = false;
 	var firstEscKey = true;
-	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "";
-		// set the map zooms for country, region, place, and photo
-		// they have been chosen in order to fit to Europe distances
+	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "", savedLink = "";
 
 	/* Displays */
 
@@ -92,25 +88,6 @@ $(document).ready(function() {
 				}
 			}
 		}
-
-		// for (var albumOrMedia in ['album', 'media']) {
-		// 	var reverseNameSort = albumOrMedia + "NameReverseSort";
-		// 	var reverseDateSort = albumOrMedia + "DateReverseSort";
-		// 	var nameSort = albumOrMedia + "NameSort";
-		// 	var sortReverseClass = "." + albumOrMedia + "-sort-reverse";
-		// 	var sortNormalClass = "." + albumOrMedia + "-sort-normal";
-		// 	var sort = "." + albumOrMedia + "-sort";
-		// 	var sortNameClass = sort + "-name";
-		// 	var sortDateClass = sort + "-date";
-		// 	var sortReverseNameClass = sortNameClass + sortReverseClass;
-		// 	var sortReverseDateClass = sortDateClass + sortReverseClass;
-		// 	var sortNormalNameClass = sortNameClass + sortNormalClass;
-		// 	var sortNormalDateClass = sortDateClass + sortNormalClass;			$(sortReverseNameClass).html(_t(sort) + _t(".by-name") + _t(".sort-reverse"));
-		// 	$(sortReverseDateClass).html(_t(sort) + _t(".by-date") + _t(".sort-reverse"));
-		// 	$(sortNormalNameClass).html(_t(sort) + _t(".by-name"));
-		// 	$(sortNormalDateClass).html(_t(sort) + _t(".by-date"));
-		// }
-
 	}
 
 	function getLanguage() {
@@ -167,7 +144,7 @@ $(document).ready(function() {
 					direc = "u";
 			}
 
-			if (direc != "") {
+			if (direc !== "") {
 				if(typeof callback == 'function')
 					callback(el,direc);
 			}
@@ -211,7 +188,7 @@ $(document).ready(function() {
 			$("#media-box-inner").stop().animate({
 				right: "-=" + window.innerWidth,
 			}, 300, function() {
-				location.href = dest;
+				window.location.href = dest;
 				$("#media-box-inner").css('right', "");
 			});
 		}
@@ -221,7 +198,7 @@ $(document).ready(function() {
 			$("#media-box-inner").stop().animate({
 				left: "-=" + window.innerWidth,
 			}, 300, function() {
-				location.href = dest;
+				window.location.href = dest;
 				$("#media-box-inner").css('left', "");
 			});
 		}
@@ -232,7 +209,7 @@ $(document).ready(function() {
 			$("#media-box-inner").stop().animate({
 				top: "-=" + window.innerHeight,
 			}, 300, function() {
-				location.href = dest;
+				window.location.href = dest;
 				$("#media-box-inner").css('top', "");
 			});
 		}
@@ -242,7 +219,7 @@ $(document).ready(function() {
 			$("#media-box-inner").stop().animate({
 				top: "+=" + window.innerHeight,
 			}, 300, function() {
-				location.href = dest;
+				window.location.href = dest;
 				$("#media-box-inner").css('top', "");
 			});
 		}
@@ -266,7 +243,7 @@ $(document).ready(function() {
 		folders = location.pathname;
 		folders = folders.substring(0, folders.lastIndexOf('/'));
 		url += folders;
-		if (currentMedia === null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
+		if (currentMedia === null || currentAlbum !== null && ! currentAlbum.subalbums.length && currentAlbum.media.length == 1) {
 			mediaParameter = PhotoFloat.pathJoin([
 				Options.server_cache_path,
 				Options.cache_album_subdir,
@@ -323,7 +300,7 @@ $(document).ready(function() {
 	}
 
 	function removeFolderMarker(cacheBase) {
-		if (cacheBase.indexOf(Options.folders_string) == 0) {
+		if (PhotoFloat.isFolderAlbum(cacheBase)) {
 			cacheBase = cacheBase.substring(Options.folders_string.length);
 			if (cacheBase.length > 0)
 				cacheBase = cacheBase.substring(1);
@@ -331,14 +308,14 @@ $(document).ready(function() {
 		return cacheBase;
 	}
 
-	function modifyMenuButtons() {
+	function updateMenu() {
 		var albumOrMedia;
 		// add the correct classes to the menu sort buttons
 		if (currentMedia !== null) {
 			// showing a media, nothing to sort
 			$("#right-menu li.sort").addClass("hidden");
 		} else if (currentAlbum !== null) {
-			if (currentAlbum.albums.length <= 1) {
+			if (currentAlbum.subalbums.length <= 1) {
 				// no subalbums or one subalbum
 				$("ul#right-menu li.album-sort").addClass("hidden");
 			} else {
@@ -376,80 +353,76 @@ $(document).ready(function() {
 
 		$("ul#right-menu li.ui").removeClass("hidden");
 
-		if (currentMedia !== null || currentAlbum.albums.length == 0) {
+		if (currentMedia !== null || currentAlbum !== null && currentAlbum.subalbums.length === 0) {
 			$("ul#right-menu li.slide").addClass("hidden");
 		} else {
 			$("ul#right-menu li.slide").removeClass("hidden");
-			if (Options.albums_slide_style) {
-				$("ul#right-menu li.slide").addClass("selected");
-			} else {
+			Options.albums_slide_style ?
+				$("ul#right-menu li.slide").addClass("selected") :
 				$("ul#right-menu li.slide").removeClass("selected");
-			}
 		}
 
-		if (currentMedia !== null || currentAlbum.albums.length <= 1 && currentAlbum.media.length <= 1) {
+		if (currentMedia !== null || currentAlbum !== null && currentAlbum.subalbums.length <= 1 && currentAlbum.media.length <= 1) {
 			$("ul#right-menu li.spaced").addClass("hidden");
 		} else {
 			$("ul#right-menu li.spaced").removeClass("hidden");
-			if (Options.spacing) {
-				$("ul#right-menu li.spaced").addClass("selected");
-			} else {
+			Options.spacing ?
+				$("ul#right-menu li.spaced").addClass("selected") :
 				$("ul#right-menu li.spaced").removeClass("selected");
-			}
 		}
-		if (currentMedia !== null || currentAlbum.albums.length == 0) {
+		if (currentMedia !== null || currentAlbum !== null && currentAlbum.subalbums.length === 0) {
 			$("ul#right-menu li.square-album-thumbnails").addClass("hidden");
 		} else {
 			$("ul#right-menu li.square-album-thumbnails").removeClass("hidden");
-			if (Options.album_thumb_type == "square") {
-				$("ul#right-menu li.square-album-thumbnails").addClass("selected");
-			} else {
+			Options.album_thumb_type == "square" ?
+				$("ul#right-menu li.square-album-thumbnails").addClass("selected") :
 				$("ul#right-menu li.square-album-thumbnails").removeClass("selected");
-			}
 		}
 
-		if (currentMedia !== null || currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
+		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length === 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase))) {
 			$("ul#right-menu li.album-names").addClass("hidden");
 		} else {
 			$("ul#right-menu li.album-names").removeClass("hidden");
-			if (Options.show_album_names_below_thumbs) {
-				$("ul#right-menu li.album-names").addClass("selected");
-			} else {
+			Options.show_album_names_below_thumbs ?
+				$("ul#right-menu li.album-names").addClass("selected") :
 				$("ul#right-menu li.album-names").removeClass("selected");
-			}
 		}
 
-		if (currentMedia !== null || currentAlbum.albums.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
+		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length === 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase))) {
 			$("ul#right-menu li.media-count").addClass("hidden");
 		} else {
 			$("ul#right-menu li.media-count").removeClass("hidden");
-			if (Options.show_album_media_count) {
-				$("ul#right-menu li.media-count").addClass("selected");
-			} else {
+			Options.show_album_media_count ?
+				$("ul#right-menu li.media-count").addClass("selected") :
 				$("ul#right-menu li.media-count").removeClass("selected");
-			}
 		}
 
-		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
+		if (
+			currentMedia !== null ||
+			currentAlbum !== null && (
+				currentAlbum.media.length === 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold
+			)
+		) {
 			$("ul#right-menu li.media-names").addClass("hidden");
 		} else {
 			$("ul#right-menu li.media-names").removeClass("hidden");
-			if (Options.show_media_names_below_thumbs) {
-				$("ul#right-menu li.media-names").addClass("selected");
-			} else {
+			Options.show_media_names_below_thumbs ?
+				$("ul#right-menu li.media-names").addClass("selected") :
 				$("ul#right-menu li.media-names").removeClass("selected");
-			}
 		}
 
-		if (currentMedia !== null || currentAlbum.media.length == 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold) {
+		if (
+			currentMedia !== null ||
+			currentAlbum !== null && (
+				currentAlbum.media.length === 0 || ! PhotoFloat.isFolderAlbum(currentAlbum.cacheBase) && currentAlbum.media.length > Options.big_virtual_folders_threshold
+			)
+		) {
 			$("ul#right-menu li.square-media-thumbnails").addClass("hidden");
 		} else {
 			$("ul#right-menu li.square-media-thumbnails").removeClass("hidden");
-			if (Options.media_thumb_type == "square") {
-				$("ul#right-menu li.square-media-thumbnails").addClass("selected");
-			} else {
+			Options.media_thumb_type == "square" ?
+			 	$("ul#right-menu li.square-media-thumbnails").addClass("selected") :
 				$("ul#right-menu li.square-media-thumbnails").removeClass("selected");
-			}
 		}
 
 		if (
@@ -460,18 +433,60 @@ $(document).ready(function() {
 			$("ul#right-menu li.media-names").hasClass("hidden") &&
 			$("ul#right-menu li.square-album-thumbnails").hasClass("hidden") &&
 			$("ul#right-menu li.square-media-thumbnails").hasClass("hidden")
-		)
+		) {
 			$("ul#right-menu li.ui").addClass("hidden");
+		}
 
+		if (
+			currentAlbum !== null && PhotoFloat.isSearchAlbum(currentAlbum.cacheBase) ||
+			Options.search_regex ||
+			Options.search_inside_words ||
+			Options.search_any_word ||
+			Options.search_case_sensitive ||
+			Options.search_accent_sensitive ||
+			$("ul#right-menu li#no-results").is(":visible") ||
+			$("ul#right-menu li#search-too-wide").is(":visible")
+		) {
+			$("ul#right-menu li#inside-words").removeClass("hidden");
+			$("ul#right-menu li#any-word").removeClass("hidden");
+			$("ul#right-menu li#case-sensitive").removeClass("hidden");
+			$("ul#right-menu li#regex-word").removeClass("hidden");
+			if (Options.search_regex) {
+				$("ul#right-menu li#regex-word").addClass("selected");
+				$("ul#right-menu li#inside-words").addClass("hidden");
+				$("ul#right-menu li#any-word").addClass("hidden");
+				$("ul#right-menu li#case-sensitive").addClass("hidden");
+			} else {
+				$("ul#right-menu li#regex-word").removeClass("selected");
+				Options.search_inside_words ?
+					$("ul#right-menu li#inside-words").addClass("selected") :
+					$("ul#right-menu li#inside-words").removeClass("selected");
+				Options.search_any_word ?
+					$("ul#right-menu li#any-word").addClass("selected") :
+					$("ul#right-menu li#any-word").removeClass("selected");
+				Options.search_case_sensitive ?
+					$("ul#right-menu li#case-sensitive").addClass("selected") :
+					$("ul#right-menu li#case-sensitive").removeClass("selected");
+				Options.search_accent_sensitive ?
+					$("ul#right-menu li#accent-sensitive").addClass("selected") :
+					$("ul#right-menu li#accent-sensitive").removeClass("selected");
+			}
+		} else {
+			$("ul#right-menu li#inside-words").addClass("hidden");
+			$("ul#right-menu li#any-word").addClass("hidden");
+			$("ul#right-menu li#case-sensitive").addClass("hidden");
+			$("ul#right-menu li#accent-sensitive").addClass("hidden");
+			$("ul#right-menu li#regex-word").addClass("hidden");
+		}
 	}
 
 	function transformAltPlaceName(altPlaceName) {
-		underscoreIndex = altPlaceName.lastIndexOf('_');
+		var underscoreIndex = altPlaceName.lastIndexOf('_');
 		if (underscoreIndex != -1) {
-			number = altPlaceName.substring(underscoreIndex + 1);
+			var number = altPlaceName.substring(underscoreIndex + 1);
 			while (number.indexOf('0') === 0)
 				number = number.substr(1);
-			base = altPlaceName.substring(0, underscoreIndex);
+			var base = altPlaceName.substring(0, underscoreIndex);
 			return base + ' (' + _t('.subalbum') + number + ')';
 		} else {
 			return altPlaceName;
@@ -479,14 +494,16 @@ $(document).ready(function() {
 	}
 
 	function setTitle() {
-		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle;
-		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, m;
+		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle, optionsAndSearchWords, searchWords;
+		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, latitude, longitude, arrayCoordinates;
 		// gpsLevelNumber is the number of levels for the by gps tree
 		// current levels are country, region, place => 3
 		var gpsLevelNumber = 3;
 		var gpsName = '';
 		var mediaForNames = null;
 		var gpsHtmlTitle;
+
+		updateMenu();
 
 		if (Options.page_title !== "")
 			originalTitle = Options.page_title;
@@ -503,6 +520,14 @@ $(document).ready(function() {
 
 		dateTitle = (components.length > 1 && components[1] == Options.by_date_string);
 		gpsTitle = (components.length > 1 && components[1] == Options.by_gps_string);
+		var searchTitle = (components.length > 1 && components[1] == Options.by_search_string);
+
+		if (searchTitle && components.length == 3) {
+			// the last element in components is the options and the search words
+			optionsAndSearchWords = components[components.length - 1].split(Options.cache_folder_separator);
+			searchWords = optionsAndSearchWords[optionsAndSearchWords.length -1].replace(/_/g, ' ');
+			components[components.length - 1] = searchWords;
+		}
 
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
 		var textComponents = [];
@@ -531,26 +556,27 @@ $(document).ready(function() {
 						gpsName = mediaForNames.geoname.place_name;
 				}
 
-				if (gpsName == '')
+				if (gpsName === '')
 					gpsName = _t('.not-specified');
 				gpsHtmlTitle = _t("#place-icon-title") + gpsName;
 			}
 
 			if (i != 1 || components[i] != Options.folders_string) {
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (i != 0 || ! (dateTitle || gpsTitle)) {
-						if (i == 1 && (dateTitle || gpsTitle)) {
-							title = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>" + title;
-							anchorOpened = true;
+					if (i !== 0 || ! (dateTitle || gpsTitle || searchTitle)) {
+						if (i == 1 && (dateTitle || gpsTitle || searchTitle)) {
+							title = "<a class='" + titleAnchorClasses + "' href='#!/" + (searchTitle ? "" : encodeURI(currentAlbum.ancestorsCacheBase[i])) + "'>" + title;
 						} else {
 							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
 							if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
 								titleAdd += " title='" + _t("#place-icon-title") + gpsName + _t("#place-icon-title-end") + "'";
 							title += titleAdd + ">";
-							anchorOpened = true;
 						}
+						anchorOpened = true;
 					}
 				} else {
+					if (spanOpened)
+						title += "</span>";
 					title += "<span class='title-no-anchor'>";
 					spanOpened = true;
 				}
@@ -558,6 +584,8 @@ $(document).ready(function() {
 					title += "(" + _t("#by-date") + ")";
 				else if (i == 1 && gpsTitle)
 					title += "(" + _t("#by-gps") + ")";
+				else if (i == 1 && searchTitle)
+					title += _t("#by-search");
 				else {
 					if (gpsTitle && i >= 2 && i <= 4) {
 						// i == 2 corresponds to the country, i == 4 to the place,
@@ -567,8 +595,8 @@ $(document).ready(function() {
 							longitude = currentMedia.metadata.longitude;
 						} else {
 							 arrayCoordinates = currentAlbum.ancestorsCenter[i];
-							 latitude = arrayCoordinates["latitude"];
-							 longitude = arrayCoordinates["longitude"];
+							 latitude = arrayCoordinates.latitude;
+							 longitude = arrayCoordinates.longitude;
 						}
 						if (anchorOpened) {
 							title += "</a>";
@@ -585,7 +613,7 @@ $(document).ready(function() {
 				}
 
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (! (i == 0 && (dateTitle || gpsTitle))) {
+					if (! (i === 0 && (dateTitle || gpsTitle || searchTitle))) {
 						if (anchorOpened)
 							title += "</a>";
 						anchorOpened = false;
@@ -593,19 +621,21 @@ $(document).ready(function() {
 				} else {
 					if (! isMobile.any()) {
 						title += " <span id=\"title-count\">(";
-						if (dateTitle || gpsTitle) {
+						if (dateTitle || gpsTitle || searchTitle) {
 							title += currentAlbum.media.length + " ";
 							title += _t(".title-media") + " ";
-							if (gpsTitle) {
-								if (components.length >= gpsLevelNumber + 2)
-									title += _t("#title-in-gps-album");
-								else
-									title += _t("#title-in-gpss-album");
-							} else if (dateTitle) {
+							if (dateTitle) {
 							 	if (components.length >= 5)
 									title += _t("#title-in-day-album");
 								else
 									title += _t("#title-in-date-album");
+							} else if (gpsTitle) {
+								if (components.length >= gpsLevelNumber + 2)
+									title += _t("#title-in-gps-album");
+								else
+									title += _t("#title-in-gpss-album");
+							} else if (searchTitle) {
+								title += _t("#title-in-search-album");
 							}
 						} else {
 							var numMediaInSubAlbums = currentAlbum.numMediaInSubTree - currentAlbum.media.length;
@@ -633,14 +663,24 @@ $(document).ready(function() {
 					title += "</span>";
 				}
 			}
-			if (i == 0 && (dateTitle || gpsTitle))
+			if (i === 0 && (dateTitle || gpsTitle))
 				title += " ";
+			else if (searchTitle) {
+				if (i === 0) {
+					title += "</a>&raquo;<span class='title-no-anchor'>";
+					anchorOpened = false;
+					spanOpened = true;
+				} else if (i == 1) {
+					title += "</span>&raquo;";
+					spanOpened = false;
+				}
+			}
 			else if ((i < components.length - 1 || currentMedia !== null) &&
 				(i == components.length - 1 || components[i + 1] != Options.folders_string))
 				title += "&raquo;";
 
 			// build the html page title
-			if (i == 0) {
+			if (i === 0) {
 				documentTitle += components[0];
 				if (components.length > 2 || currentMedia !== null)
 					documentTitle = " \u00ab " + documentTitle;
@@ -649,6 +689,8 @@ $(document).ready(function() {
 					documentTitle += " (" + _t("#by-date") + ")";
 				else if (gpsTitle)
 					documentTitle += " (" + _t("#by-gps") + ")";
+				else if (searchTitle)
+					documentTitle += " (" + _t("#by-search") + ")";
 			} else if (i > 1) {
 				if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
 					documentTitle = gpsName + documentTitle;
@@ -682,7 +724,7 @@ $(document).ready(function() {
 			}
 		}
 
-		if (currentMedia === null && currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
+		if (currentMedia === null && currentAlbum !== null && ! currentAlbum.subalbums.length && currentAlbum.media.length == 1) {
 			title += " &raquo; <span id=\"media-name\">" + photoFloat.trimExtension(currentAlbum.media[0].name) + "</span>";
 		}
 
@@ -700,7 +742,7 @@ $(document).ready(function() {
 		// keep generating the html page title
 		if (currentMedia !== null)
 			documentTitle = photoFloat.trimExtension(currentMedia.name) + documentTitle;
-		else if (currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1)
+		else if (currentAlbum !== null && ! currentAlbum.subalbums.length && currentAlbum.media.length == 1)
 			documentTitle =  photoFloat.trimExtension(currentAlbum.media[0].name) + " \u00ab " + documentTitle;
 
 		document.title = documentTitle;
@@ -714,19 +756,27 @@ $(document).ready(function() {
 		// and sets the album properties that attest the lists status
 
 		// album properties reflect the current sorting of album and media objects
-		// json files have albums and media sorted by date not reversed
+		// json files have subalbums and media sorted by date not reversed
 
-		if (currentAlbum.albumNameSort === undefined)
+		if (currentAlbum.albumNameSort === undefined) {
 			currentAlbum.albumNameSort = false;
-		if (currentAlbum.albumDateReverseSort === undefined)
+			if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase))
+				currentAlbum.subalbums = sortByDate(currentAlbum.subalbums);
+		}
+		if (currentAlbum.albumDateReverseSort === undefined){
 			currentAlbum.albumDateReverseSort = false;
-		if (currentAlbum.albumNameReverseSort === undefined)
+		}
+		if (currentAlbum.albumNameReverseSort === undefined){
 			currentAlbum.albumNameReverseSort = false;
-
-		if (currentAlbum.mediaNameSort === undefined)
+		}
+		if (currentAlbum.mediaNameSort === undefined) {
 			currentAlbum.mediaNameSort = false;
-		if (currentAlbum.mediaDateReverseSort === undefined)
+			if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase))
+				currentAlbum.media = sortByDate(currentAlbum.media);
+		}
+		if (currentAlbum.mediaDateReverseSort === undefined){
 			currentAlbum.mediaDateReverseSort = false;
+		}
 		if (currentAlbum.mediaNameReverseSort === undefined)
 			currentAlbum.mediaNameReverseSort = false;
 
@@ -754,28 +804,30 @@ $(document).ready(function() {
 		// and sets the album properties that attest the lists status
 
 		// album properties reflect the current sorting of album and media objects
-		// json files have albums and media sorted by date not reversed
+		// json files have subalbums and media sorted by date not reversed
+
+		var m;
 
 		$("li.album-sort").removeClass("selected");
 		if (needAlbumNameSort()) {
-			currentAlbum.albums = sortByPath(currentAlbum.albums);
+			currentAlbum.subalbums = sortByPath(currentAlbum.subalbums);
 			currentAlbum.albumNameSort = true;
 			if (getBooleanCookie("albumNameReverseSortRequested")) {
-				currentAlbum.albums = currentAlbum.albums.reverse();
+				currentAlbum.subalbums = currentAlbum.subalbums.reverse();
 				currentAlbum.albumNameReverseSort = true;
 			}
 			$("li.album-sort.by-name").addClass("selected");
 		} else if (needAlbumDateSort()) {
-			currentAlbum.albums = sortByDate(currentAlbum.albums);
+			currentAlbum.subalbums = sortByDate(currentAlbum.subalbums);
 			currentAlbum.albumNameSort = false;
 			if (getBooleanCookie("albumDateReverseSortRequested")) {
-				currentAlbum.albums = currentAlbum.albums.reverse();
+				currentAlbum.subalbums = currentAlbum.subalbums.reverse();
 				currentAlbum.albumDateReverseSort = true;
 			}
 			$("li.album-sort.by-date").addClass("selected");
 		}
 		if (needAlbumNameReverseSort() || needAlbumDateReverseSort()) {
-			currentAlbum.albums = currentAlbum.albums.reverse();
+			currentAlbum.subalbums = currentAlbum.subalbums.reverse();
 			if (needAlbumNameReverseSort())
 				currentAlbum.albumNameReverseSort = ! currentAlbum.albumNameReverseSort;
 			else
@@ -830,23 +882,13 @@ $(document).ready(function() {
 	}
 
 
-	function cacheBaseToCoordinateArray(cacheBase) {
-		array = cacheBase.split(Options.cache_folder_separator).slice(1);
-		for (var i = 0; i < array.length; i++) {
-			array[i] = array[i].split('_');
-			for (var j = 0; j < 2; j++)
-					array[i][j] = parseFloat(array[i][j]);
-		}
-		return array;
-	}
-
 	// see https://stackoverflow.com/questions/1069666/sorting-javascript-object-by-property-value
 	function sortByName(mediaList) {
 		return sortBy(mediaList, 'name');
 	}
 
 	function sortByPath(albumList) {
-		if (albumList[0].cacheBase.indexOf(Options.by_gps_string) == 0)
+		if (PhotoFloat.isByGpsAlbum(albumList[0].cacheBase))
 			return sortBy(albumList, 'name');
 		else
 			return sortBy(albumList, 'path');
@@ -916,7 +958,7 @@ $(document).ready(function() {
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 0, margin, imgTitle;
-		var tooBig = false, virtualAlbum = false;
+		var tooBig = false, isVirtualAlbum = false;
 		var mapLinkIcon;
 
 		PhotoFloat.subalbumIndex = 0;
@@ -930,12 +972,12 @@ $(document).ready(function() {
 			thumbnailSize = Options.media_thumb_size;
 
 			populateMedia = populate;
-			virtualAlbum = (currentAlbum.cacheBase.indexOf(Options.by_date_string) == 0 || currentAlbum.cacheBase.indexOf(Options.by_gps_string) == 0);
+			isVirtualAlbum = (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) || PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase) || PhotoFloat.isSearchAlbum(currentAlbum.cacheBase) );
 			tooBig = currentAlbum.path.split("/").length < 4 && currentAlbum.media.length > Options.big_virtual_folders_threshold;
-			if (populateMedia === true && virtualAlbum)
+			if (populateMedia === true && isVirtualAlbum)
 				populateMedia = populateMedia && ! tooBig;
 
-			if (virtualAlbum && tooBig) {
+			if (isVirtualAlbum && tooBig) {
 				$("#thumbs").empty();
 				$("#error-too-many-images").html(
 					"<span id=\"too-many-images\">" + _t('#too-many-images') + "</span>: " + currentAlbum.media.length +
@@ -1047,8 +1089,13 @@ $(document).ready(function() {
 					firstEscKey = true;
 				}
 				albumLink = "";
-				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
-					albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
+				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
+					if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
+						albumLink = savedLink ? savedLink : "#!/";
+					} else
+						albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
+				}
+
 				if (
 					populate === true ||
 					populate == "refreshSubalbums" ||
@@ -1073,8 +1120,8 @@ $(document).ready(function() {
 					if (Options.albums_slide_style)
 						margin = Math.round(correctedAlbumThumbSize * 0.05);
 
-					for (i = 0; i < currentAlbum.albums.length; ++i) {
-						link = $("<a href=\"#!/" + encodeURIComponent(currentAlbum.albums[i].cacheBase) + "\"></a>");
+					for (i = 0; i < currentAlbum.subalbums.length; ++i) {
+						link = $("<a href=\"#!/" + encodeURIComponent(currentAlbum.subalbums[i].cacheBase) + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
 						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
@@ -1095,7 +1142,7 @@ $(document).ready(function() {
 						subalbums.push(link);
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
-								var htmlText, height;
+								var htmlText;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								var heightfactor = 1.6;
@@ -1121,10 +1168,10 @@ $(document).ready(function() {
 									thumbHeight = correctedAlbumThumbSize;
 								}
 
-								if (currentAlbum.path.indexOf(Options.by_date_string) === 0) {
+								if (PhotoFloat.isByDateAlbum(currentAlbum.path)) {
 									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]).substr(Options.by_date_string.length + 1);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.dayAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
-								} else if (currentAlbum.path.indexOf(Options.by_gps_string) === 0) {
+								} else if (PhotoFloat.isByGpsAlbum(currentAlbum.path)) {
 									titleName = PhotoFloat.pathJoin([randomMedia.gpsAlbum, randomMedia.name]).substr(Options.by_gps_string.length + 1);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.gpsAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else {
@@ -1153,7 +1200,7 @@ $(document).ready(function() {
 										">";
 								theImage.html(htmlText);
 
-								if (originalAlbum.path.indexOf(Options.by_date_string) === 0) {
+								if (PhotoFloat.isByDateAlbum(originalAlbum.path)) {
 									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator);
 									folder = "";
 									if (folderArray.length >= 2)
@@ -1162,11 +1209,11 @@ $(document).ready(function() {
 										folder += "-" + folderArray[2];
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
-								} else if (originalAlbum.path.indexOf(Options.by_gps_string) === 0) {
+								} else if (PhotoFloat.isByGpsAlbum(originalAlbum.path)) {
 									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
 									var folderName = '';
 									var folderTitle = '';
-									if (level == 0)
+									if (level === 0)
 										folderName = randomAlbum.media[0].geoname.country_name;
 									else if (level == 1)
 										folderName = randomAlbum.media[0].geoname.region_name;
@@ -1175,7 +1222,7 @@ $(document).ready(function() {
 											folderName = transformAltPlaceName(randomAlbum.media[0].geoname.alt_place_name);
 										else
 											folderName = randomAlbum.media[0].geoname.place_name;
-									if (folderName == '')
+									if (folderName === '')
 										folderName = _t('.not-specified');
 									folderTitle = _t('#place-icon-title') + folderName;
 
@@ -1196,7 +1243,6 @@ $(document).ready(function() {
 								// get the value in style sheet (element with that class doesn't exist in DOM
 								var $el = $('<div class="album-caption"></div>');
 								$($el).appendTo('body');
-								var paddingTop = parseInt($($el).css('padding-top'));
 								$($el).remove();
 
 								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
@@ -1204,7 +1250,7 @@ $(document).ready(function() {
 								if (PhotoFloat.isFolderAlbum(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
 									heightfactor = 0;
 								else if (! Options.show_album_media_count)
-									heightfactor = 1.1
+									heightfactor = 1.1;
 								buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
 								html = "<div class=\"album-button-and-caption";
 								if (Options.albums_slide_style)
@@ -1253,18 +1299,18 @@ $(document).ready(function() {
 								theImage.parent().append(html);
 
 								numSubAlbumsReady ++;
-								if (numSubAlbumsReady >= originalAlbum.albums.length) {
+								if (numSubAlbumsReady >= originalAlbum.subalbums.length) {
 									// now all the subalbums random thumbnails has been loaded
 									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
 								}
 							}, function error() {
-								theContainer.albums.splice(currentAlbum.albums.indexOf(theAlbum), 1);
+								theContainer.subalbums.splice(currentAlbum.subalbums.indexOf(theAlbum), 1);
 								theLink.remove();
 								subalbums.splice(subalbums.indexOf(theLink), 1);
 							});
 							i++; i--;
-						})(currentAlbum, currentAlbum.albums[i], image, link);
+						})(currentAlbum, currentAlbum.subalbums[i], image, link);
 
 					}
 
@@ -1280,7 +1326,7 @@ $(document).ready(function() {
 		if (currentMedia === null) {
 			$(".thumb-container").removeClass("current-thumb");
 			$("#album-view").removeClass("media-view-container");
-			if (currentAlbum.albums.length > 0)
+			if (currentAlbum.subalbums.length > 0)
 				$("#subalbums").show();
 			else
 				$("#subalbums").hide();
@@ -1290,34 +1336,44 @@ $(document).ready(function() {
 			$("#media-box-inner").empty();
 			$("#media-box").hide();
 			$("#thumbs").show();
-			foldersViewLink = "#!/" + encodeURIComponent(Options.folders_string);
-			byDateViewLink = "#!/" + encodeURIComponent(Options.by_date_string);
-			byGpsViewLink = "#!/" + encodeURIComponent(Options.by_gps_string);
+			var foldersViewLink = "#!/" + encodeURIComponent(Options.folders_string);
+			var byDateViewLink = "#!/" + encodeURIComponent(Options.by_date_string);
+			var byGpsViewLink = "#!/" + encodeURIComponent(Options.by_gps_string);
 			$(".day-gps-folders-view").removeClass("selected").addClass("active").removeClass("hidden").off("click");
 			if (currentAlbum.cacheBase == Options.folders_string) {
-				$("#folders-view").removeClass("active").addClass("selected").off("click");
+				$("#folders-view").removeClass("active").addClass("selected");
 				$("#by-date-view").on("click", function(ev) {
-					window.location = byDateViewLink;
-					return false;
+					window.location.href = byDateViewLink;
 				});
-				photoFloat.AddClickToByGpsButton(byGpsViewLink);
+				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			} else if (currentAlbum.cacheBase == Options.by_date_string) {
 				$("#folders-view").on("click", function(ev) {
-					window.location = foldersViewLink;
-					return false;
+					window.location.href = foldersViewLink;
 				});
-				$("#by-date-view").removeClass("active").addClass("selected").off("click");
-				photoFloat.AddClickToByGpsButton(byGpsViewLink);
+				$("#by-date-view").removeClass("active").addClass("selected");
+				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			}	else if (currentAlbum.cacheBase == Options.by_gps_string) {
 				$("#folders-view").on("click", function(ev) {
-					window.location = foldersViewLink;
-					return false;
+					window.location.href = foldersViewLink;
 				});
 				$("#by-date-view").on("click", function(ev) {
-					window.location = byDateViewLink;
-					return false;
+					window.location.href = byDateViewLink;
 				});
-				$("#by-gps-view").removeClass("active").addClass("selected").off("click");
+				$("#by-gps-view").removeClass("active").addClass("selected");
+			} else if (
+				PhotoFloat.isSearchAlbum(currentAlbum.cacheBase) && currentAlbum.media.length === 0 && currentAlbum.subalbums.length === 0
+			) {
+				$("#folders-view").on("click", function(ev) {
+					$("#album-view").removeClass("hidden");
+					$(".search-failed").hide();
+					window.location.href = foldersViewLink;
+				});
+				$("#by-date-view").on("click", function(ev) {
+					$(".search-failed").hide();
+					$("#album-view").removeClass("hidden");
+					window.location.href = byDateViewLink;
+				});
+				photoFloat.addClickToByGpsButton(byGpsViewLink);
 			} else {
 				$(".day-gps-folders-view").addClass("hidden");
 			}
@@ -1463,7 +1519,7 @@ $(document).ready(function() {
 		chosenMedia = PhotoFloat.originalMediaPath(media);
 		maxSize = 0;
 
-		if (container == null) {
+		if (container === null) {
 			// try with what is more probable to be the container
 			if (fullScreenStatus)
 				container = $(window);
@@ -1502,9 +1558,8 @@ $(document).ready(function() {
 
 	function showMedia(album) {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
-		var prevMedia, nextMedia, text, thumbnailSize, i, changeViewLink, linkTag, triggerLoad, videoOK = true;
+		var prevMedia, nextMedia, text, thumbnailSize, i, linkTag, triggerLoad, videoOK = true;
 		var nextReducedPhoto, prevReducedPhoto;
-		var link;
 
 		mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentMedia);
 		firstEscKey = true;
@@ -1606,7 +1661,7 @@ $(document).ready(function() {
 					PhotoFloat.pathJoin([currentAlbum.media[currentMediaIndex].dayAlbum, currentAlbum.media[currentMediaIndex].name]);
 				currentAlbum.media[currentMediaIndex].byGpsName =
 						PhotoFloat.pathJoin([currentAlbum.media[currentMediaIndex].gpsAlbum, currentAlbum.media[currentMediaIndex].name]);
-				if (i == 0)
+				if (i === 0)
 					i = currentAlbum.media.length - 1;
 				else
 					i --;
@@ -1644,11 +1699,18 @@ $(document).ready(function() {
 			albumLink = "";
 			if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
 				albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
-			else
-				albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
+			else {
+				if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
+					if (currentAlbum.ancestorsCacheBase.length <= 3)
+						albumLink = "#!";
+					else
+						albumLink = "#!" + Options.cache_folder_separator.join(currentAlbum.ancestorsCacheBase.slice(1));
+				} else
+					albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
+			}
 			nextLink = "";
 			prevLink = "";
-			$("#media-view").css('cursor', 'default')
+			$("#media-view").css('cursor', 'default');
 		} else {
 			albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
@@ -1703,64 +1765,92 @@ $(document).ready(function() {
 			$('#menu-map-divider').hide();
 		}
 
-		foldersViewLink = "#!/" + PhotoFloat.pathJoin([
+		var foldersViewLink = "#!/" + PhotoFloat.pathJoin([
 									encodeURIComponent(currentMedia.foldersCacheBase),
 									encodeURIComponent(currentMedia.cacheBase)
 								]);
-		byDateViewLink = "#!/" + PhotoFloat.pathJoin([
+		var byDateViewLink = "#!/" + PhotoFloat.pathJoin([
 									encodeURIComponent(currentMedia.dayAlbumCacheBase),
 									encodeURIComponent(currentMedia.foldersCacheBase),
 									encodeURIComponent(currentMedia.cacheBase)
 								]);
-		byGpsViewLink = "#!/" + PhotoFloat.pathJoin([
+		var byGpsViewLink = "#!/" + PhotoFloat.pathJoin([
 									encodeURIComponent(currentMedia.gpsAlbumCacheBase),
 									encodeURIComponent(currentMedia.foldersCacheBase),
 									encodeURIComponent(currentMedia.cacheBase)
 								]);
 
+
 		$(".day-gps-folders-view").addClass("active").removeClass("hidden").removeClass("selected").off("click");
-		if (currentAlbum.cacheBase.indexOf(Options.folders_string) === 0) {
+		if (PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
 			// folder album: change to by date or by gps view
 			$("#folders-view").removeClass("active").addClass("selected").off("click");
+			$("#by-date-view").off("click");
 			$("#by-date-view").on("click", function(ev) {
-				window.location = byDateViewLink;
+				window.location.href = byDateViewLink;
 				return false;
 			});
 
 			if (! hasGpsData(currentMedia)) {
 				$("#by-gps-view").addClass("hidden");
 			} else {
+				$("#by-gps-view").off("click");
 				$("#by-gps-view").on("click", function(ev) {
-					window.location = byGpsViewLink;
+					window.location.href = byGpsViewLink;
 					return false;
 				});
 			}
-		} else if (currentAlbum.cacheBase.indexOf(Options.by_date_string) === 0) {
+		} else if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase)) {
 			// by date album: change to folder or by gps view
+			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
-				window.location = foldersViewLink;
+				window.location.href = foldersViewLink;
 				return false;
 			});
 			$("#by-date-view").removeClass("active").addClass("selected").off("click");
 			if (! hasGpsData(currentMedia)) {
 				$("#by-gps-view").addClass("hidden");
 			} else {
+				$("#by-gps-view").off("click");
 				$("#by-gps-view").on("click", function(ev) {
-					window.location = byGpsViewLink;
+					window.location.href = byGpsViewLink;
 					return false;
 				});
 			}
-		} else if (currentAlbum.cacheBase.indexOf(Options.by_gps_string) === 0) {
+		} else if (PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase)) {
+			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
-				window.location = foldersViewLink;
+				window.location.href = foldersViewLink;
 				return false;
 			});
+			$("#by-date-view").off("click");
 			$("#by-date-view").on("click", function(ev) {
-				window.location = byDateViewLink;
+				window.location.href = byDateViewLink;
 				return false;
 			});
 			// by gps album: change to folder or by day view
 			$("#by-gps-view").removeClass("active").addClass("selected").off("click");
+		} else if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
+			// by search album: change to folder or by gps or by view
+			$("#folders-view").off("click");
+			$("#folders-view").on("click", function(ev) {
+				window.location.href = foldersViewLink;
+				return false;
+			});
+			$("#by-date-view").off("click");
+			$("#by-date-view").on("click", function(ev) {
+				window.location.href = byDateViewLink;
+				return false;
+			});
+			if (! hasGpsData(currentMedia)) {
+				$("#by-gps-view").addClass("hidden");
+			} else {
+				$("#by-gps-view").off("click");
+				$("#by-gps-view").on("click", function(ev) {
+					window.location.href = byGpsViewLink;
+					return false;
+				});
+			}
 		}
 
 		$('#metadata tr.gps').off('click');
@@ -1830,6 +1920,7 @@ $(document).ready(function() {
 	}
 
 	function mapLink(latitude, longitude, zoom) {
+		var link;
 		if (Options.map_service == 'openstreetmap') {
 			link = 'http://www.openstreetmap.org/#map=' + zoom + '/' + latitude + '/' + longitude;
 		}
@@ -1875,11 +1966,9 @@ $(document).ready(function() {
 			$(".media-caption").removeClass("hidden");
 		}
 
-		if (! Options.show_album_media_count)
+		Options.show_album_media_count ?
+			$("#title-count").removeClass("hidden") :
 			$("#title-count").addClass("hidden");
-		else {
-			$("#title-count").removeClass("hidden");
-		}
 
 	}
 
@@ -1930,29 +2019,61 @@ $(document).ready(function() {
 
 	// this function refer to the need that the html showed be sorted
 	function needAlbumNameSort() {
-		return ! ! currentAlbum.albums.length && ! currentAlbum.albumNameSort && getBooleanCookie("albumNameSortRequested");
+		var result =
+			currentAlbum.subalbums.length &&
+			! currentAlbum.albumNameSort &&
+			getBooleanCookie("albumNameSortRequested");
+		return result;
 	}
 	function needAlbumDateSort() {
-		return ! ! currentAlbum.albums.length && currentAlbum.albumNameSort && ! getBooleanCookie("albumNameSortRequested");
+		var result =
+			currentAlbum.subalbums.length &&
+			currentAlbum.albumNameSort &&
+			! getBooleanCookie("albumNameSortRequested");
+		return result;
 	}
 	function needAlbumDateReverseSort() {
-		return ! ! currentAlbum.albums.length && ! currentAlbum.albumNameSort && currentAlbum.albumDateReverseSort !== getBooleanCookie("albumDateReverseSortRequested");
+		var result =
+			currentAlbum.subalbums.length &&
+			! currentAlbum.albumNameSort &&
+			currentAlbum.albumDateReverseSort !== getBooleanCookie("albumDateReverseSortRequested");
+		return result;
 	}
 	function needAlbumNameReverseSort() {
-		return ! ! currentAlbum.albums.length && currentAlbum.albumNameSort && currentAlbum.albumNameReverseSort !== getBooleanCookie("albumNameReverseSortRequested");
+		var result =
+			currentAlbum.subalbums.length &&
+			currentAlbum.albumNameSort &&
+			currentAlbum.albumNameReverseSort !== getBooleanCookie("albumNameReverseSortRequested");
+		return result;
 	}
 
 	function needMediaNameSort() {
-		return ! ! currentAlbum.media.length && ! currentAlbum.mediaNameSort && getBooleanCookie("mediaNameSortRequested");
+		var result =
+			currentAlbum.media.length &&
+			! currentAlbum.mediaNameSort &&
+			getBooleanCookie("mediaNameSortRequested");
+		return result;
 	}
 	function needMediaDateSort() {
-		return ! ! currentAlbum.media.length && currentAlbum.mediaNameSort && ! getBooleanCookie("mediaNameSortRequested");
+		var result =
+			currentAlbum.media.length &&
+			currentAlbum.mediaNameSort &&
+			! getBooleanCookie("mediaNameSortRequested");
+		return result;
 	}
 	function needMediaDateReverseSort() {
-		return ! ! currentAlbum.media.length && ! currentAlbum.mediaNameSort && currentAlbum.mediaDateReverseSort !== getBooleanCookie("mediaDateReverseSortRequested");
+		var result =
+			currentAlbum.media.length &&
+			! currentAlbum.mediaNameSort &&
+			currentAlbum.mediaDateReverseSort !== getBooleanCookie("mediaDateReverseSortRequested");
+		return result;
 	}
 	function needMediaNameReverseSort() {
-		return ! ! currentAlbum.media.length && currentAlbum.mediaNameSort && currentAlbum.mediaNameReverseSort !== getBooleanCookie("mediaNameReverseSortRequested");
+		var result =
+			currentAlbum.media.length &&
+			currentAlbum.mediaNameSort &&
+			currentAlbum.mediaNameReverseSort !== getBooleanCookie("mediaNameReverseSortRequested");
+		return result;
 	}
 
 	/* Error displays */
@@ -1986,8 +2107,9 @@ $(document).ready(function() {
 		$("#error-overlay").fadeTo(500, 0.8);
 		$("body, html").css("overflow", "hidden");
 	}
+
 	function undie() {
-		$("#error-text, #error-overlay, #auth-text").fadeOut(500);
+		$(".error, #error-overlay, #auth-text", ".search-failed").fadeOut(500);
 		$("body, html").css("overflow", "auto");
 	}
 
@@ -1997,6 +2119,7 @@ $(document).ready(function() {
 
 	function hashParsed(album, media, mediaIndex) {
 		var populateAlbum;
+
 		undie();
 		$("#loading").hide();
 		numSubAlbumsReady = 0;
@@ -2009,7 +2132,7 @@ $(document).ready(function() {
 			currentAlbum = null;
 
 		previousAlbum = currentAlbum;
-		if (currentAlbum && currentAlbum.path.indexOf(Options.by_date_string) === 0 && media !== null) {
+		if (currentAlbum && PhotoFloat.isByDateAlbum(currentAlbum.path) && media !== null) {
 			previousMedia = media;
 		}
 		else {
@@ -2026,10 +2149,10 @@ $(document).ready(function() {
 
 			initializeMenu();
 			sortAlbumsMedia();
-			modifyMenuButtons();
+			updateMenu();
 		}
 
-		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.albums.length && currentAlbum.media.length == 1) {
+		if (currentMedia !== null || currentAlbum !== null && ! currentAlbum.subalbums.length && currentAlbum.media.length == 1) {
 			if (currentMedia === null) {
 				currentMedia = currentAlbum.media[0];
 				currentMediaIndex = 0;
@@ -2053,8 +2176,8 @@ $(document).ready(function() {
 			else
 				$("#media").on("load", socialButtons);
 		} else  if (
-			currentAlbum !== null && ! currentAlbum.albums.length ||
-			numSubAlbumsReady >= album.albums.length
+			currentAlbum !== null && ! currentAlbum.subalbums.length ||
+			numSubAlbumsReady >= album.subalbums.length
 		) {
 			// no subalbums
 			// set social buttons href's when all the stuff is loaded
@@ -2078,8 +2201,6 @@ $(document).ready(function() {
 				url: optionsFile,
 				success: function(data) {
 					// for map zoom levels, see http://wiki.openstreetmap.org/wiki/Zoom_levels
-					// levelZeroSpecificDistance is the specific distance (m/pixel) for zoom level 0
-					var levelZeroSpecificDistance = 156412;
 
 					for (var key in data)
 						if (data.hasOwnProperty(key))
@@ -2088,9 +2209,6 @@ $(document).ready(function() {
 					// server_cache_path actually is a constant: it cannot be passed as an option, because getOptions need to know it before reading the options
 					// options.json is in this directory
 					Options.server_cache_path = 'cache';
-
-					byDateRegex = "^" + Options.by_date_string + "\/";
-					byGpsRegex = "^" + Options.by_gps_string + "\/";
 
 					maxSize = Options.reduced_sizes[Options.reduced_sizes.length - 1];
 
@@ -2131,6 +2249,31 @@ $(document).ready(function() {
 					if (squareMediaCookie !== null)
 						Options.media_thumb_type = squareMediaCookie;
 
+					Options.search_inside_words = false;
+					var searchInsideWordsCookie = getBooleanCookie("search_inside_words");
+					if (searchInsideWordsCookie !== null)
+						Options.search_inside_words = searchInsideWordsCookie;
+
+					Options.search_any_word = false;
+					var searchAnyWordCookie = getBooleanCookie("search_any_word");
+					if (searchAnyWordCookie !== null)
+						Options.search_any_word = searchAnyWordCookie;
+
+					Options.search_case_sensitive = false;
+					var searchCaseSensitiveCookie = getBooleanCookie("search_case_sensitive");
+					if (searchCaseSensitiveCookie !== null)
+						Options.search_case_sensitive = searchCaseSensitiveCookie;
+
+					Options.search_accent_sensitive = false;
+					var searchAccentSensitiveCookie = getBooleanCookie("search_accent_sensitive");
+					if (searchAccentSensitiveCookie !== null)
+						Options.search_accent_sensitive = searchAccentSensitiveCookie;
+
+					Options.search_regex = false;
+					var searchRegexCookie = getBooleanCookie("search_regex");
+					if (searchRegexCookie !== null)
+						Options.search_regex = searchRegexCookie;
+
 					callback(location.hash, hashParsed, die);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -2155,18 +2298,8 @@ $(document).ready(function() {
 
 	/* Event listeners */
 
-	$(window).hashchange(function() {
-		$("#loading").show();
-		$("link[rel=image_src]").remove();
-		$("link[rel=video_src]").remove();
-		$("ul#right-menu").removeClass("expand");
-		getOptions(parseHash);
-	});
-	$(window).hashchange();
-
-
 	$(document).on('keydown', function(e) {
-		if (! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+		if (e.target.tagName.toLowerCase() != 'input' && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
 			if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
 				//            arrow right                  n
 				swipeLeft(nextLink);
@@ -2305,19 +2438,90 @@ $(document).ready(function() {
 		}
 	}
 
-
-
 	// binds the click events to the sort buttons
 
-	// albums
-	$("li.album-sort.by-date").on('click', sortAlbumsByDate);
+	// search
+	$('#search-button').on("click", function() {
+		// save current hash in order to come back there when exiting from search
 
+		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
+		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
+		var bySearchViewLink = "#!/" + Options.by_search_string;
+		if (Options.search_regex)
+			bySearchViewLink += Options.cache_folder_separator + 'r';
+		else {
+			if (Options.search_inside_words)
+				bySearchViewLink += Options.cache_folder_separator + 'i';
+			if (Options.search_any_word)
+				bySearchViewLink += Options.cache_folder_separator + 'n';
+			if (Options.search_case_sensitive)
+				bySearchViewLink += Options.cache_folder_separator + 'c';
+			if (Options.search_accent_sensitive)
+				bySearchViewLink += Options.cache_folder_separator + 'a';
+		}
+		bySearchViewLink += Options.cache_folder_separator + searchTerms;
+		window.location.href = bySearchViewLink;
+	});
+	$('#search-field').keypress(function(ev) {
+		if (ev.which == 13) {
+			//Enter key pressed, trigger search button click event
+			$('#search-button').click();
+		}
+	});
+
+	$("li#inside-words").on('click', toggleInsideWordsSearch);
+	function toggleInsideWordsSearch(ev) {
+		Options.search_inside_words = ! Options.search_inside_words;
+		setBooleanCookie("search_inside_words", Options.search_inside_words);
+		updateMenu();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
+	}
+
+	$("li#any-word").on('click', toggleAnyWordSearch);
+	function toggleAnyWordSearch(ev) {
+		Options.search_any_word = ! Options.search_any_word;
+		setBooleanCookie("search_any_word", Options.search_any_word);
+		updateMenu();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
+	}
+
+	$("li#case-sensitive").on('click', toggleCaseSensitiveSearch);
+	function toggleCaseSensitiveSearch(ev) {
+		Options.search_case_sensitive = ! Options.search_case_sensitive;
+		setBooleanCookie("search_case_sensitive", Options.search_case_sensitive);
+		updateMenu();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
+	}
+
+	$("li#accent-sensitive").on('click', toggleAccentSensitiveSearch);
+	function toggleAccentSensitiveSearch(ev) {
+		Options.search_accent_sensitive = ! Options.search_accent_sensitive;
+		setBooleanCookie("search_accent_sensitive", Options.search_accent_sensitive);
+		updateMenu();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
+	}
+
+	$("li#regex-word").on('click', toggleRegexSearch);
+	function toggleRegexSearch(ev) {
+		Options.search_regex = ! Options.search_regex;
+		setBooleanCookie("search_regex", Options.search_regex);
+		updateMenu();
+		if ($("#search-field").val().trim())
+			$('#search-button').click();
+	}
+
+	// subalbums
+	$("li.album-sort.by-date").on('click', sortAlbumsByDate);
 	function sortAlbumsByDate(ev) {
-		if (currentMedia === null && currentAlbum.albums.length > 1 && currentAlbum.albumNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+		if (currentMedia === null && currentAlbum.subalbums.length > 1 && currentAlbum.albumNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			setBooleanCookie("albumNameSortRequested", false);
 			setBooleanCookie("albumDateReverseSortRequested", currentAlbum.albumNameReverseSort);
 			sortAlbumsMedia();
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshSubalbums");
 		}
 		return false;
@@ -2326,11 +2530,11 @@ $(document).ready(function() {
 	$("li.album-sort.by-name").on('click', sortAlbumsByName);
 
 	function sortAlbumsByName(ev) {
-		if (currentMedia === null && currentAlbum.albums.length > 1 && ! currentAlbum.albumNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+		if (currentMedia === null && currentAlbum.subalbums.length > 1 && ! currentAlbum.albumNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			setBooleanCookie("albumNameSortRequested", true);
 			setBooleanCookie("albumNameReverseSortRequested", currentAlbum.albumDateReverseSort);
 			sortAlbumsMedia();
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshSubalbums");
 		}
 		return false;
@@ -2339,13 +2543,12 @@ $(document).ready(function() {
 	$("li.album-sort.sort-reverse").on('click', sortAlbumsReverse);
 
 	function sortAlbumsReverse(ev) {
-		if (currentMedia === null && currentAlbum.albums.length > 1 && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
-			if (currentAlbum.albumNameSort)
-					setBooleanCookie("albumNameReverseSortRequested", ! currentAlbum.albumNameReverseSort);
-			else
-					setBooleanCookie("albumDateReverseSortRequested", ! currentAlbum.albumDateReverseSort);
+		if (currentMedia === null && currentAlbum.subalbums.length > 1 && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+			currentAlbum.albumNameSort ?
+				setBooleanCookie("albumNameReverseSortRequested", ! currentAlbum.albumNameReverseSort) :
+				setBooleanCookie("albumDateReverseSortRequested", ! currentAlbum.albumDateReverseSort);
 			sortAlbumsMedia();
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshSubalbums");
 		}
 		return false;
@@ -2356,9 +2559,9 @@ $(document).ready(function() {
 	function sortMediaByDate(ev) {
 		if (currentMedia === null && currentAlbum.media.length > 1 && currentAlbum.mediaNameSort && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			setBooleanCookie("mediaNameSortRequested", false);
-				setBooleanCookie("mediaDateReverseSortRequested", currentAlbum.mediaNameReverseSort);
+			setBooleanCookie("mediaDateReverseSortRequested", currentAlbum.mediaNameReverseSort);
 			sortAlbumsMedia();
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshMedia");
 		}
 		return false;
@@ -2371,7 +2574,7 @@ $(document).ready(function() {
 			setBooleanCookie("mediaNameSortRequested", true);
 			setBooleanCookie("mediaNameReverseSortRequested", currentAlbum.mediaDateReverseSort);
 			sortAlbumsMedia();
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshMedia");
 		}
 		return false;
@@ -2387,21 +2590,18 @@ $(document).ready(function() {
 				setBooleanCookie("mediaDateReverseSortRequested", ! currentAlbum.mediaDateReverseSort);
 
 			sortAlbumsMedia();
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshMedia");
 		}
 		return false;
 	}
 
-
-
-
 	$("ul#right-menu li.slide").on('click', toggleSlideMode);
 	function toggleSlideMode(ev) {
-		if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+		if (currentMedia === null && currentAlbum.subalbums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.albums_slide_style = ! Options.albums_slide_style;
 			setBooleanCookie("albums_slide_style", Options.albums_slide_style);
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshSubalbums");
 		}
 		return false;
@@ -2409,13 +2609,13 @@ $(document).ready(function() {
 
 	$("ul#right-menu li.spaced").on('click', toggleSpacing);
 	function toggleSpacing(ev) {
-		if ((currentAlbum.albums.length || currentAlbum.media.length) && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+		if ((currentAlbum.subalbums.length || currentAlbum.media.length) && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			if (Options.spacing)
 				Options.spacing = 0;
 			else
 				Options.spacing = Options.spacingSave;
 			setCookie("spacing", Options.spacing);
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshBoth");
 			// showAlbum();
 		}
@@ -2424,10 +2624,10 @@ $(document).ready(function() {
 
 	$("ul#right-menu li.album-names").on('click', toggleAlbumNames);
 	function toggleAlbumNames(ev) {
-		if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+		if (currentMedia === null && currentAlbum.subalbums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.show_album_names_below_thumbs = ! Options.show_album_names_below_thumbs;
 			setBooleanCookie("show_album_names_below_thumbs", Options.show_album_names_below_thumbs);
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshSubalbums");
 		}
 		return false;
@@ -2435,10 +2635,10 @@ $(document).ready(function() {
 
 	$("ul#right-menu li.media-count").on('click', toggleMediaCount);
 	function toggleMediaCount(ev) {
-		if (currentMedia === null && currentAlbum.albums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
+		if (currentMedia === null && currentAlbum.subalbums.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.show_album_media_count = ! Options.show_album_media_count;
 			setBooleanCookie("show_album_media_count", Options.show_album_media_count);
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshSubalbums");
 		}
 		return false;
@@ -2449,7 +2649,7 @@ $(document).ready(function() {
 		if (currentMedia === null && currentAlbum.media.length && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.show_media_names_below_thumbs = ! Options.show_media_names_below_thumbs;
 			setBooleanCookie("show_media_names_below_thumbs", Options.show_media_names_below_thumbs);
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshMedia");
 		}
 		return false;
@@ -2460,7 +2660,7 @@ $(document).ready(function() {
 		if (currentMedia === null && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.album_thumb_type = Options.album_thumb_type == "square" ? "fit" : "square";
 			setCookie("album_thumb_type", Options.album_thumb_type);
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshSubalbums");
 		}
 		return false;
@@ -2471,7 +2671,7 @@ $(document).ready(function() {
 		if (currentMedia === null && ev.which == 1 && ! ev.shiftKey && ! ev.ctrlKey && ! ev.altKey) {
 			Options.media_thumb_type = Options.media_thumb_type == "square" ? "fixed_height" : "square";
 			setCookie("media_thumb_type", Options.media_thumb_type);
-			modifyMenuButtons();
+			updateMenu();
 			showAlbum("refreshMedia");
 		}
 		return false;
@@ -2504,9 +2704,19 @@ $(document).ready(function() {
 
 	$("#menu-icon").on("click", function(ev) {
 		$("ul#right-menu").toggleClass("expand");
-		modifyMenuButtons();
+		updateMenu();
 		return false;
 	});
+
+	$(window).hashchange(function() {
+		$("#loading").show();
+		$("#album-view").removeClass("hidden");
+		$("link[rel=image_src]").remove();
+		$("link[rel=video_src]").remove();
+		$("ul#right-menu").removeClass("expand");
+		getOptions(parseHash);
+	});
+	$(window).hashchange();
 
 	$("#auth-form").submit(function() {
 		var password = $("#password");

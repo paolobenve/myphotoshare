@@ -41,22 +41,9 @@ def remove_folders_marker(path):
 			path = path[1:]
 	return path
 
-def cache_base(path, filepath=False):
-	if not filepath:
-		path = remove_album_path(path)
-	if path:
-		path = path.replace('/', Options.config['cache_folder_separator']).replace(' ', '_').replace('+', '_').replace('(', '').replace('&', '').replace(',', '').replace(')', '').replace('#', '').replace('[', '').replace(']', '').replace('"', '').replace("'", '').replace('_-_', '-').lower()
-		while path.find("--") != -1:
-			path = path.replace("--", "-")
-		while path.find("__") != -1:
-			path = path.replace("__", "_")
-	else:
-		path = "root"
-	return path
-
 def photo_cache_name(photo, size, thumb_type="", mobile_bigger=False):
 	# this function is used for video thumbnails too
-	photo_suffix = "_"
+	photo_suffix = Options.config['cache_folder_separator']
 	actual_size = size
 	if mobile_bigger:
 		actual_size = int(actual_size * Options.config['mobile_thumbnail_factor'])
@@ -80,7 +67,7 @@ def photo_cache_name(photo, size, thumb_type="", mobile_bigger=False):
 
 
 def video_cache_name(video):
-	return video.cache_base + "_transcoded_" + Options.config['video_transcode_bitrate'] + "_" + str(Options.config['video_crf']) + ".mp4"
+	return video.cache_base + Options.config['cache_folder_separator'] + "transcoded_" + Options.config['video_transcode_bitrate'] + "_" + str(Options.config['video_crf']) + ".mp4"
 
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))

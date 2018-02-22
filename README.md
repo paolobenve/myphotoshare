@@ -36,6 +36,7 @@ Content (albums and media files) can be shared over some popular social plaforms
 - [x] Manages images and videos, and permits sharing them (single image or album).
 - [x] Media can be browsed by folder, by date or by geolocation. Switching among album, date and place views.
 - [x] Media and folders can be sorted ascending/descending by date or by name.
+- [x] Media can be searched by file/album name, title, description, tags.
 - [x] Thumbnails can be square (cropped, with optional face detection by [OpenCV](https://opencv.org/)) or full-content.
 
 ### For Photographers

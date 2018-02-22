@@ -166,7 +166,7 @@ def report_times(final):
 	max_digit = len(_num_media)
 	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media)
 	if num_media:
-		print("                                                              " + str(int(total_time / num_media / 10000) / 100) + " s/media")
+		print("                                                              " + str(int(total_time / num_media / 1000000 * 1000) / 1000) + " s/media")
 	print("                  processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed)
 	if num_media_processed and num_media_processed != num_media:
 		print("                                                              " + str(int(total_time / num_media_processed / 10000) / 100) + " s/processed media")

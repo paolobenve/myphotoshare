@@ -36,7 +36,8 @@ options_requiring_thumbnails_regeneration = ['face_cascade_scale_factor', 'small
 # json_version = 1 since ...
 # json_version = 2 since checksums have been added
 # json_version = 3 since geotag managing is optional
-json_version = 3
+# json_version = 4 since search feature added
+json_version = 4
 
 
 def get_options():
@@ -70,6 +71,7 @@ def get_options():
 				'album_thumb_size',
 				'media_thumb_size',
 				'big_virtual_folders_threshold',
+				'max_search_album_number',
 				'respected_processors',
 				'max_album_share_thumbnails_number',
 				'min_album_thumbnail',

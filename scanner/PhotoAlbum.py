@@ -10,6 +10,7 @@ import os
 import os.path
 import tempfile
 import hashlib
+import unicodedata
 import sys
 from datetime import datetime
 from pprint import pprint
@@ -28,7 +29,7 @@ except ImportError:
 import math
 import numpy as np
 
-from CachePath import remove_album_path, remove_folders_marker, trim_base_custom, checksum, cache_base, thumbnail_types_and_sizes, file_mtime, photo_cache_name, video_cache_name, find, find_in_usr_share
+from CachePath import remove_album_path, remove_folders_marker, trim_base_custom, checksum, thumbnail_types_and_sizes, file_mtime, photo_cache_name, video_cache_name, find, find_in_usr_share
 from Utilities import message, next_level, back_level
 from Geonames import Geonames
 from PIL import Image
@@ -93,9 +94,9 @@ class Album(object):
 		self.baseless_path = remove_album_path(path)
 		self.cache_base = ""
 		self.media_list = list()
-		self.albums_list = list()
+		self.subalbums_list = list()
 		self.media_list_is_sorted = True
-		self.albums_list_is_sorted = True
+		self.subalbums_list_is_sorted = True
 		self._subdir = ""
 		self.num_media_in_sub_tree = 0
 		self.num_media_in_album = 0
@@ -109,7 +110,8 @@ class Album(object):
 			Options.config['subdir_method'] in ("md5", "folder") and
 			(
 				self.baseless_path.find(Options.config['by_date_string']) != 0 or
-				self.baseless_path.find(Options.config['by_gps_string']) != 0
+				self.baseless_path.find(Options.config['by_gps_string']) != 0 or
+				self.baseless_path.find(Options.config['by_search_string']) != 0
 			)
 		):
 			if Options.config['subdir_method'] == "md5":
@@ -127,12 +129,40 @@ class Album(object):
 						self._subdir += "_"
 
 	@property
+	def name(self):
+		if hasattr(self, "_name"):
+			return self._name
+		else:
+			return os.path.basename(self.baseless_path)
+
+	@property
+	def title(self):
+		if 'metadata' in self._attributes and 'title' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["title"]
+		else:
+			return ''
+
+	@property
+	def description(self):
+		if 'metadata' in self._attributes and 'description' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["description"]
+		else:
+			return ''
+
+	@property
+	def tags(self):
+		if 'metadata' in self._attributes and 'tags' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["tags"]
+		else:
+			return ''
+
+	@property
 	def media(self):
 		return self.media_list
 
 	@property
-	def albums(self):
-		return self.albums_list
+	def subalbums(self):
+		return self.subalbums_list
 
 	@property
 	def path(self):
@@ -155,13 +185,13 @@ class Album(object):
 	@property
 	def date(self):
 		self.sort_subalbums_and_media()
-		if len(self.media_list) == 0 and len(self.albums_list) == 0:
+		if len(self.media_list) == 0 and len(self.subalbums_list) == 0:
 			return datetime(1900, 1, 1)
 		elif len(self.media_list) == 0:
-			return self.albums_list[-1].date
-		elif len(self.albums_list) == 0:
+			return self.subalbums_list[-1].date
+		elif len(self.subalbums_list) == 0:
 			return self.media_list[-1].date
-		return max(self.media_list[-1].date, self.albums_list[-1].date)
+		return max(self.media_list[-1].date, self.subalbums_list[-1].date)
 
 
 	def __cmp__(self, other):
@@ -198,24 +228,24 @@ class Album(object):
 			self.media_list_is_sorted = False
 
 	def add_album(self, album):
-		self.albums_list.append(album)
-		self.albums_list_is_sorted = False
+		self.subalbums_list.append(album)
+		self.subalbums_list_is_sorted = False
 
 	def sort_subalbums_and_media(self):
 		if not self.media_list_is_sorted:
 			self.media_list.sort()
 			self.media_list_is_sorted = True
-		if not self.albums_list_is_sorted:
-			self.albums_list.sort()
-			self.albums_list_is_sorted = True
+		if not self.subalbums_list_is_sorted:
+			self.subalbums_list.sort()
+			self.subalbums_list_is_sorted = True
 
 	@property
 	def empty(self):
 		if len(self.media_list) != 0:
 			return False
-		if len(self.albums_list) == 0:
+		if len(self.subalbums_list) == 0:
 			return True
-		for album in self.albums_list:
+		for album in self.subalbums_list:
 			if not album.empty:
 				return False
 		return True
@@ -243,7 +273,7 @@ class Album(object):
 		with open(path, "r") as filepath:
 			dictionary = json.load(filepath)
 		next_level()
-		message("album read", path, 5)
+		message("album read", "", 5)
 		back_level()
 		# generate the album from the json file loaded
 		# subalbums are not generated yet
@@ -276,7 +306,7 @@ class Album(object):
 
 		if not cripple:
 			# it looks like the following code is never executed
-			for subalbum in dictionary["albums"]:
+			for subalbum in dictionary["subalbums"]:
 				album.add_album(Album.from_dict(subalbum, cripple))
 		album.sort_subalbums_and_media()
 
@@ -287,31 +317,33 @@ class Album(object):
 		self.sort_subalbums_and_media()
 		subalbums = []
 		if cripple:
-			for sub in self.albums_list:
-				if not sub.empty:
-					path_to_dict = trim_base_custom(sub.path, self.baseless_path)
+			for subalbum in self.subalbums_list:
+				if not subalbum.empty:
+					path_to_dict = trim_base_custom(subalbum.path, self.baseless_path)
 					if path_to_dict == "":
 						path_to_dict = Options.config['folders_string']
 
 					sub_dict = {
 						"path": path_to_dict,
-						"cacheBase": sub.cache_base,
-						"date": sub.date,
-						"numMediaInSubTree": sub.num_media_in_sub_tree
+						"cacheBase": subalbum.cache_base,
+						"date": subalbum.date,
+						"numMediaInSubTree": subalbum.num_media_in_sub_tree
 					}
-					if hasattr(sub, "center"):
-						sub_dict["center"] = sub.center
-					if hasattr(sub, "name"):
-						sub_dict["name"] = sub.name
-					if hasattr(sub, "alt_name"):
-						sub_dict["alt_name"] = sub.alt_name
+					if hasattr(subalbum, "center"):
+						sub_dict["center"] = subalbum.center
+					if hasattr(subalbum, "name"):
+						sub_dict["name"] = subalbum.name
+					if hasattr(subalbum, "alt_name"):
+						sub_dict["alt_name"] = subalbum.alt_name
+					if hasattr(subalbum, "words"):
+						sub_dict["words"] = subalbum.words
 					subalbums.append(sub_dict)
 
 		else:
 			# it looks like the following code is never executed
-			for sub in self.albums_list:
-				if not sub.empty:
-					subalbums.append(sub)
+			for subalbum in self.subalbums_list:
+				if not subalbum.empty:
+					subalbums.append(subalbum)
 
 		path_without_folders_marker = remove_folders_marker(self.path)
 
@@ -319,7 +351,8 @@ class Album(object):
 		folder_position = path_to_dict.find(Options.config['folders_string'])
 		by_date_position = path_to_dict.find(Options.config['by_date_string'])
 		by_gps_position = path_to_dict.find(Options.config['by_gps_string'])
-		if path_to_dict and by_date_position == -1 and by_gps_position == -1 and self.cache_base != "root" and folder_position != 0:
+		by_search_position = path_to_dict.find(Options.config['by_search_string'])
+		if path_to_dict and by_date_position == -1 and by_gps_position == -1 and by_search_position == -1 and self.cache_base != "root" and folder_position != 0:
 			path_to_dict = Options.config['folders_string'] + '/' + path_to_dict
 
 		ancestors_cache_base = list()
@@ -341,7 +374,7 @@ class Album(object):
 			"path": path_to_dict,
 			"cacheSubdir": self._subdir,
 			"date": self.date,
-			"albums": subalbums,
+			"subalbums": subalbums,
 			"media": self.media_list,
 			"cacheBase": self.cache_base,
 			"ancestorsCacheBase": ancestors_cache_base,
@@ -357,6 +390,8 @@ class Album(object):
 			dictionary["name"] = self.name
 		if hasattr(self, "alt_name"):
 			dictionary["alt_name"] = self.alt_name
+		# if hasattr(self, "words"):
+		# 	dictionary["words"] = self.words
 
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base
@@ -370,6 +405,46 @@ class Album(object):
 				return media
 		return None
 
+	def generate_cache_base(self, subalbum_or_media_path, media_file_name=None):
+		# this method calculate the cache base for a subalbum or a media in self album
+		# for a media, the parameter media_file_name has to be given; in this case subalbum_or_media_path is the media file name without any path info
+		# result only has ascii characters
+
+		# respect alphanumeric characters, substitute non-alphanumeric (but not slashes) with underscore
+		subalbum_or_media_path = "".join([c if c.isalnum() or c in ['/', '-', '.'] else "_" for c in subalbum_or_media_path])
+
+		# convert slashes
+		subalbum_or_media_path = subalbum_or_media_path.replace('/', Options.config['cache_folder_separator']).lower()
+
+		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
+		subalbum_or_media_path = ''.join(c for c in unicodedata.normalize('NFD', subalbum_or_media_path) if unicodedata.category(c) != 'Mn')
+
+		while subalbum_or_media_path.find("__") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace("__", "_")
+		while subalbum_or_media_path.find("-_") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace('-_', '-')
+		while subalbum_or_media_path.find("_-") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace('_-', '-')
+		while subalbum_or_media_path.find("--") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace("--", "-")
+
+		if media_file_name is None and hasattr(self, "subalbums_list") or media_file_name is not None and hasattr(self, "media_list"):
+			# let's avoid that different album/media with equivalent names have the same cache base
+			distinguish_suffix = 0
+			while True:
+				_path = subalbum_or_media_path
+				if distinguish_suffix:
+					_path += "_" + str(distinguish_suffix)
+				if (
+					media_file_name is None     and any(_path == _album.cache_base and self.absolute_path != _album.absolute_path   for _album in self.subalbums_list) or
+					media_file_name is not None and any(_path == _media.cache_base and media_file_name    != _media.media_file_name for _media in self.media_list)
+				):
+					distinguish_suffix += 1
+				else:
+					subalbum_or_media_path = _path
+					break
+
+		return subalbum_or_media_path
 
 class Media(object):
 	def __init__(self, album, media_path, thumbs_path=None, attributes=None):
@@ -378,6 +453,7 @@ class Media(object):
 		dirname = os.path.dirname(media_path)
 		self.folders = remove_album_path(dirname)
 		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
+		self.cache_base = album.generate_cache_base(trim_base_custom(media_path, album.absolute_path), self.media_file_name)
 
 		self.is_valid = True
 
@@ -410,7 +486,7 @@ class Media(object):
 		):
 			self._attributes = attributes
 			self._attributes["dateTimeDir"] = dir_mtime
-			self.cache_base = attributes["cacheBase"]
+			# self.cache_base = attributes["cacheBase"]
 			return
 
 		self._attributes = {}
@@ -418,19 +494,6 @@ class Media(object):
 		self._attributes["dateTimeFile"] = mtime
 		self._attributes["dateTimeDir"] = dir_mtime
 		self._attributes["mediaType"] = "photo"
-		self.cache_base = cache_base(trim_base_custom(media_path, album.absolute_path))
-
-		# let's avoid that different media names have the same cache base
-		distinguish_suffix = 0
-		while True:
-			_cache_base = self.cache_base
-			if distinguish_suffix:
-				_cache_base += "_" + str(distinguish_suffix)
-			if any(_cache_base == _media.cache_base and self.media_file_name != _media.media_file_name for _media in album.media_list):
-				distinguish_suffix += 1
-			else:
-				self.cache_base = _cache_base
-				break
 
 		try:
 			image = Image.open(media_path)
@@ -454,21 +517,9 @@ class Media(object):
 				if self.has_gps_data:
 					next_level()
 					message("looking for geonames...", media_path, 5)
-					geoname = Geonames()
-					self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
-					# self._attributes["geoname"] is a dictionary with this data:
-					#  'country_name': the country name in given language
-					#  'country_code': the ISO country code
-					#  'region_name': the administrative name (the region in normal states, the state in federative states) in given language
-					#  'region_code': the corresponding geonames code
-					#  'place_name': the nearby place name
-					#  'place_code': the nearby place geonames id
-					#  'distance': the distance between given coordinates and nearby place geonames coordinates
-
-					# Overwrite with album.ini values when album has been read from file
-					if self.album.album_ini:
-						Metadata.set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+					self.get_geonames()
 					back_level()
+
 			else:
 				# try with video detection
 				self._video_metadata(media_path)
@@ -480,15 +531,11 @@ class Media(object):
 						if self.has_gps_data:
 							next_level()
 							message("looking for geonames...", media_path, 5)
-							geoname = Geonames()
-							self._attributes["geoname"] = geoname.lookup_nearby_place(self.latitude, self.longitude)
-							# Overwrite with album.ini values when read from file
-							if self.album.album_ini:
-								Metadata.set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
+							self.get_geonames()
 							back_level()
 				else:
 					next_level()
-					message("error transcodind, not a video?", media_path, 5)
+					message("error transcodind, not a video?", "", 5)
 					back_level()
 					self.is_valid = False
 		return
@@ -502,6 +549,22 @@ class Media(object):
 	@property
 	def datetime_dir(self):
 		return self._attributes["dateTimeDir"]
+
+
+	def get_geonames(self):
+		self._attributes["geoname"] = Geonames.lookup_nearby_place(self.latitude, self.longitude)
+		# self._attributes["geoname"] is a dictionary with this data:
+		#  'country_name': the country name in given language
+		#  'country_code': the ISO country code
+		#  'region_name': the administrative name (the region in normal states, the state in federative states) in given language
+		#  'region_code': the corresponding geonames code
+		#  'place_name': the nearby place name
+		#  'place_code': the nearby place geonames id
+		#  'distance': the distance between given coordinates and nearby place geonames coordinates
+
+		# Overwrite with album.ini values when album has been read from file
+		if self.album.album_ini:
+			Metadata.set_geoname_from_album_ini(self.name, self._attributes, self.album.album_ini)
 
 
 	def _photo_metadata(self, image):
@@ -1128,15 +1191,15 @@ class Media(object):
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reducing size...", info_string, 5)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("thumbing for albums...", info_string, 5)
+				message("thumbing for subalbums...", "", 5)
 			else:
-				message("thumbing for media...", info_string, 5)
+				message("thumbing for media...", "", 5)
 			start_image_copy.thumbnail((actual_thumb_size, actual_thumb_size), Image.ANTIALIAS)
 			next_level()
 			if not mobile_bigger and original_thumb_size > Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size > int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
 				message("size reduced (" + str(original_thumb_size) + ")", "", 4)
 			elif not mobile_bigger and original_thumb_size == Options.config['album_thumb_size'] or mobile_bigger and original_thumb_size == int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor']):
-				message("thumbed for albums (" + str(original_thumb_size) + ")", "", 4)
+				message("thumbed for subalbums (" + str(original_thumb_size) + ")", "", 4)
 			else:
 				message("thumbed for media (" + str(original_thumb_size) + ")", "", 4)
 			back_level()
@@ -1179,7 +1242,7 @@ class Media(object):
 		else:
 			start_image_copy_for_saving = start_image_copy_filled
 
-		message("saving...", info_string, 5)
+		message("saving...", "", 5)
 		try:
 			jpeg_quality = Options.config['jpeg_quality']
 			if thumb_type:
@@ -1188,11 +1251,11 @@ class Media(object):
 			start_image_copy_for_saving.save(thumb_path, "JPEG", quality=jpeg_quality)
 			next_level()
 			if original_thumb_size > Options.config['album_thumb_size']:
-				message("saved reduced", thumb_path, 4)
+				message("reduced size image saved ", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("saved for albums", thumb_path, 4)
+				message("album thumbnail salved", "", 4)
 			else:
-				message("saved for media", thumb_path, 4)
+				message("media thumbnail saved", "", 4)
 			back_level()
 			back_level()
 			back_level()
@@ -1211,7 +1274,7 @@ class Media(object):
 				if original_thumb_size > Options.config['album_thumb_size']:
 					message("saved reduced (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				elif original_thumb_size == Options.config['album_thumb_size']:
-					message("saved for albums (2nd try, " + str(original_thumb_size) + ")", "", 2)
+					message("saved for subalbums (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				else:
 					message("saved for media (2nd try, " + str(original_thumb_size) + ")", "", 2)
 				back_level()
@@ -1412,11 +1475,24 @@ class Media(object):
 
 	@property
 	def title(self):
-		return self._attributes["metadata"]["title"]
+		if 'metadata' in self._attributes and 'title' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["title"]
+		else:
+			return ''
 
 	@property
 	def description(self):
-		return self._attributes["metadata"]["description"]
+		if 'metadata' in self._attributes and 'description' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["description"]
+		else:
+			return ''
+
+	@property
+	def tags(self):
+		if 'metadata' in self._attributes and 'tags' in self._attributes["metadata"]:
+			return self._attributes["metadata"]["tags"]
+		else:
+			return ''
 
 	@property
 	def size(self):
@@ -1645,10 +1721,11 @@ class Media(object):
 		# media["yearAlbum"] = self.year_album_path
 		# media["monthAlbum"] = self.month_album_path
 		media["dayAlbum"] = self.day_album_path
-		media["dayAlbumCacheBase"] = cache_base(self.day_album_path, True)
+		media["dayAlbumCacheBase"] = self.day_album_cache_base
 		if self.gps_album_path:
 			media["gpsAlbum"] = self.gps_album_path
-			media["gpsAlbumCacheBase"] = cache_base(self.gps_album_path, True)
+			media["gpsAlbumCacheBase"] = self.gps_album_cache_base
+		media["words"] = self.words
 		if Options.config['checksum']:
 			media["checksum"] = checksum(os.path.join(Options.config['album_path'], self.media_file_name))
 

@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# @python2
+from __future__ import unicode_literals
+
 import os
 import os.path
 import sys
@@ -8,11 +11,12 @@ import re
 import time
 import random
 import math
+import unicodedata
 from datetime import datetime
 
 from PIL import Image
 
-from CachePath import cache_base, remove_album_path, file_mtime, trim_base_custom, remove_folders_marker
+from CachePath import remove_album_path, file_mtime, trim_base_custom, remove_folders_marker
 from Utilities import message, next_level, back_level, report_times
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from Geonames import Geonames
@@ -22,8 +26,9 @@ import Options
 class TreeWalker:
 	def __init__(self):
 		random.seed()
-		self.all_cache_entries = ["options.json"]
-		self.all_cache_entries_by_subdir = {}
+		geonames = Geonames()
+		self.all_json_files = ["options.json"]
+		self.all_json_files_by_subdir = {}
 
 		message("method", "cascade thumbnail generation", 4)
 		# be sure reduced_sizes array is correctly sorted
@@ -33,6 +38,7 @@ class TreeWalker:
 		self.all_albums = list()
 		self.tree_by_date = {}
 		self.tree_by_geonames = {}
+		self.tree_by_search = {}
 		self.media_with_geonames_list = list()
 		self.all_media = list()
 		self.all_album_composite_images = list()
@@ -50,10 +56,9 @@ class TreeWalker:
 
 		self.origin_album = Album(Options.config['album_path'])
 		# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parente of the root physical tree and of the virtual albums
-		self.origin_album.cache_base = cache_base(Options.config['album_path'])
-		album_cache_base = Options.config['folders_string']
+		self.origin_album.cache_base = "root"
 		next_level()
-		[folders_album, num, _] = self.walk(Options.config['album_path'], album_cache_base, self.origin_album)
+		[folders_album, num, _] = self.walk(Options.config['album_path'], Options.config['folders_string'], self.origin_album)
 		back_level()
 		if folders_album is None:
 			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
@@ -66,11 +71,11 @@ class TreeWalker:
 			message("all media json file saved", "", 5)
 			back_level()
 
-			self.all_cache_entries.append("all_media.json")
+			self.all_json_files.append("all_media.json")
 
 			folders_album.num_media_in_sub_tree = num
 			self.origin_album.add_album(folders_album)
-			self.all_cache_entries.append(Options.config['folders_string'] + ".json")
+			self.all_json_files.append(Options.config['folders_string'] + ".json")
 
 			message("generating by date albums...", "", 4)
 			by_date_album = self.generate_date_albums(self.origin_album)
@@ -78,7 +83,7 @@ class TreeWalker:
 			message("by date albums generated", "", 5)
 			back_level()
 			if by_date_album is not None and not by_date_album.empty:
-				self.all_cache_entries.append(Options.config['by_date_string'] + ".json")
+				self.all_json_files.append(Options.config['by_date_string'] + ".json")
 				self.origin_album.add_album(by_date_album)
 
 			if self.tree_by_geonames:
@@ -88,12 +93,21 @@ class TreeWalker:
 				message("by geonames albums generated", "", 5)
 				back_level()
 				if by_geonames_album is not None and not by_geonames_album.empty:
-					self.all_cache_entries.append(Options.config['by_gps_string'] + ".json")
+					self.all_json_files.append(Options.config['by_gps_string'] + ".json")
 					self.origin_album.add_album(by_geonames_album)
+
+			message("generating by search albums...", "", 4)
+			by_search_album = self.generate_by_search_albums(self.origin_album)
+			next_level()
+			message("by search albums generated", "", 5)
+			back_level()
+			if by_search_album is not None and not by_search_album.empty:
+				self.all_json_files.append(Options.config['by_search_string'] + ".json")
+				self.origin_album.add_album(by_search_album)
 
 			message("saving all albums to json files...", "", 4)
 			next_level()
-			for sub_album in self.origin_album.albums_list:
+			for sub_album in self.origin_album.subalbums_list:
 				self.all_albums_to_json_file(sub_album)
 			message("all albums saved to json files", "", 5)
 			back_level()
@@ -103,7 +117,7 @@ class TreeWalker:
 		message("complete", "", 4)
 
 	def all_albums_to_json_file(self, album):
-		for sub_album in album.albums_list:
+		for sub_album in album.subalbums_list:
 			self.all_albums_to_json_file(sub_album)
 		album.to_json_file()
 
@@ -114,20 +128,20 @@ class TreeWalker:
 		by_date_path = os.path.join(Options.config['album_path'], Options.config['by_date_string'])
 		by_date_album = Album(by_date_path)
 		by_date_album.parent = origin_album
-		by_date_album.cache_base = cache_base(by_date_path)
+		by_date_album.cache_base = Options.config['by_date_string']
 		by_date_max_file_date = None
 		for year, _ in self.tree_by_date.items():
 			year_path = os.path.join(by_date_path, str(year))
 			year_album = Album(year_path)
 			year_album.parent = by_date_album
-			year_album.cache_base = cache_base(year_path)
+			year_album.cache_base = by_date_album.cache_base + Options.config['cache_folder_separator'] + year
 			year_max_file_date = None
 			by_date_album.add_album(year_album)
 			for month, _ in self.tree_by_date[year].items():
 				month_path = os.path.join(year_path, str(month))
 				month_album = Album(month_path)
 				month_album.parent = year_album
-				month_album.cache_base = cache_base(month_path)
+				month_album.cache_base = year_album.cache_base + Options.config['cache_folder_separator'] + month
 				month_max_file_date = None
 				year_album.add_album(month_album)
 				for day, media in self.tree_by_date[year][month].items():
@@ -135,10 +149,11 @@ class TreeWalker:
 					day_path = os.path.join(month_path, str(day))
 					day_album = Album(day_path)
 					day_album.parent = month_album
-					day_album.cache_base = cache_base(day_path)
+					day_album.cache_base = month_album.cache_base + Options.config['cache_folder_separator'] + day
 					day_max_file_date = None
 					month_album.add_album(day_album)
 					for single_media in media:
+						single_media.day_album_cache_base = day_album.cache_base
 						day_album.add_media(single_media)
 						day_album.num_media_in_sub_tree += 1
 						day_album.num_media_in_album += 1
@@ -180,6 +195,63 @@ class TreeWalker:
 		back_level()
 		return by_date_album
 
+	def generate_by_search_albums(self, origin_album):
+		next_level()
+		# convert the temporary structure where media are organized by words to a set of albums
+
+		by_search_path = os.path.join(Options.config['album_path'], Options.config['by_search_string'])
+		by_search_album = Album(by_search_path)
+		by_search_album.parent = origin_album
+		by_search_album.cache_base = Options.config['by_search_string']
+		by_search_max_file_date = None
+		message("working with word albums...", "", 5)
+		for word, media_and_album_words in self.tree_by_search.items():
+			next_level()
+			message("working with word album...", word + ", n=" + str(len(media_and_album_words)), 5)
+			word_path = os.path.join(by_search_path, str(word))
+			word_album = Album(word_path)
+			word_album.parent = by_search_album
+			word_album.cache_base = by_search_album.generate_cache_base(os.path.join(by_search_album.cache_base, word))
+			word_max_file_date = None
+			by_search_album.add_album(word_album)
+			for single_media in media_and_album_words["media_words"]:
+				word_album.add_media(single_media)
+				word_album.num_media_in_sub_tree += 1
+				word_album.num_media_in_album += 1
+				by_search_album.add_media(single_media)
+				by_search_album.num_media_in_sub_tree += 1
+				single_media_date = max(single_media.datetime_file, single_media.datetime_dir)
+				if word_max_file_date:
+					word_max_file_date = max(word_max_file_date, single_media_date)
+				else:
+					word_max_file_date = single_media_date
+				if by_search_max_file_date:
+					by_search_max_file_date = max(by_search_max_file_date, single_media_date)
+				else:
+					by_search_max_file_date = single_media_date
+			for single_album in media_and_album_words["album_words"]:
+				word_album.add_album(single_album)
+				word_album.num_media_in_sub_tree += single_album.num_media_in_sub_tree
+				word_album.num_media_in_album += 1
+				by_search_album.num_media_in_sub_tree += single_album.num_media_in_sub_tree
+				if word_max_file_date:
+					word_max_file_date = max(word_max_file_date, single_album.date)
+				else:
+					word_max_file_date = single_album.date
+				if by_search_max_file_date:
+					by_search_max_file_date = max(by_search_max_file_date, single_album.date)
+				else:
+					by_search_max_file_date = single_album.date
+			self.all_albums.append(word_album)
+			self.generate_composite_image(word_album, word_max_file_date)
+			next_level()
+			message("word album worked out", word, 4)
+			back_level()
+			back_level()
+		self.all_albums.append(by_search_album)
+		back_level()
+		return by_search_album
+
 
 	def generate_geonames_albums(self, origin_album):
 		next_level()
@@ -188,14 +260,14 @@ class TreeWalker:
 		by_geonames_path = os.path.join(Options.config['album_path'], Options.config['by_gps_string'])
 		by_geonames_album = Album(by_geonames_path)
 		by_geonames_album.parent = origin_album
-		by_geonames_album.cache_base = cache_base(by_geonames_path)
+		by_geonames_album.cache_base = Options.config['by_gps_string']
 		by_geonames_max_file_date = None
 		for country_code, _ in self.tree_by_geonames.items():
 			country_path = os.path.join(by_geonames_path, str(country_code))
 			country_album = Album(country_path)
 			country_album.center = {}
 			country_album.parent = by_geonames_album
-			country_album.cache_base = cache_base(country_path)
+			country_album.cache_base = by_geonames_album.generate_cache_base(os.path.join(by_geonames_album.cache_base, country_code))
 			country_max_file_date = None
 			by_geonames_album.add_album(country_album)
 			for region_code, _ in self.tree_by_geonames[country_code].items():
@@ -203,7 +275,7 @@ class TreeWalker:
 				region_album = Album(region_path)
 				region_album.center = {}
 				region_album.parent = country_album
-				region_album.cache_base = cache_base(region_path)
+				region_album.cache_base = country_album.generate_cache_base(os.path.join(country_album.cache_base, region_code))
 				region_max_file_date = None
 				country_album.add_album(region_album)
 				for place_code, media_list in self.tree_by_geonames[country_code][region_code].items():
@@ -212,7 +284,7 @@ class TreeWalker:
 					message("working with place album...", media_list[0].country_name + "-" + media_list[0].region_name + "-" + place_name, 4)
 					next_level()
 					message("sorting media...", "", 5)
-					media_list.sort(key=lambda m: m.latitude + m.longitude)
+					media_list.sort(key=lambda m: m.latitude)
 					next_level()
 					message("media sorted", "", 5)
 					back_level()
@@ -272,10 +344,11 @@ class TreeWalker:
 						place_album = Album(place_path)
 						place_album.center = {}
 						place_album.parent = region_album
-						place_album.cache_base = cache_base(place_path)
+						place_album.cache_base = region_album.generate_cache_base(os.path.join(region_album.cache_base, place_code))
 						place_max_file_date = None
 						region_album.add_album(place_album)
 						for j, single_media in enumerate(cluster):
+							single_media.gps_album_cache_base = place_album.cache_base
 							cluster[j].gps_path = remove_album_path(place_path)
 							cluster[j].place_name = place_name
 							cluster[j].alt_place_name = alt_place_name
@@ -292,7 +365,7 @@ class TreeWalker:
 							if place_album.center == {}:
 								place_album.center['latitude'] = single_media.latitude
 								place_album.center['longitude'] = single_media.longitude
-								place_album.name = place_name
+								place_album._name = place_name
 								place_album.alt_name = alt_place_name
 							else:
 								place_album.center['latitude'] = Geonames.recalculate_mean(place_album.center['latitude'], len(place_album.media_list), single_media.latitude)
@@ -301,7 +374,7 @@ class TreeWalker:
 							if region_album.center == {}:
 								region_album.center['latitude'] = single_media.latitude
 								region_album.center['longitude'] = single_media.longitude
-								region_album.name = single_media.region_name
+								region_album._name = single_media.region_name
 							else:
 								region_album.center['latitude'] = Geonames.recalculate_mean(region_album.center['latitude'], len(region_album.media_list), single_media.latitude)
 								region_album.center['longitude'] = Geonames.recalculate_mean(region_album.center['longitude'], len(region_album.media_list), single_media.longitude)
@@ -309,7 +382,7 @@ class TreeWalker:
 							if country_album.center == {}:
 								country_album.center['latitude'] = single_media.latitude
 								country_album.center['longitude'] = single_media.longitude
-								country_album.name = single_media.country_name
+								country_album._name = single_media.country_name
 							else:
 								country_album.center['latitude'] = Geonames.recalculate_mean(country_album.center['latitude'], len(country_album.media_list), single_media.latitude)
 								country_album.center['longitude'] = Geonames.recalculate_mean(country_album.center['longitude'], len(country_album.media_list), single_media.longitude)
@@ -369,6 +442,81 @@ class TreeWalker:
 		if not any(media.media_file_name == _media.media_file_name for _media in self.tree_by_date[media.year][media.month][media.day]):
 		#~ if not media in self.tree_by_date[media.year][media.month][media.day]:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
+
+	@staticmethod
+	def minimal_normalize(phrase):
+		# normalize the name without extension and remove the numbers
+
+		name = os.path.splitext(phrase)[0]
+		# convert non-alphanumeric characters to space
+		name = "".join([c if c.isalnum() else " " for c in name])
+		# remove digits
+		name = "".join(["" if c.isnumeric() else c for c in name])
+
+		name = name.strip()
+
+		return name
+
+	@staticmethod
+	def normalize_and_split_for_album_name(phrase):
+		name = TreeWalker.minimal_normalize(phrase)
+		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
+		name = ''.join(c for c in unicodedata.normalize('NFD', name) if unicodedata.category(c) != 'Mn')
+		name = name.lower()
+
+		return name.split(' ')
+
+	@staticmethod
+	def normalize_and_split_for_word_list(phrase):
+		# normalize the name without extension and remove the numbers
+		name = TreeWalker.minimal_normalize(phrase)
+		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
+
+		return name.split(' ')
+
+
+	def add_media_to_tree_by_search(self, media):
+		words_for_search_album_name = self.prepare_for_tree_by_search(media)
+		for word in words_for_search_album_name:
+			if word:
+				if word not in list(self.tree_by_search.keys()):
+					self.tree_by_search[word] = {"media_words": [], "album_words": []}
+				if not media in self.tree_by_search[word]["media_words"]:
+					self.tree_by_search[word]["media_words"].append(media)
+
+	def add_album_to_tree_by_search(self, album):
+		words_for_search_album_name = self.prepare_for_tree_by_search(album)
+		for word in words_for_search_album_name:
+			if word:
+				if word not in list(self.tree_by_search.keys()):
+					self.tree_by_search[word] = {"media_words": [], "album_words": []}
+				if not album in self.tree_by_search[word]["album_words"]:
+					self.tree_by_search[word]["album_words"].append(album)
+
+	def prepare_for_tree_by_search(self, media_or_album):
+		# add the given media or album to a temporary structure where media or albums are organized by search terms
+		# works on the words in the file/directory name and in album.ini's description, title, tags
+
+		phrase = media_or_album.name + " " + media_or_album.title + " " + media_or_album.description + " " + media_or_album.tags
+
+		# media or album word list has the words with there case and accents
+		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
+		# get unique values
+		words_for_word_list = list(set(words_for_word_list))
+		# remove empty elements
+		words_for_word_list = [x for x in words_for_word_list if x]
+
+		media_or_album.words = words_for_word_list
+
+		# words for search album names are lower case and accentless
+		words_for_search_album_name = self.normalize_and_split_for_album_name(phrase)
+		# get unique values
+		words_for_search_album_name = list(set(words_for_search_album_name))
+		# remove empty elements
+		words_for_search_album_name = [x for x in words_for_search_album_name if x]
+
+		return words_for_search_album_name
+
 
 	def add_media_to_tree_by_geonames(self, media):
 		# add the given media to a temporary structure where media are organized by country, region/state, place
@@ -462,7 +610,7 @@ class TreeWalker:
 								hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
 							):
 								next_level()
-								message("json file is OK", "  " + json_message, 4)
+								message("json file is OK", "", 4)
 								back_level()
 								json_file_OK = True
 								album = cached_album
@@ -478,7 +626,7 @@ class TreeWalker:
 								back_level()
 							else:
 								next_level()
-								message("json file invalid (old or invalid path)", json_message, 4)
+								message("json file invalid (old or invalid path)", "", 4)
 								back_level()
 								cached_album = None
 			except KeyboardInterrupt:
@@ -551,18 +699,7 @@ class TreeWalker:
 				trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 				entry_for_cache_base = os.path.join(Options.config['folders_string'], trimmed_path, entry)
 				message("determining cache base...", "", 5)
-				next_album_cache_base = cache_base(entry_for_cache_base, True)
-				# let's avoid that different album names have the same cache base
-				distinguish_suffix = 0
-				while True:
-					_next_album_cache_base = next_album_cache_base
-					if distinguish_suffix:
-						_next_album_cache_base += "_" + str(distinguish_suffix)
-					if any(_next_album_cache_base == _album.cache_base and absolute_path != _album.absolute_path for _album in album.albums_list):
-						distinguish_suffix += 1
-					else:
-						next_album_cache_base = _next_album_cache_base
-						break
+				next_album_cache_base = album.generate_cache_base(entry_for_cache_base)
 				next_level()
 				message("cache base determined", "", 5)
 				back_level()
@@ -571,6 +708,7 @@ class TreeWalker:
 					max_file_date = max(max_file_date, sub_max_file_date)
 					album.num_media_in_sub_tree += num
 					album.add_album(next_walked_album)
+					self.add_album_to_tree_by_search(next_walked_album)
 			elif os.path.isfile(entry_with_path):
 				if skip_files:
 					continue
@@ -636,12 +774,12 @@ class TreeWalker:
 						# TODO: We can't execute the code below as cache_hit = False...
 						elif cache_hit:
 							if not absolute_cache_file_exists:
-								message("unexistent reduction/thumbnail", absolute_cache_file, 4)
+								message("unexistent reduction/thumbnail", "", 4)
 							else:
 								if file_mtime(absolute_cache_file) < cached_media.datetime_file:
-									message("reduction/thumbnail older than cached media", absolute_cache_file, 4)
+									message("reduction/thumbnail older than cached media", "", 4)
 								elif file_mtime(absolute_cache_file) > json_file_mtime:
-									message("reduction/thumbnail newer than json file", absolute_cache_file, 4)
+									message("reduction/thumbnail newer than json file", "", 4)
 
 					if Options.config['recreate_reduced_photos']:
 						message("reduced photo recreation requested", "", 4)
@@ -673,41 +811,41 @@ class TreeWalker:
 					message("adding media to album...", "", 5)
 					album.add_media(media)
 					next_level()
-					message("added media to album", "", 5)
+					message("media added to album", "", 5)
 					back_level()
-
-					# message("adding media to gps list...", "", 5)
-					# self.add_media_to_gps_data_list(media)
-					# next_level()
-					# message("added media to gps list", "", 5)
-					# back_level()
 
 					message("adding media to big list...", "", 5)
 					if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
 						self.all_media.append(media)
 					next_level()
-					message("added media to big list", "", 5)
+					message("media added to big list", "", 5)
 					back_level()
 
-					# the following function has a check on media already present
 					message("adding media to by date tree...", "", 5)
+					# the following function has a check on media already present
 					self.add_media_to_tree_by_date(media)
 					next_level()
-					message("added media to by date tree", "", 5)
+					message("media added to by date tree", "", 5)
 					back_level()
 
 					if media.has_gps_data:
-						# the following function has a check on media already present
 						message("adding media to by geonames tree...", "", 5)
+						# the following function has a check on media already present
 						self.add_media_to_tree_by_geonames(media)
 						next_level()
-						message("added media to by geonames tree", "", 5)
+						message("media added to by geonames tree", "", 5)
 						back_level()
 
+					message("adding media to search tree...", "", 5)
 					# the following function has a check on media already present
+					self.add_media_to_tree_by_search(media)
+					next_level()
+					message("media added to search tree", "", 5)
+					back_level()
+
 				elif not media.is_valid:
 					next_level()
-					message("not image nor video", entry_with_path, 1)
+					message("not image nor video", "", 1)
 					back_level()
 				back_level()
 		if num_photo_in_dir:
@@ -752,7 +890,7 @@ class TreeWalker:
 			return [album.media_list[random_number], random_number]
 		else:
 			random_number -= len(album.media_list)
-			for subalbum in album.albums_list:
+			for subalbum in album.subalbums_list:
 				if random_number < subalbum.num_media_in_sub_tree:
 					[picked_image, random_number] = self.pick_random_image(subalbum, random_number)
 					if picked_image:
@@ -825,7 +963,7 @@ class TreeWalker:
 					Options.config['cache_path'],
 					random_media.album.subdir,
 					folder_prefix + random_media.cache_base
-				) + "_" + str(Options.config['album_thumb_size']) + "as.jpg"
+				) + Options.config['cache_folder_separator'] + str(Options.config['album_thumb_size']) + "as.jpg"
 			if os.path.exists(thumbnail):
 				random_thumbnails.append(thumbnail)
 				i += 1
@@ -923,16 +1061,16 @@ class TreeWalker:
 			next_level()
 			message("building stale list...", "", 4)
 			for album in self.all_albums:
-				self.all_cache_entries.append(album.json_file)
+				self.all_json_files.append(album.json_file)
 			for media in self.all_media:
 				album_subdir = media.album.subdir
 				for entry in media.image_caches:
 					entry_without_subdir = entry[len(album_subdir) + 1:]
 					try:
-						self.all_cache_entries_by_subdir[album_subdir].append(entry_without_subdir)
+						self.all_json_files_by_subdir[album_subdir].append(entry_without_subdir)
 					except KeyError:
-						self.all_cache_entries_by_subdir[album_subdir] = list()
-						self.all_cache_entries_by_subdir[album_subdir].append(entry_without_subdir)
+						self.all_json_files_by_subdir[album_subdir] = list()
+						self.all_json_files_by_subdir[album_subdir].append(entry_without_subdir)
 			next_level()
 			message("stale list built", "", 5)
 			back_level()
@@ -942,13 +1080,13 @@ class TreeWalker:
 			info = "in subdir " + subdir
 			# reduced sizes, thumbnails, old style thumbnails
 			if subdir == Options.config['cache_album_subdir']:
-				self.all_cache_entries_by_subdir[subdir] = list()
+				self.all_json_files_by_subdir[subdir] = list()
 				for path in self.all_album_composite_images:
-					self.all_cache_entries_by_subdir[subdir].append(path)
+					self.all_json_files_by_subdir[subdir].append(path)
 				deletable_files_suffixes_re = r"\.jpg$"
 			else:
-				deletable_files_suffixes_re = r"_transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
-				deletable_files_suffixes_re += r"|_[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
+				deletable_files_suffixes_re = r"(" + Options.config['cache_folder_separator'] + "|_)transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
+				deletable_files_suffixes_re += r"|(" + Options.config['cache_folder_separator'] + "|_)[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
 		message("searching for stale cache files", info, 4)
 
 		for cache_file in sorted(os.listdir(os.path.join(Options.config['cache_path'], subdir))):
@@ -985,12 +1123,12 @@ class TreeWalker:
 					#~ except:
 						#~ pass
 					if subdir:
-						if subdir in self.all_cache_entries_by_subdir:
-							cache_list = self.all_cache_entries_by_subdir[subdir]
+						if subdir in self.all_json_files_by_subdir:
+							cache_list = self.all_json_files_by_subdir[subdir]
 						else:
 							cache_list = list()
 					else:
-						cache_list = self.all_cache_entries
+						cache_list = self.all_json_files
 					if cache_file not in cache_list:
 						message("removing stale cache file...", cache_file, 3)
 						file_to_delete = os.path.join(Options.config['cache_path'], subdir, cache_file)
@@ -1001,6 +1139,7 @@ class TreeWalker:
 				else:
 					next_level()
 					message("not a stale cache file, keeping it", cache_file, 2)
+					back_level()
 					back_level()
 					continue
 				back_level()

@@ -45,12 +45,7 @@ img.thumbnail-img {
 	padding: 0 .5em;
 }
 
-#buttons-container {
-	float: right;
-	margin-left: .5em;
-}
-
-#title, #title:hover, #buttons-container {
+#title, #title:hover {
 	line-height: 1.3em;
 }
 
@@ -66,6 +61,10 @@ a.title-anchor.mobile {
 #album-view {
 	position: absolute;
 	padding: .5em;
+}
+
+#album-view.hidden {
+	display: none;
 }
 
 #thumbs {
@@ -369,7 +368,7 @@ video {
 	color: #FFAD27;
 	margin-top: 20px;
 }
-#error-overlay, #error-text-folder, #error-root-folder, #error-text-image, #error-options-file, #auth-text {
+.error, #error-overlay, #auth-text, .search-failed {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -377,16 +376,26 @@ video {
 	height: 100%;
 	display: none;
 }
+.error, #auth-text, .search-failed {
+	margin-top: 20%;
+	text-align: center;
+}
+
+.error, .search-failed {
+	font-size: 4em;
+	font-weight: bold;
+	font-style: italic;
+}
+
 #error-overlay {
 	background-color: #000000;
 }
-#error-text-folder, #error-root-folder, #error-text-image, #error-options-file, #auth-text {
-	position: fixed;
-	padding-top: 20%;
-	text-align: center;
-}
-#error-text-folder, #error-root-folder, #error-text-image, #error-options-file {
-	font-size: 4em;
+#auth-text input {
+	color: rgb(0, 0, 0);
+	background-color: rgb(200, 200, 200);
+	border: 0;
+	font-family: inherit;
+	font-size: 2em;
 	font-weight: bold;
 	font-style: italic;
 }
@@ -402,16 +411,6 @@ video {
 	background-position: top center;
 	background-repeat: no-repeat;
 	padding-top: 96px;
-}
-
-#auth-text input {
-	color: rgb(0, 0, 0);
-	background-color: rgb(200, 200, 200);
-	border: 0;
-	font-family: inherit;
-	font-size: 2em;
-	font-weight: bold;
-	font-style: italic;
 }
 
 #media-name {
@@ -561,6 +560,14 @@ ul#right-menu li#menu-icon {
 	float: right;
 	text-align: right;
 	font-style: normal;
+}
+
+ul#right-menu img#search-button {
+	width: 1.7em;
+	height: 1.7em;
+	cursor: pointer;
+	position: relative;
+	top: 7px;
 }
 
 ul#right-menu.expand li.selected {
