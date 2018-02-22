@@ -606,7 +606,7 @@ $(document).ready(function() {
 							spanOpened = false;
 						}
 						title += "<a href=" + mapLink(latitude, longitude, Options.map_zoom_levels[(i - 2)]) + " target='_blank'>" +
-											"<img class='title-img' title='" + gpsHtmlTitle + "' alt='" + gpsHtmlTitle + "' height='15px' src='img/world-map-with-pointer.png'>" +
+											"<img class='title-img' title='" + gpsHtmlTitle + "' alt='" + gpsHtmlTitle + "' height='20px' src='img/ic_place_white_24dp_2x.png'>" +
 											"</a>";
 					} else
 						title += textComponents[i];
@@ -719,7 +719,7 @@ $(document).ready(function() {
 				latitude = currentMedia.metadata.latitude;
 				longitude = currentMedia.metadata.longitude;
 				title += "<a href=" + mapLink(latitude, longitude, Options.photo_map_zoom_level) + " target='_blank'>" +
-										"<img class='title-img' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='15px' src='img/world-map-with-pointer.png'>" +
+										"<img class='title-img' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='20px' src='img/ic_place_white_24dp_2x.png'>" +
 										"</a>";
 			}
 		}
@@ -1028,7 +1028,7 @@ $(document).ready(function() {
 						var latitude = currentAlbum.media[i].metadata.latitude;
 						var longitude = currentAlbum.media[i].metadata.longitude;
 						mapLinkIcon = "<a href=" + mapLink(latitude, longitude, Options.photo_map_zoom_level) + " target='_blank'>" +
-													"<img class='thumbnail-map-link' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='15px' src='img/world-map-with-pointer.png'>" +
+													"<img class='thumbnail-map-link' title='" + _t("#show-on-map") + " [s]' alt='" + _t("#show-on-map") + "' height='20px' src='img/ic_place_white_24dp_2x.png'>" +
 													"</a>";
 					}
 
