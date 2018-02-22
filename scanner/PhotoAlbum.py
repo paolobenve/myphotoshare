@@ -411,7 +411,7 @@ class Album(object):
 		# result only has ascii characters
 
 		# respect alphanumeric characters, substitute non-alphanumeric (but not slashes) with underscore
-		subalbum_or_media_path = "".join([c if c.isalnum() or c == '/' else "_" for c in subalbum_or_media_path])
+		subalbum_or_media_path = "".join([c if c.isalnum() or c in ['/', '-', '.'] else "_" for c in subalbum_or_media_path])
 
 		# convert slashes
 		subalbum_or_media_path = subalbum_or_media_path.replace('/', Options.config['cache_folder_separator']).lower()
