@@ -486,7 +486,7 @@ class Media(object):
 		):
 			self._attributes = attributes
 			self._attributes["dateTimeDir"] = dir_mtime
-			self.cache_base = attributes["cacheBase"]
+			# self.cache_base = attributes["cacheBase"]
 			return
 
 		self._attributes = {}
