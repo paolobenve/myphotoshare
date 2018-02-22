@@ -390,8 +390,8 @@ class Album(object):
 			dictionary["name"] = self.name
 		if hasattr(self, "alt_name"):
 			dictionary["alt_name"] = self.alt_name
-		if hasattr(self, "words"):
-			dictionary["words"] = self.words
+		# if hasattr(self, "words"):
+		# 	dictionary["words"] = self.words
 
 		if self.parent is not None:
 			dictionary["parentCacheBase"] = self.parent.cache_base
