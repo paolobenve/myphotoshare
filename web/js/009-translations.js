@@ -136,7 +136,7 @@ var translations =
 			"#folders-view": "per album",
 			"#no-results": "Nessun risultato",
 			"#search-too-wide": "Ricerca troppo ampia, restringere la ricerca",
-			"#any-word": "qualsiasi parola",
+			"#any-word": "almeno una parola",
 			"#inside-words": "dentro le parole",
 			"#case-sensitive": "rispetta maiuscole",
 			"#accent-sensitive": "rispetta accenti",
