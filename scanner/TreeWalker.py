@@ -249,8 +249,6 @@ class TreeWalker:
 			back_level()
 			back_level()
 		self.all_albums.append(by_search_album)
-		if by_search_album.num_media_in_sub_tree > 0:
-			self.generate_composite_image(by_search_album, by_search_max_file_date)
 		back_level()
 		return by_search_album
 
