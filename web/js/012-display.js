@@ -1018,9 +1018,10 @@ $(document).ready(function() {
 						// }
 						calculatedWidth = Options.media_thumb_size;
 					}
-					if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) || PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase))
+					if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) || PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase) || PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
 						imgTitle = currentAlbum.media[i].albumName;
-					else
+						imgTitle = imgTitle.substr(imgTitle.indexOf('/') + 1);
+					} else
 						imgTitle = currentAlbum.media[i].name;
 
 					mapLinkIcon = "";
@@ -1143,7 +1144,7 @@ $(document).ready(function() {
 						(function(theContainer, theAlbum, theImage, theLink) {
 							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
 								var htmlText;
-								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo;
+								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								var heightfactor = 1.6;
 
@@ -1169,13 +1170,14 @@ $(document).ready(function() {
 								}
 
 								if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase)) {
-									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]).substr(Options.by_date_string.length + 1);
+									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.dayAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else if (PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase)) {
-									titleName = PhotoFloat.pathJoin([randomMedia.gpsAlbum, randomMedia.name]).substr(Options.by_gps_string.length + 1);
+									humanGeonames = PhotoFloat.pathJoin([Options.by_gps_string, randomMedia.geoname.country_name, randomMedia.geoname.region_name, randomMedia.geoname.place_name]);
+									titleName = PhotoFloat.pathJoin([humanGeonames, randomMedia.name]);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.gpsAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else {
-									titleName = randomMedia.albumName.substr(Options.server_album_path.length + 1);
+									titleName = randomMedia.albumName;
 									link = PhotoFloat.pathJoin(["#!", randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								}
 								titleName = titleName.substr(titleName.indexOf('/') + 1);
