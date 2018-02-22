@@ -1168,10 +1168,10 @@ $(document).ready(function() {
 									thumbHeight = correctedAlbumThumbSize;
 								}
 
-								if (PhotoFloat.isByDateAlbum(currentAlbum.path)) {
+								if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase)) {
 									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]).substr(Options.by_date_string.length + 1);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.dayAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
-								} else if (PhotoFloat.isByGpsAlbum(currentAlbum.path)) {
+								} else if (PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase)) {
 									titleName = PhotoFloat.pathJoin([randomMedia.gpsAlbum, randomMedia.name]).substr(Options.by_gps_string.length + 1);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.gpsAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else {
@@ -1200,7 +1200,7 @@ $(document).ready(function() {
 										">";
 								theImage.html(htmlText);
 
-								if (PhotoFloat.isByDateAlbum(originalAlbum.path)) {
+								if (PhotoFloat.isByDateAlbum(originalAlbum.cacheBase)) {
 									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator);
 									folder = "";
 									if (folderArray.length >= 2)
@@ -1209,7 +1209,7 @@ $(document).ready(function() {
 										folder += "-" + folderArray[2];
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
-								} else if (PhotoFloat.isByGpsAlbum(originalAlbum.path)) {
+								} else if (PhotoFloat.isByGpsAlbum(originalAlbum.cacheBase)) {
 									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
 									var folderName = '';
 									var folderTitle = '';
@@ -2132,7 +2132,7 @@ $(document).ready(function() {
 			currentAlbum = null;
 
 		previousAlbum = currentAlbum;
-		if (currentAlbum && PhotoFloat.isByDateAlbum(currentAlbum.path) && media !== null) {
+		if (currentAlbum && PhotoFloat.isByDateAlbum(currentAlbum.cacheBase) && media !== null) {
 			previousMedia = media;
 		}
 		else {
