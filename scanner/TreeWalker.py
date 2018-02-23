@@ -470,7 +470,6 @@ class TreeWalker:
 	def normalize_and_split_for_word_list(phrase):
 		# normalize the name without extension and remove the numbers
 		name = TreeWalker.minimal_normalize(phrase)
-		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
 
 		return name.split(' ')
 
@@ -481,7 +480,7 @@ class TreeWalker:
 			if word:
 				if word not in list(self.tree_by_search.keys()):
 					self.tree_by_search[word] = {"media_words": [], "album_words": []}
-				if not media in self.tree_by_search[word]["media_words"]:
+				if media not in self.tree_by_search[word]["media_words"]:
 					self.tree_by_search[word]["media_words"].append(media)
 
 	def add_album_to_tree_by_search(self, album):
@@ -490,16 +489,17 @@ class TreeWalker:
 			if word:
 				if word not in list(self.tree_by_search.keys()):
 					self.tree_by_search[word] = {"media_words": [], "album_words": []}
-				if not album in self.tree_by_search[word]["album_words"]:
+				if album not in self.tree_by_search[word]["album_words"]:
 					self.tree_by_search[word]["album_words"].append(album)
 
 	def prepare_for_tree_by_search(self, media_or_album):
 		# add the given media or album to a temporary structure where media or albums are organized by search terms
 		# works on the words in the file/directory name and in album.ini's description, title, tags
 
-		phrase = media_or_album.name + " " + media_or_album.title + " " + media_or_album.description + " " + media_or_album.tags
+		# media_or_album.name must be the last item because the normalization will remove the file extension
+		phrase = media_or_album.title + " " + media_or_album.description + " " + media_or_album.tags + " " + media_or_album.name
 
-		# media or album word list has the words with there case and accents
+		# media or album word list has the words with their case and accents
 		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
 		# get unique values
 		words_for_word_list = list(set(words_for_word_list))
@@ -1085,8 +1085,8 @@ class TreeWalker:
 					self.all_json_files_by_subdir[subdir].append(path)
 				deletable_files_suffixes_re = r"\.jpg$"
 			else:
-				deletable_files_suffixes_re = r"(" + Options.config['cache_folder_separator'] + "|_)transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
-				deletable_files_suffixes_re += r"|(" + Options.config['cache_folder_separator'] + "|_)[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
+				deletable_files_suffixes_re = r"(" + Options.config['cache_folder_separator'] + r"|_)transcoded(_([1-9][0-9]{0,3}[kKmM]|[1-9][0-9]{3,10})(_[1-5]?[0-9])?)?\.mp4$"
+				deletable_files_suffixes_re += r"|(" + Options.config['cache_folder_separator'] + r"|_)[1-9][0-9]{1,4}(a|t|s|[at][sf])?\.jpg$"
 		message("searching for stale cache files", info, 4)
 
 		for cache_file in sorted(os.listdir(os.path.join(Options.config['cache_path'], subdir))):
