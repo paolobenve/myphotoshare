@@ -417,7 +417,11 @@ class Album(object):
 		subalbum_or_media_path = subalbum_or_media_path.replace('/', Options.config['cache_folder_separator']).lower()
 
 		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
-		subalbum_or_media_path = ''.join(c for c in unicodedata.normalize('NFD', subalbum_or_media_path) if unicodedata.category(c) != 'Mn')
+		# @python2
+		if sys.version_info < (3,):
+			subalbum_or_media_path = ''.join(c for c in unicodedata.normalize('NFD', unicode(subalbum_or_media_path)) if unicodedata.category(c) != 'Mn')
+		else:
+			subalbum_or_media_path = ''.join(c for c in unicodedata.normalize('NFD', subalbum_or_media_path) if unicodedata.category(c) != 'Mn')
 
 		while subalbum_or_media_path.find("__") != -1:
 			subalbum_or_media_path = subalbum_or_media_path.replace("__", "_")
