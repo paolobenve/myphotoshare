@@ -243,7 +243,7 @@ class TreeWalker:
 				else:
 					by_search_max_file_date = single_album.date
 			self.all_albums.append(word_album)
-			self.generate_composite_image(word_album, word_max_file_date)
+			# self.generate_composite_image(word_album, word_max_file_date)
 			next_level()
 			message("word album worked out", word, 4)
 			back_level()
