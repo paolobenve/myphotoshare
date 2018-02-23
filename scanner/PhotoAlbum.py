@@ -1733,7 +1733,7 @@ class Media(object):
 		if Options.config['checksum']:
 			media["checksum"] = checksum(os.path.join(Options.config['album_path'], self.media_file_name))
 
-		# the following data don't belong properly to media, but to album, but they must be put here in order to work with dates structure
+		# the following data don't belong properly to media, but to album, but they must be put here in order to work with date, gps and search structure
 		media["albumName"] = self.album_path
 		media["folders_album"] = folders_album
 		media["foldersCacheBase"] = self.album.cache_base
