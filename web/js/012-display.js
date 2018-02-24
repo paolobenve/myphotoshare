@@ -1793,7 +1793,6 @@ $(document).ready(function() {
 		if (PhotoFloat.isFolderAlbum(currentAlbum.cacheBase)) {
 			// folder album: change to by date or by gps view
 			$("#folders-view").removeClass("active").addClass("selected").off("click");
-			$("#by-date-view").off("click");
 			$("#by-date-view").on("click", function(ev) {
 				window.location.href = byDateViewLink;
 				return false;
@@ -1802,7 +1801,6 @@ $(document).ready(function() {
 			if (! hasGpsData(currentMedia)) {
 				$("#by-gps-view").addClass("hidden");
 			} else {
-				$("#by-gps-view").off("click");
 				$("#by-gps-view").on("click", function(ev) {
 					window.location.href = byGpsViewLink;
 					return false;
@@ -1810,7 +1808,6 @@ $(document).ready(function() {
 			}
 		} else if (PhotoFloat.isByDateAlbum(currentAlbum.cacheBase)) {
 			// by date album: change to folder or by gps view
-			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
 				window.location.href = foldersViewLink;
 				return false;
@@ -1819,19 +1816,16 @@ $(document).ready(function() {
 			if (! hasGpsData(currentMedia)) {
 				$("#by-gps-view").addClass("hidden");
 			} else {
-				$("#by-gps-view").off("click");
 				$("#by-gps-view").on("click", function(ev) {
 					window.location.href = byGpsViewLink;
 					return false;
 				});
 			}
 		} else if (PhotoFloat.isByGpsAlbum(currentAlbum.cacheBase)) {
-			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
 				window.location.href = foldersViewLink;
 				return false;
 			});
-			$("#by-date-view").off("click");
 			$("#by-date-view").on("click", function(ev) {
 				window.location.href = byDateViewLink;
 				return false;
@@ -1840,12 +1834,10 @@ $(document).ready(function() {
 			$("#by-gps-view").removeClass("active").addClass("selected").off("click");
 		} else if (PhotoFloat.isSearchAlbum(currentAlbum.cacheBase)) {
 			// by search album: change to folder or by gps or by view
-			$("#folders-view").off("click");
 			$("#folders-view").on("click", function(ev) {
 				window.location.href = foldersViewLink;
 				return false;
 			});
-			$("#by-date-view").off("click");
 			$("#by-date-view").on("click", function(ev) {
 				window.location.href = byDateViewLink;
 				return false;
@@ -1853,7 +1845,6 @@ $(document).ready(function() {
 			if (! hasGpsData(currentMedia)) {
 				$("#by-gps-view").addClass("hidden");
 			} else {
-				$("#by-gps-view").off("click");
 				$("#by-gps-view").on("click", function(ev) {
 					window.location.href = byGpsViewLink;
 					return false;
