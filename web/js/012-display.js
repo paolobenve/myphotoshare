@@ -1182,6 +1182,9 @@ $(document).ready(function() {
 									humanGeonames = PhotoFloat.pathJoin([Options.by_gps_string, randomMedia.geoname.country_name, randomMedia.geoname.region_name, randomMedia.geoname.place_name]);
 									titleName = PhotoFloat.pathJoin([humanGeonames, randomMedia.name]);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.gpsAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
+								} else if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+									titleName = randomMedia.albumName;
+									link = PhotoFloat.pathJoin(["#!", PhotoFloat.searchCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else {
 									titleName = randomMedia.albumName;
 									link = PhotoFloat.pathJoin(["#!", randomMedia.foldersCacheBase, randomMedia.cacheBase]);
