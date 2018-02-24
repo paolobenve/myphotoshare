@@ -20,7 +20,7 @@ print("getting " + zip_file + " from geonames.org and extracting it to file...")
 url = "http://download.geonames.org/export/dump/" + zip_file
 request = requests.get(url)
 if request.status_code != 200:
-	print("error getting url, quitting")
+	print("error getting " + url + ", quitting")
 else:
 	alternate_names = zipfile.ZipFile(io.BytesIO(request.content))
 	alternate_names_file_name = "alternateNames.txt"
@@ -72,8 +72,14 @@ else:
 					file_language.write(essential_line)
 	print("local files generated!")
 
-	os.remove(alternate_names_file_name)
-	os.remove(zip_file)
+	try:
+		os.remove(alternate_names_file_name)
+	except IOError:
+		pass
+	try:
+		os.remove(zip_file)
+	except IOError:
+		pass
 
 	# close the target files
 	file_.close()

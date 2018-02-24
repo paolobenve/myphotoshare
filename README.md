@@ -20,6 +20,7 @@ Content (albums and media files) can be shared over some popular social plaforms
 ## Read more
 
 * [Install and update procedure](doc/Install.md)
+* [Utility scripts](doc/Scripts.md)
 * [Gallery of MyPhotoShare screenshots](doc/Gallery.md)
 * [Geotagging](doc/GPS.md)
 * [Tweaking metadata with `album.ini`](doc/Metadata.md)

@@ -1,5 +1,6 @@
 # Changelog
 
+* moved scripts into bin directory. Create `scanner` as a link to `main.py`. Added `make_album_ini.sh`to create a default `album.ini` file in a directory.
 * add options `social`, `social_size` and `social_color` for tuning display of social icons.
 * use Debian/Ubuntu system-wide JavaScript packages if available (you might need to run `sudo a2enconf javascript-common` on the server to enable the use of `/javascript` virtual directory).
 * added support for `uglifyjs` JavaScript minifier

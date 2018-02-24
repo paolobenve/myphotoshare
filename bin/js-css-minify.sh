@@ -1,26 +1,41 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
+PROJECT_DIR="$(dirname $(realpath $0))"
+DEFAULT_CONF="$PROJECT_DIR/myphotoshare.conf.defaults"
+CONF="$1"
+
+if [ -z "$CONF" ]; then
 	# The script must be launched with the user's config file
 	echo
 	echo "Usage: ./$0 MYPHOTOSHARE_CONFIG_FILE"
 	echo
 	echo "Quitting"
 	exit 1
-elif [ ! -f "$1" ]; then
+elif [ ! -f "$CONF" ]; then
 	echo
-	echo "Error: file '$1' does not exist"
+	echo "Error: file '$CONF' does not exist"
 	echo
 	echo "Quitting"
 	exit 1
 fi
 
-PROJECT_DIR="$(dirname $(realpath $0))"
+# If can't find default config, try from parent directory in case the script
+# is run from 'bin' directory.
+if [ ! -e "$DEFAULT_CONF" ]; then
+	PROJECT_DIR="$(realpath "$PROJECT_DIR/..")"
+	DEFAULT_CONF="$PROJECT_DIR/myphotoshare.conf.defaults"
+fi
+if [ ! -e "$DEFAULT_CONF" ]; then
+	echo
+	echo "Can't find default config file 'myphotoshare.conf.defaults'."
+	echo "Run $0 from MyPhotoShare root directory."
+	echo
+	echo "Quitting"
+	exit 1
+fi
+
 
 # Parse which minifiers to use from configuration file
-DEFAULT_CONF="$PROJECT_DIR/myphotoshare.conf.defaults"
-CONF="$1"
-
 MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $CONF)"
 DEFAULT_MINIFY_JS="$(sed -nr 's/^\s*js_minifier\s*=\s*(\w+)\s*.*$/\1/p' $DEFAULT_CONF)"
 MINIFY_JS=${MINIFY_JS:-$DEFAULT_MINIFY_JS}
