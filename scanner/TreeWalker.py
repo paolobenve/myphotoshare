@@ -218,7 +218,6 @@ class TreeWalker:
 				word_album.add_media(single_media)
 				word_album.num_media_in_sub_tree += 1
 				word_album.num_media_in_album += 1
-				by_search_album.add_media(single_media)
 				by_search_album.num_media_in_sub_tree += 1
 				single_media_date = max(single_media.datetime_file, single_media.datetime_dir)
 				if word_max_file_date:
