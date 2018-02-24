@@ -2482,6 +2482,7 @@ $(document).ready(function() {
 		if (ev.which == 13) {
 			//Enter key pressed, trigger search button click event
 			$('#search-button').click();
+			$("#search-field").focus();
 		}
 	});
 
@@ -2492,6 +2493,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
+		$("#search-field").focus();
 	}
 
 	$("li#any-word").on('click', toggleAnyWordSearch);
@@ -2501,6 +2503,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
+		$("#search-field").focus();
 	}
 
 	$("li#case-sensitive").on('click', toggleCaseSensitiveSearch);
@@ -2510,6 +2513,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
+		$("#search-field").focus();
 	}
 
 	$("li#accent-sensitive").on('click', toggleAccentSensitiveSearch);
@@ -2519,6 +2523,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
+		$("#search-field").focus();
 	}
 
 	$("li#regex-word").on('click', toggleRegexSearch);
@@ -2528,6 +2533,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
+		$("#search-field").focus();
 	}
 
 	// subalbums
@@ -2539,6 +2545,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshSubalbums");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2552,6 +2559,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshSubalbums");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2566,6 +2574,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshSubalbums");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2579,6 +2588,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshMedia");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2592,6 +2602,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshMedia");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2608,6 +2619,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshMedia");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2619,6 +2631,7 @@ $(document).ready(function() {
 			setBooleanCookie("albums_slide_style", Options.albums_slide_style);
 			updateMenu();
 			showAlbum("refreshSubalbums");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2633,7 +2646,7 @@ $(document).ready(function() {
 			setCookie("spacing", Options.spacing);
 			updateMenu();
 			showAlbum("refreshBoth");
-			// showAlbum();
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2645,6 +2658,7 @@ $(document).ready(function() {
 			setBooleanCookie("show_album_names_below_thumbs", Options.show_album_names_below_thumbs);
 			updateMenu();
 			showAlbum("refreshSubalbums");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2656,6 +2670,7 @@ $(document).ready(function() {
 			setBooleanCookie("show_album_media_count", Options.show_album_media_count);
 			updateMenu();
 			showAlbum("refreshSubalbums");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2667,6 +2682,7 @@ $(document).ready(function() {
 			setBooleanCookie("show_media_names_below_thumbs", Options.show_media_names_below_thumbs);
 			updateMenu();
 			showAlbum("refreshMedia");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2678,6 +2694,7 @@ $(document).ready(function() {
 			setCookie("album_thumb_type", Options.album_thumb_type);
 			updateMenu();
 			showAlbum("refreshSubalbums");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2689,6 +2706,7 @@ $(document).ready(function() {
 			setCookie("media_thumb_type", Options.media_thumb_type);
 			updateMenu();
 			showAlbum("refreshMedia");
+			$("#search-field").focus();
 		}
 		return false;
 	}
@@ -2720,6 +2738,8 @@ $(document).ready(function() {
 
 	$("#menu-icon").on("click", function(ev) {
 		$("ul#right-menu").toggleClass("expand");
+		if ($("ul#right-menu").hasClass("expand"))
+			$("#search-field").focus();
 		updateMenu();
 		return false;
 	});
