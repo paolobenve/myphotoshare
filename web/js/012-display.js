@@ -1148,28 +1148,15 @@ $(document).ready(function() {
 						}
 						// a dot could be present in a cache base, making $("#" + cacheBase) fail, beware...
 						linkContainer = $("<div id=\"" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "\" class=\"album-button-and-caption\"></div>");
-						imageString = "<div class=\"album-button\"";
-						imageString += 		" style=\"";
-						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
-						imageString += 			" height: " + correctedAlbumThumbSize + "px;";
-						imageString += 			" margin-top: " + margin + "px;";
-						imageString += 			" margin-bottom: " + margin + "px;";
-						imageString += 			" margin-left: " + margin + "px;";
-						imageString += 			" margin-right: " + margin + "px;";
-						if (Options.albums_slide_style)
-							imageString +=		" background-color: " + Options.album_button_background_color + ";";
-						else
-							imageString +=		" border: none;";
-						imageString += 			"\"";
-						imageString += 		">";
-						imageString += "</div>";
-						image = $(imageString);
+						image = $("<div class=\"album-button\"></div>");
 						linkContainer.append(image);
 						subalbumsElement.append(linkContainer);
 						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
 						// add the clicks
 						container.off('click').css("cursor","pointer").on('click', function(ev) {
-							if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+							if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
+								albumLink = "#!/";
+							} else if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 								albumLink = "#!/" + PhotoFloat.searchCacheBase;
 							}
 							window.location.href = "#!/" + subfolderHash;
@@ -1365,6 +1352,15 @@ $(document).ready(function() {
 						})(currentAlbum, currentAlbum.subalbums[i], image, container);
 						//////////////////// end anonymous function /////////////////////
 					}
+
+					$(".album-button")
+						.css("width", correctedAlbumThumbSize + "px")
+						.css("height", correctedAlbumThumbSize + "px")
+						.css("margin", margin + "px");
+					if (Options.albums_slide_style)
+						$(".album-button").css("background-color", Options.album_button_background_color);
+					else
+						$(".album-button").css("border", "none");
 				}
 			}
 
