@@ -16,9 +16,12 @@
 			callback(thisAlbum);
 			return;
 		}
-		if (Object.prototype.toString.call(thisAlbum).slice(8, -1) === "String")
-			cacheKey = thisAlbum;
-		else
+		if (Object.prototype.toString.call(thisAlbum).slice(8, -1) === "String") {
+			if (PhotoFloat.isSearchAlbum(thisAlbum) && thisAlbum.indexOf('/') != -1)
+				cacheKey = thisAlbum.substr(thisAlbum.indexOf('/') + 1);
+			else
+				cacheKey = thisAlbum;
+		} else
 			cacheKey = thisAlbum.cacheBase;
 
 		if (this.albumCache.hasOwnProperty(cacheKey)) {
@@ -155,16 +158,21 @@
 
 			if (slashCount == 1) {
 				// folders hash: album and media
+				// or: search album and folder
 				albumHash = hashParts[0];
-				mediaHash = hashParts[1];
+				if (PhotoFloat.isFolderAlbum(hashParts[1])) {
+					foldersHash = hashParts[1];
+				} else {
+					mediaHash = hashParts[1];
+				}
 			} else if (slashCount === 0) {
 				// folders or by date hash: album only
 				albumHash = hash;
 			} else if (slashCount == 2) {
 				// virtual folder hash: by date/gps/search album, folders album, media
 				albumHash = hashParts[0];
-				mediaHash = hashParts[2];
 				foldersHash = hashParts[1];
+				mediaHash = hashParts[2];
 			}
 		}
 
@@ -201,7 +209,7 @@
 		if (foldersHash)
 			foldersHash = decodeURI(foldersHash);
 
-		if (albumHash && SearchWordsFromUser.length > 0) {
+		if (albumHash && foldersHash === null && SearchWordsFromUser.length > 0) {
 			self = this;
 			// get the search root album before getting the search words ones
 			this.getAlbum(
@@ -408,8 +416,11 @@
 				error
 			);
 		} else {
+			albumHashToGet = albumHash;
+			if (PhotoFloat.isSearchAlbum(albumHash))
+				albumHashToGet = PhotoFloat.pathJoin([albumHash, foldersHash]);
 			this.getAlbum(
-				albumHash,
+				albumHashToGet,
 				function(theAlbum) {
 					var i = -1;
 					if (mediaHash !== null) {
