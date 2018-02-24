@@ -960,7 +960,7 @@ $(document).ready(function() {
 	}
 
 	function showAlbum(populate) {
-		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, subfolderHash, thumbHash, thumbnailSize;
+		var i, imageLink, albumContainer, image, media, thumbsElement, subalbums, subalbumsElement, hash, subfolderHash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 0, margin, imgTitle;
@@ -1070,16 +1070,16 @@ $(document).ready(function() {
 					} else {
 						hash = photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[i]);
 					}
-					link = $("<a href=\"#!/" + hash + "\"></a>");
-					link.append(image);
-					media.push(link);
+					imageLink = $("<a href=\"#!/" + hash + "\"></a>");
+					imageLink.append(image);
+					media.push(imageLink);
 					(function(theLink, theImage, theAlbum) {
 						theImage.error(function() {
 							media.splice(media.indexOf(theLink), 1);
 							theLink.remove();
 							theAlbum.media.splice(theAlbum.media.indexOf(theImage.get(0).media), 1);
 						});
-					})(link, image, currentAlbum);
+					})(imageLink, image, currentAlbum);
 				}
 
 				thumbsElement = $("#thumbs");
@@ -1141,7 +1141,7 @@ $(document).ready(function() {
 						else {
 							subfolderHash = currentAlbum.subalbums[i].cacheBase;
 						}
-						link = $("<a href=\"#!/" + subfolderHash + "\"></a>");
+						albumContainer = $("<div id=\"" + currentAlbum.subalbums[i].cacheBase + "\"></div>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
 						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
@@ -1158,10 +1158,10 @@ $(document).ready(function() {
 						imageString += 		">";
 						imageString += "</div>";
 						image = $(imageString);
-						link.append(image);
-						subalbums.push(link);
+						albumContainer.append(image);
+						subalbums.push(albumContainer);
 						(function(theContainer, theAlbum, theImage, theLink) {
-							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalAlbum, subalbum) {
+							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalContainer, subalbum) {
 								var htmlText;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
@@ -1224,7 +1224,7 @@ $(document).ready(function() {
 										">";
 								theImage.html(htmlText);
 
-								if (PhotoFloat.isByDateCacheBase(originalAlbum.cacheBase)) {
+								if (PhotoFloat.isByDateCacheBase(originalContainer.cacheBase)) {
 									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator);
 									folder = "";
 									if (folderArray.length >= 2)
@@ -1233,7 +1233,7 @@ $(document).ready(function() {
 										folder += "-" + folderArray[2];
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
-								} else if (PhotoFloat.isByGpsCacheBase(originalAlbum.cacheBase)) {
+								} else if (PhotoFloat.isByGpsCacheBase(originalContainer.cacheBase)) {
 									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
 									var folderName = '';
 									var folderTitle = '';
@@ -1271,7 +1271,7 @@ $(document).ready(function() {
 
 								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
 								captionHeight = captionFontSize * 3;
-								if (PhotoFloat.isFolderCacheBase(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+								if (PhotoFloat.isFolderCacheBase(originalContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									heightfactor = 0;
 								else if (! Options.show_album_media_count)
 									heightfactor = 1.1;
@@ -1293,7 +1293,7 @@ $(document).ready(function() {
 
 
 								html = "<div class=\"album-caption";
-								if (PhotoFloat.isFolderCacheBase(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+								if (PhotoFloat.isFolderCacheBase(originalContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									html += " hidden";
 								html += "\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
@@ -1307,7 +1307,7 @@ $(document).ready(function() {
 								html += ">" + folder ;
 								html += "</div>";
 								html += "<div class=\"album-caption-count";
-								if (PhotoFloat.isFolderCacheBase(originalAlbum.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
+								if (PhotoFloat.isFolderCacheBase(originalContainer.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
 									html += " hidden";
 								html += "\"";
 								html += 	"style=\"font-size: " + Math.round((captionFontSize / 1.5)) + "px;" +
@@ -1323,7 +1323,7 @@ $(document).ready(function() {
 								theImage.parent().append(html);
 
 								numSubAlbumsReady ++;
-								if (numSubAlbumsReady >= originalAlbum.subalbums.length) {
+								if (numSubAlbumsReady >= originalContainer.subalbums.length) {
 									// now all the subalbums random thumbnails has been loaded
 									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
@@ -1334,14 +1334,21 @@ $(document).ready(function() {
 								subalbums.splice(subalbums.indexOf(theLink), 1);
 							});
 							i++; i--;
-						})(currentAlbum, currentAlbum.subalbums[i], image, link);
-
+						})(currentAlbum, currentAlbum.subalbums[i], image, albumContainer);
 					}
 
 					subalbumsElement = $("#subalbums");
 					subalbumsElement.empty();
 					subalbumsElement.append.apply(subalbumsElement, subalbums);
 					subalbumsElement.insertBefore(thumbsElement);
+					for (i = 0; i < currentAlbum.subalbums.length; ++i) {
+						$("#" + currentAlbum.subalbums[i].cacheBase).off('click').css("cursor","pointer").on('click', function(ev) {
+							if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+								albumLink = "#!/" + PhotoFloat.searchCacheBase;
+							}
+							window.location.href = "#!/" + subfolderHash;
+						});
+					}
 				}
 			}
 
