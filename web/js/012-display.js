@@ -635,7 +635,13 @@ $(document).ready(function() {
 								else
 									title += _t("#title-in-gpss-album");
 							} else if (searchTitle) {
-								title += _t("#title-in-search-album");
+								if (currentAlbum.subalbums.length) {
+									if (currentAlbum.media.length)
+										title += _t("#title-and") + " ";
+									title += currentAlbum.subalbums.length + " ";
+									title += _t("#title-albums") + " ";
+								}
+								title += _t("#title-in-search-album") + " ";
 							}
 						} else {
 							var numMediaInSubAlbums = currentAlbum.numMediaInSubTree - currentAlbum.media.length;

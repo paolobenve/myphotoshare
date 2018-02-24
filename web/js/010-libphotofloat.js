@@ -208,7 +208,7 @@
 				Options.by_search_string,
 				// success:
 				function(bySearchRootAlbum) {
-					var last_index, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0, normalizedWords;
+					var lastIndex, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0, normalizedWords, albumToGet;
 					var searchResultsMedia = [];
 					var searchResultsSubalbums = [];
 					var searchResultsAlbumFinal = {};
@@ -223,12 +223,12 @@
 					searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
 					if (! Options.search_any_word)
 						// when serching all the words, getting the first album is enough, media that do not match the other words will be escluded later
-						last_index = 0;
+						lastIndex = 0;
 					else
-						last_index = SearchWordsFromUser.length - 1;
+						lastIndex = SearchWordsFromUser.length - 1;
 					if (Options.search_inside_words) {
 						// we must determine the albums that could match the words given by the user, word by word
-						for (i = 0; i <= last_index; i ++) {
+						for (i = 0; i <= lastIndex; i ++) {
 							wordHashes = [];
 							for (j = 0; j < searchWordsFromJsonFile.length; j ++) {
 								if (searchWordsFromJsonFile[j].indexOf(SearchWordsFromUserNormalized[i]) > -1) {
@@ -241,7 +241,7 @@
 						}
 					} else {
 						// whole words
-						for (i = 0; i <= last_index; i ++)
+						for (i = 0; i <= lastIndex; i ++)
 							if (searchWordsFromJsonFile.indexOf(SearchWordsFromUserNormalized[i]) > -1) {
 								albumHashes.push([Options.by_search_string + Options.cache_folder_separator + encodeURIComponent(SearchWordsFromUserNormalized[i])]);
 								numSubAlbumsToGet ++;
@@ -257,7 +257,7 @@
 					} else {
 						$("#album-view").removeClass("hidden");
 						$(".search-failed").hide();
-						for (indexWords = 0; indexWords <= last_index; indexWords ++) {
+						for (indexWords = 0; indexWords <= lastIndex; indexWords ++) {
 							// console.log("n. album to get", albumHashes[indexWords].length);
 							for (indexAlbums = 0; indexAlbums < albumHashes[indexWords].length; indexAlbums ++) {
 								// getAlbum is called here with 2 more parameters, indexAlbums and indexWords, in order to know their ValueError
@@ -317,7 +317,7 @@
 											// all the albums have been got, we can merge the results
 											searchResultsAlbumFinal.media = searchResultsMedia[0];
 											searchResultsAlbumFinal.subalbums = searchResultsSubalbums[0];
-											for (indexWords1 = 1; indexWords1 <= last_index; indexWords1 ++) {
+											for (indexWords1 = 1; indexWords1 <= lastIndex; indexWords1 ++) {
 												searchResultsAlbumFinal.media = Options.search_any_word ?
 													PhotoFloat.union(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]) :
 													PhotoFloat.intersect(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]);
@@ -326,7 +326,7 @@
 													PhotoFloat.intersect(searchResultsAlbumFinal.subalbums, searchResultsSubalbums[indexWords1]);
 											}
 
-											if (last_index != SearchWordsFromUser.length - 1) {
+											if (lastIndex != SearchWordsFromUser.length - 1) {
 												// we still have to filter out the media that do not match the words after the first
 												// we are in all words search mode
 												matchingMedia = [];
@@ -336,12 +336,12 @@
 														// whole word
 														normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words);
 														if (SearchWordsFromUser.some(function(element, index) {
-															return index > last_index && normalizedWords.indexOf(element) == -1;
+															return index > lastIndex && normalizedWords.indexOf(element) == -1;
 														}))
 															match = false;
 													} else {
 														// inside words
-														for (indexWordsLeft = last_index + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
+														for (indexWordsLeft = lastIndex + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
 															normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words);
 															if (! normalizedWords.every(function(element) {
 																return normalizedWords.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
@@ -363,12 +363,12 @@
 														// whole word
 														normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
 														if (SearchWordsFromUser.some(function(element, index) {
-															return index > last_index && normalizedWords.indexOf(element) == -1;
+															return index > lastIndex && normalizedWords.indexOf(element) == -1;
 														}))
 															match = false;
 													} else {
 														// inside words
-														for (indexWordsLeft = last_index + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
+														for (indexWordsLeft = lastIndex + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
 															normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
 															if (! normalizedWords.every(function(element) {
 																return normalizedWords.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
@@ -407,7 +407,7 @@
 				},
 				error
 			);
-		} else
+		} else {
 			this.getAlbum(
 				albumHash,
 				function(theAlbum) {
@@ -436,6 +436,7 @@
 				},
 				error
 			);
+		}
 	};
 
 	PhotoFloat.cloneObject = function(object) {
