@@ -7,15 +7,15 @@ Various scripts are stored in the `bin` directory.
 
 This is MyPhotoShare's main program used to scan media files in directories. You must give a configuration file as parameter. A typical run looks like:
 
-```bash
+```
 $ bin/scanner /etc/myphotoshare/myphotoshare.conf 
     853349 2018-02-23 20:43:15.318259   [importer]                 No opencv library available, not using it
      26805 2018-02-23 20:43:15.345064   [Options]                  asterisk denotes options changed by config file
-       257 2018-02-23 20:43:15.345321   |--[debug_css]                * true                                    [DEFAULT: false           ]
-       120 2018-02-23 20:43:15.345441   |--[debug_js]                 * true                                    [DEFAULT: false           ]
-       135 2018-02-23 20:43:15.345576   |--[max_verbose]                3                                       [DEFAULT                  ]
-       129 2018-02-23 20:43:15.345705   |--[show_faces]                 False                                   [DEFAULT                  ]
-       116 2018-02-23 20:43:15.345821   |--[css_minifier]               cssmin                                  [DEFAULT                  ]
+       257 2018-02-23 20:43:15.345321   |--[debug_css]                * true                    [DEFAULT: false           ]
+       120 2018-02-23 20:43:15.345441   |--[debug_js]                 * true                    [DEFAULT: false           ]
+       135 2018-02-23 20:43:15.345576   |--[max_verbose]                3                       [DEFAULT                  ]
+       129 2018-02-23 20:43:15.345705   |--[show_faces]                 False                   [DEFAULT                  ]
+       116 2018-02-23 20:43:15.345821   |--[css_minifier]               cssmin                  [DEFAULT                  ]
 ...
 ```
 
@@ -28,7 +28,7 @@ This script has to be run once when you first setup MyPhotoShare. It minifies (c
 
 Minifying JavaScript and CSS reduces the bandwidth used to display MyPhotoShare web pages and reduces the number of requests sent to the server. You will probably use it on your production server. You can disable minifying in the configuration file if you want to view human-readable source files in your browser.
 
-```bash
+```
 $ bin/js-css-minify.sh /etc/myphotoshare/myphotoshare.conf 
 
 Using cssmin as CSS minifier
@@ -48,7 +48,7 @@ minifying 001-hashchange.js
 This script downloads the alternate locations file from [GeoNames.org](https://www.geonames.org/) and prepares the locations files used by MyPhotoShare. If the script is run with additional language code parameters like 'ru', it will download localized place names for these parameters, in the current example in Russian. Without parameters, it defaults to using the language codes for the languages supported by MyPhotoShare: currently 'en', 'it', 'es' and 'fr'.
 The resulting files are stored into `scanner/geonames/alternate_names_LN` where `LN` is a language code.
 
-```bash
+```
 $ bin/get_alternate_names.py 
 
 getting alternateNames.zip from geonames.org and extracting it to file...
