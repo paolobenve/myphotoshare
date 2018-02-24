@@ -44,7 +44,7 @@
 						// root of search albums: build the word list
 						for (i = 0; i < theAlbum.subalbums.length; ++i)
 							PhotoFloat.searchWordsFromJsonFile.push(theAlbum.subalbums[i].path);
-					} else if (! PhotoFloat.isSearchCacheBase(cacheKey)) {
+					} else if (! PhotoFloat.isSearchCacheBaseStrictly(cacheKey)) {
 						for (i = 0; i < theAlbum.subalbums.length; ++i)
 							theAlbum.subalbums[i].parent = theAlbum;
 						for (i = 0; i < theAlbum.media.length; ++i)
@@ -184,7 +184,7 @@
 			}
 		}
 
-		if (PhotoFloat.isSearchCacheBase(albumHash)) {
+		if (PhotoFloat.isSearchCacheBaseStrictly(albumHash)) {
 			albumHashToGet = PhotoFloat.pathJoin([albumHash, foldersHash]);
 			PhotoFloat.searchCacheBase = encodeURIComponent(albumHash);
 		} else {
@@ -197,7 +197,7 @@
 		SearchWordsFromUserNormalized = [];
 		if (albumHash) {
 			albumHash = decodeURI(albumHash);
-			if (slashCount === 0 && PhotoFloat.isSearchCacheBase(albumHash) && albumHash != Options.by_search_string) {
+			if (slashCount === 0 && PhotoFloat.isSearchCacheBaseStrictly(albumHash) && albumHash != Options.by_search_string) {
 				var wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
 				var wordsAndOptions = wordsWithOptionsString.split(Options.search_options_separator);
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
@@ -499,6 +499,17 @@
 	};
 
 
+	PhotoFloat.hashCode = function(string) {
+		var hash = 0, i, chr;
+		if (string.length === 0) return hash;
+		for (i = 0; i < string.length; i++) {
+			chr   = string.charCodeAt(i);
+			hash  = ((hash << 5) - hash) + chr;
+			hash |= 0; // Convert to 32bit integer
+		}
+		return hash;
+	}
+
 	PhotoFloat.normalize = function(object) {
 		var string = object;
 		if (typeof object === "object")
@@ -552,8 +563,12 @@
 		return string == Options.folders_string || string.indexOf(PhotoFloat.foldersStringWithTrailingSeparator) === 0;
 	};
 
+	PhotoFloat.isSearchCacheBaseStrictly = function(string) {
+		return string == Options.by_search_string || string.indexOf(PhotoFloat.bySearchStringWithTrailingSeparator) === 0;
+	};
+
 	PhotoFloat.isSearchCacheBase = function(string) {
-		return string == Options.by_search_string || string.indexOf(PhotoFloat.bySearchStringWithTrailingSeparator) === 0 || PhotoFloat.searchCacheBase;
+		return PhotoFloat.isSearchCacheBaseStrictly(string) || PhotoFloat.searchCacheBase !== '';
 	};
 
 

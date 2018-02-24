@@ -960,7 +960,7 @@ $(document).ready(function() {
 	}
 
 	function showAlbum(populate) {
-		var i, imageLink, albumContainer, image, media, thumbsElement, subalbums, subalbumsElement, hash, subfolderHash, thumbHash, thumbnailSize;
+		var i, imageLink, linkContainer, container, image, media, thumbsElement, subalbums, subalbumsElement, hash, subfolderHash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 0, margin, imgTitle;
@@ -1131,6 +1131,11 @@ $(document).ready(function() {
 					if (Options.albums_slide_style)
 						margin = Math.round(correctedAlbumThumbSize * 0.05);
 
+					// insert into DOM
+					subalbumsElement = $("#subalbums");
+					subalbumsElement.empty();
+					subalbumsElement.insertBefore(thumbsElement);
+
 					for (i = 0; i < currentAlbum.subalbums.length; ++i) {
 						if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 							subfolderHash = PhotoFloat.pathJoin([
@@ -1141,7 +1146,8 @@ $(document).ready(function() {
 						else {
 							subfolderHash = currentAlbum.subalbums[i].cacheBase;
 						}
-						albumContainer = $("<div id=\"" + currentAlbum.subalbums[i].cacheBase + "\"></div>");
+						// a dot could be present in a cache base, making $("#" + cacheBase) fail, beware...
+						linkContainer = $("<div id=\"" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "\" class=\"album-button-and-caption\"></div>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
 						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
@@ -1158,10 +1164,21 @@ $(document).ready(function() {
 						imageString += 		">";
 						imageString += "</div>";
 						image = $(imageString);
-						albumContainer.append(image);
-						subalbums.push(albumContainer);
-						(function(theContainer, theAlbum, theImage, theLink) {
-							photoFloat.pickRandomMedia(theAlbum, theContainer, function(randomAlbum, randomMedia, originalContainer, subalbum) {
+						linkContainer.append(image);
+						subalbumsElement.append(linkContainer);
+						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
+						// add the clicks
+						container.off('click').css("cursor","pointer").on('click', function(ev) {
+							if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+								albumLink = "#!/" + PhotoFloat.searchCacheBase;
+							}
+							window.location.href = "#!/" + subfolderHash;
+						});
+						//////////////////// begin anonymous function /////////////////////
+						//      })(currentAlbum, currentAlbum.subalbums[i], image, container);
+						(function(theAlbumContainer, theAlbum, theImage, theLink) {
+							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,              subalbum);
+							photoFloat.pickRandomMedia(theAlbum, theAlbumContainer, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
 								var htmlText;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
@@ -1224,7 +1241,7 @@ $(document).ready(function() {
 										">";
 								theImage.html(htmlText);
 
-								if (PhotoFloat.isByDateCacheBase(originalContainer.cacheBase)) {
+								if (PhotoFloat.isByDateCacheBase(theOriginalAlbumContainer.cacheBase)) {
 									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator);
 									folder = "";
 									if (folderArray.length >= 2)
@@ -1233,7 +1250,7 @@ $(document).ready(function() {
 										folder += "-" + folderArray[2];
 									if (folderArray.length == 4)
 										folder += "-" + folderArray[3];
-								} else if (PhotoFloat.isByGpsCacheBase(originalContainer.cacheBase)) {
+								} else if (PhotoFloat.isByGpsCacheBase(theOriginalAlbumContainer.cacheBase)) {
 									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
 									var folderName = '';
 									var folderTitle = '';
@@ -1271,29 +1288,40 @@ $(document).ready(function() {
 
 								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
 								captionHeight = captionFontSize * 3;
-								if (PhotoFloat.isFolderCacheBase(originalContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
+								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									heightfactor = 0;
 								else if (! Options.show_album_media_count)
 									heightfactor = 1.1;
 								buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
-								html = "<div class=\"album-button-and-caption";
+
+								// html = "<div class=\"album-button-and-caption";
+								container = $("#" + PhotoFloat.hashCode(subalbum.cacheBase));
 								if (Options.albums_slide_style)
-									html += " slide";
-								html += "\"";
-								html += "style=\"";
-								html += 	"height: " + buttonAndCaptionHeight + "px; " +
-										"margin-right: " + Options.spacing + "px; " +
-										"margin-top: " + Options.spacing + "px; ";
-								html +=		"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
+									// html += " slide";
+									container.addClass("slide");
+								// html += "\"";
+								// html += "style=\"";
+								// html += 	"height: " + buttonAndCaptionHeight + "px; " +
+								// 		"margin-right: " + Options.spacing + "px; " +
+								// 		"margin-top: " + Options.spacing + "px; ";
+								// html +=		"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
+								// if (Options.albums_slide_style)
+								// 	html += "background-color: " + Options.album_button_background_color + "; ";
+								// html += 	"\"";
+								container
+									.css("height", buttonAndCaptionHeight + "px")
+									.css("margin-right", Options.spacing + "px")
+									.css("margin-top", Options.spacing + "px")
+									.css("width", albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px");
 								if (Options.albums_slide_style)
-									html += "background-color: " + Options.album_button_background_color + "; ";
-								html += 	"\"";
-								html += ">";
-								theImage.wrap(html);
+									container.css("background-color", Options.album_button_background_color);
+								// html += 	"\"";
+								// html += ">";
+								// theImage.wrap(html);
 
 
 								html = "<div class=\"album-caption";
-								if (PhotoFloat.isFolderCacheBase(originalContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
+								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									html += " hidden";
 								html += "\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
@@ -1307,7 +1335,7 @@ $(document).ready(function() {
 								html += ">" + folder ;
 								html += "</div>";
 								html += "<div class=\"album-caption-count";
-								if (PhotoFloat.isFolderCacheBase(originalContainer.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
+								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
 									html += " hidden";
 								html += "\"";
 								html += 	"style=\"font-size: " + Math.round((captionFontSize / 1.5)) + "px;" +
@@ -1323,31 +1351,19 @@ $(document).ready(function() {
 								theImage.parent().append(html);
 
 								numSubAlbumsReady ++;
-								if (numSubAlbumsReady >= originalContainer.subalbums.length) {
+								if (numSubAlbumsReady >= theOriginalAlbumContainer.subalbums.length) {
 									// now all the subalbums random thumbnails has been loaded
 									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
 								}
 							}, function error() {
-								theContainer.subalbums.splice(currentAlbum.subalbums.indexOf(theAlbum), 1);
+								theAlbumContainer.subalbums.splice(currentAlbum.subalbums.indexOf(theAlbum), 1);
 								theLink.remove();
 								subalbums.splice(subalbums.indexOf(theLink), 1);
 							});
 							i++; i--;
-						})(currentAlbum, currentAlbum.subalbums[i], image, albumContainer);
-					}
-
-					subalbumsElement = $("#subalbums");
-					subalbumsElement.empty();
-					subalbumsElement.append.apply(subalbumsElement, subalbums);
-					subalbumsElement.insertBefore(thumbsElement);
-					for (i = 0; i < currentAlbum.subalbums.length; ++i) {
-						$("#" + currentAlbum.subalbums[i].cacheBase).off('click').css("cursor","pointer").on('click', function(ev) {
-							if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-								albumLink = "#!/" + PhotoFloat.searchCacheBase;
-							}
-							window.location.href = "#!/" + subfolderHash;
-						});
+						})(currentAlbum, currentAlbum.subalbums[i], image, container);
+						//////////////////// end anonymous function /////////////////////
 					}
 				}
 			}
