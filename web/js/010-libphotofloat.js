@@ -407,7 +407,7 @@
 				},
 				error
 			);
-		} else
+		} else {
 			this.getAlbum(
 				albumHash,
 				function(theAlbum) {
@@ -436,6 +436,7 @@
 				},
 				error
 			);
+		}
 	};
 
 	PhotoFloat.cloneObject = function(object) {
