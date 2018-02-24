@@ -960,7 +960,7 @@ $(document).ready(function() {
 	}
 
 	function showAlbum(populate) {
-		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, thumbHash, thumbnailSize;
+		var i, link, image, media, thumbsElement, subalbums, subalbumsElement, hash, subfolderHash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
 		var albumViewWidth, correctedAlbumThumbSize = Options.album_thumb_size;
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 0, margin, imgTitle;
@@ -1065,7 +1065,11 @@ $(document).ready(function() {
 					image = $(imageString);
 
 					image.get(0).media = currentAlbum.media[i];
-					hash = photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[i]);
+					if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+						hash = PhotoFloat.pathJoin([PhotoFloat.searchCacheBase, currentAlbum.media[i].foldersCacheBase, currentAlbum.media[i].cacheBase]);
+					} else {
+						hash = photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[i]);
+					}
 					link = $("<a href=\"#!/" + hash + "\"></a>");
 					link.append(image);
 					media.push(link);
@@ -1128,7 +1132,16 @@ $(document).ready(function() {
 						margin = Math.round(correctedAlbumThumbSize * 0.05);
 
 					for (i = 0; i < currentAlbum.subalbums.length; ++i) {
-						link = $("<a href=\"#!/" + encodeURIComponent(currentAlbum.subalbums[i].cacheBase) + "\"></a>");
+						if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+							subfolderHash = PhotoFloat.pathJoin([
+								PhotoFloat.searchCacheBase,
+								currentAlbum.subalbums[i].cacheBase
+							]);
+						}
+						else {
+							subfolderHash = currentAlbum.subalbums[i].cacheBase;
+						}
+						link = $("<a href=\"#!/" + subfolderHash + "\"></a>");
 						imageString = "<div class=\"album-button\"";
 						imageString += 		" style=\"";
 						imageString += 			"width: " + correctedAlbumThumbSize + "px;";
@@ -1678,8 +1691,8 @@ $(document).ready(function() {
 				prevMedia.byGpsName = PhotoFloat.pathJoin([prevMedia.gpsAlbum, prevMedia.name]);
 
 				i = currentMediaIndex;
-				nextMedia = currentAlbum.media[i];
 				i == currentAlbum.media.length - 1 ? i = 0 : i ++;
+				nextMedia = currentAlbum.media[i];
 				nextMedia.byDateName = PhotoFloat.pathJoin([nextMedia.dayAlbum, nextMedia.name]);
 				nextMedia.byGpsName = PhotoFloat.pathJoin([nextMedia.gpsAlbum, nextMedia.name]);
 
@@ -1717,7 +1730,11 @@ $(document).ready(function() {
 			prevLink = "";
 			$("#media-view").css('cursor', 'default');
 		} else {
-			albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
+			if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+				albumLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.searchCacheBase, currentAlbum.cacheBase]);
+			} else {
+				albumLink = "#!/" + currentAlbum.cacheBase;
+			}
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
 			prevLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, prevMedia);
 			$("#next").show();
