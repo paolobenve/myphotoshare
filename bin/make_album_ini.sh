@@ -22,7 +22,7 @@ fi
 
 if [ -e "$DIR/album.ini" ]; then
 	( >&2 echo "'$DIR/album.ini' already exists. Nothing done.")
-	exit 1
+	exit 2
 fi
 
 
