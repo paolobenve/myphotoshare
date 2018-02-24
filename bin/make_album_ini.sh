@@ -39,7 +39,7 @@ echo >> "$DIR/album.ini"
 
 SAVEIFS="$IFS"
 IFS=$(echo -en "\n\b")
-for media in $(ls "$DIR"/*.{jpg,jpeg,JPG,mp4,avi,MP4,AVI} 2> /dev/null); do
+for media in $(ls "$DIR"/*.{jpg,jpeg,JPG,JPEG,mp4,avi,MP4,AVI} 2> /dev/null); do
 	MEDIA=${media##*/}
 	MEDIA=${MEDIA%.*}
 	echo "[$MEDIA]" >> "$DIR/album.ini"
@@ -52,4 +52,3 @@ for media in $(ls "$DIR"/*.{jpg,jpeg,JPG,mp4,avi,MP4,AVI} 2> /dev/null); do
 	echo >> "$DIR/album.ini"
 done
 IFS=$SAVEIFS
-
