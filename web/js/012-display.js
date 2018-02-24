@@ -271,7 +271,7 @@ $(document).ready(function() {
 		}
 
 		myShareUrl = url + '?';
-		myShareUrl += 'm=' + encodeURIComponent(mediaParameter);
+		myShareUrl += 'm=' + mediaParameter;
 		hash = location.hash;
 		if (hash)
 			myShareUrl += '#' + hash.substring(1);
@@ -1092,7 +1092,7 @@ $(document).ready(function() {
 					if (currentAlbum.media.length)
 						mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[0]);
 					else
-						mediaLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
+						mediaLink = "#!/" + currentAlbum.cacheBase;
 					firstEscKey = true;
 				}
 				albumLink = "";
@@ -1100,7 +1100,7 @@ $(document).ready(function() {
 					if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 						albumLink = savedLink ? savedLink : "#!/";
 					} else
-						albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
+						albumLink = "#!/" + currentAlbum.parentCacheBase;
 				}
 
 				if (
@@ -1700,7 +1700,7 @@ $(document).ready(function() {
 		if (currentAlbum.media.length == 1) {
 			albumLink = "";
 			if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
-				albumLink = "#!/" + encodeURIComponent(currentAlbum.parentCacheBase);
+				albumLink = "#!/" + currentAlbum.parentCacheBase;
 			else {
 				if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 					if (currentAlbum.ancestorsCacheBase.length <= 3)
@@ -1708,7 +1708,7 @@ $(document).ready(function() {
 					else
 						albumLink = "#!" + Options.cache_folder_separator.join(currentAlbum.ancestorsCacheBase.slice(1));
 				} else
-					albumLink = "#!/" + encodeURIComponent(currentAlbum.cacheBase);
+					albumLink = "#!/" + currentAlbum.cacheBase;
 			}
 			nextLink = "";
 			prevLink = "";
@@ -1768,18 +1768,18 @@ $(document).ready(function() {
 		}
 
 		var foldersViewLink = "#!/" + PhotoFloat.pathJoin([
-									encodeURIComponent(currentMedia.foldersCacheBase),
-									encodeURIComponent(currentMedia.cacheBase)
+									currentMedia.foldersCacheBase,
+									currentMedia.cacheBase
 								]);
 		var byDateViewLink = "#!/" + PhotoFloat.pathJoin([
-									encodeURIComponent(currentMedia.dayAlbumCacheBase),
-									encodeURIComponent(currentMedia.foldersCacheBase),
-									encodeURIComponent(currentMedia.cacheBase)
+									currentMedia.dayAlbumCacheBase,
+									currentMedia.foldersCacheBase,
+									currentMedia.cacheBase
 								]);
 		var byGpsViewLink = "#!/" + PhotoFloat.pathJoin([
-									encodeURIComponent(currentMedia.gpsAlbumCacheBase),
-									encodeURIComponent(currentMedia.foldersCacheBase),
-									encodeURIComponent(currentMedia.cacheBase)
+									currentMedia.gpsAlbumCacheBase,
+									currentMedia.foldersCacheBase,
+									currentMedia.cacheBase
 								]);
 
 

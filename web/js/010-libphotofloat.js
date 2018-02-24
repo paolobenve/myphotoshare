@@ -4,6 +4,7 @@
 		this.albumCache = [];
 		this.geotaggedPhotosFound = null;
 		this.searchWordsFromJsonFile = [];
+		this.SearchCacheBase = '';
 		// expose variable
 		window.searchWordsFromJsonFile = this.searchWordsFromJsonFile;
 	}
@@ -170,9 +171,15 @@
 				}
 			} else if (slashCount == 2) {
 				// virtual folder hash: by date/gps/search album, folders album, media
-				albumHash = hashParts[0];
-				foldersHash = hashParts[1];
-				mediaHash = hashParts[2];
+				if (PhotoFloat.isFolderCacheBase(hashParts[1])) {
+					albumHash = hashParts[0];
+					foldersHash = hashParts[1];
+					mediaHash = hashParts[2];
+				} else {
+					albumHash = hashParts[0];
+					foldersHash = hashParts[1];
+					mediaHash = hashParts[2];
+				}
 			}
 		}
 
@@ -229,6 +236,7 @@
 					searchResultsAlbumFinal.ancestorsCacheBase.push(wordsWithOptionsString);
 					searchResultsAlbumFinal.path = searchResultsAlbumFinal.cacheBase.replace(Options.cache_folder_separator, "/");
 					searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
+					this.SearchCacheBase = albumHash;
 					if (! Options.search_any_word)
 						// when serching all the words, getting the first album is enough, media that do not match the other words will be escluded later
 						lastIndex = 0;
@@ -238,9 +246,9 @@
 						// we must determine the albums that could match the words given by the user, word by word
 						for (i = 0; i <= lastIndex; i ++) {
 							wordHashes = [];
-							for (j = 0; j < searchWordsFromJsonFile.length; j ++) {
-								if (searchWordsFromJsonFile[j].indexOf(SearchWordsFromUserNormalized[i]) > -1) {
-								 	wordHashes.push(Options.by_search_string + Options.cache_folder_separator + encodeURIComponent(searchWordsFromJsonFile[j]));
+							for (j = 0; j < PhotoFloat.searchWordsFromJsonFile.length; j ++) {
+								if (PhotoFloat.searchWordsFromJsonFile[j].indexOf(SearchWordsFromUserNormalized[i]) > -1) {
+								 	wordHashes.push(Options.by_search_string + Options.cache_folder_separator + PhotoFloat.searchWordsFromJsonFile[j]);
 									numSubAlbumsToGet ++;
 								}
 							}
@@ -250,8 +258,8 @@
 					} else {
 						// whole words
 						for (i = 0; i <= lastIndex; i ++)
-							if (searchWordsFromJsonFile.indexOf(SearchWordsFromUserNormalized[i]) > -1) {
-								albumHashes.push([Options.by_search_string + Options.cache_folder_separator + encodeURIComponent(SearchWordsFromUserNormalized[i])]);
+							if (PhotoFloat.searchWordsFromJsonFile.indexOf(SearchWordsFromUserNormalized[i]) > -1) {
+								albumHashes.push([Options.by_search_string + Options.cache_folder_separator + SearchWordsFromUserNormalized[i]]);
 								numSubAlbumsToGet ++;
 							}
 					}
@@ -416,9 +424,14 @@
 				error
 			);
 		} else {
-			albumHashToGet = albumHash;
-			if (PhotoFloat.isSearchCacheBase(albumHash))
+			if (PhotoFloat.isSearchCacheBase(albumHash)) {
 				albumHashToGet = PhotoFloat.pathJoin([albumHash, foldersHash]);
+				window.SearchCacheBase = albumHash;
+			} else {
+				albumHashToGet = albumHash;
+				window.SearchCacheBase = '';
+			}
+
 			this.getAlbum(
 				albumHashToGet,
 				function(theAlbum) {
@@ -544,16 +557,22 @@
 
 	PhotoFloat.mediaHashURIEncoded = function(album, media) {
 		var hash;
-		if (PhotoFloat.isByDateCacheBase(album.cacheBase) || PhotoFloat.isByGpsCacheBase(album.cacheBase) || PhotoFloat.isSearchCacheBase(album.cacheBase))
+		if (PhotoFloat.isByDateCacheBase(album.cacheBase) || PhotoFloat.isByGpsCacheBase(album.cacheBase))
 			hash = PhotoFloat.pathJoin([
-				encodeURIComponent(album.cacheBase),
-				encodeURIComponent(media.foldersCacheBase),
-				encodeURIComponent(media.cacheBase)
+				album.cacheBase,
+				media.foldersCacheBase,
+				media.cacheBase
+			]);
+		else if (window.SearchCacheBase)
+			hash = PhotoFloat.pathJoin([
+				PhotoFloat.searchCacheBase,
+				media.foldersCacheBase,
+				media.cacheBase
 			]);
 		else
 			hash = PhotoFloat.pathJoin([
-				encodeURIComponent(album.cacheBase),
-				encodeURIComponent(media.cacheBase)
+				album.cacheBase,
+				media.cacheBase
 			]);
 		return hash;
 	};
