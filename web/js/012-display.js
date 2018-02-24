@@ -1669,20 +1669,14 @@ $(document).ready(function() {
 					PhotoFloat.pathJoin([currentAlbum.media[currentMediaIndex].dayAlbum, currentAlbum.media[currentMediaIndex].name]);
 				currentAlbum.media[currentMediaIndex].byGpsName =
 						PhotoFloat.pathJoin([currentAlbum.media[currentMediaIndex].gpsAlbum, currentAlbum.media[currentMediaIndex].name]);
-				if (i === 0)
-					i = currentAlbum.media.length - 1;
-				else
-					i --;
+				i === 0 ? i = currentAlbum.media.length - 1 : i --;
 				prevMedia = currentAlbum.media[i];
 				prevMedia.byDateName = PhotoFloat.pathJoin([prevMedia.dayAlbum, prevMedia.name]);
 				prevMedia.byGpsName = PhotoFloat.pathJoin([prevMedia.gpsAlbum, prevMedia.name]);
 
 				i = currentMediaIndex;
-				if (i == currentAlbum.media.length - 1)
-					i = 0;
-				else
-					i ++;
 				nextMedia = currentAlbum.media[i];
+				i == currentAlbum.media.length - 1 ? i = 0 : i ++;
 				nextMedia.byDateName = PhotoFloat.pathJoin([nextMedia.dayAlbum, nextMedia.name]);
 				nextMedia.byGpsName = PhotoFloat.pathJoin([nextMedia.gpsAlbum, nextMedia.name]);
 
