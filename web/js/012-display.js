@@ -2450,24 +2450,20 @@ $(document).ready(function() {
 
 	// search
 	$('#search-button').on("click", function() {
+		var searchOptions = '';
 		// save current hash in order to come back there when exiting from search
-
 		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
 		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
-		var bySearchViewLink = "#!/" + Options.by_search_string;
-		if (Options.search_regex)
-			bySearchViewLink += Options.cache_folder_separator + 'r';
-		else {
-			if (Options.search_inside_words)
-				bySearchViewLink += Options.cache_folder_separator + 'i';
-			if (Options.search_any_word)
-				bySearchViewLink += Options.cache_folder_separator + 'n';
-			if (Options.search_case_sensitive)
-				bySearchViewLink += Options.cache_folder_separator + 'c';
-			if (Options.search_accent_sensitive)
-				bySearchViewLink += Options.cache_folder_separator + 'a';
-		}
-		bySearchViewLink += Options.cache_folder_separator + searchTerms;
+		var bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator;
+		if (Options.search_inside_words)
+			searchOptions += 'i' + Options.search_options_separator;
+		if (Options.search_any_word)
+			searchOptions += 'n' + Options.search_options_separator;
+		if (Options.search_case_sensitive)
+			searchOptions += 'c' + Options.search_options_separator;
+		if (Options.search_accent_sensitive)
+			searchOptions += 'a' + Options.search_options_separator;
+		bySearchViewLink += searchOptions + searchTerms;
 		window.location.href = bySearchViewLink;
 	});
 	$('#search-field').keypress(function(ev) {

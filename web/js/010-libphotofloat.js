@@ -161,7 +161,7 @@
 				// folders or by date hash: album only
 				albumHash = hash;
 			} else if (slashCount == 2) {
-				// by date hash: by date album, folders album, media
+				// virtual folder hash: by date/gps/search album, folders album, media
 				albumHash = hashParts[0];
 				mediaHash = hashParts[2];
 				foldersHash = hashParts[1];
@@ -175,7 +175,7 @@
 			albumHash = decodeURI(albumHash);
 			if (slashCount === 0 && PhotoFloat.isSearchAlbum(albumHash) && albumHash != Options.by_search_string) {
 				var wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
-				var wordsAndOptions = wordsWithOptionsString.split(Options.cache_folder_separator);
+				var wordsAndOptions = wordsWithOptionsString.split(Options.search_options_separator);
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
 				var wordsStringOriginal = wordsString.replace(/_/g, ' ');
 				// the normalized words are needed in order to compare with the search cache json files names, which are normalized

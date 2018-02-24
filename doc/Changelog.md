@@ -14,6 +14,7 @@
 * new option `slide_album_caption_color`: the color to use with album slide mode
 * implemented search function: media and albums can be searched by file name, title, description, tags; search may be whole word or inside words, considering accents and capitals or not
   * new option `by_search_string`: the string used for search albums
+  * new option `search_options_separator`: the character used for separating search options from search string in URIs
   * new option `max_search_album_number`: the maximum number of search album that will be loaded
 * reorganization of documentation:
   * creation of `doc` and `doc/img` folders
