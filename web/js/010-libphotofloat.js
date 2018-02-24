@@ -156,7 +156,10 @@
 			slashCount = hashParts.length -1;
 			lastSlashPosition = hash.lastIndexOf("/");
 
-			if (slashCount == 1) {
+			if (slashCount === 0) {
+				// folders only or root of a virtual folders: album only
+				albumHash = hash;
+			} else if (slashCount == 1) {
 				// folders hash: album and media
 				// or: search album and folder
 				albumHash = hashParts[0];
@@ -165,9 +168,6 @@
 				} else {
 					mediaHash = hashParts[1];
 				}
-			} else if (slashCount === 0) {
-				// folders or by date hash: album only
-				albumHash = hash;
 			} else if (slashCount == 2) {
 				// virtual folder hash: by date/gps/search album, folders album, media
 				albumHash = hashParts[0];
