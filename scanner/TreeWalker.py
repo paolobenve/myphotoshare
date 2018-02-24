@@ -807,18 +807,6 @@ class TreeWalker:
 							Options.num_photo_geotagged += 1
 						else:
 							photos_without_geotag_in_dir.append(entry_with_path)
-					message("adding media to album...", "", 5)
-					album.add_media(media)
-					next_level()
-					message("media added to album", "", 5)
-					back_level()
-
-					message("adding media to big list...", "", 5)
-					if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
-						self.all_media.append(media)
-					next_level()
-					message("media added to big list", "", 5)
-					back_level()
 
 					message("adding media to by date tree...", "", 5)
 					# the following function has a check on media already present
@@ -840,6 +828,19 @@ class TreeWalker:
 					self.add_media_to_tree_by_search(media)
 					next_level()
 					message("media added to search tree", "", 5)
+					back_level()
+
+					message("adding media to album...", "", 5)
+					album.add_media(media)
+					next_level()
+					message("media added to album", "", 5)
+					back_level()
+
+					message("adding media to big list...", "", 5)
+					if not any(media.media_file_name == _media.media_file_name for _media in self.all_media):
+						self.all_media.append(media)
+					next_level()
+					message("media added to big list", "", 5)
 					back_level()
 
 				elif not media.is_valid:
