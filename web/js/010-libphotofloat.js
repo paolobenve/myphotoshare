@@ -475,9 +475,14 @@
 			var t;
 			t = b, b = a, a = t;
 		}
+		property = 'albumName';
+		if (a.length && ! a[0].hasOwnProperty('albumName'))
+			// searched albums hasn't albumName property
+			property = 'path';
+
 		return a.filter(function (e) {
 			for (var i = 0; i < b.length; i ++) {
-				if (PhotoFloat.normalize(b[i].albumName) == PhotoFloat.normalize(e.albumName))
+				if (PhotoFloat.normalize(b[i][property]) == PhotoFloat.normalize(e[property]))
 					return true;
 			}
 			return false;
@@ -487,10 +492,16 @@
 	PhotoFloat.union = function(a, b) {
 		// begin cloning the first array
 		var union = a.slice(0);
+
+		property = 'albumName';
+		if (a.length && ! a[0].hasOwnProperty('albumName'))
+			// searched albums hasn't albumName property
+			property = 'path';
+
 		for (var i = 0; i < b.length; i ++) {
 			if (! a.some(
 				function (e) {
-					return PhotoFloat.normalize(b[i].albumName) == PhotoFloat.normalize(e.albumName);
+					return PhotoFloat.normalize(b[i][property]) == PhotoFloat.normalize(e[property]);
 				})
 			)
 				union.push(b[i]);
@@ -512,7 +523,7 @@
 
 	PhotoFloat.normalize = function(object) {
 		var string = object;
-		if (typeof object === "object")
+		if (typeof object !== "string")
 			string = string.join('|');
 
 		if (! Options.search_case_sensitive)
