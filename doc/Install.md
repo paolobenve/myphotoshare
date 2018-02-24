@@ -55,7 +55,7 @@ In your config file (the name `myproject.conf` can be whatever you want) you mus
 This simply minifies and concatenate all JavaScript and CSS source files.
 
 ```bash
-    $ ./js-css-minify.sh /etc/myphotoshare/myproject.conf
+    $ ./bin/js-css-minify.sh /etc/myphotoshare/myproject.conf
 ```
 
 By default, a local minifier is used (cssmin and jsmin are currently supported, more local tools can easily be added). https://javascript-minifier.com/ and https://cssminifier.com/ web services may be used, changing options in the config file, but they are subject to timeout errors which the script cannot detect.
@@ -92,7 +92,7 @@ When MyPhotoShare code is updated, update your `myphotoshare` directory.
 Go to the folder you cloned the repository in and execute:
 ```bash
     $ git pull https://github.com/paolobenve/myphotoshare.git
-    $ ./js-css-minify.sh
+    $ ./bin/js-css-minify.sh
 ```
 
 Obviously the scanner should be launched too.
@@ -142,7 +142,7 @@ Testing that Python loads OpenCV:
 Python will require also the XML file `haarcascade_frontalface_alt.xml` for face detection. On Debian based system, this file is provided by package `opencv-data`. If this file is not found, a message will be printed when the verbose level is at least 3.
 
 ```bash
-$ ./main.py /etc/myphotoshare/myphotoshare.conf 
+$ ./bin/scanner /etc/myphotoshare/myphotoshare.conf 
    2612236 2018-01-28 11:01:42.562583   [importer]                                     opencv library available, using it!
        118 2018-01-28 11:01:42.562701   |--[looking for file...]                          haarcascade_frontalface_default.xml
   67881115 2018-01-28 11:02:50.443816   |  |--[face xml file not found]                      haarcascade_frontalface_default.xml

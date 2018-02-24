@@ -10,7 +10,7 @@ MyPhotoShare comes with a database of place names originating from [GeoNames.org
 To update the database, run the `get_alternate_names.py` script indicating the languages you want to retrieve, like for instance:
 
 ```bash
-$ ./get_alternate_names.py ru
+$ ./bin/get_alternate_names.py ru
 ```
 
 This script will download the names of countries, regions and cities/towns in the languages known by MyPhotoShare adding the languages specified as arguments.
@@ -18,7 +18,7 @@ This script will download the names of countries, regions and cities/towns in th
 
 ## Overloading geolocation
 
-There are situations were you need to overload automatic geolocation for your media:
+There are situations where you need to overload automatic geolocation for your media:
 * Sometimes, the name referenced by GeoNames.org is not correct in your locale. For example, in French, the French region Corsica is named Corse and not Corsica as reported by GeoNames.
 * Your media is not geotagged (you don't have a GPS camera) but you know where the photos or videos were shot.
 * MyPhotoShare distance calculation algorithms tags your media with the wrong name. Geonaming uses only distances and does not knows about borders...

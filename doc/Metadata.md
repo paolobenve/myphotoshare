@@ -3,6 +3,7 @@
 ## EXIF metadata of images and videos
 The scanner retrieve EXIF matadata from photos. This metadata is accessible from the JavaScript in the gallery and is displayed on-demand.
 
+
 ### Metadata displayed
 For images, if available in EXIF/IPTC/XMP:
 * Image size
@@ -55,10 +56,13 @@ Supported metadata selectors are:
 * `place_name`: The name of the city or town to be displayed. This value is only used if the media is geotagged, that is has a latitude/longitude, either from EXIF metadata in the file or from album.ini. Overloading this value is interesting when the geoname feature does not find the correct place name. For instance, if you want to specify a special location instead of a city name.
 * `tags`: A comma separated list of key words. For the moment, these tags are only displayed in the Metadata drawer window, but one could use them to build new navigation between media or search by key word.
 
-Section names are case sensitive. Particularly `[DEFAULT]` must be in uppercase. Spaces in sections are part of the name and section names are not trimmed!
-Metadata selectors are not case sensitive and are trimmed for spaces. Metadata values are timmed for spaces too.
+Note that `title`, `description` and `tags` metadata are used, as well as media file name, when searched for keywords.
 
-### Inheritance for finding metadata values
+Section names are case sensitive. Particularly `[DEFAULT]` must be in uppercase. Spaces in sections are part of the name and section names are not trimmed!
+Metadata selectors are not case sensitive and are trimmed for spaces. Metadata values are trimmed for spaces too.
+
+
+### Inheritance when finding metadata values
 
 The scanner supports a 2-levels inheritance to search for metadata values. It searches the metadata selector first into the section named with the name of the media file, and if not found it looks for it in the `[DEFAULT]` section.
 The same principle applies for `[album]` that is searched first and then `[DEFAULT]` if not found.
