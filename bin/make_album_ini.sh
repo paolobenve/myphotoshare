@@ -24,6 +24,10 @@ if [ ! -f "$DIR/album.ini" ]; then
 	touch "$DIR/album.ini"
 fi
 
+# Count the number of media added
+SECTION_COUNT=0
+
+# The [album] section
 SECTION_EXISTS=$(grep -c "\[album\]" "$DIR/album.ini")
 if [ $SECTION_EXISTS -eq 0 ]; then
 	TITLE=${DIR##*/}
@@ -35,8 +39,10 @@ if [ $SECTION_EXISTS -eq 0 ]; then
 	echo "#tags = " >> "$DIR/album.ini"
 	echo >> "$DIR/album.ini"
 	echo >> "$DIR/album.ini"
+	((SECTION_COUNT+=1))
 fi
 
+# Loop on album content
 SAVEIFS="$IFS"
 IFS=$(echo -en "\n\b")
 for media in $(ls "$DIR"/*.{jpg,jpeg,JPG,JPEG,mp4,avi,MP4,AVI} 2> /dev/null); do
@@ -52,6 +58,10 @@ for media in $(ls "$DIR"/*.{jpg,jpeg,JPG,JPEG,mp4,avi,MP4,AVI} 2> /dev/null); do
 		echo "#longitude = " >> "$DIR/album.ini"
 		echo >> "$DIR/album.ini"
 		echo >> "$DIR/album.ini"
+		((SECTION_COUNT+=1))
 	fi
 done
 IFS=$SAVEIFS
+
+echo "$SECTION_COUNT media added to '$DIR/album.ini'."
+
