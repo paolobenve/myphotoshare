@@ -418,7 +418,8 @@
 											}
 											searchResultsAlbumFinal.numMediaInAlbum = searchResultsAlbumFinal.media.length;
 											searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
-											self.albumCache[searchResultsAlbumFinal.cacheBase] = searchResultsAlbumFinal;
+											if (! searchResultsAlbumFinal.cacheBase in self.albumCache)
+												self.albumCache[searchResultsAlbumFinal.cacheBase] = searchResultsAlbumFinal;
 											callback(searchResultsAlbumFinal, null, -1);
 										}
 									},
