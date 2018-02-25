@@ -57,7 +57,7 @@ $(document).ready(function() {
 	var numSubAlbumsReady;
 	var fromEscKey = false;
 	var firstEscKey = true;
-	var nextLink = "", prevLink = "", albumLink = "", mediaLink = "", savedLink = "";
+	var nextLink = "", prevLink = "", upLink = "", mediaLink = "", savedLink = "";
 
 	/* Displays */
 
@@ -171,9 +171,9 @@ $(document).ready(function() {
 		} else if (d == "l") {
 			swipeLeft(nextLink);
 		} else if (d == "d") {
-			if (albumLink) {
+			if (upLink) {
 				fromEscKey = true;
-				swipeDown(albumLink);
+				swipeDown(upLink);
 			}
 		} else if (d == "u") {
 			if (currentMedia === null)
@@ -1101,12 +1101,12 @@ $(document).ready(function() {
 						mediaLink = "#!/" + currentAlbum.cacheBase;
 					firstEscKey = true;
 				}
-				albumLink = "";
+				upLink = "";
 				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
 					if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-						albumLink = savedLink ? savedLink : "#!/";
+						upLink = savedLink ? savedLink : "#!/";
 					} else
-						albumLink = "#!/" + currentAlbum.parentCacheBase;
+						upLink = "#!/" + currentAlbum.parentCacheBase;
 				}
 
 				if (
@@ -1157,9 +1157,9 @@ $(document).ready(function() {
 						// add the clicks
 						container.off('click').css("cursor", "pointer").on('click', {hash: subfolderHash}, function(ev) {
 							if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
-								albumLink = "#!/";
+								upLink = "#!/";
 							} else if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-								albumLink = "#!/" + PhotoFloat.searchCacheBase;
+								upLink = "#!/" + PhotoFloat.searchCacheBase;
 							}
 							window.location.href = "#!/" + ev.data.hash;
 						});
@@ -1741,26 +1741,26 @@ $(document).ready(function() {
 
 
 		if (currentAlbum.media.length == 1) {
-			albumLink = "";
+			upLink = "";
 			if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
-				albumLink = "#!/" + currentAlbum.parentCacheBase;
+				upLink = "#!/" + currentAlbum.parentCacheBase;
 			else {
 				if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 					if (currentAlbum.ancestorsCacheBase.length <= 3)
-						albumLink = "#!";
+						upLink = "#!";
 					else
-						albumLink = "#!" + Options.cache_folder_separator.join(currentAlbum.ancestorsCacheBase.slice(1));
+						upLink = "#!" + Options.cache_folder_separator.join(currentAlbum.ancestorsCacheBase.slice(1));
 				} else
-					albumLink = "#!/" + currentAlbum.cacheBase;
+					upLink = "#!/" + currentAlbum.cacheBase;
 			}
 			nextLink = "";
 			prevLink = "";
 			$("#media-view").css('cursor', 'default');
 		} else {
 			if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-				albumLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.searchCacheBase, currentAlbum.cacheBase]);
+				upLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.searchCacheBase, currentAlbum.cacheBase]);
 			} else {
-				albumLink = "#!/" + currentAlbum.cacheBase;
+				upLink = "#!/" + currentAlbum.cacheBase;
 			}
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
 			prevLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, prevMedia);
@@ -2351,10 +2351,10 @@ $(document).ready(function() {
 				//             esc
 				goFullscreen(e);
 				return false;
-			} else if (albumLink && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
+			} else if (upLink && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
 				//                            esc            arrow up             page up
 				fromEscKey = true;
-				swipeDown(albumLink);
+				swipeDown(upLink);
 				return false;
 			} else if (mediaLink && currentMedia === null && (e.keyCode === 40 || e.keyCode === 34)) {
 				//                                              arrow down           page down
