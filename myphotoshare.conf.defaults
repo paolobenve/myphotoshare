@@ -162,6 +162,7 @@ by_date_string = _bd
 by_gps_string = _bg
 by_search_string = _bs
 cache_folder_separator = -
+search_options_separator = .
 
 # The language you want to get the geonames features
 # must be a 2 character code, like 'en' (without quotes)
