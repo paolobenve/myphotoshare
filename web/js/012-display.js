@@ -966,8 +966,10 @@ $(document).ready(function() {
 		var mediaWidth, mediaHeight, slideBorder = 0, scrollBarWidth = 0, buttonBorder = 0, margin, imgTitle;
 		var tooBig = false, isVirtualAlbum = false;
 		var mapLinkIcon;
+		var element;
 
 		PhotoFloat.subalbumIndex = 0;
+		numSubAlbumsReady = 0;
 
 		if (Options.albums_slide_style)
 			slideBorder = 3;
@@ -1169,7 +1171,7 @@ $(document).ready(function() {
 								var htmlText;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
-								var heightfactor = 1.6;
+								var heightfactor;
 
 								PhotoFloat.subalbumIndex ++;
 								mediaWidth = randomMedia.metadata.size[0];
@@ -1274,27 +1276,18 @@ $(document).ready(function() {
 								$($el).remove();
 
 								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
-								captionHeight = captionFontSize * 3;
+								captionHeight = captionFontSize * 1.1;
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									heightfactor = 0;
 								else if (! Options.show_album_media_count)
 									heightfactor = 1.1;
+								else
+									heightfactor = 2.8;
 								buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
 
-								// html = "<div class=\"album-button-and-caption";
 								container = $("#" + PhotoFloat.hashCode(subalbum.cacheBase));
 								if (Options.albums_slide_style)
-									// html += " slide";
 									container.addClass("slide");
-								// html += "\"";
-								// html += "style=\"";
-								// html += 	"height: " + buttonAndCaptionHeight + "px; " +
-								// 		"margin-right: " + Options.spacing + "px; " +
-								// 		"margin-top: " + Options.spacing + "px; ";
-								// html +=		"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
-								// if (Options.albums_slide_style)
-								// 	html += "background-color: " + Options.album_button_background_color + "; ";
-								// html += 	"\"";
 								container
 									.css("height", buttonAndCaptionHeight + "px")
 									.css("margin-right", Options.spacing + "px")
@@ -1302,9 +1295,6 @@ $(document).ready(function() {
 									.css("width", albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px");
 								if (Options.albums_slide_style)
 									container.css("background-color", Options.album_button_background_color);
-								// html += 	"\"";
-								// html += ">";
-								// theImage.wrap(html);
 
 
 								html = "<div class=\"album-caption";
@@ -1313,7 +1303,7 @@ $(document).ready(function() {
 								html += "\"";
 								html += " style=\"width: " + correctedAlbumThumbSize + "px; " +
 											"font-size: " + captionFontSize + "px; " +
-											"max-height: " + captionHeight + "px; ";
+											"height: " + captionHeight + "px; ";
 								var captionColor = Options.album_caption_color;
 								if (Options.albums_slide_style)
 									captionColor = Options.slide_album_caption_color;
@@ -1342,6 +1332,24 @@ $(document).ready(function() {
 									// now all the subalbums random thumbnails has been loaded
 									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
+
+									// check for overflow in album-caption class
+									while (true) {
+										overflow = false;
+										for (i = 0; i < currentAlbum.subalbums.length; ++i) {
+											element = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + " .album-caption");
+											if (element.height() < element[0].scrollHeight) {
+												// the element have overflow
+												overflow = true;
+												$(".album-caption").css("height", (parseInt($(".album-caption").css("height")) + 5) + 'px');
+												$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + 5) + 'px');
+												break;
+											}
+										}
+										if (! overflow)
+											break
+									}
+
 								}
 							}, function error() {
 								theAlbumContainer.subalbums.splice(currentAlbum.subalbums.indexOf(theAlbum), 1);
@@ -2154,7 +2162,6 @@ $(document).ready(function() {
 
 		undie();
 		$("#loading").hide();
-		numSubAlbumsReady = 0;
 
 		$(window).off("resize");
 
