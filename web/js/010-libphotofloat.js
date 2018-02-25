@@ -510,15 +510,21 @@
 	};
 
 
-	PhotoFloat.hashCode = function(string) {
-		var hash = 0, i, chr;
-		if (string.length === 0) return hash;
-		for (i = 0; i < string.length; i++) {
-			chr   = string.charCodeAt(i);
-			hash  = ((hash << 5) - hash) + chr;
-			hash |= 0; // Convert to 32bit integer
+	PhotoFloat.hashCode = function(hash) {
+		var codedHash, i, chr;
+
+		if (hash.length === 0)
+			return 0;
+		else if (hash.indexOf('.') === -1)
+			return hash;
+		else {
+			for (i = 0; i < hash.length; i++) {
+				chr   = hash.charCodeAt(i);
+				codedHash  = ((codedHash << 5) - codedHash) + chr;
+				codedHash |= 0; // Convert to 32bit integer
+			}
+			return hash.replace(/\./g, '_') + '_' + codedHash;
 		}
-		return hash;
 	}
 
 	PhotoFloat.normalize = function(object) {
