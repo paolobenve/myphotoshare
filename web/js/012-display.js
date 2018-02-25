@@ -1153,13 +1153,13 @@ $(document).ready(function() {
 						subalbumsElement.append(linkContainer);
 						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
 						// add the clicks
-						container.off('click').css("cursor","pointer").on('click', function(ev) {
+						container.off('click').css("cursor", "pointer").on('click', {hash: subfolderHash}, function(ev) {
 							if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
 								albumLink = "#!/";
 							} else if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 								albumLink = "#!/" + PhotoFloat.searchCacheBase;
 							}
-							window.location.href = "#!/" + subfolderHash;
+							window.location.href = "#!/" + ev.data.hash;
 						});
 						//////////////////// begin anonymous function /////////////////////
 						//      })(currentAlbum, currentAlbum.subalbums[i], image, container);
