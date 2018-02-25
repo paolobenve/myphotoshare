@@ -21,22 +21,49 @@ fi
 
 
 if [ ! -f "$DIR/album.ini" ]; then
-	touch "$DIR/album.ini"
+	echo "# User defined metadata for MyPhotoShare" > "$DIR/album.ini"
+	echo "########################################" >> "$DIR/album.ini"
+	echo "# Possible metadata:" >> "$DIR/album.ini"
+	echo "# - title: To give a title to the photo, video or album." >> "$DIR/album.ini"
+	echo "# - description: A long description of the media." >> "$DIR/album.ini"
+	echo "# - tags: A comma separated list of key words." >> "$DIR/album.ini"
+	echo "# - date: The date the photo was taken, in the format YYYY-MM-DD." >> "$DIR/album.ini"
+	echo "# - latitude: The latitude of the media, for instance if the media was not geotagged when captured." >> "$DIR/album.ini"
+	echo "# - longitude: The longitude of the capture of media." >> "$DIR/album.ini"
+	echo "# - country_name: The name of the country where the photo was shot." >> "$DIR/album.ini"
+	echo "# - region_name: The name of the region." >> "$DIR/album.ini"
+	echo "# - place_name: The name of the city or town to be displayed." >> "$DIR/album.ini"
+	echo >> "$DIR/album.ini"
+	echo >> "$DIR/album.ini"
+	echo "#[DEFAULT]" >> "$DIR/album.ini"
+	echo "#tags = " >> "$DIR/album.ini"
+	echo "#date = " >> "$DIR/album.ini"
+	echo "#latitude = " >> "$DIR/album.ini"
+	echo "#longitude = " >> "$DIR/album.ini"
+	echo "#place_name = " >> "$DIR/album.ini"
+	echo "#region_name = " >> "$DIR/album.ini"
+	echo "#country_name = " >> "$DIR/album.ini"
+	echo >> "$DIR/album.ini"
+	echo >> "$DIR/album.ini"
 fi
 
+# Count the number of media added
+SECTION_COUNT=0
+
+# The [album] section
 SECTION_EXISTS=$(grep -c "\[album\]" "$DIR/album.ini")
 if [ $SECTION_EXISTS -eq 0 ]; then
 	TITLE=${DIR##*/}
-	echo "# User defined metadata for MyPhotoShare" >> "$DIR/album.ini"
-	echo >> "$DIR/album.ini"
 	echo "[album]" >> "$DIR/album.ini"
 	echo "#title = $TITLE" >> "$DIR/album.ini"
 	echo "#description = " >> "$DIR/album.ini"
 	echo "#tags = " >> "$DIR/album.ini"
 	echo >> "$DIR/album.ini"
 	echo >> "$DIR/album.ini"
+	((SECTION_COUNT+=1))
 fi
 
+# Loop on album content
 SAVEIFS="$IFS"
 IFS=$(echo -en "\n\b")
 for media in $(ls "$DIR"/*.{jpg,jpeg,JPG,JPEG,mp4,avi,MP4,AVI} 2> /dev/null); do
@@ -52,6 +79,11 @@ for media in $(ls "$DIR"/*.{jpg,jpeg,JPG,JPEG,mp4,avi,MP4,AVI} 2> /dev/null); do
 		echo "#longitude = " >> "$DIR/album.ini"
 		echo >> "$DIR/album.ini"
 		echo >> "$DIR/album.ini"
+		((SECTION_COUNT+=1))
 	fi
 done
 IFS=$SAVEIFS
+
+# Print number of media added in 'album.ini'
+echo "$SECTION_COUNT media added to '$DIR/album.ini'."
+
