@@ -1346,6 +1346,8 @@ $(document).ready(function() {
 										.css("height", captionHeight + "px")
 										.css("color", captionColor);
 
+									$("#subalbums").show();
+
 									// check for overflow in album-caption class in order to adapt album caption height to the string length
 									// when diving into search subalbum, the whole album path is showed and it can be lengthy
 									while (true) {
