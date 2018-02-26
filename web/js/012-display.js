@@ -1208,14 +1208,14 @@ $(document).ready(function() {
 									thumbHeight = correctedAlbumThumbSize;
 								}
 
-								if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase)) {
+								if (PhotoFloat.isByDateCacheBase(theAlbumContainer.cacheBase)) {
 									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.dayAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
-								} else if (PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase)) {
+								} else if (PhotoFloat.isByGpsCacheBase(theAlbumContainer.cacheBase)) {
 									humanGeonames = PhotoFloat.pathJoin([Options.by_gps_string, randomMedia.geoname.country_name, randomMedia.geoname.region_name, randomMedia.geoname.place_name]);
 									titleName = PhotoFloat.pathJoin([humanGeonames, randomMedia.name]);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.gpsAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
-								} else if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+								} else if (PhotoFloat.isSearchCacheBase(theAlbumContainer.cacheBase)) {
 									titleName = randomMedia.albumName;
 									link = PhotoFloat.pathJoin(["#!", PhotoFloat.searchCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else {
@@ -1290,7 +1290,7 @@ $(document).ready(function() {
 								$($el).remove();
 
 								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
-								captionHeight = captionFontSize * 1.1;
+								captionHeight = parseInt(captionFontSize * 1.1) + 1;
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									heightfactor = 0;
 								else if (! Options.show_album_media_count)
@@ -1302,7 +1302,7 @@ $(document).ready(function() {
 								html = "<div class=\"album-caption";
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									html += " hidden";
-								html += "\">" + folder + "</div>";
+								html += "\" id=\"album-caption-" + PhotoFloat.hashCode(theAlbum.cacheBase) + "\">" + folder + "</div>";
 
 								html += "<div class=\"album-caption-count";
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
@@ -1338,8 +1338,7 @@ $(document).ready(function() {
 									$(".album-caption")
 										.css("width", correctedAlbumThumbSize + "px")
 										.css("font-size",  captionFontSize + "px")
-										.css("height", "1em")
-										// .css("height", captionHeight + "px")
+										.css("height", captionHeight + "px")
 										.css("color", captionColor);
 
 									$(".album-caption-count")
@@ -1351,9 +1350,9 @@ $(document).ready(function() {
 									// when diving into search subalbum, the whole album path is showed and it can be lengthy
 									while (true) {
 										overflow = false;
-										for (var indexSubalbums = 0; indexSubalbums < currentAlbum.subalbums.length; indexSubalbums ++) {
-											element = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase) + " .album-caption");
 											console.log(numSubAlbumsReady,theOriginalAlbumContainer.subalbums.length,element[0].offsetHeight,element[0].scrollHeight);
+										for (var indexSubalbums = 0; indexSubalbums < theAlbumContainer.subalbums.length; indexSubalbums ++) {
+											element = $("#album-caption-" + PhotoFloat.hashCode(theAlbumContainer.subalbums[indexSubalbums].cacheBase));
 											if (element.height() < element[0].scrollHeight) {
 												// the element have overflow
 												overflow = true;
@@ -1368,7 +1367,7 @@ $(document).ready(function() {
 
 								}
 							}, function error() {
-								theAlbumContainer.subalbums.splice(currentAlbum.subalbums.indexOf(theAlbum), 1);
+								theAlbumContainer.subalbums.splice(theAlbumContainer.subalbums.indexOf(theAlbum), 1);
 								theLink.remove();
 								subalbums.splice(subalbums.indexOf(theLink), 1);
 							});
