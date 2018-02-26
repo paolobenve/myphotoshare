@@ -473,6 +473,62 @@ class TreeWalker:
 		return name.split(' ')
 
 
+	# The dictionaries of stopwords for the user language
+	stopwords_for_album = {}
+	stopwords_for_word = {}
+
+
+	@staticmethod
+	def load_stopwords():
+		"""
+		Load the list of stopwords for the user language into the two sets `stopwords_for_album`
+		and `stopwords_for_word`. The words in the sets are normalized (no accents and diacritics).
+		The list of stopwords comes from https://github.com/stopwords-iso/stopwords-iso
+		"""
+		language = os.getenv('LANG')[:2]
+		if Options.config['language'] != '':
+			language = config['language']
+		message("stopwords", "Using language " + language, 4)
+
+		stopwords = []
+		stopwords_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", "scanner/resources/stopwords-iso.json")
+		message("stopwords", "Loading " + stopwords_file, 4)
+		with open(stopwords_file, "r") as stopwords_p:
+			stopwords = json.load(stopwords_p)
+
+		if language in stopwords:
+			words = " ".join(stopwords[language])
+			TreeWalker.stopwords_for_album = frozenset(TreeWalker.normalize_and_split_for_album_name(words))
+			TreeWalker.stopwords_for_word = frozenset(TreeWalker.normalize_and_split_for_word_list(words))
+		else:
+			message("stopwords", "No stopwords for language " + language, 4)
+		return
+
+
+	@staticmethod
+	def get_stopwords_for_album():
+		"""
+		Get the set of stopwords used when searching albums.
+		Loads the stopwords from resource file if necessary.
+		"""
+		if TreeWalker.stopwords_for_album == {}:
+			TreeWalker.load_stopwords()
+
+		return TreeWalker.stopwords_for_album
+
+
+	@staticmethod
+	def get_stopwords_for_word():
+		"""
+		Get the set of stopwords used when searching media.
+		Loads the stopwords from resource file if necessary.
+		"""
+		if TreeWalker.stopwords_for_word == {}:
+			TreeWalker.load_stopwords()
+
+		return TreeWalker.stopwords_for_word
+		
+
 	def add_media_to_tree_by_search(self, media):
 		words_for_search_album_name = self.prepare_for_tree_by_search(media)
 		for word in words_for_search_album_name:
@@ -491,17 +547,18 @@ class TreeWalker:
 				if album not in self.tree_by_search[word]["album_words"]:
 					self.tree_by_search[word]["album_words"].append(album)
 
+
 	def prepare_for_tree_by_search(self, media_or_album):
 		# add the given media or album to a temporary structure where media or albums are organized by search terms
 		# works on the words in the file/directory name and in album.ini's description, title, tags
 
 		# media_or_album.name must be the last item because the normalization will remove the file extension
-		phrase = media_or_album.title + " " + media_or_album.description + " " + media_or_album.tags + " " + media_or_album.name
+		phrase = media_or_album.title + " " + media_or_album.description + " " + "".join(media_or_album.tags) + " " + media_or_album.name
 
 		# media or album word list has the words with their case and accents
 		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
-		# get unique values
-		words_for_word_list = list(set(words_for_word_list))
+		# get unique values and filter out stopwords
+		words_for_word_list = list(frozenset(words_for_word_list) - TreeWalker.get_stopwords_for_word())
 		# remove empty elements
 		words_for_word_list = [x for x in words_for_word_list if x]
 
@@ -509,8 +566,8 @@ class TreeWalker:
 
 		# words for search album names are lower case and accentless
 		words_for_search_album_name = self.normalize_and_split_for_album_name(phrase)
-		# get unique values
-		words_for_search_album_name = list(set(words_for_search_album_name))
+		# get unique values and filter out stopwords
+		words_for_search_album_name = list(frozenset(words_for_search_album_name) - TreeWalker.get_stopwords_for_album())
 		# remove empty elements
 		words_for_search_album_name = [x for x in words_for_search_album_name if x]
 
