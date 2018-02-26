@@ -1112,8 +1112,9 @@ $(document).ready(function() {
 					if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
 						// search results: go to root album
 						upLink = savedLink ? savedLink : "#!/";
+						savedLink = '';
 					} else {
-					 	if (enterSubalbumCacheBase && enterSubalbumCacheBase.substr(enterSubalbumCacheBase.indexOf('/') + 1).length == currentAlbum.cacheBase.length) {
+					 	if (enterSubalbumCacheBase && enterSubalbumCacheBase.substr(enterSubalbumCacheBase.indexOf('/') + 1) == currentAlbum.cacheBase) {
 							// we are in the search result album, where we arrived with a click from the search result
 							upLink = "#!" + PhotoFloat.searchCacheBase;
 						} else {
@@ -1175,8 +1176,8 @@ $(document).ready(function() {
 						subalbumsElement.append(linkContainer);
 						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
 						// add the clicks
-						container.off('click').css("cursor", "pointer").on('click', {hash: subfolderHash}, function(ev) {
-							if (PhotoFloat.isSearchCacheBaseStrictly(ev.data.hash))
+						container.off('click').css("cursor", "pointer").on('click', {hash: subfolderHash, album: currentAlbum}, function(ev) {
+							if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase))
 								enterSubalbumCacheBase =  ev.data.hash;
 							window.location.href = "#!/" + ev.data.hash;
 						});
