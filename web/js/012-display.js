@@ -2351,56 +2351,60 @@ $(document).ready(function() {
 	/* Event listeners */
 
 	$(document).on('keydown', function(e) {
-		if (e.target.tagName.toLowerCase() != 'input' && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
-				//            arrow right                  n
-				swipeLeft(nextLink);
-				return false;
-			} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80) && currentMedia !== null) {
-				//                   arrow left                   p
-				swipeRight(prevLink);
-				return false;
-			} else if (e.keyCode === 27 && ! Modernizr.fullscreen && fullScreenStatus) {
-				//             esc
-				goFullscreen(e);
-				return false;
-			} else if (upLink && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
-				//                            esc            arrow up             page up
-				fromEscKey = true;
-				swipeDown(upLink);
-				return false;
-			} else if (mediaLink && currentMedia === null && (e.keyCode === 40 || e.keyCode === 34)) {
-				//                                              arrow down           page down
-				swipeUp(mediaLink);
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 68) {
-				//                                        d
-				$("#download-link")[0].click();
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 70) {
-				//                                        f
-				goFullscreen(e);
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 77) {
-				//                                        m
-				showMetadata(e);
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 79) {
-				//                                        o
-				$("#original-link")[0].click();
-				return false;
-			} else if (currentMedia !== null && hasGpsData(currentMedia) && e.keyCode === 83) {
-				//                                                                    s
-					$("#map-link")[0].click();
-				return false;
-			} else if (e.keyCode === 82) {
-				//               r
+		if (e.target.tagName.toLowerCase() != 'input') {
+			if (! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+				if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
+					//            arrow right                  n
+					swipeLeft(nextLink);
+					return false;
+				} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80) && currentMedia !== null) {
+					//                   arrow left                   p
+					swipeRight(prevLink);
+					return false;
+				} else if (e.keyCode === 27 && ! Modernizr.fullscreen && fullScreenStatus) {
+					//             esc
+					goFullscreen(e);
+					return false;
+				} else if (upLink && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
+					//                            esc            arrow up             page up
+					fromEscKey = true;
+					swipeDown(upLink);
+					return false;
+				} else if (mediaLink && currentMedia === null && (e.keyCode === 40 || e.keyCode === 34)) {
+					//                                              arrow down           page down
+					swipeUp(mediaLink);
+					return false;
+				} else if (currentMedia !== null && e.keyCode === 68) {
+					//                                        d
+					$("#download-link")[0].click();
+					return false;
+				} else if (currentMedia !== null && e.keyCode === 70) {
+					//                                        f
+					goFullscreen(e);
+					return false;
+				} else if (currentMedia !== null && e.keyCode === 77) {
+					//                                        m
+					showMetadata(e);
+					return false;
+				} else if (currentMedia !== null && e.keyCode === 79) {
+					//                                        o
+					$("#original-link")[0].click();
+					return false;
+				} else if (currentMedia !== null && hasGpsData(currentMedia) && e.keyCode === 83) {
+					//                                                                    s
+						$("#map-link")[0].click();
+					return false;
+				}
+			}
+
+			if (e.keyCode === 69 && ! e.ctrlKey && ! e.shiftKey) {
+				//        e, possibly with alt
 					$("#menu-icon")[0].click();
 				return false;
-			} else
-				return true;
-		} else
+			}
+
 			return true;
+		}
 	});
 	$("#album-view").on('mousewheel', swipeOnWheel);
 
