@@ -270,6 +270,8 @@
 							if (PhotoFloat.searchWordsFromJsonFile.indexOf(SearchWordsFromUserNormalized[i]) > -1) {
 								albumHashes.push([Options.by_search_string + Options.cache_folder_separator + SearchWordsFromUserNormalized[i]]);
 								numSubAlbumsToGet ++;
+							} else {
+								albumHashes.push([]);
 							}
 					}
 
@@ -343,12 +345,16 @@
 											searchResultsAlbumFinal.media = searchResultsMedia[0];
 											searchResultsAlbumFinal.subalbums = searchResultsSubalbums[0];
 											for (indexWords1 = 1; indexWords1 <= lastIndex; indexWords1 ++) {
-												searchResultsAlbumFinal.media = Options.search_any_word ?
-													PhotoFloat.union(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]) :
-													PhotoFloat.intersect(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]);
-												searchResultsAlbumFinal.subalbums = Options.search_any_word ?
-													PhotoFloat.union(searchResultsAlbumFinal.subalbums, searchResultsSubalbums[indexWords1]) :
-													PhotoFloat.intersect(searchResultsAlbumFinal.subalbums, searchResultsSubalbums[indexWords1]);
+												if (indexWords1 in searchResultsMedia) {
+													searchResultsAlbumFinal.media = Options.search_any_word ?
+														PhotoFloat.union(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]) :
+														PhotoFloat.intersect(searchResultsAlbumFinal.media, searchResultsMedia[indexWords1]);
+												}
+												if (indexWords1 in searchResultsSubalbums) {
+													searchResultsAlbumFinal.subalbums = Options.search_any_word ?
+														PhotoFloat.union(searchResultsAlbumFinal.subalbums, searchResultsSubalbums[indexWords1]) :
+														PhotoFloat.intersect(searchResultsAlbumFinal.subalbums, searchResultsSubalbums[indexWords1]);
+												}
 											}
 
 											if (lastIndex != SearchWordsFromUser.length - 1) {
@@ -368,8 +374,8 @@
 														// inside words
 														for (indexWordsLeft = lastIndex + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
 															normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words);
-															if (! normalizedWords.every(function(element) {
-																return normalizedWords.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
+															if (! normalizedWords.some(function(element) {
+																return element.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
 															})) {
 																match = false;
 																break;
@@ -395,8 +401,8 @@
 														// inside words
 														for (indexWordsLeft = lastIndex + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
 															normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
-															if (! normalizedWords.every(function(element) {
-																return normalizedWords.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
+															if (! normalizedWords.some(function(element) {
+																return element.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
 															})) {
 																match = false;
 																break;
@@ -530,7 +536,7 @@
 
 	PhotoFloat.normalize = function(object) {
 		var string = object;
-		if (typeof object !== "string")
+		if (typeof object  === "object")
 			string = string.join('|');
 
 		if (! Options.search_case_sensitive)
