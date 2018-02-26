@@ -1352,7 +1352,6 @@ $(document).ready(function() {
 									// when diving into search subalbum, the whole album path is showed and it can be lengthy
 									while (true) {
 										overflow = false;
-											console.log(numSubAlbumsReady,theOriginalAlbumContainer.subalbums.length,element[0].offsetHeight,element[0].scrollHeight);
 										for (var indexSubalbums = 0; indexSubalbums < theAlbumContainer.subalbums.length; indexSubalbums ++) {
 											element = $("#album-caption-" + PhotoFloat.hashCode(theAlbumContainer.subalbums[indexSubalbums].cacheBase));
 											if (element.height() < element[0].scrollHeight) {
@@ -2390,7 +2389,6 @@ $(document).ready(function() {
 	$("#album-view").on('mousewheel', swipeOnWheel);
 
 	function swipeOnWheel(event, delta) {
-		//~ console.log(delta, event.delta, event.deltaX, event.deltaY, event.deltaFactor);
 		if (currentMedia === null)
 			return true;
 		if (delta < 0) {
