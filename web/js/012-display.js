@@ -1076,13 +1076,13 @@ $(document).ready(function() {
 					imageLink = $("<a href=\"#!/" + hash + "\"></a>");
 					imageLink.append(image);
 					media.push(imageLink);
-					(function(theLink, theImage, theAlbum) {
+					(function(theLink, theImage) {
 						theImage.error(function() {
 							media.splice(media.indexOf(theLink), 1);
 							theLink.remove();
-							theAlbum.media.splice(theAlbum.media.indexOf(theImage.get(0).media), 1);
+							currentAlbum.media.splice(currentAlbum.media.indexOf(theImage.get(0).media), 1);
 						});
-					})(imageLink, image, currentAlbum);
+					})(imageLink, image);
 				}
 
 				thumbsElement = $("#thumbs");
@@ -1179,10 +1179,10 @@ $(document).ready(function() {
 						});
 
 						//////////////////// begin anonymous function /////////////////////
-						//      })(currentAlbum, currentAlbum.subalbums[i], image, container);
-						(function(theAlbumContainer, theAlbum, theImage, theLink) {
-							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,              subalbum);
-							photoFloat.pickRandomMedia(theAlbum, theAlbumContainer, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
+						//      })(currentAlbum.subalbums[i], image, container);
+						(function(theSubalbum, theImage, theLink) {
+							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,            subalbum);
+							photoFloat.pickRandomMedia(theSubalbum, currentAlbum, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
 								var htmlText;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
@@ -1209,14 +1209,14 @@ $(document).ready(function() {
 									thumbHeight = correctedAlbumThumbSize;
 								}
 
-								if (PhotoFloat.isByDateCacheBase(theAlbumContainer.cacheBase)) {
+								if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase)) {
 									titleName = PhotoFloat.pathJoin([randomMedia.dayAlbum, randomMedia.name]);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.dayAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
-								} else if (PhotoFloat.isByGpsCacheBase(theAlbumContainer.cacheBase)) {
+								} else if (PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase)) {
 									humanGeonames = PhotoFloat.pathJoin([Options.by_gps_string, randomMedia.geoname.country_name, randomMedia.geoname.region_name, randomMedia.geoname.place_name]);
 									titleName = PhotoFloat.pathJoin([humanGeonames, randomMedia.name]);
 									link = PhotoFloat.pathJoin(["#!", randomMedia.gpsAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
-								} else if (PhotoFloat.isSearchCacheBase(theAlbumContainer.cacheBase)) {
+								} else if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 									titleName = randomMedia.albumName;
 									link = PhotoFloat.pathJoin(["#!", PhotoFloat.searchCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else {
@@ -1303,7 +1303,7 @@ $(document).ready(function() {
 								html = "<div class=\"album-caption";
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									html += " hidden";
-								html += "\" id=\"album-caption-" + PhotoFloat.hashCode(theAlbum.cacheBase) + "\">" + folder + "</div>";
+								html += "\" id=\"album-caption-" + PhotoFloat.hashCode(theSubalbum.cacheBase) + "\">" + folder + "</div>";
 
 								html += "<div class=\"album-caption-count";
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
@@ -1353,9 +1353,9 @@ $(document).ready(function() {
 									// when diving into search subalbum, the whole album path is showed and it can be lengthy
 									while (true) {
 										overflow = false;
-										for (var indexSubalbums = 0; indexSubalbums < theAlbumContainer.subalbums.length; indexSubalbums ++) {
-											// element = $("#album-caption-" + PhotoFloat.hashCode(theAlbumContainer.subalbums[indexSubalbums].cacheBase));
-											element = document.getElementById("album-caption-" + PhotoFloat.hashCode(theAlbumContainer.subalbums[indexSubalbums].cacheBase));
+										for (var indexSubalbums = 0; indexSubalbums < currentAlbum.subalbums.length; indexSubalbums ++) {
+											// element = $("#album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
+											element = document.getElementById("album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
 											if (element.scrollHeight > element.clientHeight) {
 												// the element have overflow
 												overflow = true;
@@ -1370,12 +1370,12 @@ $(document).ready(function() {
 
 								}
 							}, function error() {
-								theAlbumContainer.subalbums.splice(theAlbumContainer.subalbums.indexOf(theAlbum), 1);
+								currentAlbum.subalbums.splice(currentAlbum.subalbums.indexOf(theSubalbum), 1);
 								theLink.remove();
 								subalbums.splice(subalbums.indexOf(theLink), 1);
 							});
 							i ++; i --;
-						})(currentAlbum, currentAlbum.subalbums[i], image, container);
+						})(currentAlbum.subalbums[i], image, container);
 						//////////////////// end anonymous function /////////////////////
 					}
 
