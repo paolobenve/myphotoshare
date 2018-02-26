@@ -389,7 +389,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.album-names").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length === 0 || ! PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase))) {
+		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length === 0 && currentAlbum.media.length <= 1)) {
 			$("ul#right-menu li.media-count").addClass("hidden");
 		} else {
 			$("ul#right-menu li.media-count").removeClass("hidden");
@@ -1190,7 +1190,7 @@ $(document).ready(function() {
 						(function(theSubalbum, theImage, theLink) {
 							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,            subalbum);
 							photoFloat.pickRandomMedia(theSubalbum, currentAlbum, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
-								var htmlText;
+								var htmlText, difference;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
 								var heightfactor;
@@ -1364,10 +1364,14 @@ $(document).ready(function() {
 											// element = $("#album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
 											element = document.getElementById("album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
 											if (element.scrollHeight > element.clientHeight) {
+												console.log(element.scrollHeight, element.clientHeight);
 												// the element have overflow
 												overflow = true;
-												$(".album-caption").css("height", (parseInt($(".album-caption").css("height")) + 5) + 'px');
-												$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + 5) + 'px');
+												difference = element.scrollHeight - element.clientHeight;
+												if (! Options.show_album_media_count)
+													difference += 10;
+												$(".album-caption").css("height", (parseInt($(".album-caption").css("height")) + difference) + 'px');
+												$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + difference) + 'px');
 												break;
 											}
 										}
