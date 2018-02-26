@@ -1177,6 +1177,7 @@ $(document).ready(function() {
 							enterSubalbumCacheBase =  ev.data.hash;
 							window.location.href = "#!/" + ev.data.hash;
 						});
+
 						//////////////////// begin anonymous function /////////////////////
 						//      })(currentAlbum, currentAlbum.subalbums[i], image, container);
 						(function(theAlbumContainer, theAlbum, theImage, theLink) {

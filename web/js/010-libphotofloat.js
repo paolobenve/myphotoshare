@@ -611,6 +611,7 @@
 			]);
 		return hash;
 	};
+
 	PhotoFloat.mediaHashFolder = function(album, media) {
 		var hash;
 		hash = media.cacheBase;
