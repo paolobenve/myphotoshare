@@ -215,9 +215,9 @@
 
 				$("ul#right-menu #search-field").attr("value", wordsStringOriginal);
 				wordsString = PhotoFloat.normalize(wordsString);
-				$("ul#right-menu").addClass("expand");
 				SearchWordsFromUser = wordsString.split('_');
 				SearchWordsFromUserNormalized = wordsStringNormalized.split('_');
+				$("ul#right-menu").addClass("expand");
 			}
 		}
 		if (mediaHash)
