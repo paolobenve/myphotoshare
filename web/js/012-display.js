@@ -1104,7 +1104,8 @@ $(document).ready(function() {
 						mediaLink = "#!/" + currentAlbum.cacheBase;
 					firstEscKey = true;
 				}
-				upLink = "";
+
+				upLink = "#!/";
 				if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 					// we somewhere inside a subalbum of a search result
 					parentCacheBase = PhotoFloat.pathJoin([
@@ -1113,7 +1114,8 @@ $(document).ready(function() {
 					]);
 					if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
 						// search results: go to root album
-						upLink = savedLink ? savedLink : "";
+						if (savedLink)
+							upLink = savedLink;
 					} else {
 					 	if (enterSubalbumCacheBase && enterSubalbumCacheBase.substr(enterSubalbumCacheBase.indexOf('/') + 1) == currentAlbum.cacheBase) {
 							// we are in the search result album, where we arrived with a click from the search result
@@ -1760,7 +1762,6 @@ $(document).ready(function() {
 
 
 		if (currentAlbum.media.length == 1) {
-			upLink = "";
 			if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
 				upLink = "#!/" + currentAlbum.parentCacheBase;
 			else {
