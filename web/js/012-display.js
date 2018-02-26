@@ -1103,21 +1103,23 @@ $(document).ready(function() {
 					firstEscKey = true;
 				}
 				upLink = "";
-				if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
-					// search results: go to root album
-					upLink = savedLink ? savedLink : "#!/";
-				} else if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+				if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 					// we somewhere inside a subalbum of a search result
 					parentCacheBase = PhotoFloat.pathJoin([
 						PhotoFloat.searchCacheBase,
 						currentAlbum.parentCacheBase
 					]);
-				 	if (enterSubalbumCacheBase && enterSubalbumCacheBase.substr(enterSubalbumCacheBase.indexOf('/') + 1).length == currentAlbum.cacheBase.length) {
-						// we are in the search result album, where we arrived with a click from the search result
-						upLink = "#!" + PhotoFloat.searchCacheBase;
+					if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
+						// search results: go to root album
+						upLink = savedLink ? savedLink : "#!/";
 					} else {
-						// we are more deeply inside
-						upLink = "#!" + parentCacheBase;
+					 	if (enterSubalbumCacheBase && enterSubalbumCacheBase.substr(enterSubalbumCacheBase.indexOf('/') + 1).length == currentAlbum.cacheBase.length) {
+							// we are in the search result album, where we arrived with a click from the search result
+							upLink = "#!" + PhotoFloat.searchCacheBase;
+						} else {
+							// we are more deeply inside
+							upLink = "#!" + parentCacheBase;
+						}
 					}
 				} else if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
 					enterSubalbumCacheBase = null;
@@ -1174,7 +1176,8 @@ $(document).ready(function() {
 						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
 						// add the clicks
 						container.off('click').css("cursor", "pointer").on('click', {hash: subfolderHash}, function(ev) {
-							enterSubalbumCacheBase =  ev.data.hash;
+							if (PhotoFloat.isSearchCacheBaseStrictly(ev.data.hash))
+								enterSubalbumCacheBase =  ev.data.hash;
 							window.location.href = "#!/" + ev.data.hash;
 						});
 

@@ -582,7 +582,7 @@
 	};
 
 	PhotoFloat.isSearchCacheBaseStrictly = function(string) {
-		return string == Options.by_search_string || string.indexOf(PhotoFloat.bySearchStringWithTrailingSeparator) === 0;
+		return string == Options.by_search_string || string.indexOf(PhotoFloat.bySearchStringWithTrailingSeparator) === 0 && string.indexOf('/') === -1;
 	};
 
 	PhotoFloat.isSearchCacheBase = function(string) {
