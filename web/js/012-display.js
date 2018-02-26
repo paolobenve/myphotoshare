@@ -804,6 +804,8 @@ $(document).ready(function() {
 			setBooleanCookie("mediaDateReverseSortRequested", Options.default_media_date_reverse_sort);
 		if (getBooleanCookie("mediaNameReverseSortRequested") === null)
 			setBooleanCookie("mediaNameReverseSortRequested", false);
+
+		$("#menu-icon").attr("title", _t("#menu-icon-title"));
 	}
 
 	function sortAlbumsMedia() {
@@ -2387,6 +2389,10 @@ $(document).ready(function() {
 				//                                                                    s
 					$("#map-link")[0].click();
 				return false;
+			} else if (e.keyCode === 82) {
+				//               r
+					$("#menu-icon")[0].click();
+				return false;
 			} else
 				return true;
 		} else
@@ -2761,13 +2767,14 @@ $(document).ready(function() {
 		}
 	}
 
-	$("#menu-icon").on("click", function(ev) {
+	function toggleMenu(ev) {
 		$("ul#right-menu").toggleClass("expand");
 		if ($("ul#right-menu").hasClass("expand"))
 			$("#search-field").focus();
 		updateMenu();
-		return false;
-	});
+	}
+
+	$("#menu-icon").on("click", toggleMenu);
 
 	$(window).hashchange(function() {
 		$("#loading").show();
