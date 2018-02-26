@@ -1284,10 +1284,10 @@ $(document).ready(function() {
 									folder = subalbum.path;
 								}
 
-								// get the value in style sheet (element with that class doesn't exist in DOM
-								var $el = $('<div class="album-caption"></div>');
-								$($el).appendTo('body');
-								$($el).remove();
+								// // get the value in style sheet (element with that class doesn't exist in DOM)
+								// var $el = $('<div class="album-caption"></div>');
+								// $($el).appendTo('body');
+								// $($el).remove();
 
 								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
 								captionHeight = parseInt(captionFontSize * 1.1) + 1;
