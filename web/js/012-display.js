@@ -1113,8 +1113,7 @@ $(document).ready(function() {
 					]);
 					if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
 						// search results: go to root album
-						upLink = savedLink ? savedLink : "#!/";
-						savedLink = '';
+						upLink = savedLink ? savedLink : "";
 					} else {
 					 	if (enterSubalbumCacheBase && enterSubalbumCacheBase.substr(enterSubalbumCacheBase.indexOf('/') + 1) == currentAlbum.cacheBase) {
 							// we are in the search result album, where we arrived with a click from the search result
