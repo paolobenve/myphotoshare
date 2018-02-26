@@ -1353,8 +1353,9 @@ $(document).ready(function() {
 									while (true) {
 										overflow = false;
 										for (var indexSubalbums = 0; indexSubalbums < theAlbumContainer.subalbums.length; indexSubalbums ++) {
-											element = $("#album-caption-" + PhotoFloat.hashCode(theAlbumContainer.subalbums[indexSubalbums].cacheBase));
-											if (element.height() < element[0].scrollHeight) {
+											// element = $("#album-caption-" + PhotoFloat.hashCode(theAlbumContainer.subalbums[indexSubalbums].cacheBase));
+											element = document.getElementById("album-caption-" + PhotoFloat.hashCode(theAlbumContainer.subalbums[indexSubalbums].cacheBase));
+											if (element.scrollHeight > element.clientHeight) {
 												// the element have overflow
 												overflow = true;
 												$(".album-caption").css("height", (parseInt($(".album-caption").css("height")) + 5) + 'px');
