@@ -637,6 +637,7 @@
 		}
 		return result;
 	};
+
 	PhotoFloat.mediaPath = function(album, media, size) {
 		var suffix = Options.cache_folder_separator, hash, rootString = "root-";
 		if (
@@ -650,7 +651,7 @@
 				actualSize = Math.round(actualSize * Options.mobile_thumbnail_factor);
 				albumThumbSize = Math.round(albumThumbSize * Options.mobile_thumbnail_factor);
 				mediaThumbSize = Math.round(mediaThumbSize * Options.mobile_thumbnail_factor);
-		  }
+			}
 			suffix += actualSize.toString();
 			if (size == Options.album_thumb_size) {
 				suffix += "a";
@@ -687,15 +688,18 @@
 		else
 			return PhotoFloat.pathJoin([Options.server_cache_path, hash]);
 	};
+
 	PhotoFloat.originalMediaPath = function(media) {
 		return media.albumName;
 	};
+
 	PhotoFloat.trimExtension = function(name) {
 		var index = name.lastIndexOf(".");
 		if (index !== -1)
 			return name.substring(0, index);
 		return name;
 	};
+
 	PhotoFloat.cleanHash = function(hash) {
 		while (hash.length) {
 			if (hash.charAt(0) === "#")
