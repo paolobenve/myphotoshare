@@ -2483,7 +2483,7 @@ $(document).ready(function() {
 		if (Options.search_accent_sensitive)
 			searchOptions += 'a' + Options.search_options_separator;
 		bySearchViewLink += searchOptions + searchTerms;
-		window.location.hash = bySearchViewLink;
+		window.location.href = bySearchViewLink;
 	});
 	$('#search-field').keypress(function(ev) {
 		if (ev.which == 13) {
