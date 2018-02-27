@@ -446,6 +446,7 @@ class TreeWalker:
 	def minimal_normalize(phrase):
 		# normalize the name without extension and remove the numbers
 
+		# TODO: Potential bug. If phrase contains a dot, the text after the last dot occurence is stripped...
 		name = os.path.splitext(phrase)[0]
 		# convert non-alphanumeric characters to space
 		name = "".join([c if c.isalnum() else " " for c in name])
@@ -551,7 +552,7 @@ class TreeWalker:
 		# works on the words in the file/directory name and in album.ini's description, title, tags
 
 		# media_or_album.name must be the last item because the normalization will remove the file extension
-		phrase = media_or_album.title + " " + media_or_album.description + " " + "".join(media_or_album.tags) + " " + media_or_album.name
+		phrase = media_or_album.title + " " + media_or_album.description + " " + " ".join(media_or_album.tags) + " " + media_or_album.name
 
 		# media or album word list has the words with their case and accents
 		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
