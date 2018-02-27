@@ -622,14 +622,6 @@
 		return hash;
 	};
 
-	PhotoFloat.mediaHashFolder = function(album, media) {
-		var hash;
-		hash = media.cacheBase;
-		if (PhotoFloat.isByDateCacheBase(hash) || PhotoFloat.isByGpsCacheBase(hash)) {
-			hash = PhotoFloat.pathJoin([media.foldersAlbum.cacheBase, media.cacheBase]);
-		}
-		return hash;
-	};
 	PhotoFloat.pathJoin = function(pathArr) {
 		var result = '';
 		for (var i = 0; i < pathArr.length; ++i) {
@@ -728,7 +720,6 @@
 	PhotoFloat.prototype.cacheBase = PhotoFloat.cacheBase;
 	PhotoFloat.prototype.mediaHash = PhotoFloat.mediaHash;
 	PhotoFloat.prototype.mediaHashURIEncoded = PhotoFloat.mediaHashURIEncoded;
-	PhotoFloat.prototype.mediaHashFolder = PhotoFloat.mediaHashFolder;
 	PhotoFloat.prototype.pathJoin = PhotoFloat.pathJoin;
 	PhotoFloat.prototype.mediaPath = PhotoFloat.mediaPath;
 	PhotoFloat.prototype.originalMediaPath = PhotoFloat.originalMediaPath;
@@ -736,4 +727,5 @@
 	PhotoFloat.prototype.cleanHash = PhotoFloat.cleanHash;
 	/* expose class globally */
 	window.PhotoFloat = PhotoFloat;
+	PhotoFloat.searchAndSubalbumHash = this.searchAndSubalbumHash;
 }());
