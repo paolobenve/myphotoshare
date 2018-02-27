@@ -5,6 +5,7 @@
 		this.geotaggedPhotosFound = null;
 		this.searchWordsFromJsonFile = [];
 
+		PhotoFloat.searchAndSubalbumHash = '';
 		PhotoFloat.searchWordsFromJsonFile = this.searchWordsFromJsonFile;
 	}
 
@@ -18,7 +19,7 @@
 		}
 		if (Object.prototype.toString.call(thisAlbum).slice(8, -1) === "String") {
 			if (PhotoFloat.isSearchCacheBase(thisAlbum) && thisAlbum.indexOf('/') != -1)
-				cacheKey = thisAlbum.substr(thisAlbum.indexOf('/') + 1);
+				cacheKey = thisAlbum.substr(0, thisAlbum.indexOf('/'));
 			else
 				cacheKey = thisAlbum;
 		} else
@@ -42,7 +43,7 @@
 						// root of search albums: build the word list
 						for (i = 0; i < theAlbum.subalbums.length; ++i)
 							PhotoFloat.searchWordsFromJsonFile.push(theAlbum.subalbums[i].path);
-					} else if (! PhotoFloat.isSearchCacheBaseStrictly(cacheKey)) {
+					} else if (! PhotoFloat.isSearchCacheBase(cacheKey)) {
 						for (i = 0; i < theAlbum.subalbums.length; ++i)
 							theAlbum.subalbums[i].parent = theAlbum;
 						for (i = 0; i < theAlbum.media.length; ++i)
@@ -165,24 +166,25 @@
 				albumHash = hashParts[0];
 				if (PhotoFloat.isFolderCacheBase(hashParts[1])) {
 					foldersHash = hashParts[1];
+				} else if (PhotoFloat.isSearchCacheBase(hashParts[1])) {
+					PhotoFloat.searchAndSubalbumHash = hashParts[1];
+					// compare searchAndSubalbumHash with the album: if the album is contained strictly in searchAndSubalbumHash than we have reached the search album
 				} else {
 					mediaHash = hashParts[1];
 				}
 			} else if (slashCount == 2) {
 				// virtual folder hash: by date/gps/search album, folders album, media
+				albumHash = hashParts[0];
 				if (PhotoFloat.isFolderCacheBase(hashParts[1])) {
-					albumHash = hashParts[0];
 					foldersHash = hashParts[1];
-					mediaHash = hashParts[2];
-				} else {
-					albumHash = hashParts[0];
-					foldersHash = hashParts[1];
-					mediaHash = hashParts[2];
+				} else if (PhotoFloat.isSearchCacheBase(hashParts[1])) {
+					PhotoFloat.searchAndSubalbumHash = hashParts[1];
 				}
+				mediaHash = hashParts[2];
 			}
 		}
 
-		if (PhotoFloat.isSearchCacheBaseStrictly(albumHash)) {
+		if (PhotoFloat.isSearchCacheBase(albumHash)) {
 			albumHashToGet = albumHash;
 		} else if (PhotoFloat.isSearchCacheBase(albumHash)) {
 			albumHashToGet = PhotoFloat.pathJoin([albumHash, foldersHash]);
@@ -195,7 +197,7 @@
 		SearchWordsFromUserNormalized = [];
 		if (albumHash) {
 			albumHash = decodeURI(albumHash);
-			if (PhotoFloat.isSearchCacheBaseStrictly(albumHash) && albumHash != Options.by_search_string) {
+			if (PhotoFloat.isSearchCacheBase(albumHash) && albumHash != Options.by_search_string) {
 				var wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
 				var wordsAndOptions = wordsWithOptionsString.split(Options.search_options_separator);
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
@@ -222,8 +224,21 @@
 			mediaHash = decodeURI(mediaHash);
 		if (foldersHash)
 			foldersHash = decodeURI(foldersHash);
+		if (PhotoFloat.searchAndSubalbumHash)
+			PhotoFloat.searchAndSubalbumHash = decodeURI(PhotoFloat.searchAndSubalbumHash);
 
-		if (albumHash && foldersHash === null && SearchWordsFromUser.length > 0 && ! this.albumCache.hasOwnProperty(albumHash)) {
+		if (this.albumCache.hasOwnProperty(albumHashToGet)) {
+			PhotoFloat.selectMedia(this.albumCache[albumHashToGet], foldersHash, mediaHash, callback);
+		} else if (! PhotoFloat.isSearchCacheBase(albumHash) || SearchWordsFromUser.length === 0) {
+			this.getAlbum(
+				albumHashToGet,
+				function(theAlbum) {
+					PhotoFloat.selectMedia(theAlbum, foldersHash, mediaHash, callback);
+				},
+				error
+			);
+		} else {
+			// it's a search!
 			self = this;
 			// get the search root album before getting the search words ones
 			this.getAlbum(
@@ -421,9 +436,10 @@
 											}
 											searchResultsAlbumFinal.numMediaInAlbum = searchResultsAlbumFinal.media.length;
 											searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
-											if (! searchResultsAlbumFinal.cacheBase in self.albumCache)
+											if (! self.albumCache.hasOwnProperty(searchResultsAlbumFinal.cacheBase))
 												self.albumCache[searchResultsAlbumFinal.cacheBase] = searchResultsAlbumFinal;
-											PhotoFloat.selectMedia(searchResultsAlbumFinal, foldersHash, mediaHash, callback);
+
+											PhotoFloat.selectMedia(searchResultsAlbumFinal, null, mediaHash, callback);
 										}
 									},
 									error,
@@ -436,18 +452,6 @@
 				},
 				error
 			);
-		} else {
-			if (this.albumCache.hasOwnProperty(albumHashToGet)) {
-				PhotoFloat.selectMedia(this.albumCache[albumHashToGet], foldersHash, mediaHash, callback);
-			} else {
-				this.getAlbum(
-					albumHashToGet,
-					function(theAlbum) {
-						PhotoFloat.selectMedia(theAlbum, foldersHash, mediaHash, callback);
-					},
-					error
-				);
-			}
 		}
 	};
 
@@ -470,7 +474,7 @@
 				$("#album-view").fadeIn(3500);
 				$("#error-text-image").fadeIn(200);
 				$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
-				window.location.hash = theAlbum.cacheBase;
+				window.location.href = "#!" + theAlbum.cacheBase;
 				i = -1;
 			}
 		}
@@ -592,14 +596,9 @@
 		return string == Options.folders_string || string.indexOf(PhotoFloat.foldersStringWithTrailingSeparator) === 0;
 	};
 
-	PhotoFloat.isSearchCacheBaseStrictly = function(string) {
-		return string == Options.by_search_string || string.indexOf(PhotoFloat.bySearchStringWithTrailingSeparator) === 0 && string.indexOf('/') === -1;
-	};
-
 	PhotoFloat.isSearchCacheBase = function(string) {
-		return PhotoFloat.isSearchCacheBaseStrictly(string) || PhotoFloat.searchCacheBase !== '';
+		return string.indexOf(PhotoFloat.bySearchStringWithTrailingSeparator) === 0;
 	};
-
 
 	PhotoFloat.mediaHashURIEncoded = function(album, media) {
 		var hash;
@@ -609,10 +608,10 @@
 				media.foldersCacheBase,
 				media.cacheBase
 			]);
-		else if (PhotoFloat.isSearchCacheBase(album.cacheBase) && ! PhotoFloat.isSearchCacheBaseStrictly(album.cacheBase))
+		else if (PhotoFloat.searchAndSubalbumHash)
 			hash = PhotoFloat.pathJoin([
-				PhotoFloat.searchCacheBase,
-				media.foldersCacheBase,
+				album.cacheBase,
+				PhotoFloat.searchAndSubalbumHash,
 				media.cacheBase
 			]);
 		else
