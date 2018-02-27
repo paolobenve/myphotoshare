@@ -622,7 +622,6 @@
 		var hash;
 		hash = media.cacheBase;
 		if (PhotoFloat.isByDateCacheBase(hash) || PhotoFloat.isByGpsCacheBase(hash)) {
-			media.completeName = PhotoFloat.pathJoin([media.foldersAlbum, media.name]);
 			hash = PhotoFloat.pathJoin([media.foldersAlbum.cacheBase, media.cacheBase]);
 		}
 		return hash;
