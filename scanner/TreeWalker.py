@@ -485,13 +485,11 @@ class TreeWalker:
 		and `stopwords_for_word`. The words in the sets are normalized (no accents and diacritics).
 		The list of stopwords comes from https://github.com/stopwords-iso/stopwords-iso
 		"""
-		language = os.getenv('LANG')[:2]
-		if Options.config['language'] != '':
-			language = config['language']
+		language = Options.config['language'] if Options.config['language'] != '' else os.getenv('LANG')[:2]
 		message("stopwords", "Using language " + language, 4)
 
 		stopwords = []
-		stopwords_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", "scanner/resources/stopwords-iso.json")
+		stopwords_file = os.path.join(os.path.dirname(__file__), "resources/stopwords-iso.json")
 		message("stopwords", "Loading " + stopwords_file, 4)
 		with open(stopwords_file, "r") as stopwords_p:
 			stopwords = json.load(stopwords_p)
