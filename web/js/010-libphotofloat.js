@@ -4,9 +4,7 @@
 		this.albumCache = [];
 		this.geotaggedPhotosFound = null;
 		this.searchWordsFromJsonFile = [];
-		this.searchCacheBase = '';
 
-		PhotoFloat.searchCacheBase = this.searchCacheBase;
 		PhotoFloat.searchWordsFromJsonFile = this.searchWordsFromJsonFile;
 	}
 
@@ -186,13 +184,10 @@
 
 		if (PhotoFloat.isSearchCacheBaseStrictly(albumHash)) {
 			albumHashToGet = albumHash;
-			PhotoFloat.searchCacheBase = encodeURIComponent(albumHash);
 		} else if (PhotoFloat.isSearchCacheBase(albumHash)) {
 			albumHashToGet = PhotoFloat.pathJoin([albumHash, foldersHash]);
-			PhotoFloat.searchCacheBase = encodeURIComponent(albumHash);
 		} else {
 			albumHashToGet = albumHash;
-			PhotoFloat.searchCacheBase = '';
 		}
 
 		albumHashes = [];
@@ -248,7 +243,6 @@
 					searchResultsAlbumFinal.ancestorsCacheBase.push(wordsWithOptionsString);
 					searchResultsAlbumFinal.path = searchResultsAlbumFinal.cacheBase.replace(Options.cache_folder_separator, "/");
 					searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
-					// PhotoFloat.searchCacheBase = albumHash;
 					if (! Options.search_any_word)
 						// when serching all the words, getting the first album is enough, media that do not match the other words will be escluded later
 						lastIndex = 0;
