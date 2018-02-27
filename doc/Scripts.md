@@ -66,4 +66,28 @@ local files generated!
 
 `album.ini` files contain user-defined metadata. The user can create them into album directories with media. Running this script with a directory parameter creates a default `album.ini` file in that directory with sections for all media found.
 
-If an `album.ini` file already exists in the directory, it isn't change and the script aborts with error code `2`. When an error occurs, the script exits with error code `1`.
+The metadata added is commented in each section and you only have to uncomment it and add values:
+```ini
+#[DEFAULT]
+#tags =
+#date =
+#latitude =
+#longitude =
+#place_name =
+#region_name =
+#country_name =
+
+[album]
+#title = ALBUM_NAME
+#description =
+#tags =
+
+[MEDIA_FILENAME]
+#title = MEDIA_FILENAME_WITHOUT_EXTENSION
+#description =
+#tags =
+#latitude =
+#longitude =
+```
+
+If an `album.ini` file already exists in the directory, new media found in the album is added to `album.ini`. When an error occurs, the script exits with error code `1`.
