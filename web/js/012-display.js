@@ -1005,11 +1005,6 @@ $(document).ready(function() {
 					height = currentAlbum.media[i].metadata.size[1];
 					thumbHash = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize);
 
-					if (PhotoFloat.isByDateCacheBase(thumbHash) || PhotoFloat.isByGpsCacheBase(thumbHash)) {
-						currentAlbum.media[i].completeName = PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
-						thumbHash = currentAlbum.cacheBase + Options.cache_folder_separator + currentAlbum.media[i].cacheBase;
-					}
-
 					if (Options.media_thumb_type == "fixed_height") {
 						if (height < Options.media_thumb_size) {
 							thumbHeight = height;
