@@ -1003,7 +1003,7 @@ $(document).ready(function() {
 				for (i = 0; i < currentAlbum.media.length; ++i) {
 					width = currentAlbum.media[i].metadata.size[0];
 					height = currentAlbum.media[i].metadata.size[1];
-					thumbHash = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize, thumbnailSize);
+					thumbHash = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize);
 
 					if (PhotoFloat.isByDateCacheBase(thumbHash) || PhotoFloat.isByGpsCacheBase(thumbHash)) {
 						currentAlbum.media[i].completeName = PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
@@ -1192,7 +1192,7 @@ $(document).ready(function() {
 							photoFloat.pickRandomMedia(theSubalbum, currentAlbum, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
 								var htmlText, difference;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
-								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
+								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size);
 								var heightfactor;
 
 								PhotoFloat.subalbumIndex ++;
@@ -1628,7 +1628,7 @@ $(document).ready(function() {
 		return chosenMedia;
 	}
 
-	function chooseThumbnail(album, media, thumbnailSize, calculatedThumbnailSize) {
+	function chooseThumbnail(album, media, thumbnailSize) {
 		return photoFloat.mediaPath(album, media, thumbnailSize);
 	}
 
