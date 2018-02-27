@@ -185,6 +185,9 @@
 		}
 
 		if (PhotoFloat.isSearchCacheBaseStrictly(albumHash)) {
+			albumHashToGet = albumHash;
+			PhotoFloat.searchCacheBase = encodeURIComponent(albumHash);
+		} else if (PhotoFloat.isSearchCacheBase(albumHash)) {
 			albumHashToGet = PhotoFloat.pathJoin([albumHash, foldersHash]);
 			PhotoFloat.searchCacheBase = encodeURIComponent(albumHash);
 		} else {
@@ -197,7 +200,7 @@
 		SearchWordsFromUserNormalized = [];
 		if (albumHash) {
 			albumHash = decodeURI(albumHash);
-			if (slashCount === 0 && PhotoFloat.isSearchCacheBaseStrictly(albumHash) && albumHash != Options.by_search_string) {
+			if (PhotoFloat.isSearchCacheBaseStrictly(albumHash) && albumHash != Options.by_search_string) {
 				var wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
 				var wordsAndOptions = wordsWithOptionsString.split(Options.search_options_separator);
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
@@ -612,7 +615,7 @@
 				media.foldersCacheBase,
 				media.cacheBase
 			]);
-		else if (PhotoFloat.isSearchCacheBase(album.cacheBase))
+		else if (PhotoFloat.isSearchCacheBase(album.cacheBase) && ! PhotoFloat.isSearchCacheBaseStrictly(album.cacheBase))
 			hash = PhotoFloat.pathJoin([
 				PhotoFloat.searchCacheBase,
 				media.foldersCacheBase,
