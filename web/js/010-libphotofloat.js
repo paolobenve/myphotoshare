@@ -682,6 +682,8 @@
 				hash = hash.substring(PhotoFloat.byDateStringWithTrailingSeparator.length);
 			else if (PhotoFloat.isByGpsCacheBase(hash))
 				hash = hash.substring(PhotoFloat.byGpsStringWithTrailingSeparator.length);
+			else if (PhotoFloat.isSearchCacheBase(hash))
+				hash = hash.substring(PhotoFloat.bySearchStringWithTrailingSeparator.length);
 		}
 		if (media.cacheSubdir)
 			return PhotoFloat.pathJoin([Options.server_cache_path, media.cacheSubdir, hash]);
