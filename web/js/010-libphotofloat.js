@@ -225,7 +225,7 @@
 		if (foldersHash)
 			foldersHash = decodeURI(foldersHash);
 
-		if (albumHash && foldersHash === null && SearchWordsFromUser.length > 0) {
+		if (albumHash && foldersHash === null && SearchWordsFromUser.length > 0 && ! this.albumCache.hasOwnProperty(albumHash)) {
 			self = this;
 			// get the search root album before getting the search words ones
 			this.getAlbum(
@@ -426,7 +426,7 @@
 											searchResultsAlbumFinal.numMediaInSubTree = searchResultsAlbumFinal.media.length;
 											if (! searchResultsAlbumFinal.cacheBase in self.albumCache)
 												self.albumCache[searchResultsAlbumFinal.cacheBase] = searchResultsAlbumFinal;
-											callback(searchResultsAlbumFinal, null, -1);
+											PhotoFloat.selectMedia(searchResultsAlbumFinal, foldersHash, mediaHash, callback);
 										}
 									},
 									error,
@@ -440,36 +440,44 @@
 				error
 			);
 		} else {
-
-			this.getAlbum(
-				albumHashToGet,
-				function(theAlbum) {
-					var i = -1;
-					if (mediaHash !== null) {
-						for (i = 0; i < theAlbum.media.length; ++i) {
-							if (
-								theAlbum.media[i].cacheBase === mediaHash &&
-								(foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash)
-							) {
-								media = theAlbum.media[i];
-								break;
-							}
-						}
-						if (i >= theAlbum.media.length) {
-							$("#album-view").fadeOut(200);
-							$("#media-view").fadeOut(200);
-							$("#album-view").fadeIn(3500);
-							$("#error-text-image").fadeIn(200);
-							$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
-							window.location.hash = theAlbum.cacheBase;
-							i = -1;
-						}
-					}
-					callback(theAlbum, media, i);
-				},
-				error
-			);
+			if (this.albumCache.hasOwnProperty(albumHashToGet)) {
+				PhotoFloat.selectMedia(this.albumCache[albumHashToGet], foldersHash, mediaHash, callback);
+			} else {
+				this.getAlbum(
+					albumHashToGet,
+					function(theAlbum) {
+						PhotoFloat.selectMedia(theAlbum, foldersHash, mediaHash, callback);
+					},
+					error
+				);
+			}
 		}
+	};
+
+	PhotoFloat.selectMedia = function(theAlbum, foldersHash, mediaHash, callback) {
+		var i = -1;
+		var media = null;
+		if (mediaHash !== null) {
+			for (i = 0; i < theAlbum.media.length; ++i) {
+				if (
+					theAlbum.media[i].cacheBase === mediaHash &&
+					(foldersHash === null || theAlbum.media[i].foldersCacheBase === foldersHash)
+				) {
+					media = theAlbum.media[i];
+					break;
+				}
+			}
+			if (i >= theAlbum.media.length) {
+				$("#album-view").fadeOut(200);
+				$("#media-view").fadeOut(200);
+				$("#album-view").fadeIn(3500);
+				$("#error-text-image").fadeIn(200);
+				$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
+				window.location.hash = theAlbum.cacheBase;
+				i = -1;
+			}
+		}
+		callback(theAlbum, media, i);
 	};
 
 	PhotoFloat.cloneObject = function(object) {
