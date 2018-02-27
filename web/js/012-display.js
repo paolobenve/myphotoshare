@@ -1776,7 +1776,7 @@ $(document).ready(function() {
 			prevLink = "";
 			$("#media-view").css('cursor', 'default');
 		} else {
-			if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+			if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase) && ! PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
 				upLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.searchCacheBase, currentAlbum.cacheBase]);
 			} else {
 				upLink = "#!/" + currentAlbum.cacheBase;
