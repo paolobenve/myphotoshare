@@ -1,4 +1,4 @@
-# Changelog
+### version 3.4
 
 * moved scripts into bin directory. Create `scanner` as a link to `main.py`. Added `make_album_ini.sh`to create a default `album.ini` file in a directory.
 * add options `social`, `social_size` and `social_color` for tuning display of social icons.
