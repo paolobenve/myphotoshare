@@ -2,15 +2,48 @@
 #
 # This file is imported through the ConfigParser standard module
 #       boolean values:
-#          1 = yes = true;
-#          0 = false = no
+#          1 = yes = YES = true = True = TRUE;
+#          0 = no = NO = false = False = FALSE;
 #
 # This file sets the default options: they are read by scanner/ModOptions.py
 #
-# Do not modify this file: copy it to any location on your disk (e.g. /etc/myphotoshare), rename it removing the trailing ".defaults" and have fun customizing it!
+# Do not modify this file:
+# * copy it to any location on your disk (e.g. /etc/myphotoshare) and rename it removing the trailing ".defaults"
+# * then, in _your_ copy:
+# * - do not remove nor change the `[options]` marker
+# * - set the `physical folders` at the beginning
+# * - have fun customizing the other options!
+# * - if you want to go back to an option default value, add a leading `#` to the option or remove the line
+
 # Your config values will supersede the standard ones defined here
 
 [options]
+
+##########################################################
+###########################################################
+# physical folders
+# YOU MUST SET THESE OPTIONS
+###########################################################
+##########################################################
+
+# absolute path of the folder where index.html resides; normally album_path will be its "albums" subfolder, and cache_path its "cache" subfolder
+index_html_path =
+
+# albums folder absolute path, for use in python
+album_path =
+
+# cache folder absolute path, for use in python
+# WARNING: javascript code will always use 'cache' subfolder of web site, so assure yourself that this folder corresponds to or is moved to the correct web site path
+cache_path =
+
+
+
+##########################################################
+##########################################################
+# optional customization
+###########################################################
+##########################################################
+
 
 ##########################################################
 # debugging
@@ -57,16 +90,6 @@ js_minifier = jsmin3
 ###########################################################
 # scanner option
 ###########################################################
-
-# absolute path of the folder where index.html resides; normally album_path will be its "albums" subfolder, and cache_path its "cache" subfolder
-index_html_path =
-
-# albums folder absolute path, for use in python
-album_path =
-
-# cache folder absolute path, for use in python
-# WARNING: javascript code will always use 'cache' subfolder of web site, so assure yourself that this folder corresponds to or is moved to the correct web site path
-cache_path =
 
 # cache subfolder: where the album composite images will be saved
 cache_album_subdir = cache_album
@@ -277,12 +300,6 @@ album_caption_color = white
 # the album buttons background color for slide mode (this is lighter black)
 slide_album_caption_color = #303030
 
-# The colors for the top right button which switches between folder and date view
-switch_button_background_color = black
-switch_button_background_color_hover = white
-switch_button_color = white
-switch_button_color_hover = black
-
 # shoud metadata be shown persistently until they are closed?
 persistent_metadata = false
 
@@ -297,8 +314,8 @@ default_media_date_reverse_sort = false
 # How many album thumbnails will fit at least on screen width?
 # Album button sizes will be reduced in order that the given number of buttons fit in it
 # if set to 1, no correction is made
-min_album_thumbnail = 3
-
+min_album_thumbnail = 2
+s
 # Which social icons to display
 # Possible values are:
 # - none: No share icons displayed
