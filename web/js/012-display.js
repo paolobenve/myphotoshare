@@ -495,7 +495,7 @@ $(document).ready(function() {
 	}
 
 	function setTitle() {
-		var title = "", titleAdd, documentTitle = "", components, i, dateTitle, gpsTitle, originalTitle, optionsAndSearchWords, searchWords;
+		var title = "", titleAdd, documentTitle = "", components, i, isDateTitle, isGpsTitle, isSearchTitle, originalTitle, optionsAndSearchWords, searchWords;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, latitude, longitude, arrayCoordinates;
 		// gpsLevelNumber is the number of levels for the by gps tree
 		// current levels are country, region, place => 3
@@ -519,11 +519,11 @@ $(document).ready(function() {
 			components.unshift(originalTitle);
 		}
 
-		dateTitle = (components.length > 1 && components[1] == Options.by_date_string);
-		gpsTitle = (components.length > 1 && components[1] == Options.by_gps_string);
-		var searchTitle = (components.length > 1 && components[1] == Options.by_search_string);
+		isDateTitle = (components.length > 1 && components[1] == Options.by_date_string);
+		isGpsTitle = (components.length > 1 && components[1] == Options.by_gps_string);
+		isSearchTitle = (components.length > 1 && components[1] == Options.by_search_string);
 
-		if (searchTitle && components.length == 3) {
+		if (isSearchTitle && components.length == 3) {
 			// the last element in components is the options and the search words
 			optionsAndSearchWords = components[components.length - 1].split(Options.cache_folder_separator);
 			searchWords = optionsAndSearchWords[optionsAndSearchWords.length -1].replace(/_/g, ' ');
@@ -541,7 +541,7 @@ $(document).ready(function() {
 		if (isMobile.any())
 			titleAnchorClasses += ' mobile';
 		for (i = 0; i < components.length; ++i) {
-			if (gpsTitle) {
+			if (isGpsTitle) {
 				if (currentMedia !== null)
 					mediaForNames = currentMedia;
 				else
@@ -564,12 +564,12 @@ $(document).ready(function() {
 
 			if (i != 1 || components[i] != Options.folders_string) {
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (i !== 0 || ! (dateTitle || gpsTitle || searchTitle)) {
-						if (i == 1 && (dateTitle || gpsTitle || searchTitle)) {
-							title = "<a class='" + titleAnchorClasses + "' href='#!/" + (searchTitle ? "" : encodeURI(currentAlbum.ancestorsCacheBase[i])) + "'>" + title;
+					if (i !== 0 || ! (isDateTitle || isGpsTitle || isSearchTitle)) {
+						if (i == 1 && (isDateTitle || isGpsTitle || isSearchTitle)) {
+							title = "<a class='" + titleAnchorClasses + "' href='#!/" + (isSearchTitle ? "" : encodeURI(currentAlbum.ancestorsCacheBase[i])) + "'>" + title;
 						} else {
 							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
-							if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
+							if (isGpsTitle && [2, 3, 4].indexOf(i) > -1)
 								titleAdd += " title='" + _t("#place-icon-title") + gpsName + _t("#place-icon-title-end") + "'";
 							title += titleAdd + ">";
 						}
@@ -581,14 +581,14 @@ $(document).ready(function() {
 					title += "<span class='title-no-anchor'>";
 					spanOpened = true;
 				}
-				if (i == 1 && dateTitle)
+				if (i == 1 && isDateTitle)
 					title += "(" + _t("#by-date") + ")";
-				else if (i == 1 && gpsTitle)
+				else if (i == 1 && isGpsTitle)
 					title += "(" + _t("#by-gps") + ")";
-				else if (i == 1 && searchTitle)
+				else if (i == 1 && isSearchTitle)
 					title += _t("#by-search");
 				else {
-					if (gpsTitle && i >= 2 && i <= 4) {
+					if (isGpsTitle && i >= 2 && i <= 4) {
 						// i == 2 corresponds to the country, i == 4 to the place,
 						title += gpsName;
 						if (currentMedia !== null) {
@@ -614,7 +614,7 @@ $(document).ready(function() {
 				}
 
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (! (i === 0 && (dateTitle || gpsTitle || searchTitle))) {
+					if (! (i === 0 && (isDateTitle || isGpsTitle || isSearchTitle))) {
 						if (anchorOpened)
 							title += "</a>";
 						anchorOpened = false;
@@ -622,20 +622,20 @@ $(document).ready(function() {
 				} else {
 					if (! isMobile.any()) {
 						title += " <span id=\"title-count\">(";
-						if (dateTitle || gpsTitle || searchTitle) {
+						if (isDateTitle || isGpsTitle || isSearchTitle) {
 							title += currentAlbum.media.length + " ";
 							title += _t(".title-media") + " ";
-							if (dateTitle) {
+							if (isDateTitle) {
 							 	if (components.length >= 5)
 									title += _t("#title-in-day-album");
 								else
 									title += _t("#title-in-date-album");
-							} else if (gpsTitle) {
+							} else if (isGpsTitle) {
 								if (components.length >= gpsLevelNumber + 2)
 									title += _t("#title-in-gps-album");
 								else
 									title += _t("#title-in-gpss-album");
-							} else if (searchTitle) {
+							} else if (isSearchTitle) {
 								if (currentAlbum.subalbums.length) {
 									if (currentAlbum.media.length)
 										title += _t("#title-and") + " ";
@@ -670,9 +670,9 @@ $(document).ready(function() {
 					title += "</span>";
 				}
 			}
-			if (i === 0 && (dateTitle || gpsTitle))
+			if (i === 0 && (isDateTitle || isGpsTitle))
 				title += " ";
-			else if (searchTitle) {
+			else if (isSearchTitle) {
 				if (i === 0) {
 					title += "</a>&raquo;<span class='title-no-anchor'>";
 					anchorOpened = false;
@@ -692,14 +692,14 @@ $(document).ready(function() {
 				if (components.length > 2 || currentMedia !== null)
 					documentTitle = " \u00ab " + documentTitle;
 			} else if (i == 1) {
-			 	if (dateTitle)
+			 	if (isDateTitle)
 					documentTitle += " (" + _t("#by-date") + ")";
-				else if (gpsTitle)
+				else if (isGpsTitle)
 					documentTitle += " (" + _t("#by-gps") + ")";
-				else if (searchTitle)
+				else if (isSearchTitle)
 					documentTitle += " (" + _t("#by-search") + ")";
 			} else if (i > 1) {
-				if (gpsTitle && [2, 3, 4].indexOf(i) > -1)
+				if (isGpsTitle && [2, 3, 4].indexOf(i) > -1)
 					documentTitle = gpsName + documentTitle;
 				else
 					documentTitle = textComponents[i] + documentTitle;
