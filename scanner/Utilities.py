@@ -123,12 +123,6 @@ def report_times(final):
 	albums where media is not geotagged or has no EXIF.
 	"""
 
-	if 'num_media_in_tree' not in locals():
-		# calculate the number of media in the album tree: it will be used in order to guess the execution time
-		num_media_in_tree = sum([len(files) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
-		message("Media in tree", num_media_in_tree, 4)
-
-
 	print()
 	print((50 - len("message")) * " ", "message", (15 - len("total time")) * " ", "total time", (15 - len("counter")) * " ", "counter", (20 - len("average time")) * " ", "average time")
 	print()
@@ -163,11 +157,21 @@ def report_times(final):
 	print()
 	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time, "     ", _total_time_unfolded)
 	num_media = Options.num_video + Options.num_photo
-	if num_media:
+
+	try:
+		num_media_in_tree
+	except NameError:
+		# calculate the number of media in the album tree: it will be used in order to guess the execution time
+		special_files = [Options.config['exclude_tree_marker'], Options.config['exclude_files_marker'], 'album.ini']
+		num_media_in_tree = sum([len([file for file in files if file[:1] != '.' and file not in special_files]) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
+
+	try:
 		total_time_missing = total_time / num_media * num_media_in_tree - total_time
 		if total_time_missing > 0:
 			(_total_time_missing, _total_time_missing_unfolded) = time_totals(total_time_missing)
 			print((50 - len("total time missing")) * " ", "total time missing", (18 - len(_total_time_missing)) * " ", _total_time_missing, "     ", _total_time_missing_unfolded)
+	except ZeroDivisionError:
+		pass
 	print()
 
 	_num_media = str(num_media)
