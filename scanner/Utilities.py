@@ -93,12 +93,12 @@ def back_level(verbose=0):
 		message.level -= 1
 
 
-def time_totals(total_time):
-	seconds = int(round(total_time / 1000000))
-	if total_time <= 1800:
-		_total_time = str(int(round(total_time))) + " μs"
-	elif total_time <= 1800:
-		_total_time = str(int(round(total_time / 1000))) + "    ms"
+def time_totals(time):
+	seconds = int(round(time / 1000000))
+	if time <= 1800:
+		_total_time = str(int(round(time))) + " μs"
+	elif time <= 1800:
+		_total_time = str(int(round(time / 1000))) + "    ms"
 	else:
 		_total_time = str(seconds) + "       s "
 
@@ -126,7 +126,7 @@ def report_times(final):
 	print()
 	print((50 - len("message")) * " ", "message", (15 - len("total time")) * " ", "total time", (15 - len("counter")) * " ", "counter", (20 - len("average time")) * " ", "average time")
 	print()
-	total_time = 0
+	time_till_now = 0
 	for category in sorted(Options.elapsed_times, key=Options.elapsed_times.get, reverse=True):
 		time = int(round(Options.elapsed_times[category]))
 		if time == 0:
@@ -138,7 +138,7 @@ def report_times(final):
 		else:
 			_time = str(int(round(time / 1000000))) + "       s "
 
-		total_time += time
+		time_till_now += time
 
 		counter = str(Options.elapsed_times_counter[category]) + " times"
 
@@ -153,9 +153,9 @@ def report_times(final):
 			_average_time = str(int(round(average_time / 1000000))) + "       s "
 		print((50 - len(category)) * " ", category, (18 - len(_time)) * " ", _time, (15 - len(counter)) * " ", counter, (20 - len(_average_time)) * " ", _average_time)
 
-	(_total_time, _total_time_unfolded) = time_totals(total_time)
+	(_time_till_now, _time_till_now_unfolded) = time_totals(time_till_now)
 	print()
-	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time, "     ", _total_time_unfolded)
+	print((50 - len("time taken till now")) * " ", "time taken till now", (18 - len(_time_till_now)) * " ", _time_till_now, "     ", _time_till_now_unfolded)
 	num_media = Options.num_video + Options.num_photo
 
 	try:
@@ -166,10 +166,14 @@ def report_times(final):
 		num_media_in_tree = sum([len([file for file in files if file[:1] != '.' and file not in special_files]) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
 
 	try:
-		total_time_missing = total_time / num_media * num_media_in_tree - total_time
-		if total_time_missing > 0:
-			(_total_time_missing, _total_time_missing_unfolded) = time_totals(total_time_missing)
-			print((50 - len("total time missing")) * " ", "total time missing", (18 - len(_total_time_missing)) * " ", _total_time_missing, "     ", _total_time_missing_unfolded)
+		time_missing = time_till_now / num_media * num_media_in_tree - time_till_now
+		if time_missing >= 0:
+			(_time_missing, _time_missing_unfolded) = time_totals(time_missing)
+			print((50 - len("total time missing")) * " ", "total time missing", (18 - len(_time_missing)) * " ", _time_missing, "     ", _time_missing_unfolded)
+		time_total = time_till_now + time_missing
+		if time_total > 0:
+			(_time_total, _time_total_unfolded) = time_totals(time_total)
+			print((50 - len("total time")) * " ", "total time", (18 - len(_time_total)) * " ", _time_total, "     ", _time_total_unfolded)
 	except ZeroDivisionError:
 		pass
 	print()
@@ -188,10 +192,10 @@ def report_times(final):
 	max_digit = len(_num_media)
 	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media + ' / ' + str(num_media_in_tree) + ' (' + str(int(num_media / num_media_in_tree * 1000) / 10) + '%)')
 	if num_media:
-		print("                                                              " + str(int(total_time / num_media / 1000000 * 1000) / 1000) + " s/media")
+		print("                                                              " + str(int(time_till_now / num_media / 1000000 * 1000) / 1000) + " s/media")
 	print("                  processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed)
 	if num_media_processed and num_media_processed != num_media:
-		print("                                                              " + str(int(total_time / num_media_processed / 10000) / 100) + " s/processed media")
+		print("                                                              " + str(int(time_till_now / num_media_processed / 10000) / 100) + " s/processed media")
 	print("- Videos " + ((max_digit - len(_num_video)) * " ") + _num_video)
 	print("                  processed " + ((max_digit - len(_num_video_processed)) * " ") + _num_video_processed)
 	print("- Photos " + ((max_digit - len(_num_photo)) * " ") + _num_photo)
