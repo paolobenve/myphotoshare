@@ -1,5 +1,7 @@
 AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript application/json
 
+DirectoryIndex index.php index.html
+
 <FilesMatch "\.(jpg|otf|ico)$">
 	Header set Cache-Control "max-age=29030400, public"
 </FilesMatch>
