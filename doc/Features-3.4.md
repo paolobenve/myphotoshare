@@ -21,7 +21,7 @@ The gallery owner can define global options in the configuration file but each v
 
 ## Browse the media the way you want
 
-MyPhotoShare allows you to browser the media by album, by date or by location if the photos are geotagged.
+MyPhotoShare allows you to browse the media by album, by date or by location if the photos are geotagged.
 
 * MyPhotoShare extracts date information and other metadata from pictures' EXIF and sorts your photos by year, month and and day.
 
@@ -42,9 +42,9 @@ MyPhotoShare allows you to browser the media by album, by date or by location if
 
 ## Add metadata to your pictures
 
-You don't have a GPS and your photos are not geotagged but you know where they were captured and you don't want to loose this information. Or you want add memories to your photos. Even without having a database or a CMS, MyPhotoShare offer you powerful features that don't lock you to a technology. The gallery owner can add user defined metadata in an `album.ini` file and drop it in a photos directory.
+You don't have a GPS and your photos are not geotagged but you know where they were captured and you don't want to loose this information. Or you want to add memories to your photos. Even without having a database or a CMS, MyPhotoShare offers you powerful features that don't lock you to a technology. The gallery owner can add user defined metadata in an `album.ini` file and drop it in a photos directory.
 
-* Edit your metadata in the `album.ini` file with a simple syntax. When you move an album, your metadata follows the media. You can even use the `make_album_ini.sh` script to create skeleton `album.ini` files from your existing albums.
+* Edit your metadata in the `album.ini` file with a simple syntax. When you move an album, the metadata follows the media. You can even use the `make_album_ini.sh` script to create skeleton `album.ini` files from your existing albums.
 
 ![Add metadata to your pictures](img/myphotoshare-3.4-album-ini-fr.png)
 
