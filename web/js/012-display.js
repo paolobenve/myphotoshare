@@ -2484,12 +2484,14 @@ $(document).ready(function() {
 			searchOptions += 'a' + Options.search_options_separator;
 		bySearchViewLink += searchOptions + searchTerms;
 		window.location.href = bySearchViewLink;
+		return false;
 	});
 	$('#search-field').keypress(function(ev) {
 		if (ev.which == 13) {
 			//Enter key pressed, trigger search button click event
 			$('#search-button').click();
 			$("#search-field").focus();
+			return false;
 		}
 	});
 
