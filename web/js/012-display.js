@@ -389,7 +389,7 @@ $(document).ready(function() {
 				$("ul#right-menu li.album-names").removeClass("selected");
 		}
 
-		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length === 0 || ! PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase))) {
+		if (currentMedia !== null || currentAlbum !== null && (currentAlbum.subalbums.length === 0 && currentAlbum.media.length <= 1)) {
 			$("ul#right-menu li.media-count").addClass("hidden");
 		} else {
 			$("ul#right-menu li.media-count").removeClass("hidden");
@@ -962,6 +962,17 @@ $(document).ready(function() {
 			return thumbnailWidth + 2 * buttonBorder;
 	}
 
+	function correctUpHash(albumHash) {
+		var start = PhotoFloat.bySearchStringWithTrailingSeparator.length + 1;
+		if (PhotoFloat.searchAndSubalbumHash) {
+			var searchAndSubalbumHashWithoutSearchAlbum = PhotoFloat.searchAndSubalbumHash.substr(PhotoFloat.searchAndSubalbumHash.indexOf(Options.cache_folder_separator, start) + 1);
+			if (searchAndSubalbumHashWithoutSearchAlbum.indexOf(albumHash) === 0 && albumHash.length < searchAndSubalbumHashWithoutSearchAlbum.length) {
+				return PhotoFloat.searchAndSubalbumHash.substr(0, PhotoFloat.searchAndSubalbumHash.indexOf(Options.cache_folder_separator, start));
+			}
+		}
+		return PhotoFloat.pathJoin([albumHash, PhotoFloat.searchAndSubalbumHash]);
+	}
+
 	function showAlbum(populate) {
 		var i, imageLink, linkContainer, container, image, media, thumbsElement, subalbums, subalbumsElement, hash, subfolderHash, thumbHash, thumbnailSize;
 		var width, height, thumbWidth, thumbHeight, imageString, calculatedWidth, populateMedia;
@@ -1003,12 +1014,7 @@ $(document).ready(function() {
 				for (i = 0; i < currentAlbum.media.length; ++i) {
 					width = currentAlbum.media[i].metadata.size[0];
 					height = currentAlbum.media[i].metadata.size[1];
-					thumbHash = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize, thumbnailSize);
-
-					if (PhotoFloat.isByDateCacheBase(thumbHash) || PhotoFloat.isByGpsCacheBase(thumbHash)) {
-						currentAlbum.media[i].completeName = PhotoFloat.pathJoin([currentAlbum.media[i].foldersAlbum, currentAlbum.media[i].name]);
-						thumbHash = currentAlbum.cacheBase + Options.cache_folder_separator + currentAlbum.media[i].cacheBase;
-					}
+					thumbHash = chooseThumbnail(currentAlbum, currentAlbum.media[i], thumbnailSize);
 
 					if (Options.media_thumb_type == "fixed_height") {
 						if (height < Options.media_thumb_size) {
@@ -1070,11 +1076,7 @@ $(document).ready(function() {
 					image = $(imageString);
 
 					image.get(0).media = currentAlbum.media[i];
-					if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-						hash = PhotoFloat.pathJoin([PhotoFloat.searchCacheBase, currentAlbum.media[i].foldersCacheBase, currentAlbum.media[i].cacheBase]);
-					} else {
-						hash = photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[i]);
-					}
+					hash = photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[i]);
 					imageLink = $("<a href=\"#!/" + hash + "\"></a>");
 					imageLink.append(image);
 					media.push(imageLink);
@@ -1106,31 +1108,8 @@ $(document).ready(function() {
 				}
 
 				upLink = "#!/";
-				if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-					// we somewhere inside a subalbum of a search result
-					parentCacheBase = PhotoFloat.pathJoin([
-						PhotoFloat.searchCacheBase,
-						currentAlbum.parentCacheBase
-					]);
-					if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase)) {
-						// search results: go to root album
-						if (savedLink)
-							upLink = savedLink;
-					} else {
-					 	if (enterSubalbumCacheBase && enterSubalbumCacheBase.substr(enterSubalbumCacheBase.indexOf('/') + 1) == currentAlbum.cacheBase) {
-							// we are in the search result album, where we arrived with a click from the search result
-							upLink = "#!" + PhotoFloat.searchCacheBase;
-						} else {
-							// we are more deeply inside
-							upLink = "#!" + parentCacheBase;
-						}
-					}
-				} else if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
-					enterSubalbumCacheBase = null;
-					upLink = "#!/" + currentAlbum.parentCacheBase;
-				} else {
-					enterSubalbumCacheBase = null;
-					upLink = "#!/";
+				if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root") {
+					upLink = "#!/" + correctUpHash(currentAlbum.parentCacheBase);
 				}
 
 				if (
@@ -1165,11 +1144,15 @@ $(document).ready(function() {
 					for (i = 0; i < currentAlbum.subalbums.length; ++i) {
 						if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 							subfolderHash = PhotoFloat.pathJoin([
-								PhotoFloat.searchCacheBase,
-								currentAlbum.subalbums[i].cacheBase
+								currentAlbum.subalbums[i].cacheBase,
+								currentAlbum.cacheBase + Options.cache_folder_separator + currentAlbum.subalbums[i].cacheBase
 							]);
-						}
-						else {
+						} else if (PhotoFloat.searchAndSubalbumHash) {
+							subfolderHash = PhotoFloat.pathJoin([
+								currentAlbum.subalbums[i].cacheBase,
+								PhotoFloat.searchAndSubalbumHash
+							]);
+						} else {
 							subfolderHash = currentAlbum.subalbums[i].cacheBase;
 						}
 						// a dot could be present in a cache base, making $("#" + cacheBase) fail, beware...
@@ -1179,9 +1162,7 @@ $(document).ready(function() {
 						subalbumsElement.append(linkContainer);
 						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
 						// add the clicks
-						container.off('click').css("cursor", "pointer").on('click', {hash: subfolderHash, album: currentAlbum}, function(ev) {
-							if (PhotoFloat.isSearchCacheBaseStrictly(currentAlbum.cacheBase))
-								enterSubalbumCacheBase =  ev.data.hash;
+						container.off('click').css("cursor", "pointer").on('click', {hash: subfolderHash}, function(ev) {
 							window.location.href = "#!/" + ev.data.hash;
 						});
 
@@ -1190,9 +1171,9 @@ $(document).ready(function() {
 						(function(theSubalbum, theImage, theLink) {
 							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,            subalbum);
 							photoFloat.pickRandomMedia(theSubalbum, currentAlbum, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
-								var htmlText;
+								var htmlText, difference;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
-								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size, correctedAlbumThumbSize);
+								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size);
 								var heightfactor;
 
 								PhotoFloat.subalbumIndex ++;
@@ -1225,7 +1206,7 @@ $(document).ready(function() {
 									link = PhotoFloat.pathJoin(["#!", randomMedia.gpsAlbumCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
 								} else if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
 									titleName = randomMedia.albumName;
-									link = PhotoFloat.pathJoin(["#!", PhotoFloat.searchCacheBase, randomMedia.foldersCacheBase, randomMedia.cacheBase]);
+									link = PhotoFloat.pathJoin(["#!", randomMedia.foldersCacheBase, currentAlbum.cacheBase + Options.cache_folder_separator + theSubalbum.cacheBase, randomMedia.cacheBase]);
 								} else {
 									titleName = randomMedia.albumName;
 									link = PhotoFloat.pathJoin(["#!", randomMedia.foldersCacheBase, randomMedia.cacheBase]);
@@ -1364,10 +1345,14 @@ $(document).ready(function() {
 											// element = $("#album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
 											element = document.getElementById("album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
 											if (element.scrollHeight > element.clientHeight) {
+												console.log(element.scrollHeight, element.clientHeight);
 												// the element have overflow
 												overflow = true;
-												$(".album-caption").css("height", (parseInt($(".album-caption").css("height")) + 5) + 'px');
-												$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + 5) + 'px');
+												difference = element.scrollHeight - element.clientHeight;
+												if (! Options.show_album_media_count)
+													difference += 10;
+												$(".album-caption").css("height", (parseInt($(".album-caption").css("height")) + difference) + 'px');
+												$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + difference) + 'px');
 												break;
 											}
 										}
@@ -1624,7 +1609,7 @@ $(document).ready(function() {
 		return chosenMedia;
 	}
 
-	function chooseThumbnail(album, media, thumbnailSize, calculatedThumbnailSize) {
+	function chooseThumbnail(album, media, thumbnailSize) {
 		return photoFloat.mediaPath(album, media, thumbnailSize);
 	}
 
@@ -1763,25 +1748,12 @@ $(document).ready(function() {
 
 		if (currentAlbum.media.length == 1) {
 			if (currentAlbum.parentCacheBase && currentAlbum.parentCacheBase != "root")
-				upLink = "#!/" + currentAlbum.parentCacheBase;
-			else {
-				if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-					if (currentAlbum.ancestorsCacheBase.length <= 3)
-						upLink = "#!";
-					else
-						upLink = "#!" + Options.cache_folder_separator.join(currentAlbum.ancestorsCacheBase.slice(1));
-				} else
-					upLink = "#!/" + currentAlbum.cacheBase;
-			}
+				upLink = "#!/" + correctUpHash(currentAlbum.parentCacheBase);
 			nextLink = "";
 			prevLink = "";
 			$("#media-view").css('cursor', 'default');
 		} else {
-			if (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-				upLink = "#!/" + PhotoFloat.pathJoin([PhotoFloat.searchCacheBase, currentAlbum.cacheBase]);
-			} else {
-				upLink = "#!/" + currentAlbum.cacheBase;
-			}
+			upLink = "#!/" + currentAlbum.cacheBase;
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
 			prevLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, prevMedia);
 			$("#next").show();
@@ -2135,12 +2107,12 @@ $(document).ready(function() {
 			// Jason's code only had the following line
 			//$("#error-text").fadeIn(2500);
 
-			var rootHash = "!/" + Options.folders_string;
+			var rootLink = "#!/" + Options.folders_string;
 
 			$("#album-view").fadeOut(200);
 			$("#media-view").fadeOut(200);
 
-			if (window.location.hash == "#" + rootHash) {
+			if (window.location.href == rootLink) {
 				$("#loading").hide();
 				$("#error-text-folder").stop();
 				$("#error-root-folder").fadeIn(2000);
@@ -2150,7 +2122,7 @@ $(document).ready(function() {
 				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(2500);
 				$("#album-view").fadeIn(3500);
 				$("#media-view").fadeIn(3500);
-				window.location.hash = rootHash;
+				window.location.href = rootLink;
 			}
 		}
 		$("#error-overlay").fadeTo(500, 0.8);
@@ -2347,56 +2319,60 @@ $(document).ready(function() {
 	/* Event listeners */
 
 	$(document).on('keydown', function(e) {
-		if (e.target.tagName.toLowerCase() != 'input' && ! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-			if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
-				//            arrow right                  n
-				swipeLeft(nextLink);
-				return false;
-			} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80) && currentMedia !== null) {
-				//                   arrow left                   p
-				swipeRight(prevLink);
-				return false;
-			} else if (e.keyCode === 27 && ! Modernizr.fullscreen && fullScreenStatus) {
-				//             esc
-				goFullscreen(e);
-				return false;
-			} else if (upLink && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
-				//                            esc            arrow up             page up
-				fromEscKey = true;
-				swipeDown(upLink);
-				return false;
-			} else if (mediaLink && currentMedia === null && (e.keyCode === 40 || e.keyCode === 34)) {
-				//                                              arrow down           page down
-				swipeUp(mediaLink);
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 68) {
-				//                                        d
-				$("#download-link")[0].click();
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 70) {
-				//                                        f
-				goFullscreen(e);
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 77) {
-				//                                        m
-				showMetadata(e);
-				return false;
-			} else if (currentMedia !== null && e.keyCode === 79) {
-				//                                        o
-				$("#original-link")[0].click();
-				return false;
-			} else if (currentMedia !== null && hasGpsData(currentMedia) && e.keyCode === 83) {
-				//                                                                    s
-					$("#map-link")[0].click();
-				return false;
-			} else if (e.keyCode === 82) {
-				//               r
+		if (e.target.tagName.toLowerCase() != 'input') {
+			if (! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
+				if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
+					//            arrow right                  n
+					swipeLeft(nextLink);
+					return false;
+				} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80) && currentMedia !== null) {
+					//                   arrow left                   p
+					swipeRight(prevLink);
+					return false;
+				} else if (e.keyCode === 27 && ! Modernizr.fullscreen && fullScreenStatus) {
+					//             esc
+					goFullscreen(e);
+					return false;
+				} else if (upLink && (e.keyCode === 27 || e.keyCode === 38 || e.keyCode === 33)) {
+					//                            esc            arrow up             page up
+					fromEscKey = true;
+					swipeDown(upLink);
+					return false;
+				} else if (mediaLink && currentMedia === null && (e.keyCode === 40 || e.keyCode === 34)) {
+					//                                              arrow down           page down
+					swipeUp(mediaLink);
+					return false;
+				} else if (currentMedia !== null && e.keyCode === 68) {
+					//                                        d
+					$("#download-link")[0].click();
+					return false;
+				} else if (currentMedia !== null && e.keyCode === 70) {
+					//                                        f
+					goFullscreen(e);
+					return false;
+				} else if (currentMedia !== null && e.keyCode === 77) {
+					//                                        m
+					showMetadata(e);
+					return false;
+				} else if (currentMedia !== null && e.keyCode === 79) {
+					//                                        o
+					$("#original-link")[0].click();
+					return false;
+				} else if (currentMedia !== null && hasGpsData(currentMedia) && e.keyCode === 83) {
+					//                                                                    s
+						$("#map-link")[0].click();
+					return false;
+				}
+			}
+
+			if (e.keyCode === 69 && ! e.ctrlKey && ! e.shiftKey) {
+				//        e, possibly with alt
 					$("#menu-icon")[0].click();
 				return false;
-			} else
-				return true;
-		} else
+			}
+
 			return true;
+		}
 	});
 	$("#album-view").on('mousewheel', swipeOnWheel);
 
@@ -2495,7 +2471,7 @@ $(document).ready(function() {
 	$('#search-button').on("click", function() {
 		var searchOptions = '';
 		// save current hash in order to come back there when exiting from search
-		savedLink = location.hash ? '#' + location.hash.substring(1) : "";
+		savedLink = location.hash;
 		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
 		var bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator;
 		if (Options.search_inside_words)
