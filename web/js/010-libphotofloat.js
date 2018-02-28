@@ -134,6 +134,7 @@
 			id = 'no-results';
 		$(".search-failed").hide();
 		$("#" + id).fadeIn(2000);
+		$("#" + id).fadeOut(4000);
 	};
 
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
