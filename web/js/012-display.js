@@ -59,6 +59,7 @@ $(document).ready(function() {
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", upLink = "", mediaLink = "", savedLink = "";
 	var enterSubalbumCacheBase = null;
+	var searchCacheBase = '', searchSubAlbum = '';
 
 	/* Displays */
 
@@ -494,6 +495,17 @@ $(document).ready(function() {
 		}
 	}
 
+	function detectSearchSubAlbum() {
+		var splittedHash = location.hash.split('/');
+		var splittedSearchAndSubalbumHash;
+		if (splittedHash.length >= 3 && PhotoFloat.isSearchCacheBase(splittedHash[2])) {
+			splittedSearchAndSubalbumHash = splittedHash[2].split(Options.cache_folder_separator);
+			searchCacheBase = splittedSearchAndSubalbumHash.slice(0, 2).join(Options.cache_folder_separator);
+			searchSubAlbum = splittedSearchAndSubalbumHash.slice(2).join(Options.cache_folder_separator);
+		}
+		return;
+	}
+
 	function setTitle() {
 		var title = "", titleAdd, documentTitle = "", components, i, isDateTitle, isGpsTitle, isSearchTitle, originalTitle, optionsAndSearchWords, searchWords;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, latitude, longitude, arrayCoordinates, numMediaInSubAlbums;
@@ -522,13 +534,6 @@ $(document).ready(function() {
 		isDateTitle = (components.length > 1 && components[1] == Options.by_date_string);
 		isGpsTitle = (components.length > 1 && components[1] == Options.by_gps_string);
 		isSearchTitle = (components.length > 1 && components[1] == Options.by_search_string);
-
-		if (isSearchTitle && components.length == 3) {
-			// the last element in components is the options and the search words
-			optionsAndSearchWords = components[components.length - 1].split(Options.cache_folder_separator);
-			searchWords = optionsAndSearchWords[optionsAndSearchWords.length -1].replace(/_/g, ' ');
-			components[components.length - 1] = searchWords;
-		}
 
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
 		var textComponents = components.slice();
@@ -1110,14 +1115,12 @@ $(document).ready(function() {
 	}
 
 	function correctUpHash(albumHash) {
-		var start = PhotoFloat.bySearchStringWithTrailingSeparator.length + 1;
-		if (PhotoFloat.searchAndSubalbumHash) {
-			var searchAndSubalbumHashWithoutSearchAlbum = PhotoFloat.searchAndSubalbumHash.substr(PhotoFloat.searchAndSubalbumHash.indexOf(Options.cache_folder_separator, start) + 1);
-			if (searchAndSubalbumHashWithoutSearchAlbum.indexOf(albumHash) === 0 && albumHash.length < searchAndSubalbumHashWithoutSearchAlbum.length) {
-				return PhotoFloat.searchAndSubalbumHash.substr(0, PhotoFloat.searchAndSubalbumHash.indexOf(Options.cache_folder_separator, start));
+		if (searchCacheBase) {
+			if (searchSubAlbum.indexOf(albumHash) === 0 && albumHash.length < searchSubAlbum.length) {
+				return searchCacheBase;
 			}
 		}
-		return PhotoFloat.pathJoin([albumHash, PhotoFloat.searchAndSubalbumHash]);
+		return PhotoFloat.pathJoin([albumHash, [searchCacheBase, searchSubAlbum].join(Options.cache_folder_separator)]);
 	}
 
 	function showAlbum(populate) {
@@ -1294,10 +1297,10 @@ $(document).ready(function() {
 								currentAlbum.subalbums[i].cacheBase,
 								currentAlbum.cacheBase + Options.cache_folder_separator + currentAlbum.subalbums[i].cacheBase
 							]);
-						} else if (PhotoFloat.searchAndSubalbumHash) {
+						} else if (searchCacheBase) {
 							subfolderHash = PhotoFloat.pathJoin([
 								currentAlbum.subalbums[i].cacheBase,
-								PhotoFloat.searchAndSubalbumHash
+								[searchCacheBase, searchSubAlbum].join(Options.cache_folder_separator)
 							]);
 						} else {
 							subfolderHash = currentAlbum.subalbums[i].cacheBase;
@@ -2290,6 +2293,7 @@ $(document).ready(function() {
 
 		undie();
 		$("#loading").hide();
+		detectSearchSubAlbum();
 
 		$(window).off("resize");
 
@@ -2907,6 +2911,8 @@ $(document).ready(function() {
 		$("link[rel=image_src]").remove();
 		$("link[rel=video_src]").remove();
 		$("ul#right-menu").removeClass("expand");
+		searchCacheBase = '';
+		searchSubAlbum = '';
 		getOptions(parseHash);
 	});
 	$(window).hashchange();
