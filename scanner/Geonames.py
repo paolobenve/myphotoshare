@@ -43,9 +43,9 @@ class Geonames(object):
 		elif self.cities == []:
 			next_level()
 			message("reading and processing local geonames files", "", 5)
-			territories_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/territories.json')
-			countries_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/countries.json')
-			cities_file = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "..", 'scanner/geonames/cities1000.txt')
+			territories_file = os.path.join(os.path.dirname(__file__), 'geonames/territories.json')
+			countries_file = os.path.join(os.path.dirname(__file__), 'geonames/countries.json')
+			cities_file = os.path.join(os.path.dirname(__file__), 'geonames/cities1000.txt')
 
 			with open(territories_file, 'r') as territories_file_p:
 				territories = json.load(territories_file_p)

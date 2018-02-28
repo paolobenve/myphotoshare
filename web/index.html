@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="fragment" content="!" />
+	<meta name="medium" content="image" />
+	<title>MyPhotoShare</title>
+	<link rel="icon" href="favicon.ico" type="image/x-icon"/>
+
+	<link href="css/styles.min.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="js/scripts.min.js"></script>
+	</head>
+<body>
+	<div id="no-results" class="search-failed"></div>
+	<div id="search-too-wide" class="search-failed"></div>
+	<!-- <div id="social">
+			<div class="ssk-group ssk-rounded ssk-sticky ssk-left ssk-center  ssk-sm ssk-grayscale">
+					<a href="" class="ssk ssk-facebook"></a>
+					<a href="" class="ssk ssk-twitter"></a>
+					<a href="" class="ssk ssk-google-plus"></a>
+					<a href="" class="ssk ssk-email"></a>
+				</div>
+	</div> -->
+
+	<div id="title-container">
+		<div id="title">
+			<span id="title-string"></span>
+		</div>
+	</div>
+	<div id="media-view">
+		<div id="media-box">
+			<a id="next-media">
+				<div id="media-box-inner" ></div>
+			</a>
+			<div id="media-bar">
+				<div id="links">
+					<a id="metadata-show" href="javascript:void(0)"></a>
+					<a id="metadata-hide" style="display:none;" href="javascript:void(0)"></a> |
+					<a id="original-link"></a> |
+					<a id="download-link"></a> <a id="menu-map-divider">|</a>
+					<a id="menu-map-link"></a>
+					<a id="fullscreen" href="javascript:void(0)">
+						<span id="fullscreen-divider"> | </span>
+						<span id="enter-fullscreen"></span>
+						<span id="exit-fullscreen"></span>
+					</a>
+				</div>
+				<div id="metadata"></div>
+			</div>
+		</div>
+
+		<a id="prev">&lsaquo;</a>
+		<a id="next">&rsaquo;</a>
+	</div>
+	<div id="album-view">
+		<div id="subalbums"></div>
+		<div id="thumbs">
+			<div id="loading"></div>
+		</div>
+		<div id="error-too-many-images"></div>
+		<div id="powered-by">
+			<span id="powered-by-string">Powered by</span>
+			<a href="https://github.com/paolobenve/myphotoshare" target="_blank">MyPhotoShare</a>
+		</div>
+	</div>
+
+	<ul id="right-menu">
+		<li id="menu-icon"> ☰ </li>
+		<li class="search">
+			<form>
+				<input type="text" id="search-field" />
+				<img id="search-button" src="img/ic_search_black_48dp_2x.png" />
+			</form>
+		</li>
+		<li id="inside-words" class="search active"></li>
+		<li id="any-word" class="search active"></li>
+		<li id="case-sensitive" class="search active"></li>
+		<li id="accent-sensitive" class="search active"></li>
+		<!-- <li id="regex-word" class="search active"></li> -->
+
+		<li class="day-gps-folders-view caption"></li>
+		<li id="folders-view" class="day-gps-folders-view"></li>
+		<li id="by-date-view" class="day-gps-folders-view"></li>
+		<li id="by-gps-view" class="day-gps-folders-view"></li>
+		<li class="sort album-sort caption"></li>
+		<li class='sort album-sort by-date'></li>
+		<li class='sort album-sort by-name'></li>
+		<li class='sort album-sort sort-reverse active'></li>
+		<li class="sort media-sort caption"></li>
+		<li class='sort media-sort by-date'></li>
+		<li class='sort media-sort by-name'></li>
+		<li class='sort media-sort sort-reverse active'></li>
+		<li class='ui caption'></li>
+		<li class='ui slide active'></li>
+		<li class='ui spaced active'></li>
+		<li class='ui album-names active'></li>
+		<li class='ui media-count active'></li>
+		<li class='ui media-names active'></li>
+		<li class='ui square-album-thumbnails active'></li>
+		<li class='ui square-media-thumbnails active'></li>
+	</ul>
+
+	<div id="error-overlay"></div>
+	<div id="error-options-file" class="error"></div>
+	<div id="error-text-folder" class="error"></div>
+	<div id="error-root-folder" class="error"></div>
+	<div id="error-text-image" class="error"></div>
+
+	<div id="auth-text"><form id="auth-form"><input id="password" type="password" /><input type="submit" value="Login" /></form></div>
+</body>
+</html>
