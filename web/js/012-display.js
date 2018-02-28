@@ -907,7 +907,7 @@ $(document).ready(function() {
 		return albumOrMediaList.sort(function(a,b) {
 			var aValue = a[field];
 			var bValue = b[field];
-			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+			return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
 		});
 	}
 
@@ -915,7 +915,7 @@ $(document).ready(function() {
 		return albumOrMediaList.sort(function(a,b) {
 			var aValue = new Date(a.date);
 			var bValue = new Date(b.date);
-			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+			return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
 		});
 	}
 
