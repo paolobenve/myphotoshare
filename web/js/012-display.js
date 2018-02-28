@@ -1324,7 +1324,7 @@ $(document).ready(function() {
 								var htmlText, difference;
 								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size);
-								var heightfactor;
+								var heightfactor, captionColor, overflow;
 
 								PhotoFloat.subalbumIndex ++;
 								mediaWidth = randomMedia.metadata.size[0];
@@ -1507,7 +1507,7 @@ $(document).ready(function() {
 											}
 										}
 										if (! overflow)
-											break
+											break;
 									}
 
 								}
