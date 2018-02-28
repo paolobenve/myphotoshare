@@ -5,6 +5,7 @@
 from __future__ import print_function
 
 from datetime import datetime
+import os
 
 import Options
 
@@ -92,6 +93,26 @@ def back_level(verbose=0):
 		message.level -= 1
 
 
+def time_totals(total_time):
+	seconds = int(round(total_time / 1000000))
+	if total_time <= 1800:
+		_total_time = str(int(round(total_time))) + " μs"
+	elif total_time <= 1800:
+		_total_time = str(int(round(total_time / 1000))) + "    ms"
+	else:
+		_total_time = str(seconds) + "       s "
+
+	_total_time_m, _total_time_s = divmod(seconds, 60)
+	_total_time_h, _total_time_m = divmod(_total_time_m, 60)
+
+	_total_time_hours = str(_total_time_h) + "h " if _total_time_h else ""
+	_total_time_minutes = str(_total_time_m) + "m " if _total_time_m else ""
+	_total_time_seconds = str(_total_time_s) + "s" if _total_time_m else ""
+	_total_time_unfolded = _total_time_hours + _total_time_minutes + _total_time_seconds
+	if _total_time_unfolded:
+		_total_time_unfolded = "= " + _total_time_unfolded
+	return (_total_time, _total_time_unfolded)
+
 def report_times(final):
 	"""
 	Print a report with the total time spent on each `message()` categories and the number of times
@@ -101,6 +122,13 @@ def report_times(final):
 	The report includes a section at the end with the number of media processed by type and list the
 	albums where media is not geotagged or has no EXIF.
 	"""
+
+	if 'num_media_in_tree' not in locals():
+		# calculate the number of media in the album tree: it will be used in order to guess the execution time
+		num_media_in_tree = sum([len(files) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
+		message("Media in tree", num_media_in_tree, 4)
+
+
 	print()
 	print((50 - len("message")) * " ", "message", (15 - len("total time")) * " ", "total time", (15 - len("counter")) * " ", "counter", (20 - len("average time")) * " ", "average time")
 	print()
@@ -131,27 +159,17 @@ def report_times(final):
 			_average_time = str(int(round(average_time / 1000000))) + "       s "
 		print((50 - len(category)) * " ", category, (18 - len(_time)) * " ", _time, (15 - len(counter)) * " ", counter, (20 - len(_average_time)) * " ", _average_time)
 
-	seconds = int(round(total_time / 1000000))
-	if total_time <= 1800:
-		_total_time = str(int(round(total_time))) + " μs"
-	elif total_time <= 1800:
-		_total_time = str(int(round(total_time / 1000))) + "    ms"
-	else:
-		_total_time = str(seconds) + "       s "
-
-	_total_time_m, _total_time_s = divmod(seconds, 60)
-	_total_time_h, _total_time_m = divmod(_total_time_m, 60)
-
-	_total_time_hours = str(_total_time_h) + "h " if _total_time_h else ""
-	_total_time_minutes = str(_total_time_m) + "m " if _total_time_m else ""
-	_total_time_seconds = str(_total_time_s) + "s" if _total_time_m else ""
-	_total_time_unfolded = _total_time_hours + _total_time_minutes + _total_time_seconds
-	if _total_time_unfolded:
-		_total_time_unfolded = "= " + _total_time_unfolded
+	(_total_time, _total_time_unfolded) = time_totals(total_time)
 	print()
 	print((50 - len("total time")) * " ", "total time", (18 - len(_total_time)) * " ", _total_time, "     ", _total_time_unfolded)
-	print()
 	num_media = Options.num_video + Options.num_photo
+	if num_media:
+		total_time_missing = total_time / num_media * num_media_in_tree - total_time
+		if total_time_missing > 0:
+			(_total_time_missing, _total_time_missing_unfolded) = time_totals(total_time_missing)
+			print((50 - len("total time missing")) * " ", "total time missing", (18 - len(_total_time_missing)) * " ", _total_time_missing, "     ", _total_time_missing_unfolded)
+	print()
+
 	_num_media = str(num_media)
 	num_media_processed = Options.num_photo_processed + Options.num_video_processed
 	_num_media_processed = str(num_media_processed)
@@ -164,7 +182,7 @@ def report_times(final):
 	_num_video = str(Options.num_video)
 	_num_video_processed = str(Options.num_video_processed)
 	max_digit = len(_num_media)
-	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media)
+	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media + ' / ' + str(num_media_in_tree) + ' (' + str(int(num_media / num_media_in_tree * 1000) / 10) + '%)')
 	if num_media:
 		print("                                                              " + str(int(total_time / num_media / 1000000 * 1000) / 1000) + " s/media")
 	print("                  processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed)

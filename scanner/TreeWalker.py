@@ -207,7 +207,7 @@ class TreeWalker:
 		message("working with word albums...", "", 5)
 		for word, media_and_album_words in self.tree_by_search.items():
 			next_level()
-			message("working with word album...", word + ", num. media =" + str(media_and_album_words), 5)
+			message("working with word album...", word, 5)
 			word_path = os.path.join(by_search_path, str(word))
 			word_album = Album(word_path)
 			word_album.parent = by_search_album
@@ -526,7 +526,7 @@ class TreeWalker:
 			TreeWalker.load_stopwords()
 
 		return TreeWalker.stopwords_for_word
-		
+
 
 	def add_media_to_tree_by_search(self, media):
 		words_for_search_album_name = self.prepare_for_tree_by_search(media)
