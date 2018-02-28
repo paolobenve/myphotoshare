@@ -1,4 +1,4 @@
-# MyPhotoShare v. 3.3
+# MyPhotoShare v. 3.4
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>), Pierre Métras (<p.metras@videotron.ca>)
 
@@ -16,6 +16,7 @@ Content (albums and media files) can be shared over some popular social plaforms
 
 ![Screenshot](doc/img/myphotoshare-2.2-panorama.png)
 
+[What's great in version 3.4](doc/Features-3.4.md)
 
 ## Read more
 

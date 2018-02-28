@@ -26,6 +26,8 @@ PHP is *required* for sharing, because social apps do not execute any JavaScript
 
 PHP does the job you need for sharing: JavaScript creates proper URLs based on the page hash, and when a share button is pressed a parameter is passed to PHP and it sets the proper HTML page title and appends the proper `<link rel='video_src' href="`video_link`">` or `<link rel='image_src' href="`image_link`">` tag to the `<head>` tag. This way the social media apps get the data they need and show a preview of the media/album you are sharing.
 
+If your web server does not have PHP, you can use MyPhotoShare in degraded mode: just use the `index.html` file instead of the `index.php` one in the `web` directory. You won't have the social sharing features but you'll still have all the great features of MyPhotoShare like geotagging or keyword search...
+
 
 ## Setup
 
@@ -81,7 +83,7 @@ However, the "Debian's way" could be better:
 
 * Clone MyPhotoShare repository in `/usr/share`, so that you end with a `/usr/share/myphotoshare` directory.
 * Copy `myphotoshare.conf.defaults` to `/etc/myphotoshare` and properly configure it.
-* In your web site root, create symbolink links to MyPhotoShare `web` folder files and directories: `css`, `favicon.ico`, `fonts`, `img`, `index.php`, `js`
+* In your web site root, create symbolink links to MyPhotoShare `web` folder files and directories: `css`, `favicon.ico`, `fonts`, `img`, `index.php` (or `index.html` in degraded mode), `js`
 * Create a `cache` directory and make sure the scanner has write access to that directory.
 
 
