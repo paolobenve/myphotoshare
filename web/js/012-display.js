@@ -1077,9 +1077,11 @@ $(document).ready(function() {
 		if (searchCacheBase) {
 			if (searchSubAlbum.indexOf(albumHash) === 0 && albumHash.length < searchSubAlbum.length) {
 				return searchCacheBase;
+			} else {
+				return PhotoFloat.pathJoin([albumHash, [searchCacheBase, searchSubAlbum].join(Options.cache_folder_separator)]);
 			}
 		}
-		return PhotoFloat.pathJoin([albumHash, [searchCacheBase, searchSubAlbum].join(Options.cache_folder_separator)]);
+		return albumHash;
 	}
 
 	function showAlbum(populate) {
