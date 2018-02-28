@@ -496,7 +496,7 @@ $(document).ready(function() {
 
 	function setTitle() {
 		var title = "", titleAdd, documentTitle = "", components, i, isDateTitle, isGpsTitle, isSearchTitle, originalTitle, optionsAndSearchWords, searchWords;
-		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, latitude, longitude, arrayCoordinates;
+		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, latitude, longitude, arrayCoordinates, numMediaInSubAlbums;
 		// gpsLevelNumber is the number of levels for the by gps tree
 		// current levels are country, region, place => 3
 		var gpsLevelNumber = 3;
@@ -531,17 +531,82 @@ $(document).ready(function() {
 		}
 
 		// textComponents = components doesn't work: textComponents becomes a pointer to components
-		var textComponents = [];
-		for (i = 0; i < components.length; ++i)
-			textComponents[i] = components[i];
+		var textComponents = components.slice();
 
 		// generate the title in the page top
 		var anchorOpened = false, spanOpened = false;
 		titleAnchorClasses = 'title-anchor';
 		if (isMobile.any())
 			titleAnchorClasses += ' mobile';
-		for (i = 0; i < components.length; ++i) {
-			if (isGpsTitle) {
+
+		if (isDateTitle) {
+			for (i = 0; i < components.length; ++i) {
+				if (i != 1 || components[i] != Options.folders_string) {
+					if (i < components.length - 1 || currentMedia !== null) {
+						if (i !== 0) {
+							if (i == 1) {
+								title = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>" + title;
+							} else {
+								titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
+								title += titleAdd + ">";
+							}
+							anchorOpened = true;
+						}
+					} else {
+						if (spanOpened)
+							title += "</span>";
+						title += "<span class='title-no-anchor'>";
+						spanOpened = true;
+					}
+					if (i == 1)
+						title += "(" + _t("#by-date") + ")";
+					else {
+						title += textComponents[i];
+					}
+
+					if (i < components.length - 1 || currentMedia !== null) {
+						if (i !== 0) {
+							if (anchorOpened)
+								title += "</a>";
+							anchorOpened = false;
+						}
+					} else {
+						if (! isMobile.any()) {
+							title += " <span id=\"title-count\">(";
+							title += currentAlbum.media.length + " ";
+							title += _t(".title-media") + " ";
+						 	if (components.length >= 5)
+								title += _t("#title-in-day-album");
+							else
+								title += _t("#title-in-date-album");
+							title += ")</span>";
+						}
+						title += "</span>";
+					}
+				}
+				if (i === 0)
+					title += " ";
+				else if (
+					(i < components.length - 1 || currentMedia !== null) &&
+					(i == components.length - 1 || components[i + 1] != Options.folders_string)
+				)
+					title += "&raquo;";
+
+				// build the html page title
+				if (i === 0) {
+					documentTitle += components[0];
+					if (components.length > 2 || currentMedia !== null)
+						documentTitle = " \u00ab " + documentTitle;
+				} else if (i == 1) {
+					documentTitle += " (" + _t("#by-date") + ")";
+				} else if (i > 1) {
+					documentTitle = textComponents[i] + documentTitle;
+					if (i < components.length - 1 || currentMedia !== null)
+						documentTitle = " \u00ab " + documentTitle;
+				}
+			}
+		} else if (isGpsTitle) {
+			for (i = 0; i < components.length; ++i) {
 				if (currentMedia !== null)
 					mediaForNames = currentMedia;
 				else
@@ -560,92 +625,192 @@ $(document).ready(function() {
 				if (gpsName === '')
 					gpsName = _t('.not-specified');
 				gpsHtmlTitle = _t("#place-icon-title") + gpsName;
-			}
 
-			if (i != 1 || components[i] != Options.folders_string) {
-				if (i < components.length - 1 || currentMedia !== null) {
-					if (i !== 0 || ! (isDateTitle || isGpsTitle || isSearchTitle)) {
-						if (i == 1 && (isDateTitle || isGpsTitle || isSearchTitle)) {
-							title = "<a class='" + titleAnchorClasses + "' href='#!/" + (isSearchTitle ? "" : encodeURI(currentAlbum.ancestorsCacheBase[i])) + "'>" + title;
-						} else {
-							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
-							if (isGpsTitle && [2, 3, 4].indexOf(i) > -1)
-								titleAdd += " title='" + _t("#place-icon-title") + gpsName + _t("#place-icon-title-end") + "'";
-							title += titleAdd + ">";
+				if (i != 1 || components[i] != Options.folders_string) {
+					if (i < components.length - 1 || currentMedia !== null) {
+						if (i !== 0) {
+							if (i == 1) {
+								title = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>" + title;
+							} else {
+								titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
+								if ([2, 3, 4].indexOf(i) > -1)
+									titleAdd += " title='" + _t("#place-icon-title") + gpsName + _t("#place-icon-title-end") + "'";
+								title += titleAdd + ">";
+							}
+							anchorOpened = true;
 						}
-						anchorOpened = true;
-					}
-				} else {
-					if (spanOpened)
-						title += "</span>";
-					title += "<span class='title-no-anchor'>";
-					spanOpened = true;
-				}
-				if (i == 1 && isDateTitle)
-					title += "(" + _t("#by-date") + ")";
-				else if (i == 1 && isGpsTitle)
-					title += "(" + _t("#by-gps") + ")";
-				else if (i == 1 && isSearchTitle)
-					title += _t("#by-search");
-				else {
-					if (isGpsTitle && i >= 2 && i <= 4) {
-						// i == 2 corresponds to the country, i == 4 to the place,
-						title += gpsName;
-						if (currentMedia !== null) {
-							latitude = currentMedia.metadata.latitude;
-							longitude = currentMedia.metadata.longitude;
-						} else {
-							 arrayCoordinates = currentAlbum.ancestorsCenter[i];
-							 latitude = arrayCoordinates.latitude;
-							 longitude = arrayCoordinates.longitude;
-						}
-						if (anchorOpened) {
-							title += "</a>";
-							anchorOpened = false;
-						} else if (spanOpened) {
+					} else {
+						if (spanOpened)
 							title += "</span>";
-							spanOpened = false;
+						title += "<span class='title-no-anchor'>";
+						spanOpened = true;
+					}
+					if (i == 1)
+						title += "(" + _t("#by-gps") + ")";
+					else {
+						if (i >= 2 && i <= 4) {
+							// i == 2 corresponds to the country, i == 4 to the place,
+							title += gpsName;
+							if (currentMedia !== null) {
+								latitude = currentMedia.metadata.latitude;
+								longitude = currentMedia.metadata.longitude;
+							} else {
+								 arrayCoordinates = currentAlbum.ancestorsCenter[i];
+								 latitude = arrayCoordinates.latitude;
+								 longitude = arrayCoordinates.longitude;
+							}
+							if (anchorOpened) {
+								title += "</a>";
+								anchorOpened = false;
+							} else if (spanOpened) {
+								title += "</span>";
+								spanOpened = false;
+							}
+							title += "<a href=" + mapLink(latitude, longitude, Options.map_zoom_levels[(i - 2)]) + " target='_blank'>" +
+												"<img class='title-img' title='" + gpsHtmlTitle + "' alt='" + gpsHtmlTitle + "' height='20px' src='img/ic_place_white_24dp_2x.png'>" +
+												"</a>";
+						} else
+							title += textComponents[i];
+					}
+
+					if (i < components.length - 1 || currentMedia !== null) {
+						if (i !== 0) {
+							if (anchorOpened)
+								title += "</a>";
+							anchorOpened = false;
 						}
-						title += "<a href=" + mapLink(latitude, longitude, Options.map_zoom_levels[(i - 2)]) + " target='_blank'>" +
-											"<img class='title-img' title='" + gpsHtmlTitle + "' alt='" + gpsHtmlTitle + "' height='20px' src='img/ic_place_white_24dp_2x.png'>" +
-											"</a>";
-					} else
+					} else {
+						if (! isMobile.any()) {
+							title += " <span id=\"title-count\">(";
+							title += currentAlbum.media.length + " ";
+							title += _t(".title-media") + " ";
+							if (components.length >= gpsLevelNumber + 2)
+								title += _t("#title-in-gps-album");
+							else
+								title += _t("#title-in-gpss-album");
+							title += ")</span>";
+						}
+						title += "</span>";
+					}
+				}
+				if (i === 0)
+					title += " ";
+				else if ((i < components.length - 1 || currentMedia !== null) &&
+					(i == components.length - 1 || components[i + 1] != Options.folders_string))
+					title += "&raquo;";
+
+				// build the html page title
+				if (i === 0) {
+					documentTitle += components[0];
+					if (components.length > 2 || currentMedia !== null)
+						documentTitle = " \u00ab " + documentTitle;
+				} else if (i == 1) {
+					documentTitle += " (" + _t("#by-gps") + ")";
+				} else if (i > 1) {
+					if ([2, 3, 4].indexOf(i) > -1)
+						documentTitle = gpsName + documentTitle;
+					else
+						documentTitle = textComponents[i] + documentTitle;
+					if (i < components.length - 1 || currentMedia !== null)
+						documentTitle = " \u00ab " + documentTitle;
+				}
+			}
+		} else if (isSearchTitle) {
+			for (i = 0; i < components.length; ++i) {
+				if (i != 1 || components[i] != Options.folders_string) {
+					if (i < components.length - 1 || currentMedia !== null) {
+						if (i !== 0) {
+							if (i == 1) {
+								title = "<a class='" + titleAnchorClasses + "' href='#!/" + "'>" + title;
+							} else {
+								titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
+								title += titleAdd + ">";
+							}
+							anchorOpened = true;
+						}
+					} else {
+						if (spanOpened)
+							title += "</span>";
+						title += "<span class='title-no-anchor'>";
+						spanOpened = true;
+					}
+					if (i == 1)
+						title += _t("#by-search");
+					else {
 						title += textComponents[i];
+					}
+
+					if (i < components.length - 1 || currentMedia !== null) {
+						if (i !== 0) {
+							if (anchorOpened)
+								title += "</a>";
+							anchorOpened = false;
+						}
+					} else {
+						if (! isMobile.any()) {
+							title += " <span id=\"title-count\">(";
+							title += currentAlbum.media.length + " ";
+							title += _t(".title-media") + " ";
+							if (currentAlbum.subalbums.length) {
+								if (currentAlbum.media.length)
+									title += _t("#title-and") + " ";
+								title += currentAlbum.subalbums.length + " ";
+								title += _t("#title-albums") + " ";
+							}
+							title += _t("#title-in-search-album") + " ";
+							title += ")</span>";
+						}
+						title += "</span>";
+					}
+				}
+				if (i === 0) {
+					title += "</a>&raquo;<span class='title-no-anchor'>";
+					anchorOpened = false;
+					spanOpened = true;
+				} else if (i == 1) {
+					title += "</span>&raquo;";
+					spanOpened = false;
 				}
 
-				if (i < components.length - 1 || currentMedia !== null) {
-					if (! (i === 0 && (isDateTitle || isGpsTitle || isSearchTitle))) {
+				// build the html page title
+				if (i === 0) {
+					documentTitle += components[0];
+					if (components.length > 2 || currentMedia !== null)
+						documentTitle = " \u00ab " + documentTitle;
+				} else if (i == 1) {
+					documentTitle += " (" + _t("#by-search") + ")";
+				} else if (i > 1) {
+					documentTitle = textComponents[i] + documentTitle;
+					if (i < components.length - 1 || currentMedia !== null)
+						documentTitle = " \u00ab " + documentTitle;
+				}
+			}
+		} else {
+			// folders title
+			for (i = 0; i < components.length; ++i) {
+				if (i != 1 || components[i] != Options.folders_string) {
+					if (i < components.length - 1 || currentMedia !== null) {
+						if (i !== 0) {
+							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
+							title += titleAdd + ">";
+							anchorOpened = true;
+						}
+					} else {
+						if (spanOpened)
+							title += "</span>";
+						title += "<span class='title-no-anchor'>";
+						spanOpened = true;
+					}
+					title += textComponents[i];
+
+					if (i < components.length - 1 || currentMedia !== null) {
 						if (anchorOpened)
 							title += "</a>";
 						anchorOpened = false;
-					}
-				} else {
-					if (! isMobile.any()) {
-						title += " <span id=\"title-count\">(";
-						if (isDateTitle || isGpsTitle || isSearchTitle) {
-							title += currentAlbum.media.length + " ";
-							title += _t(".title-media") + " ";
-							if (isDateTitle) {
-							 	if (components.length >= 5)
-									title += _t("#title-in-day-album");
-								else
-									title += _t("#title-in-date-album");
-							} else if (isGpsTitle) {
-								if (components.length >= gpsLevelNumber + 2)
-									title += _t("#title-in-gps-album");
-								else
-									title += _t("#title-in-gpss-album");
-							} else if (isSearchTitle) {
-								if (currentAlbum.subalbums.length) {
-									if (currentAlbum.media.length)
-										title += _t("#title-and") + " ";
-									title += currentAlbum.subalbums.length + " ";
-									title += _t("#title-albums") + " ";
-								}
-								title += _t("#title-in-search-album") + " ";
-							}
-						} else {
-							var numMediaInSubAlbums = currentAlbum.numMediaInSubTree - currentAlbum.media.length;
+					} else {
+						if (! isMobile.any()) {
+							title += " <span id=\"title-count\">(";
+							numMediaInSubAlbums = currentAlbum.numMediaInSubTree - currentAlbum.media.length;
 							if (currentAlbum.media.length) {
 								title += currentAlbum.media.length + " ";
 								title += _t(".title-media") + " ";
@@ -664,49 +829,31 @@ $(document).ready(function() {
 								title += _t("#title-total") + " ";
 								title += currentAlbum.media.length + numMediaInSubAlbums;
 							}
+							title += ")</span>";
 						}
-						title += ")</span>";
+						title += "</span>";
 					}
-					title += "</span>";
 				}
-			}
-			if (i === 0 && (isDateTitle || isGpsTitle))
-				title += " ";
-			else if (isSearchTitle) {
-				if (i === 0) {
-					title += "</a>&raquo;<span class='title-no-anchor'>";
-					anchorOpened = false;
-					spanOpened = true;
-				} else if (i == 1) {
-					title += "</span>&raquo;";
-					spanOpened = false;
-				}
-			}
-			else if ((i < components.length - 1 || currentMedia !== null) &&
-				(i == components.length - 1 || components[i + 1] != Options.folders_string))
-				title += "&raquo;";
 
-			// build the html page title
-			if (i === 0) {
-				documentTitle += components[0];
-				if (components.length > 2 || currentMedia !== null)
-					documentTitle = " \u00ab " + documentTitle;
-			} else if (i == 1) {
-			 	if (isDateTitle)
-					documentTitle += " (" + _t("#by-date") + ")";
-				else if (isGpsTitle)
-					documentTitle += " (" + _t("#by-gps") + ")";
-				else if (isSearchTitle)
-					documentTitle += " (" + _t("#by-search") + ")";
-			} else if (i > 1) {
-				if (isGpsTitle && [2, 3, 4].indexOf(i) > -1)
-					documentTitle = gpsName + documentTitle;
-				else
+				if ((i < components.length - 1 || currentMedia !== null) &&
+					(i == components.length - 1 || components[i + 1] != Options.folders_string))
+					title += "&raquo;";
+
+				// build the html page title
+				if (i === 0) {
+					documentTitle += components[0];
+					if (components.length > 2 || currentMedia !== null)
+						documentTitle = " \u00ab " + documentTitle;
+				} else if (i > 1) {
 					documentTitle = textComponents[i] + documentTitle;
-				if (i < components.length - 1 || currentMedia !== null)
-					documentTitle = " \u00ab " + documentTitle;
+					if (i < components.length - 1 || currentMedia !== null)
+						documentTitle = " \u00ab " + documentTitle;
+				}
 			}
 		}
+
+
+
 
 		// leave only the last link on mobile
 		linksToLeave = 1;
