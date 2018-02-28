@@ -315,7 +315,7 @@ default_media_date_reverse_sort = false
 # Album button sizes will be reduced in order that the given number of buttons fit in it
 # if set to 1, no correction is made
 min_album_thumbnail = 2
-s
+
 # Which social icons to display
 # Possible values are:
 # - none: No share icons displayed
