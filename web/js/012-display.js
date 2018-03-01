@@ -260,15 +260,15 @@ $(document).ready(function() {
 				prefix += Options.cache_folder_separator;
 			if (currentMedia.mediaType == "video") {
 				mediaParameter = PhotoFloat.pathJoin([
-					Options.server_cache_path,
-					currentMedia.cacheSubdir,
-					]) + prefix + currentMedia.cacheBase + "_transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
+						Options.server_cache_path,
+						currentMedia.cacheSubdir,
+					]) + prefix + currentMedia.cacheBase + Options.cache_folder_separator + "transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 			} else if (currentMedia.mediaType == "photo") {
 				mediaParameter = PhotoFloat.pathJoin([
-					Options.server_cache_path,
-					currentMedia.cacheSubdir,
-					prefix + currentMedia.cacheBase
-					]) + "_" + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
+						Options.server_cache_path,
+						currentMedia.cacheSubdir,
+						prefix + currentMedia.cacheBase
+					]) + Options.cache_folder_separator + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 			}
 		}
 

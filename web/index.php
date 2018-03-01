@@ -97,7 +97,7 @@
 			if (strpos($realPath, realpath('cache')) === 0  && url_exist($realPath)) {
 				$linkTag = '<link rel="';
 				$videoEnd = ".mp4";
-				if (substr($_GET['m'], - strlen($videoEnd)) === strlen($videoEnd))
+				if (substr($_GET['m'], - strlen($videoEnd)) === $videoEnd)
 					// video
 					$linkTag .= 'video_src';
 				else
