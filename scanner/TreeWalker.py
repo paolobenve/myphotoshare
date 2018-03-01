@@ -459,9 +459,12 @@ class TreeWalker:
 
 	@staticmethod
 	def normalize_and_split_for_album_name(phrase):
+		from unidecode import unidecode
+
 		name = TreeWalker.minimal_normalize(phrase)
 		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
-		name = ''.join(c for c in unicodedata.normalize('NFD', name) if unicodedata.category(c) != 'Mn')
+		# name = ''.join(c for c in unicodedata.normalize('NFD', name) if unicodedata.category(c) != 'Mn')
+		name = unidecode(name)
 		name = name.lower()
 
 		return name.split(' ')
