@@ -1798,7 +1798,7 @@ $(document).ready(function() {
 			prevLink = "";
 			$("#media-view").css('cursor', 'default');
 		} else {
-			upLink = "#!/" + currentAlbum.cacheBase;
+			upLink = "#!/" + correctUpHash(currentAlbum.cacheBase);
 			nextLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, nextMedia);
 			prevLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, prevMedia);
 			$("#next").show();
