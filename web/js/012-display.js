@@ -440,12 +440,13 @@ $(document).ready(function() {
 		}
 
 		if (
-			currentAlbum !== null && PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase) ||
+			currentAlbum !== null && (PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.by_search_string) ||
 			Options.search_regex ||
 			Options.search_inside_words ||
 			Options.search_any_word ||
 			Options.search_case_sensitive ||
 			Options.search_accent_sensitive ||
+			$("ul#right-menu li#no-search-string").is(":visible") ||
 			$("ul#right-menu li#no-results").is(":visible") ||
 			$("ul#right-menu li#search-too-wide").is(":visible")
 		) {
@@ -2585,17 +2586,22 @@ $(document).ready(function() {
 		// save current hash in order to come back there when exiting from search
 		savedLink = location.hash;
 		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
-		var bySearchViewLink = "#!/" + Options.by_search_string + Options.cache_folder_separator;
-		if (Options.search_inside_words)
-			searchOptions += 'i' + Options.search_options_separator;
-		if (Options.search_any_word)
-			searchOptions += 'n' + Options.search_options_separator;
-		if (Options.search_case_sensitive)
-			searchOptions += 'c' + Options.search_options_separator;
-		if (Options.search_accent_sensitive)
-			searchOptions += 'a' + Options.search_options_separator;
-		bySearchViewLink += searchOptions + searchTerms;
-		window.location.href = bySearchViewLink;
+		var bySearchViewLinkBase = "#!/" + Options.by_search_string
+		if (searchTerms) {
+			var bySearchViewLink = bySearchViewLinkBase + Options.cache_folder_separator;
+			if (Options.search_inside_words)
+				searchOptions += 'i' + Options.search_options_separator;
+			if (Options.search_any_word)
+				searchOptions += 'n' + Options.search_options_separator;
+			if (Options.search_case_sensitive)
+				searchOptions += 'c' + Options.search_options_separator;
+			if (Options.search_accent_sensitive)
+				searchOptions += 'a' + Options.search_options_separator;
+			bySearchViewLink += searchOptions + searchTerms;
+			window.location.href = bySearchViewLink;
+		} else {
+			window.location.href = bySearchViewLinkBase;
+		}
 		return false;
 	});
 	$('#search-field').keypress(function(ev) {

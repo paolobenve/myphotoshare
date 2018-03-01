@@ -128,7 +128,7 @@
 	};
 
 	PhotoFloat.noResults = function(id) {
-		// no media found, show the "no results" line
+		// no media found or other search fail, show the message
 		$("#album-view").addClass("hidden");
 		if (typeof id === "undefined")
 			id = 'no-results';
@@ -140,7 +140,7 @@
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
 		var hashParts, lastSlashPosition, slashCount, albumHash, albumHashes, mediaHash = null, foldersHash = null, media = null;
 		var SearchWordsFromUser, SearchWordsFromUserNormalized;
-		var indexWords, indexAlbums;
+		var indexWords, indexAlbums, wordsWithOptionsString;
 		// this vars are defined here and not at the beginning of the file because the options must have been read
 		PhotoFloat.foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
 		PhotoFloat.byDateStringWithTrailingSeparator = Options.by_date_string + Options.cache_folder_separator;
@@ -148,6 +148,7 @@
 		PhotoFloat.bySearchStringWithTrailingSeparator = Options.by_search_string + Options.cache_folder_separator;
 
 		$("#error-too-many-images").hide();
+		$(".search-failed").hide();
 		hash = PhotoFloat.cleanHash(hash);
 		// count the number of slashes in hash, by date hashes have 2, folders ones 1
 		if (! hash.length) {
@@ -185,21 +186,13 @@
 			}
 		}
 
-		if (PhotoFloat.isSearchCacheBase(albumHash)) {
-			albumHashToGet = albumHash;
-		} else if (PhotoFloat.isSearchCacheBase(albumHash)) {
-			albumHashToGet = PhotoFloat.pathJoin([albumHash, foldersHash]);
-		} else {
-			albumHashToGet = albumHash;
-		}
-
 		albumHashes = [];
 		SearchWordsFromUser = [];
 		SearchWordsFromUserNormalized = [];
 		if (albumHash) {
 			albumHash = decodeURI(albumHash);
-			if (PhotoFloat.isSearchCacheBase(albumHash) && albumHash != Options.by_search_string) {
-				var wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
+			if (PhotoFloat.isSearchCacheBase(albumHash) || albumHash == Options.by_search_string) {
+				wordsWithOptionsString = albumHash.substring(Options.by_search_string.length + 1);
 				var wordsAndOptions = wordsWithOptionsString.split(Options.search_options_separator);
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
 				var wordsStringOriginal = wordsString.replace(/_/g, ' ');
@@ -219,8 +212,32 @@
 				SearchWordsFromUser = wordsString.split('_');
 				SearchWordsFromUserNormalized = wordsStringNormalized.split('_');
 				$("ul#right-menu").addClass("expand");
+
+				var searchResultsAlbumFinal = {};
+				searchResultsAlbumFinal.media = [];
+				searchResultsAlbumFinal.subalbums = [];
+				searchResultsAlbumFinal.numMediaInAlbum = 0;
+				searchResultsAlbumFinal.numMediaInSubTree = 0;
+				searchResultsAlbumFinal.cacheBase = albumHash;
+				searchResultsAlbumFinal.path = searchResultsAlbumFinal.cacheBase.replace(Options.cache_folder_separator, "/");
+				searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
+
+				if (albumHash == Options.by_search_string) {
+					PhotoFloat.noResults('no-search-string');
+					callback(searchResultsAlbumFinal, null, -1);
+					return;
+				}
 			}
 		}
+
+		if (PhotoFloat.isSearchCacheBase(albumHash)) {
+			albumHashToGet = albumHash;
+		} else if (PhotoFloat.isSearchCacheBase(albumHash)) {
+			albumHashToGet = PhotoFloat.pathJoin([albumHash, foldersHash]);
+		} else {
+			albumHashToGet = albumHash;
+		}
+
 		if (mediaHash)
 			mediaHash = decodeURI(mediaHash);
 		if (foldersHash)
@@ -249,16 +266,8 @@
 					var lastIndex, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0, normalizedWords, albumToGet;
 					var searchResultsMedia = [];
 					var searchResultsSubalbums = [];
-					var searchResultsAlbumFinal = {};
-					searchResultsAlbumFinal.media = [];
-					searchResultsAlbumFinal.subalbums = [];
-					searchResultsAlbumFinal.numMediaInAlbum = 0;
-					searchResultsAlbumFinal.numMediaInSubTree = 0;
-					searchResultsAlbumFinal.cacheBase = albumHash;
 					searchResultsAlbumFinal.ancestorsCacheBase = bySearchRootAlbum.ancestorsCacheBase.slice();
 					searchResultsAlbumFinal.ancestorsCacheBase.push(wordsWithOptionsString);
-					searchResultsAlbumFinal.path = searchResultsAlbumFinal.cacheBase.replace(Options.cache_folder_separator, "/");
-					searchResultsAlbumFinal.physicalPath = searchResultsAlbumFinal.path;
 					if (! Options.search_any_word)
 						// when serching all the words, getting the first album is enough, media that do not match the other words will be escluded later
 						lastIndex = 0;
