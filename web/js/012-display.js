@@ -260,15 +260,15 @@ $(document).ready(function() {
 				prefix += Options.cache_folder_separator;
 			if (currentMedia.mediaType == "video") {
 				mediaParameter = PhotoFloat.pathJoin([
-						Options.server_cache_path,
-						currentMedia.cacheSubdir,
-					]) + prefix + currentMedia.cacheBase + Options.cache_folder_separator + "transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
+					Options.server_cache_path,
+					currentMedia.cacheSubdir,
+				]) + prefix + currentMedia.cacheBase + Options.cache_folder_separator + "transcoded_" + Options.video_transcode_bitrate + "_" + Options.video_crf + ".mp4";
 			} else if (currentMedia.mediaType == "photo") {
 				mediaParameter = PhotoFloat.pathJoin([
-						Options.server_cache_path,
-						currentMedia.cacheSubdir,
-						prefix + currentMedia.cacheBase
-					]) + Options.cache_folder_separator + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
+					Options.server_cache_path,
+					currentMedia.cacheSubdir,
+					prefix + currentMedia.cacheBase
+				]) + Options.cache_folder_separator + Options.reduced_sizes[reducedSizesIndex] + ".jpg";
 			}
 		}
 
@@ -546,70 +546,55 @@ $(document).ready(function() {
 			titleAnchorClasses += ' mobile';
 
 		if (isDateTitle) {
-			for (i = 0; i < components.length; ++i) {
-				if (i != 1) {
-					if (i < components.length - 1 || currentMedia !== null) {
-						if (i !== 0) {
-							if (i == 1) {
-								title = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>" + title;
-							} else {
-								titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
-								title += titleAdd + ">";
-							}
-							anchorOpened = true;
-						}
-					} else {
-						if (spanOpened)
-							title += "</span>";
-						title += "<span class='title-no-anchor'>";
-						spanOpened = true;
-					}
-					if (i == 1)
-						title += "(" + _t("#by-date") + ")";
-					else {
-						title += textComponents[i];
-					}
+			title = "<a class='" + titleAnchorClasses + "' href='#!/" + "'>" + components[0] + "</a>";
+			title += "<span class='title-no-anchor'>(" + _t("#by-date") + ")</span>&raquo;";
 
-					if (i < components.length - 1 || currentMedia !== null) {
-						if (i !== 0) {
-							if (anchorOpened)
-								title += "</a>";
-							anchorOpened = false;
-						}
-					} else {
-						if (! isMobile.any()) {
-							title += " <span id=\"title-count\">(";
-							title += currentAlbum.media.length + " ";
-							title += _t(".title-media") + " ";
-						 	if (components.length >= 5)
-								title += _t("#title-in-day-album");
-							else
-								title += _t("#title-in-date-album");
-							title += ")</span>";
-						}
-						title += "</span>";
+			documentTitle += components[0];
+			if (components.length > 2 || currentMedia !== null)
+				documentTitle = " \u00ab " + documentTitle;
+			documentTitle += " (" + _t("#by-date") + ")";
+
+			for (i = 2; i < components.length; ++i) {
+				if (i < components.length - 1 || currentMedia !== null)
+					title += "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'" + ">";
+				else
+					title += "<span class='title-no-anchor'>";
+				title += textComponents[i];
+				if (i < components.length - 1 || currentMedia !== null)
+					title += "</a>";
+				else
+					title += "</span>";
+				if (i == components.length - 1 && currentMedia === null) {
+					if (! isMobile.any()) {
+						title += " <span id=\"title-count\">(";
+						title += currentAlbum.media.length + " ";
+						title += _t(".title-media") + " ";
+					 	if (components.length >= 5)
+							title += _t("#title-in-day-album");
+						else
+							title += _t("#title-in-date-album");
+						title += ")</span>";
 					}
+					title += "</span>";
 				}
-				if (i === 0)
-					title += " ";
-				else if (i < components.length - 1 || currentMedia !== null)
+				if (i < components.length - 1 || currentMedia !== null)
 					title += "&raquo;";
 
-				// build the html page title
-				if (i === 0) {
-					documentTitle += components[0];
-					if (components.length > 2 || currentMedia !== null)
-						documentTitle = " \u00ab " + documentTitle;
-				} else if (i == 1) {
-					documentTitle += " (" + _t("#by-date") + ")";
-				} else if (i > 1) {
-					documentTitle = textComponents[i] + documentTitle;
-					if (i < components.length - 1 || currentMedia !== null)
-						documentTitle = " \u00ab " + documentTitle;
-				}
+				// keep buildimg the html page title
+				documentTitle = textComponents[i] + documentTitle;
+				if (i < components.length - 1 || currentMedia !== null)
+					documentTitle = " \u00ab " + documentTitle;
 			}
 		} else if (isGpsTitle) {
-			for (i = 0; i < components.length; ++i) {
+			title = "<a class='" + titleAnchorClasses + "' href='#!/" + "'>" + components[0] + "</a>";
+			title += "<span class='title-no-anchor'>(" + _t("#by-gps") + ")</span>&raquo;";
+
+			documentTitle += components[0];
+			if (components.length > 2 || currentMedia !== null)
+				documentTitle = " \u00ab " + documentTitle;
+			documentTitle += " (" + _t("#by-gps") + ")";
+
+			for (i = 2; i < components.length; ++i) {
 				if (currentMedia !== null)
 					mediaForNames = currentMedia;
 				else
@@ -630,90 +615,46 @@ $(document).ready(function() {
 				gpsHtmlTitle = _t("#place-icon-title") + gpsName;
 
 				if (i < components.length - 1 || currentMedia !== null) {
-					if (i !== 0) {
-						if (i == 1) {
-							title = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>" + title;
-						} else {
-							titleAdd = "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'";
-							if ([2, 3, 4].indexOf(i) > -1)
-								titleAdd += " title='" + _t("#place-icon-title") + gpsName + _t("#place-icon-title-end") + "'";
-							title += titleAdd + ">";
-						}
-						anchorOpened = true;
-					}
-				} else {
-					if (spanOpened)
-						title += "</span>";
+					title += "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'";
+					title += " title='" + _t("#place-icon-title") + gpsName + _t("#place-icon-title-end") + "'";
+					title += ">";
+				} else
 					title += "<span class='title-no-anchor'>";
-					spanOpened = true;
-				}
-				if (i == 1)
-					title += "(" + _t("#by-gps") + ")";
-				else {
-					if (i >= 2 && i <= 4) {
-						// i == 2 corresponds to the country, i == 4 to the place,
-						title += gpsName;
-						if (currentMedia !== null) {
-							latitude = currentMedia.metadata.latitude;
-							longitude = currentMedia.metadata.longitude;
-						} else {
-							 arrayCoordinates = currentAlbum.ancestorsCenter[i];
-							 latitude = arrayCoordinates.latitude;
-							 longitude = arrayCoordinates.longitude;
-						}
-						if (anchorOpened) {
-							title += "</a>";
-							anchorOpened = false;
-						} else if (spanOpened) {
-							title += "</span>";
-							spanOpened = false;
-						}
-						title += "<a href=" + mapLink(latitude, longitude, Options.map_zoom_levels[(i - 2)]) + " target='_blank'>" +
-											"<img class='title-img' title='" + gpsHtmlTitle + "' alt='" + gpsHtmlTitle + "' height='20px' src='img/ic_place_white_24dp_2x.png'>" +
-											"</a>";
-					} else
-						title += textComponents[i];
-				}
-
-				if (i < components.length - 1 || currentMedia !== null) {
-					if (i !== 0) {
-						if (anchorOpened)
-							title += "</a>";
-						anchorOpened = false;
-					}
-				} else {
-					if (! isMobile.any()) {
-						title += " <span id=\"title-count\">(";
-						title += currentAlbum.media.length + " ";
-						title += _t(".title-media") + " ";
-						if (components.length >= gpsLevelNumber + 2)
-							title += _t("#title-in-gps-album");
-						else
-							title += _t("#title-in-gpss-album");
-						title += ")</span>";
-					}
+				title += gpsName;
+				if (i < components.length - 1 || currentMedia !== null)
+					title += "</a>";
+				else
 					title += "</span>";
+
+				if (currentMedia !== null) {
+					latitude = currentMedia.metadata.latitude;
+					longitude = currentMedia.metadata.longitude;
+				} else {
+					 arrayCoordinates = currentAlbum.ancestorsCenter[i];
+					 latitude = arrayCoordinates.latitude;
+					 longitude = arrayCoordinates.longitude;
 				}
-				if (i === 0)
-					title += " ";
-				else if (i < components.length - 1 || currentMedia !== null)
+				title += "<a href=" + mapLink(latitude, longitude, Options.map_zoom_levels[(i - 2)]) + " target='_blank'>" +
+									"<img class='title-img' title='" + gpsHtmlTitle + "' alt='" + gpsHtmlTitle + "' height='20px' src='img/ic_place_white_24dp_2x.png'>" +
+									"</a>";
+
+				if (i == components.length - 1 && currentMedia === null) {
+					title += " <span id=\"title-count\">(";
+					title += currentAlbum.media.length + " ";
+					title += _t(".title-media") + " ";
+					if (components.length >= gpsLevelNumber + 2)
+						title += _t("#title-in-gps-album");
+					else
+						title += _t("#title-in-gpss-album");
+					title += ")</span>";
+				}
+				if (i < components.length - 1 || currentMedia !== null)
 					title += "&raquo;";
 
-				// build the html page title
-				if (i === 0) {
-					documentTitle += components[0];
-					if (components.length > 2 || currentMedia !== null)
-						documentTitle = " \u00ab " + documentTitle;
-				} else if (i == 1) {
-					documentTitle += " (" + _t("#by-gps") + ")";
-				} else if (i > 1) {
-					if ([2, 3, 4].indexOf(i) > -1)
-						documentTitle = gpsName + documentTitle;
-					else
-						documentTitle = textComponents[i] + documentTitle;
-					if (i < components.length - 1 || currentMedia !== null)
-						documentTitle = " \u00ab " + documentTitle;
-				}
+				// keep buildimg the html page title
+				documentTitle = gpsName + documentTitle;
+				if (i < components.length - 1 || currentMedia !== null)
+					documentTitle = " \u00ab " + documentTitle;
 			}
 		} else if (isSearchTitle) {
 			// i=0: title
@@ -737,83 +678,68 @@ $(document).ready(function() {
 				title += "&raquo;";
 			}
 
-			for (i = 0; i < components.length; ++i) {
-				// build the html page title
-				if (i === 0) {
-					documentTitle += components[0];
-					if (components.length > 2 || currentMedia !== null)
-						documentTitle = " \u00ab " + documentTitle;
-				} else if (i == 1) {
-					documentTitle += " (" + _t("#by-search") + ")";
-				} else if (i > 1) {
-					documentTitle = textComponents[i] + documentTitle;
-					if (i < components.length - 1 || currentMedia !== null)
-						documentTitle = " \u00ab " + documentTitle;
-				}
-			}
+			// build the html page title
+			documentTitle += components[0];
+			if (components.length > 2 || currentMedia !== null)
+				documentTitle = " \u00ab " + documentTitle;
+			documentTitle += " (" + _t("#by-search") + ")";
+			documentTitle = textComponents[i] + documentTitle;
+			if (i < components.length - 1 || currentMedia !== null)
+				documentTitle = " \u00ab " + documentTitle;
 		} else {
 			// folders title
-			for (i = 0; i < components.length; ++i) {
-				if (i != 1) {
-					if (i < components.length - 1 || currentMedia !== null) {
-						title += "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(i ? currentAlbum.ancestorsCacheBase[i] : "") + "'>";
-						anchorOpened = true;
-					} else {
-						if (spanOpened)
-							title += "</span>";
-						title += "<span class='title-no-anchor'>";
-						spanOpened = true;
-					}
-					title += textComponents[i];
+			title = "<a class='" + titleAnchorClasses + "' href='#!/" + "'>" + components[0] + "</a>";
+			if (components.length > 1 || currentMedia !== null)
+				title += "&raquo;";
 
-					if (i < components.length - 1 || currentMedia !== null) {
-						if (anchorOpened)
-							title += "</a>";
-						anchorOpened = false;
-					} else {
-						if (! isMobile.any()) {
-							title += " <span id=\"title-count\">(";
-							numMediaInSubAlbums = currentAlbum.numMediaInSubTree - currentAlbum.media.length;
-							if (currentAlbum.media.length) {
-								title += currentAlbum.media.length + " ";
-								title += _t(".title-media") + " ";
-								title += _t("#title-in-album");
-								if (numMediaInSubAlbums)
-									title += ", ";
-							}
-							if (numMediaInSubAlbums) {
-								title += numMediaInSubAlbums + " ";
-								if (! currentAlbum.media.length)
-									title += _t(".title-media") + " ";
-								title += _t("#title-in-subalbums");
-							}
-							if (currentAlbum.media.length > 0 && numMediaInSubAlbums > 0) {
-								title += ", ";
-								title += _t("#title-total") + " ";
-								title += currentAlbum.media.length + numMediaInSubAlbums;
-							}
-							title += ")</span>";
-						}
-						title += "</span>";
+			documentTitle += components[0];
+			if (components.length > 2 || currentMedia !== null)
+				documentTitle = " \u00ab " + documentTitle;
+
+			for (i = 2; i < components.length; ++i) {
+				if (i < components.length - 1 || currentMedia !== null)
+					title += "<a class='" + titleAnchorClasses + "' href='#!/" + encodeURI(currentAlbum.ancestorsCacheBase[i]) + "'>";
+				else
+					title += "<span class='title-no-anchor'>";
+
+				title += textComponents[i];
+
+				if (i < components.length - 1 || currentMedia !== null)
+					title += "</a>";
+				else
+					title += "</span>";
+
+				if (i == components.length - 1 && currentMedia === null) {
+					title += " <span id=\"title-count\">(";
+					numMediaInSubAlbums = currentAlbum.numMediaInSubTree - currentAlbum.media.length;
+					if (currentAlbum.media.length) {
+						title += currentAlbum.media.length + " ";
+						title += _t(".title-media") + " ";
+						title += _t("#title-in-album");
+						if (numMediaInSubAlbums)
+							title += ", ";
 					}
+					if (numMediaInSubAlbums) {
+						title += numMediaInSubAlbums + " ";
+						if (! currentAlbum.media.length)
+							title += _t(".title-media") + " ";
+						title += _t("#title-in-subalbums");
+					}
+					if (currentAlbum.media.length > 0 && numMediaInSubAlbums > 0) {
+						title += ", ";
+						title += _t("#title-total") + " ";
+						title += currentAlbum.media.length + numMediaInSubAlbums;
+					}
+					title += ")</span>";
 				}
 
-				if (
-					(i < components.length - 1 || currentMedia !== null) &&
-					(i == components.length - 1 || i !== 0)
-				)
+				if (i < components.length - 1 || currentMedia !== null)
 					title += "&raquo;";
 
-				// build the html page title
-				if (i === 0) {
-					documentTitle += components[0];
-					if (components.length > 2 || currentMedia !== null)
-						documentTitle = " \u00ab " + documentTitle;
-				} else if (i > 1) {
-					documentTitle = textComponents[i] + documentTitle;
-					if (i < components.length - 1 || currentMedia !== null)
-						documentTitle = " \u00ab " + documentTitle;
-				}
+				// keep building the html page title
+				documentTitle = textComponents[i] + documentTitle;
+				if (i < components.length - 1 || currentMedia !== null)
+					documentTitle = " \u00ab " + documentTitle;
 			}
 		}
 
