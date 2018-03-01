@@ -692,6 +692,13 @@ $(document).ready(function() {
 			if (components.length > 1 || currentMedia !== null)
 				title += "&raquo;";
 
+			if (searchCacheBase) {
+				title += "<a class='" + titleAnchorClasses + "' href='#!/" + searchCacheBase + "'>";
+				title += _t("#by-search");
+				title += "</a>";
+				title += "&raquo;";
+			}
+
 			documentTitle += components[0];
 			if (components.length > 2 || currentMedia !== null)
 				documentTitle = " \u00ab " + documentTitle;
