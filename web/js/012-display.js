@@ -2511,6 +2511,13 @@ $(document).ready(function() {
 		}
 	}
 
+	function focusSearchField() {
+		if (! isMobile.any())
+			$("#search-field").focus();
+		else
+			$("#search-field").blur();
+	}
+
 	// binds the click events to the sort buttons
 
 	// search
@@ -2535,13 +2542,14 @@ $(document).ready(function() {
 		} else {
 			window.location.href = bySearchViewLinkBase;
 		}
+		focusSearchField();
 		return false;
 	});
 	$('#search-field').keypress(function(ev) {
 		if (ev.which == 13) {
 			//Enter key pressed, trigger search button click event
 			$('#search-button').click();
-			$("#search-field").focus();
+			focusSearchField();
 			return false;
 		}
 	});
@@ -2553,7 +2561,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
-		$("#search-field").focus();
+		focusSearchField();
 	}
 
 	$("li#any-word").on('click', toggleAnyWordSearch);
@@ -2563,7 +2571,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
-		$("#search-field").focus();
+		focusSearchField();
 	}
 
 	$("li#case-sensitive").on('click', toggleCaseSensitiveSearch);
@@ -2573,7 +2581,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
-		$("#search-field").focus();
+		focusSearchField();
 	}
 
 	$("li#accent-sensitive").on('click', toggleAccentSensitiveSearch);
@@ -2583,7 +2591,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
-		$("#search-field").focus();
+		focusSearchField();
 	}
 
 	$("li#regex-word").on('click', toggleRegexSearch);
@@ -2593,7 +2601,7 @@ $(document).ready(function() {
 		updateMenu();
 		if ($("#search-field").val().trim())
 			$('#search-button').click();
-		$("#search-field").focus();
+		focusSearchField();
 	}
 
 	// subalbums
@@ -2605,7 +2613,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshSubalbums");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2619,7 +2627,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshSubalbums");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2634,7 +2642,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshSubalbums");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2648,7 +2656,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshMedia");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2662,7 +2670,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshMedia");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2679,7 +2687,7 @@ $(document).ready(function() {
 			sortAlbumsMedia();
 			updateMenu();
 			showAlbum("refreshMedia");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2691,7 +2699,7 @@ $(document).ready(function() {
 			setBooleanCookie("albums_slide_style", Options.albums_slide_style);
 			updateMenu();
 			showAlbum("refreshSubalbums");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2706,7 +2714,7 @@ $(document).ready(function() {
 			setCookie("spacing", Options.spacing);
 			updateMenu();
 			showAlbum("refreshBoth");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2718,7 +2726,7 @@ $(document).ready(function() {
 			setBooleanCookie("show_album_names_below_thumbs", Options.show_album_names_below_thumbs);
 			updateMenu();
 			showAlbum("refreshSubalbums");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2730,7 +2738,7 @@ $(document).ready(function() {
 			setBooleanCookie("show_album_media_count", Options.show_album_media_count);
 			updateMenu();
 			showAlbum("refreshSubalbums");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2742,7 +2750,7 @@ $(document).ready(function() {
 			setBooleanCookie("show_media_names_below_thumbs", Options.show_media_names_below_thumbs);
 			updateMenu();
 			showAlbum("refreshMedia");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2754,7 +2762,7 @@ $(document).ready(function() {
 			setCookie("album_thumb_type", Options.album_thumb_type);
 			updateMenu();
 			showAlbum("refreshSubalbums");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2766,7 +2774,7 @@ $(document).ready(function() {
 			setCookie("media_thumb_type", Options.media_thumb_type);
 			updateMenu();
 			showAlbum("refreshMedia");
-			$("#search-field").focus();
+			focusSearchField();
 		}
 		return false;
 	}
@@ -2799,7 +2807,7 @@ $(document).ready(function() {
 	function toggleMenu(ev) {
 		$("ul#right-menu").toggleClass("expand");
 		if ($("ul#right-menu").hasClass("expand"))
-			$("#search-field").focus();
+			focusSearchField();
 		updateMenu();
 	}
 
