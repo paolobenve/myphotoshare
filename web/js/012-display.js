@@ -663,10 +663,10 @@ $(document).ready(function() {
 			title = "<a class='" + titleAnchorClasses + "' href='#!/" + "'>" + components[0] + "</a>&raquo;";
 
 			if (currentMedia === null)
-				title += "<span class='title-no-anchor'>";
+				title += "<span class='title-no-anchor'";
 			else
-				title += "<a class='" + titleAnchorClasses + "' href='#!/" + currentAlbum.cacheBase + "'>";
-			title += _t("#by-search");
+				title += "<a class='" + titleAnchorClasses + "' href='#!/" + currentAlbum.cacheBase + "'";
+			title += " style='font-style: italic;'>(" + _t("#by-search") + ")";
 			if (currentMedia === null)
 				title += "</span>";
 			else
@@ -679,12 +679,8 @@ $(document).ready(function() {
 			}
 
 			// build the html page title
-			documentTitle += components[0];
-			if (components.length > 2 || currentMedia !== null)
-				documentTitle = " \u00ab " + documentTitle;
-			documentTitle += " (" + _t("#by-search") + ")";
-			documentTitle = textComponents[i] + documentTitle;
-			if (i < components.length - 1 || currentMedia !== null)
+			documentTitle += " (" + _t("#by-search") + ") \u00ab " + components[0];
+			if (currentMedia !== null)
 				documentTitle = " \u00ab " + documentTitle;
 		} else {
 			// folders title
