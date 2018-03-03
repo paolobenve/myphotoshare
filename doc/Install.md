@@ -4,21 +4,22 @@
 
 MyPhotoShare needs:
 
+* a working web server (e.g. `apache`, `nginx`, etc.)
+* the web server `php` module installed (optional if accepting degraded mode, see below)
+* `php5-gd` in order to create albums share images (optional if accepting degraded mode, see below)
 * `python3` (running it with Python 2 is possible, replace `python3` by `python2` in the first line in `scanner/main.py` and install the corresponding Python 2 dependencies).
 * `python3-numpy`
 * `python3-requests`
 * `python3-pil`
 * `python3-unidecode`
-* `avconv` / `ffmpeg` in order to be able to manage videos.
-* a working web server (e.g. `apache`, `nginx`, etc.) with `php` module installed.
-* `php5-gd` in order to create albums share images.
+* `avconv` / `ffmpeg` in order to be able to manage videos
 * `curl`, used by minify script.
-* `cssmin` (`https://github.com/zacharyvoase/cssmin`, debian/ubuntu packages `cssmin`) and `jsmin` (`https://github.com/tikitu/jsmin`, debian/ubuntu package `python-jsmin`), unless using external web service
-
 
 ### Optional
 * `python-opencv` if found, face detection is used when cropping images to square.
 * OpenCV libraries and data (`opencv-data`)
+* `cssmin` (`https://github.com/zacharyvoase/cssmin`, debian/ubuntu packages `cssmin`), unless using external web service
+* `jsmin` (`https://github.com/tikitu/jsmin`, debian/ubuntu package `python-jsmin`) or `uglifyjs` (`https://github.com/mishoo/UglifyJS`, debian/ubuntu package `uglifyjs`), unless using external web service
 
 
 ### Why PHP? Isn't it enough with JavaScript?
