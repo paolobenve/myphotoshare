@@ -572,7 +572,7 @@
 	};
 
 	PhotoFloat.removeAccents = function(string) {
-		return string.latinise();
+		return string.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 	};
 
 	PhotoFloat.prototype.authenticate = function(password, result) {

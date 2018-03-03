@@ -72,7 +72,6 @@
 		<script type="text/javascript" src="js/005-modernizr.js"></script>
 	<?php	} ?>
 
-		<script type="text/javascript" src="js/006-latinize.js"></script>
 		<script type="text/javascript" src="js/008-social.js"></script>
 		<script type="text/javascript" src="js/009-translations.js"></script>
 		<script type="text/javascript" src="js/010-libphotofloat.js"></script>
