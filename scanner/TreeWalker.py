@@ -482,39 +482,34 @@ class TreeWalker:
 
 	@staticmethod
 	def normalize_for_word_list(phrase):
-		return self.remove_non_alphabetic_characters(phrase)
+		return TreeWalker.remove_non_alphabetic_characters(phrase)
 
 	@staticmethod
 	def normalize_for_search(phrase):
-		return self.remove_accents_and_switch_to_lowercase(phrase)
+		return TreeWalker.remove_accents_and_switch_to_lowercase(phrase)
 
 	@staticmethod
 	def normalize_for_album_name(phrase):
-		return self.convert_to_ascii_only(phrase)
+		return TreeWalker.convert_to_ascii_only(phrase)
 
-
-	# The dictionaries of stopwords for the user language
-	lowercase_stopwords = {}
-	stopwords_for_album = {}
-	stopwords_for_word = {}
-
-
-	@staticmethod
-	def remove_stopwords(lowercase_words, search_normalized_words, ascii_words):
+	def remove_stopwords(self, lowercase_words, search_normalized_words, ascii_words):
 		# remove the stopwords in self.lowercase_stopwords from 2nd and 3rd argument according to their presence in the 1st
-		purged_lowercase_words = lowercase_words - TreeWalker.lowercase_stopwords
-		purged_search_normalized_words = ()
-		purged_ascii_words = ()
-		for word in lowercase_words:
-			if word in purged_lowercase_words:
-				purged_search_normalized_words.append(word)
-				purged_ascii_words.append(word)
+		purged_lowercase_words = lowercase_words - self.get_lowercase_stopwords()
+		purged_search_normalized_words = []
+		purged_ascii_words = []
+		lowercase_words = list(lowercase_words)
+		search_normalized_words = list(search_normalized_words)
+		ascii_words = list(ascii_words)
+		for word_index in range(len(lowercase_words)):
+			if lowercase_words[word_index] in purged_lowercase_words:
+				purged_search_normalized_words.append(search_normalized_words[word_index])
+				purged_ascii_words.append(ascii_words[word_index])
 
 		return purged_search_normalized_words, purged_ascii_words
 
 
 	@staticmethod
-	def load_stopwords():
+	def get_lowercase_stopwords():
 		"""
 		Load the list of stopwords for the user language into the two sets `stopwords_for_album`
 		and `stopwords_for_word`. The words in the sets are normalized (no accents and diacritics).
@@ -525,47 +520,25 @@ class TreeWalker:
 
 		stopwords = []
 		stopwords_file = os.path.join(os.path.dirname(__file__), "resources/stopwords-iso.json")
-		message("stopwords", "Loading " + stopwords_file, 4)
+		message("loading stopwords...", stopwords_file, 4)
 		with open(stopwords_file, "r") as stopwords_p:
 			stopwords = json.load(stopwords_p)
 
 		if language in stopwords:
 			phrase = " ".join(stopwords[language])
-			self.lowercase_stopwords = frozenset(self.switch_to_lowercase(phrase))
+			lowercase_stopwords = frozenset(TreeWalker.switch_to_lowercase(phrase))
+			message("stopwords loaded", "", 4)
 			# self.stopwords_for_album = frozenset(self.normalize_for_album_name(phrase))
 			# self.stopwords_for_word = frozenset(self.remove_non_alphabetic_characters(phrase))
 		else:
+			lowercase_stopwords = []
 			message("stopwords: no stopwords for language", language, 4)
-		return
-
-
-	@staticmethod
-	def get_stopwords_for_album():
-		"""
-		Get the set of stopwords used when searching albums.
-		Loads the stopwords from resource file if necessary.
-		"""
-		if self.stopwords_for_album == {}:
-			self.load_stopwords()
-
-		return self.stopwords_for_album
-
-
-	@staticmethod
-	def get_stopwords_for_word():
-		"""
-		Get the set of stopwords used when searching media.
-		Loads the stopwords from resource file if necessary.
-		"""
-		if self.stopwords_for_word == {}:
-			self.load_stopwords()
-
-		return self.stopwords_for_word
-
+		return lowercase_stopwords
 
 	def add_media_to_tree_by_search(self, media):
 		words_for_word_list, words_for_search_album_name = self.prepare_for_tree_by_search(media)
-		media_or_album.words = words_for_word_list
+		print(words_for_word_list, words_for_search_album_name)
+		media.words = words_for_word_list
 		for word_index in range(len(words_for_search_album_name)):
 			word = words_for_search_album_name[word_index]
 			unicode_word = words_for_word_list[word_index]
@@ -579,7 +552,7 @@ class TreeWalker:
 
 	def add_album_to_tree_by_search(self, album):
 		words_for_word_list, words_for_search_album_name = self.prepare_for_tree_by_search(album)
-		media_or_album.words = words_for_word_list
+		album.words = words_for_word_list
 		for word_index in range(len(words_for_search_album_name)):
 			word = words_for_search_album_name[word_index]
 			unicode_word = words_for_word_list[word_index]
@@ -603,9 +576,9 @@ class TreeWalker:
 			media_or_album_name = os.path.splitext(media_or_album_name)[0]
 		phrase = media_or_album.title + " " + media_or_album.description + " " + " ".join(media_or_album.tags) + " " + media_or_album_name
 
-		alphabetic_phrase = self.remove_non_alphabetic_characters(phrase)
-		lowercase_phrase = self.switch_to_lowercase(alphabetic_phrase)
-		search_normalized_phrase = self.remove_accents(lowercase_phrase)
+		alphabetic_phrase = TreeWalker.remove_non_alphabetic_characters(phrase)
+		lowercase_phrase = TreeWalker.switch_to_lowercase(alphabetic_phrase)
+		search_normalized_phrase = TreeWalker.remove_accents(lowercase_phrase)
 		ascii_phrase = self.normalize_for_album_name(search_normalized_phrase)
 
 		lowercase_words = self.phrase_to_words(lowercase_phrase)
