@@ -555,7 +555,11 @@ class TreeWalker:
 		# works on the words in the file/directory name and in album.ini's description, title, tags
 
 		# media_or_album.name must be the last item because the normalization will remove the file extension
-		phrase = media_or_album.title + " " + media_or_album.description + " " + " ".join(media_or_album.tags) + " " + media_or_album.name
+		media_or_album_name = media_or_album.name
+		if isinstance(media_or_album, Media):
+			# remove the extension
+			media_or_album_name = os.path.splitext(media_or_album_name)[0]
+		phrase = media_or_album.title + " " + media_or_album.description + " " + " ".join(media_or_album.tags) + " " + media_or_album_name
 
 		# media or album word list has the words with their case and accents
 		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
