@@ -472,14 +472,20 @@ class TreeWalker:
 	@staticmethod
 	def convert_to_ascii_only(phrase):
 		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
-		phrase = unidecode.unidecode(phrase)
+		words = TreeWalker.phrase_to_words(phrase)
+		decoded_words = []
+		for word in words:
+			# removing spaces is necessary with chinese: every ideogram is rendered with a word
+			decoded_words.append(unidecode.unidecode(word).replace(' ', ''))
+
+		phrase = ' '.join(decoded_words)
 
 		return phrase
 
 	@staticmethod
 	def phrase_to_words(phrase):
-		# splits the phrase into a set
-		return set(phrase.split(' '))
+		# splits the phrase into a list
+		return list(phrase.split(' '))
 
 	@staticmethod
 	def normalize_for_word_list(phrase):
@@ -588,7 +594,7 @@ class TreeWalker:
 		# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
 		words_for_word_list, words_for_search_album_name = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
 
-		return words_for_word_list, words_for_search_album_name
+		return search_normalized_words, ascii_words
 
 
 	def add_media_to_tree_by_geonames(self, media):
