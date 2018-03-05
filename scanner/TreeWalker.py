@@ -447,7 +447,7 @@ class TreeWalker:
 	@staticmethod
 	def remove_non_alphabetic_characters(phrase):
 		# remove digits
-		phrase = "".join(["" if c.decimal() else c for c in phrase])
+		phrase = "".join(["" if c.isdecimal() else c for c in phrase])
 		# convert non-alphabetic characters to spaces
 		phrase = "".join([c if c.isalpha() else " " for c in phrase])
 		# normalize multiple, leading and trailing spaces
@@ -502,7 +502,7 @@ class TreeWalker:
 	@staticmethod
 	def remove_stopwords(lowercase_words, search_normalized_words, ascii_words):
 		# remove the stopwords in self.lowercase_stopwords from 2nd and 3rd argument according to their presence in the 1st
-		purged_lowercase_words = lowercase_words - self.lowercase_stopwords
+		purged_lowercase_words = lowercase_words - TreeWalker.lowercase_stopwords
 		purged_search_normalized_words = ()
 		purged_ascii_words = ()
 		for word in lowercase_words:
