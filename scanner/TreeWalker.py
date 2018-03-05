@@ -494,8 +494,23 @@ class TreeWalker:
 
 
 	# The dictionaries of stopwords for the user language
+	lowercase_stopwords = {}
 	stopwords_for_album = {}
 	stopwords_for_word = {}
+
+
+	@staticmethod
+	def remove_stopwords(lowercase_words, search_normalized_words, ascii_words):
+		# remove the stopwords in self.lowercase_stopwords from 2nd and 3rd argument according to their presence in the 1st
+		purged_lowercase_words = lowercase_words - self.lowercase_stopwords
+		purged_search_normalized_words = ()
+		purged_ascii_words = ()
+		for word in lowercase_words:
+			if word in purged_lowercase_words:
+				purged_search_normalized_words.append(word)
+				purged_ascii_words.append(word)
+
+		return purged_search_normalized_words, purged_ascii_words
 
 
 	@staticmethod
@@ -515,11 +530,12 @@ class TreeWalker:
 			stopwords = json.load(stopwords_p)
 
 		if language in stopwords:
-			words = " ".join(stopwords[language])
-			TreeWalker.stopwords_for_album = frozenset(TreeWalker.normalize_and_split_for_album_name(words))
-			TreeWalker.stopwords_for_word = frozenset(TreeWalker.normalize_and_split_for_word_list(words))
+			phrase = " ".join(stopwords[language])
+			self.lowercase_stopwords = frozenset(self.switch_to_lowercase(phrase))
+			# self.stopwords_for_album = frozenset(self.normalize_for_album_name(phrase))
+			# self.stopwords_for_word = frozenset(self.remove_non_alphabetic_characters(phrase))
 		else:
-			message("stopwords", "No stopwords for language " + language, 4)
+			message("stopwords: no stopwords for language", language, 4)
 		return
 
 
