@@ -13,6 +13,8 @@ import random
 import math
 import unicodedata
 from datetime import datetime
+import unicodedata
+import unidecode
 
 from PIL import Image
 
@@ -443,38 +445,52 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
 
 	@staticmethod
-	def minimal_normalize(phrase):
-		# normalize the name without extension and remove the numbers
-
-		# TODO: Potential bug. If phrase contains a dot, the text after the last dot occurence is stripped...
-		name = os.path.splitext(phrase)[0]
-		# convert non-alphanumeric characters to space
-		name = "".join([c if c.isalnum() else " " for c in name])
+	def remove_non_alphabetic_characters(phrase):
 		# remove digits
-		name = "".join(["" if c.isnumeric() else c for c in name])
+		phrase = "".join(["" if c.decimal() else c for c in phrase])
+		# convert non-alphabetic characters to spaces
+		phrase = "".join([c if c.isalpha() else " " for c in phrase])
+		# normalize multiple, leading and trailing spaces
+		phrase = ' '.join(phrase.split())
 
-		name = name.strip()
-
-		return name
-
-	@staticmethod
-	def normalize_and_split_for_album_name(phrase):
-		import unicodedata
-
-		normalized_phrase = TreeWalker.minimal_normalize(phrase)
-		# from http://nullege.com/codes/show/src@d@b@dbkit-0.2.2@examples@notary@notary.py/38/unicodedata.combining
-		nfkd = unicodedata.normalize('NFKD', normalized_phrase)
-		normalized_phrase = u''.join(ch for ch in nfkd if not unicodedata.combining(ch))
-		normalized_phrase = name.lower()
-
-		return name.split(' ')
+		return phrase
 
 	@staticmethod
-	def normalize_and_split_for_word_list(phrase):
-		# normalize the name without extension and remove the numbers
-		name = TreeWalker.minimal_normalize(phrase)
+	def remove_accents(phrase):
+		# strip accents (from http://nullege.com/codes/show/src@d@b@dbkit-0.2.2@examples@notary@notary.py/38/unicodedata.combining)
+		phrase = u''.join(ch for ch in unicodedata.normalize('NFKD', phrase) if not unicodedata.combining(ch))
 
-		return name.split(' ')
+		return phrase
+
+	@staticmethod
+	def switch_to_lowercase(phrase):
+		phrase = phrase.lower()
+
+		return phrase
+
+	@staticmethod
+	def convert_to_ascii_only(phrase):
+		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
+		phrase = unidecode.unidecode(phrase)
+
+		return phrase
+
+	@staticmethod
+	def phrase_to_words(phrase):
+		# splits the phrase into a set
+		return set(phrase.split(' '))
+
+	@staticmethod
+	def normalize_for_word_list(phrase):
+		return self.remove_non_alphabetic_characters(phrase)
+
+	@staticmethod
+	def normalize_for_search(phrase):
+		return self.remove_accents_and_switch_to_lowercase(phrase)
+
+	@staticmethod
+	def normalize_for_album_name(phrase):
+		return self.convert_to_ascii_only(phrase)
 
 
 	# The dictionaries of stopwords for the user language
@@ -532,22 +548,32 @@ class TreeWalker:
 
 
 	def add_media_to_tree_by_search(self, media):
-		words_for_search_album_name = self.prepare_for_tree_by_search(media)
-		for word in words_for_search_album_name:
+		words_for_word_list, words_for_search_album_name = self.prepare_for_tree_by_search(media)
+		media_or_album.words = words_for_word_list
+		for word_index in range(len(words_for_search_album_name)):
+			word = words_for_search_album_name[word_index]
+			unicode_word = words_for_word_list[word_index]
 			if word:
 				if word not in list(self.tree_by_search.keys()):
-					self.tree_by_search[word] = {"media_words": [], "album_words": []}
+					self.tree_by_search[word] = {"media_words": [], "album_words": [], "unicode_words": []}
 				if media not in self.tree_by_search[word]["media_words"]:
 					self.tree_by_search[word]["media_words"].append(media)
+				if unicode_word not in self.tree_by_search[word]["unicode_words"]:
+					self.tree_by_search[word]["unicode_words"].append(unicode_word)
 
 	def add_album_to_tree_by_search(self, album):
-		words_for_search_album_name = self.prepare_for_tree_by_search(album)
-		for word in words_for_search_album_name:
+		words_for_word_list, words_for_search_album_name = self.prepare_for_tree_by_search(album)
+		media_or_album.words = words_for_word_list
+		for word_index in range(len(words_for_search_album_name)):
+			word = words_for_search_album_name[word_index]
+			unicode_word = words_for_word_list[word_index]
 			if word:
 				if word not in list(self.tree_by_search.keys()):
-					self.tree_by_search[word] = {"media_words": [], "album_words": []}
+					self.tree_by_search[word] = {"media_words": [], "album_words": [], "unicode_words": []}
 				if album not in self.tree_by_search[word]["album_words"]:
 					self.tree_by_search[word]["album_words"].append(album)
+					if unicode_word not in self.tree_by_search[word]["unicode_words"]:
+						self.tree_by_search[word]["unicode_words"].append(unicode_word)
 
 
 	def prepare_for_tree_by_search(self, media_or_album):
@@ -561,23 +587,19 @@ class TreeWalker:
 			media_or_album_name = os.path.splitext(media_or_album_name)[0]
 		phrase = media_or_album.title + " " + media_or_album.description + " " + " ".join(media_or_album.tags) + " " + media_or_album_name
 
-		# media or album word list has the words with their case and accents
-		words_for_word_list = self.normalize_and_split_for_word_list(phrase)
-		# get unique values and filter out stopwords
-		words_for_word_list = list(frozenset(words_for_word_list) - TreeWalker.get_stopwords_for_word())
-		# remove empty elements
-		words_for_word_list = [x for x in words_for_word_list if x]
+		alphabetic_phrase = self.remove_non_alphabetic_characters(phrase)
+		lowercase_phrase = self.switch_to_lowercase(alphabetic_phrase)
+		search_normalized_phrase = self.remove_accents(lowercase_phrase)
+		ascii_phrase = self.normalize_for_album_name(search_normalized_phrase)
 
-		media_or_album.words = words_for_word_list
+		lowercase_words = self.phrase_to_words(lowercase_phrase)
+		search_normalized_words = self.phrase_to_words(search_normalized_phrase)
+		ascii_words = self.phrase_to_words(ascii_phrase)
 
-		# words for search album names are lower case and accentless
-		words_for_search_album_name = self.normalize_and_split_for_album_name(phrase)
-		# get unique values and filter out stopwords
-		words_for_search_album_name = list(frozenset(words_for_search_album_name) - TreeWalker.get_stopwords_for_album())
-		# remove empty elements
-		words_for_search_album_name = [x for x in words_for_search_album_name if x]
+		# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
+		words_for_word_list, words_for_search_album_name = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
 
-		return words_for_search_album_name
+		return words_for_word_list, words_for_search_album_name
 
 
 	def add_media_to_tree_by_geonames(self, media):
