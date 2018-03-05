@@ -538,7 +538,6 @@ class TreeWalker:
 
 	def add_media_to_tree_by_search(self, media):
 		words_for_word_list, words_for_search_album_name = self.prepare_for_tree_by_search(media)
-		print(words_for_word_list, words_for_search_album_name)
 		media.words = words_for_word_list
 		for word_index in range(len(words_for_search_album_name)):
 			word = words_for_search_album_name[word_index]
