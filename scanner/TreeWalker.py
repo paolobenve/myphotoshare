@@ -243,6 +243,7 @@ class TreeWalker:
 					by_search_max_file_date = max(by_search_max_file_date, single_album.date)
 				else:
 					by_search_max_file_date = single_album.date
+			word_album.unicode_words = media_and_album_words["unicode_words"]
 			self.all_albums.append(word_album)
 			# self.generate_composite_image(word_album, word_max_file_date)
 			next_level()

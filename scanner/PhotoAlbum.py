@@ -337,6 +337,9 @@ class Album(object):
 						sub_dict["alt_name"] = subalbum.alt_name
 					if hasattr(subalbum, "words"):
 						sub_dict["words"] = subalbum.words
+					if hasattr(subalbum, "unicode_words"):
+						sub_dict["unicode_words"] = subalbum.unicode_words
+						print(sub_dict)
 					subalbums.append(sub_dict)
 
 		else:

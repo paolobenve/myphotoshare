@@ -4,9 +4,11 @@
 		this.albumCache = [];
 		this.geotaggedPhotosFound = null;
 		this.searchWordsFromJsonFile = [];
+		this.searchAlbumCacheBaseFromJsonFile = [];
 
 		PhotoFloat.searchAndSubalbumHash = '';
 		PhotoFloat.searchWordsFromJsonFile = this.searchWordsFromJsonFile;
+		PhotoFloat.searchAlbumCacheBaseFromJsonFile = this.searchAlbumCacheBaseFromJsonFile;
 	}
 
 	/* public member functions */
@@ -41,8 +43,10 @@
 					var i;
 					if (cacheKey == Options.by_search_string) {
 						// root of search albums: build the word list
-						for (i = 0; i < theAlbum.subalbums.length; ++i)
-							PhotoFloat.searchWordsFromJsonFile.push(theAlbum.subalbums[i].path);
+						for (i = 0; i < theAlbum.subalbums.length; ++i) {
+							PhotoFloat.searchWordsFromJsonFile.push(theAlbum.subalbums[i].unicode_words);
+							PhotoFloat.searchAlbumCacheBaseFromJsonFile.push(theAlbum.subalbums[i].cacheBase);
+						}
 					} else if (! PhotoFloat.isSearchCacheBase(cacheKey)) {
 						for (i = 0; i < theAlbum.subalbums.length; ++i)
 							theAlbum.subalbums[i].parent = theAlbum;
@@ -278,8 +282,12 @@
 						for (i = 0; i <= lastIndex; i ++) {
 							wordHashes = [];
 							for (j = 0; j < PhotoFloat.searchWordsFromJsonFile.length; j ++) {
-								if (PhotoFloat.searchWordsFromJsonFile[j].indexOf(SearchWordsFromUserNormalized[i]) > -1) {
-								 	wordHashes.push(Options.by_search_string + Options.cache_folder_separator + PhotoFloat.searchWordsFromJsonFile[j]);
+								if (PhotoFloat.searchWordsFromJsonFile[j].some(function(word) {
+									console.log(word);
+									console.log(SearchWordsFromUserNormalized[i]);
+									return word.indexOf(SearchWordsFromUserNormalized[i]) > -1;
+								})) {
+								 	wordHashes.push(PhotoFloat.searchAlbumCacheBaseFromJsonFile[j]);
 									numSubAlbumsToGet ++;
 								}
 							}
@@ -289,8 +297,15 @@
 					} else {
 						// whole words
 						for (i = 0; i <= lastIndex; i ++)
-							if (PhotoFloat.searchWordsFromJsonFile.indexOf(SearchWordsFromUserNormalized[i]) > -1) {
-								albumHashes.push([Options.by_search_string + Options.cache_folder_separator + SearchWordsFromUserNormalized[i]]);
+							if (PhotoFloat.searchWordsFromJsonFile.some(function(words, index, searchWords) {
+								console.log(words[0]);
+								console.log(SearchWordsFromUserNormalized[i]);
+								if (words.indexOf(SearchWordsFromUserNormalized[i]) > -1) {
+									albumHashes.push([PhotoFloat.searchAlbumCacheBaseFromJsonFile[index]]);
+									return true;
+								}
+								return false;
+							})) {
 								numSubAlbumsToGet ++;
 							} else {
 								albumHashes.push([]);
