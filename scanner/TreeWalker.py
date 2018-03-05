@@ -112,7 +112,7 @@ class TreeWalker:
 			message("all albums saved to json files", "", 5)
 			back_level()
 		# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
-		TreeWalker._save_json_options()
+		self._save_json_options()
 		self.remove_stale()
 		message("complete", "", 4)
 
@@ -513,10 +513,10 @@ class TreeWalker:
 		Get the set of stopwords used when searching albums.
 		Loads the stopwords from resource file if necessary.
 		"""
-		if TreeWalker.stopwords_for_album == {}:
-			TreeWalker.load_stopwords()
+		if self.stopwords_for_album == {}:
+			self.load_stopwords()
 
-		return TreeWalker.stopwords_for_album
+		return self.stopwords_for_album
 
 
 	@staticmethod
@@ -525,10 +525,10 @@ class TreeWalker:
 		Get the set of stopwords used when searching media.
 		Loads the stopwords from resource file if necessary.
 		"""
-		if TreeWalker.stopwords_for_word == {}:
-			TreeWalker.load_stopwords()
+		if self.stopwords_for_word == {}:
+			self.load_stopwords()
 
-		return TreeWalker.stopwords_for_word
+		return self.stopwords_for_word
 
 
 	def add_media_to_tree_by_search(self, media):
@@ -720,7 +720,7 @@ class TreeWalker:
 		num_photo_in_dir = 0
 		photos_without_geotag_in_dir = []
 		photos_without_exif_date_in_dir = []
-		for entry in TreeWalker._listdir_sorted_by_time(absolute_path):
+		for entry in self._listdir_sorted_by_time(absolute_path):
 			try:
 				# @python2
 				if sys.version_info < (3, ):
@@ -1061,7 +1061,7 @@ class TreeWalker:
 			tile = Image.open(thumbnail)
 			tile_img_width = tile.size[0]
 			tile_img_height = tile.size[1]
-			[x, y] = TreeWalker._index_to_coords(index, tile_width, px_between_tiles, side_off_set, linear_number_of_tiles)
+			[x, y] = self._index_to_coords(index, tile_width, px_between_tiles, side_off_set, linear_number_of_tiles)
 			if tile_img_width < tile_width:
 				x += int(float(tile_width - tile_img_width) / 2)
 			if tile_img_height < tile_width:
