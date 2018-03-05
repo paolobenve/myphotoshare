@@ -592,7 +592,7 @@ class TreeWalker:
 		ascii_words = self.phrase_to_words(ascii_phrase)
 
 		# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
-		words_for_word_list, words_for_search_album_name = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
+		search_normalized_words, ascii_words = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
 
 		return search_normalized_words, ascii_words
 
