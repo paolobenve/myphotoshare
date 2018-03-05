@@ -323,6 +323,8 @@
 						$(".search-failed").hide();
 						for (indexWords = 0; indexWords <= lastIndex; indexWords ++) {
 							// console.log("n. album to get", albumHashes[indexWords].length);
+							searchResultsMedia[indexWords] = [];
+							searchResultsSubalbums[indexWords] = [];
 							for (indexAlbums = 0; indexAlbums < albumHashes[indexWords].length; indexAlbums ++) {
 								// getAlbum is called here with 2 more parameters, indexAlbums and indexWords, in order to know their ValueError
 								// if they are not passed as arguments, the success function will see their values updates (getAlbum is an asyncronous function)
@@ -531,6 +533,10 @@
 	};
 
 	PhotoFloat.union = function(a, b) {
+		if (a === [])
+			return b;
+		if (b === [])
+			return a;
 		// begin cloning the first array
 		var union = a.slice(0);
 
