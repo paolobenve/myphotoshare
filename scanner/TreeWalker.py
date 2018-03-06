@@ -705,7 +705,7 @@ class TreeWalker:
 								cached_album is not None and
 								hasattr(cached_album, "absolute_path") and
 								cached_album.absolute_path == absolute_path and
-								hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
+								Options.json_version != 0 and hasattr(cached_album, "json_version") and cached_album.json_version == Options.json_version
 							):
 								next_level()
 								message("json file is OK", "", 4)

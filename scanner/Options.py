@@ -33,6 +33,7 @@ options_requiring_json_regeneration = ['geonames_language', 'unspecified_geoname
 options_requiring_reduced_images_regeneration = ['jpeg_quality']
 options_requiring_thumbnails_regeneration = ['face_cascade_scale_factor', 'small_square_crops_background_color']
 # set this variable to a new integer number whenever the json files structure changes
+# json_version = 0 is debug mode: json files are always considered invalid
 # json_version = 1 since ...
 # json_version = 2 since checksums have been added
 # json_version = 3 since geotag managing is optional
