@@ -453,6 +453,8 @@ class TreeWalker:
 		phrase = "".join([c if c.isalpha() else " " for c in phrase])
 		# normalize multiple, leading and trailing spaces
 		phrase = ' '.join(phrase.split())
+		# normalize unicode, see https://stackoverflow.com/questions/16467479/normalizing-unicode
+		phrase = unicodedata.normalize('NFC', phrase)
 
 		return phrase
 

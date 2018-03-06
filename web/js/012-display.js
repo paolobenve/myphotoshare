@@ -2523,7 +2523,7 @@ $(document).ready(function() {
 		var searchOptions = '';
 		// save current hash in order to come back there when exiting from search
 		savedLink = location.hash;
-		var searchTerms = encodeURIComponent($("#search-field").val().trim().replace(/  /g, ' ').replace(/ /g, '_'));
+		var searchTerms = encodeURIComponent($("#search-field").val().normalize().trim().replace(/  /g, ' ').replace(/ /g, '_'));
 		var bySearchViewLinkBase = "#!/" + Options.by_search_string
 		if (searchTerms) {
 			var bySearchViewLink = bySearchViewLinkBase + Options.cache_folder_separator;
