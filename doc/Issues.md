@@ -37,3 +37,7 @@ The scanner gets modification date-time for video date-time. Be sure you do not 
 #### Pillow bug
 
 As a result of a pillow bug, exif data could not be read for some photos which have two APP1 (0xFFE1/65505) aka Exif segments. A fix is available, see https://github.com/python-pillow/Pillow/issues/2944#issuecomment-356316273: a line of code is to be added in a python source file.
+
+#### Oriental languages
+
+Oriental languages like chinese do not define easily word separation, so whole word search could thrown no results, try inside word search.

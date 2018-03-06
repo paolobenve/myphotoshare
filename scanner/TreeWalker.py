@@ -472,7 +472,17 @@ class TreeWalker:
 	@staticmethod
 	def convert_to_ascii_only(phrase):
 		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
-		phrase = unidecode.unidecode(phrase)
+
+		# the following line generate a problem with chinese, because unidecode translate every ideogram with a word
+		#phrase = unidecode.unidecode(phrase)
+
+		words = TreeWalker.phrase_to_words(phrase)
+		decoded_words = []
+		for word in words:
+			# removing spaces is necessary with chinese: every ideogram is rendered with a word
+			decoded_words.append(unidecode.unidecode(word).strip().replace(' ', '_'))
+
+		phrase = ' '.join(decoded_words)
 
 		return phrase
 
