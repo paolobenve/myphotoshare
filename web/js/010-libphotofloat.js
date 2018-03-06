@@ -201,7 +201,7 @@
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
 				var wordsStringOriginal = wordsString.replace(/_/g, ' ');
 				// the normalized words are needed in order to compare with the search cache json files names, which are normalized
-				var wordsStringNormalized = PhotoFloat.removeAccents(wordsString.toLowerCase());
+				var wordsStringNormalized = PhotoFloat.removeAccents(wordsStringOriginal.toLowerCase());
 				if (wordsAndOptions.length > 1) {
 					var searchOptions = wordsAndOptions.slice(0, -1);
 					Options.search_regex = searchOptions.indexOf('r') > -1;
@@ -294,6 +294,8 @@
 							}
 							if (wordHashes.length)
 								albumHashes.push(wordHashes);
+							else
+								albumHashes.push([]);
 						}
 					} else {
 						// whole words
