@@ -495,7 +495,7 @@ class TreeWalker:
 
 	def remove_stopwords(self, lowercase_words, search_normalized_words, ascii_words):
 		# remove the stopwords in self.lowercase_stopwords from 2nd and 3rd argument according to their presence in the 1st
-		purged_lowercase_words = lowercase_words - self.get_lowercase_stopwords()
+		purged_lowercase_words = set(lowercase_words) - self.get_lowercase_stopwords()
 		purged_search_normalized_words = []
 		purged_ascii_words = []
 		lowercase_words = list(lowercase_words)
@@ -508,12 +508,13 @@ class TreeWalker:
 
 		return purged_search_normalized_words, purged_ascii_words
 
+	# The dictionaries of stopwords for the user language
+	lowercase_stopwords = {}
 
 	@staticmethod
-	def get_lowercase_stopwords():
+	def load_stopwords():
 		"""
-		Load the list of stopwords for the user language into the two sets `stopwords_for_album`
-		and `stopwords_for_word`. The words in the sets are normalized (no accents and diacritics).
+		Load the list of stopwords for the user language into the set `lowercase_stopwords`
 		The list of stopwords comes from https://github.com/stopwords-iso/stopwords-iso
 		"""
 		language = Options.config['language'] if Options.config['language'] != '' else os.getenv('LANG')[:2]
@@ -527,14 +528,24 @@ class TreeWalker:
 
 		if language in stopwords:
 			phrase = " ".join(stopwords[language])
-			lowercase_stopwords = frozenset(TreeWalker.switch_to_lowercase(phrase))
+			TreeWalker.lowercase_stopwords = frozenset(TreeWalker.switch_to_lowercase(phrase).split())
 			message("stopwords loaded", "", 4)
 			# self.stopwords_for_album = frozenset(self.normalize_for_album_name(phrase))
 			# self.stopwords_for_word = frozenset(self.remove_non_alphabetic_characters(phrase))
 		else:
-			lowercase_stopwords = []
 			message("stopwords: no stopwords for language", language, 4)
-		return lowercase_stopwords
+		return
+
+	@staticmethod
+	def get_lowercase_stopwords():
+		"""
+		Get the set of lowercase stopwords used when searching albums.
+		Loads the stopwords from resource file if necessary.
+		"""
+		if TreeWalker.lowercase_stopwords == {}:
+			TreeWalker.load_stopwords()
+
+		return TreeWalker.lowercase_stopwords
 
 	def add_media_to_tree_by_search(self, media):
 		words_for_word_list, words_for_search_album_name = self.prepare_for_tree_by_search(media)
