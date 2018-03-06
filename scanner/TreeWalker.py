@@ -596,8 +596,12 @@ class TreeWalker:
 		search_normalized_words = self.phrase_to_words(search_normalized_phrase)
 		ascii_words = self.phrase_to_words(ascii_phrase)
 
-		# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
-		search_normalized_words, ascii_words = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
+		if (Options.config['use_stop_words']):
+			# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
+			search_normalized_words, ascii_words = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
+		else:
+			search_normalized_words = search_normalized_words
+			ascii_words = ascii_words
 
 		return search_normalized_words, ascii_words
 

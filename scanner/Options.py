@@ -102,7 +102,8 @@ def get_options():
 				'default_media_date_reverse_sort',
 				'recreate_fixed_height_thumbnails',
 				'get_geonames_online',
-				'show_faces'
+				'show_faces',
+				'use_stop_words'
 		):
 			try:
 				config[option] = usr_config.getboolean('options', option)

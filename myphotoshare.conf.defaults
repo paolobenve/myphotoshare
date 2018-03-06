@@ -142,6 +142,10 @@ face_cascade_scale_factor = 1.1
 # it must be an integer, and a square: 4, 9, 16,..
 max_album_share_thumbnails_number = 16
 
+# should stop words be used?
+# for a small set of media/albums it's not needed, while perhaps it's necessary if working with many media
+use_stop_words = true
+
 ###########################################################
 # scanner and ui options
 ###########################################################
