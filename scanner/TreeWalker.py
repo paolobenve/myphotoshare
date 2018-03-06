@@ -597,7 +597,8 @@ class TreeWalker:
 		if isinstance(media_or_album, Media):
 			# remove the extension
 			media_or_album_name = os.path.splitext(media_or_album_name)[0]
-		phrase = media_or_album.title + " " + media_or_album.description + " " + " ".join(media_or_album.tags) + " " + media_or_album_name
+		elements = [media_or_album.title, media_or_album.description, " ".join(media_or_album.tags), media_or_album_name]
+		phrase = ' '.join(filter(None, elements))
 
 		alphabetic_phrase = TreeWalker.remove_non_alphabetic_characters(phrase)
 		lowercase_phrase = TreeWalker.switch_to_lowercase(alphabetic_phrase)
