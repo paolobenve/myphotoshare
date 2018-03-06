@@ -476,7 +476,7 @@ class TreeWalker:
 		decoded_words = []
 		for word in words:
 			# removing spaces is necessary with chinese: every ideogram is rendered with a word
-			decoded_words.append(unidecode.unidecode(word).replace(' ', ''))
+			decoded_words.append(unidecode.unidecode(word).replace(' ', '_'))
 
 		phrase = ' '.join(decoded_words)
 
