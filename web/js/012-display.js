@@ -1010,6 +1010,8 @@ $(document).ready(function() {
 			} else {
 				return PhotoFloat.pathJoin([albumHash, [searchCacheBase, searchSubAlbum].join(Options.cache_folder_separator)]);
 			}
+		} else if (albumHash == Options.by_search_string) {
+			return Options.folders_string
 		}
 		return albumHash;
 	}
