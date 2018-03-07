@@ -491,8 +491,6 @@ class TreeWalker:
 			phrase = " ".join(stopwords[language])
 			TreeWalker.lowercase_stopwords = frozenset(switch_to_lowercase(phrase).split())
 			message("stopwords loaded", "", 4)
-			# self.stopwords_for_album = frozenset(self.normalize_for_album_name(phrase))
-			# self.stopwords_for_word = frozenset(self.remove_non_alphabetic_characters(phrase))
 		else:
 			message("stopwords: no stopwords for language", language, 4)
 		return
