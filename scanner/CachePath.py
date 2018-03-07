@@ -7,6 +7,9 @@ from __future__ import print_function
 import os.path
 from datetime import datetime
 import hashlib
+import unicodedata
+import unidecode
+
 import Options
 
 def trim_base_custom(path, base):
@@ -40,6 +43,52 @@ def remove_folders_marker(path):
 		if len(path) > 0:
 			path = path[1:]
 	return path
+
+def remove_non_alphabetic_characters(phrase, remove_digits=True):
+	# normalize unicode, see https://stackoverflow.com/questions/16467479/normalizing-unicode
+	phrase = unicodedata.normalize('NFC', phrase)
+	# remove digits
+	if remove_digits:
+		phrase = "".join(["" if c.isdecimal() else c for c in phrase])
+	# convert non-alphabetic characters to spaces
+	new_phrase = ''
+	for c in phrase:
+		new_phrase += c if (c.isalpha() or unicodedata.combining(c)) else " "
+	# normalize multiple, leading and trailing spaces
+	phrase = ' '.join(phrase.split())
+
+	return phrase
+
+def remove_accents(phrase):
+	# strip accents (from http://nullege.com/codes/show/src@d@b@dbkit-0.2.2@examples@notary@notary.py/38/unicodedata.combining)
+	phrase = u''.join(c for c in unicodedata.normalize('NFKD', phrase) if not unicodedata.combining(c))
+
+	return phrase
+
+def switch_to_lowercase(phrase):
+	phrase = phrase.lower()
+
+	return phrase
+
+def convert_to_ascii_only(phrase):
+	# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
+
+	# the following line generate a problem with chinese, because unidecode translate every ideogram with a word
+	#phrase = unidecode.unidecode(phrase)
+
+	words = phrase_to_words(phrase)
+	decoded_words = []
+	for word in words:
+		# removing spaces is necessary with chinese: every ideogram is rendered with a word
+		decoded_words.append(unidecode.unidecode(word).strip().replace(' ', '_'))
+
+	phrase = ' '.join(decoded_words)
+
+	return phrase
+
+def phrase_to_words(phrase):
+	# splits the phrase into a list
+	return list(phrase.split(' '))
 
 def photo_cache_name(photo, size, thumb_type="", mobile_bigger=False):
 	# this function is used for video thumbnails too

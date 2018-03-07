@@ -11,10 +11,7 @@ import re
 import time
 import random
 import math
-import unicodedata
 from datetime import datetime
-import unicodedata
-import unidecode
 
 from PIL import Image
 
@@ -23,7 +20,7 @@ from Utilities import message, next_level, back_level, report_times
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from Geonames import Geonames
 import Options
-
+from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, switch_to_lowercase, phrase_to_words
 
 class TreeWalker:
 	def __init__(self):
@@ -446,64 +443,16 @@ class TreeWalker:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
 
 	@staticmethod
-	def remove_non_alphabetic_characters(phrase):
-		# remove digits
-		phrase = "".join(["" if c.isdecimal() else c for c in phrase])
-		# convert non-alphabetic characters to spaces
-		phrase = "".join([c if c.isalpha() else " " for c in phrase])
-		# normalize multiple, leading and trailing spaces
-		phrase = ' '.join(phrase.split())
-		# normalize unicode, see https://stackoverflow.com/questions/16467479/normalizing-unicode
-		phrase = unicodedata.normalize('NFC', phrase)
-
-		return phrase
-
-	@staticmethod
-	def remove_accents(phrase):
-		# strip accents (from http://nullege.com/codes/show/src@d@b@dbkit-0.2.2@examples@notary@notary.py/38/unicodedata.combining)
-		phrase = u''.join(ch for ch in unicodedata.normalize('NFKD', phrase) if not unicodedata.combining(ch))
-
-		return phrase
-
-	@staticmethod
-	def switch_to_lowercase(phrase):
-		phrase = phrase.lower()
-
-		return phrase
-
-	@staticmethod
-	def convert_to_ascii_only(phrase):
-		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
-
-		# the following line generate a problem with chinese, because unidecode translate every ideogram with a word
-		#phrase = unidecode.unidecode(phrase)
-
-		words = TreeWalker.phrase_to_words(phrase)
-		decoded_words = []
-		for word in words:
-			# removing spaces is necessary with chinese: every ideogram is rendered with a word
-			decoded_words.append(unidecode.unidecode(word).strip().replace(' ', '_'))
-
-		phrase = ' '.join(decoded_words)
-
-		return phrase
-
-	@staticmethod
-	def phrase_to_words(phrase):
-		# splits the phrase into a list
-		return list(phrase.split(' '))
-
-	@staticmethod
 	def normalize_for_word_list(phrase):
-		return TreeWalker.remove_non_alphabetic_characters(phrase)
+		return remove_non_alphabetic_characters(phrase)
 
 	@staticmethod
 	def normalize_for_search(phrase):
-		return TreeWalker.remove_accents_and_switch_to_lowercase(phrase)
+		return remove_accents_and_switch_to_lowercase(phrase)
 
 	@staticmethod
 	def normalize_for_album_name(phrase):
-		return TreeWalker.convert_to_ascii_only(phrase)
+		return convert_to_ascii_only(phrase)
 
 	def remove_stopwords(self, lowercase_words, search_normalized_words, ascii_words):
 		# remove the stopwords in self.lowercase_stopwords from 2nd and 3rd argument according to their presence in the 1st
@@ -540,7 +489,7 @@ class TreeWalker:
 
 		if language in stopwords:
 			phrase = " ".join(stopwords[language])
-			TreeWalker.lowercase_stopwords = frozenset(TreeWalker.switch_to_lowercase(phrase).split())
+			TreeWalker.lowercase_stopwords = frozenset(switch_to_lowercase(phrase).split())
 			message("stopwords loaded", "", 4)
 			# self.stopwords_for_album = frozenset(self.normalize_for_album_name(phrase))
 			# self.stopwords_for_word = frozenset(self.remove_non_alphabetic_characters(phrase))
@@ -600,14 +549,14 @@ class TreeWalker:
 		elements = [media_or_album.title, media_or_album.description, " ".join(media_or_album.tags), media_or_album_name]
 		phrase = ' '.join(filter(None, elements))
 
-		alphabetic_phrase = TreeWalker.remove_non_alphabetic_characters(phrase)
-		lowercase_phrase = TreeWalker.switch_to_lowercase(alphabetic_phrase)
-		search_normalized_phrase = TreeWalker.remove_accents(lowercase_phrase)
+		alphabetic_phrase = remove_non_alphabetic_characters(phrase)
+		lowercase_phrase = switch_to_lowercase(alphabetic_phrase)
+		search_normalized_phrase = remove_accents(lowercase_phrase)
 		ascii_phrase = self.normalize_for_album_name(search_normalized_phrase)
 
-		lowercase_words = self.phrase_to_words(lowercase_phrase)
-		search_normalized_words = self.phrase_to_words(search_normalized_phrase)
-		ascii_words = self.phrase_to_words(ascii_phrase)
+		lowercase_words = phrase_to_words(lowercase_phrase)
+		search_normalized_words = phrase_to_words(search_normalized_phrase)
+		ascii_words = phrase_to_words(ascii_phrase)
 
 		if (Options.config['use_stop_words']):
 			# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
