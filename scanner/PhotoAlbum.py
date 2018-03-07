@@ -36,6 +36,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 from VideoToolWrapper import VideoProbeWrapper, VideoTranscodeWrapper
 import Options
+from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, switch_to_lowercase
 
 
 cv2_installed = True
@@ -411,26 +412,26 @@ class Album(object):
 		# result only has ascii characters
 
 		# respect alphanumeric characters, substitute non-alphanumeric (but not slashes) with underscore
-		subalbum_or_media_path = "".join([c if c.isalnum() or c in ['/', '-', '.'] else "_" for c in subalbum_or_media_path])
+		# subalbum_or_media_path = "".join([c if c.isalnum() or c in ['/', '-', '.'] else "_" for c in subalbum_or_media_path])
+		subalbum_or_media_path = switch_to_lowercase(remove_accents(remove_non_alphabetic_characters(subalbum_or_media_path, False)))
 
-		# convert slashes
-		subalbum_or_media_path = subalbum_or_media_path.replace('/', Options.config['cache_folder_separator']).lower()
+		# convert spaces to underscores
+		subalbum_or_media_path = subalbum_or_media_path.replace(' ', '_')
 
-		# convert accented characters to ascii, from https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
-		# @python2
-		if sys.version_info < (3,):
-			subalbum_or_media_path = ''.join(c for c in unicodedata.normalize('NFD', unicode(subalbum_or_media_path)) if unicodedata.category(c) != 'Mn')
-		else:
-			subalbum_or_media_path = ''.join(c for c in unicodedata.normalize('NFD', subalbum_or_media_path) if unicodedata.category(c) != 'Mn')
+		# convert to ascii only characters
+		subalbum_or_media_path = '/'.join([convert_to_ascii_only(part).replace('/', '_') for part in subalbum_or_media_path.split('/')])
+
+		# convert slashes to proper separator
+		subalbum_or_media_path = subalbum_or_media_path.replace('/', Options.config['cache_folder_separator'])
 
 		while subalbum_or_media_path.find("__") != -1:
 			subalbum_or_media_path = subalbum_or_media_path.replace("__", "_")
-		while subalbum_or_media_path.find("-_") != -1:
-			subalbum_or_media_path = subalbum_or_media_path.replace('-_', '-')
-		while subalbum_or_media_path.find("_-") != -1:
-			subalbum_or_media_path = subalbum_or_media_path.replace('_-', '-')
-		while subalbum_or_media_path.find("--") != -1:
-			subalbum_or_media_path = subalbum_or_media_path.replace("--", "-")
+		while subalbum_or_media_path.find(Options.config['cache_folder_separator'] + "_") != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace(Options.config['cache_folder_separator'] + '_', Options.config['cache_folder_separator'])
+		while subalbum_or_media_path.find("_" + Options.config['cache_folder_separator']) != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace('_' + Options.config['cache_folder_separator'], Options.config['cache_folder_separator'])
+		while subalbum_or_media_path.find(Options.config['cache_folder_separator'] + Options.config['cache_folder_separator']) != -1:
+			subalbum_or_media_path = subalbum_or_media_path.replace(Options.config['cache_folder_separator'] + Options.config['cache_folder_separator'], Options.config['cache_folder_separator'])
 
 		if media_file_name is None and hasattr(self, "subalbums_list") or media_file_name is not None and hasattr(self, "media_list"):
 			# let's avoid that different album/media with equivalent names have the same cache base
