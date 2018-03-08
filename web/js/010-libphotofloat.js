@@ -138,7 +138,7 @@
 		if (typeof id === "undefined")
 			id = 'no-results';
 		$(".search-failed").hide();
-		$("#" + id).fadeIn(2000);
+		$("#" + id).stop().fadeIn(2000);
 		$("#" + id).fadeOut(4000);
 	};
 
@@ -502,8 +502,8 @@
 			if (i >= theAlbum.media.length) {
 				$("#album-view").fadeOut(200);
 				$("#media-view").fadeOut(200);
-				$("#album-view").fadeIn(3500);
-				$("#error-text-image").fadeIn(200);
+				$("#album-view").stop().fadeIn(3500);
+				$("#error-text-image").stop().fadeIn(200);
 				$("#error-text-image, #error-overlay, #auth-text").fadeOut(2500);
 				window.location.href = "#!" + theAlbum.cacheBase;
 				i = -1;

@@ -2144,11 +2144,11 @@ $(document).ready(function() {
 
 	function die(error) {
 		if (error == 403) {
-			$("#auth-text").fadeIn(1000);
+			$("#auth-text").stop().fadeIn(1000);
 			$("#password").focus();
 		} else {
 			// Jason's code only had the following line
-			//$("#error-text").fadeIn(2500);
+			//$("#error-text").stop().fadeIn(2500);
 
 			var rootLink = "#!/" + Options.folders_string;
 
@@ -2158,13 +2158,13 @@ $(document).ready(function() {
 			if (window.location.href == rootLink) {
 				$("#loading").hide();
 				$("#error-text-folder").stop();
-				$("#error-root-folder").fadeIn(2000);
+				$("#error-root-folder").stop().fadeIn(2000);
 				$("#powered-by").show();
 			} else {
-				$("#error-text-folder").fadeIn(200);
+				$("#error-text-folder").stop().fadeIn(200);
 				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(2500);
-				$("#album-view").fadeIn(3500);
-				$("#media-view").fadeIn(3500);
+				$("#album-view").stop().fadeIn(3500);
+				$("#media-view").stop().fadeIn(3500);
 				window.location.href = rootLink;
 			}
 		}
@@ -2344,9 +2344,9 @@ $(document).ready(function() {
 					if (errorThrown == "Not Found") {
 						$("#album-view").fadeOut(200);
 						$("#media-view").fadeOut(200);
-						$("#album-view").fadeIn(3500);
-						$("#media-view").fadeIn(3500);
-						$("#error-options-file").fadeIn(200);
+						$("#album-view").stop().fadeIn(3500);
+						$("#media-view").stop().fadeIn(3500);
+						$("#error-options-file").stop().fadeIn(200);
 						$("#error-options-file, #error-overlay, #auth-text").fadeOut(2500);
 					}
 				}
