@@ -413,7 +413,7 @@ class Album(object):
 
 		# respect alphanumeric characters, substitute non-alphanumeric (but not slashes) with underscore
 		# subalbum_or_media_path = "".join([c if c.isalnum() or c in ['/', '-', '.'] else "_" for c in subalbum_or_media_path])
-		subalbum_or_media_path = switch_to_lowercase(remove_accents(remove_non_alphabetic_characters(subalbum_or_media_path, False)))
+		subalbum_or_media_path = switch_to_lowercase(remove_accents(remove_non_alphabetic_characters(subalbum_or_media_path)))
 
 		# convert spaces to underscores
 		subalbum_or_media_path = subalbum_or_media_path.replace(' ', '_')

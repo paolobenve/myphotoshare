@@ -20,7 +20,7 @@ from Utilities import message, next_level, back_level, report_times
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from Geonames import Geonames
 import Options
-from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, switch_to_lowercase, phrase_to_words
+from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, remove_digits, switch_to_lowercase, phrase_to_words
 
 class TreeWalker:
 	def __init__(self):
@@ -442,18 +442,6 @@ class TreeWalker:
 		#~ if not media in self.tree_by_date[media.year][media.month][media.day]:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
 
-	@staticmethod
-	def normalize_for_word_list(phrase):
-		return remove_non_alphabetic_characters(phrase)
-
-	@staticmethod
-	def normalize_for_search(phrase):
-		return remove_accents_and_switch_to_lowercase(phrase)
-
-	@staticmethod
-	def normalize_for_album_name(phrase):
-		return convert_to_ascii_only(phrase)
-
 	def remove_stopwords(self, lowercase_words, search_normalized_words, ascii_words):
 		# remove the stopwords in self.lowercase_stopwords from 2nd and 3rd argument according to their presence in the 1st
 		purged_lowercase_words = set(lowercase_words) - self.get_lowercase_stopwords()
@@ -547,10 +535,10 @@ class TreeWalker:
 		elements = [media_or_album.title, media_or_album.description, " ".join(media_or_album.tags), media_or_album_name]
 		phrase = ' '.join(filter(None, elements))
 
-		alphabetic_phrase = remove_non_alphabetic_characters(phrase)
+		alphabetic_phrase = remove_non_alphabetic_characters(remove_digits(phrase))
 		lowercase_phrase = switch_to_lowercase(alphabetic_phrase)
 		search_normalized_phrase = remove_accents(lowercase_phrase)
-		ascii_phrase = self.normalize_for_album_name(search_normalized_phrase)
+		ascii_phrase = convert_to_ascii_only(search_normalized_phrase)
 
 		lowercase_words = phrase_to_words(lowercase_phrase)
 		search_normalized_words = phrase_to_words(search_normalized_phrase)
@@ -559,9 +547,6 @@ class TreeWalker:
 		if (Options.config['use_stop_words']):
 			# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
 			search_normalized_words, ascii_words = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
-		else:
-			search_normalized_words = search_normalized_words
-			ascii_words = ascii_words
 
 		return search_normalized_words, ascii_words
 

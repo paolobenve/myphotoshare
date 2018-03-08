@@ -44,16 +44,21 @@ def remove_folders_marker(path):
 			path = path[1:]
 	return path
 
-def remove_non_alphabetic_characters(phrase, remove_digits=True):
+def remove_non_alphabetic_characters(phrase):
 	# normalize unicode, see https://stackoverflow.com/questions/16467479/normalizing-unicode
 	phrase = unicodedata.normalize('NFC', phrase)
-	# remove digits
-	if remove_digits:
-		phrase = "".join(["" if c.isdecimal() else c for c in phrase])
 	# convert non-alphabetic characters to spaces
 	new_phrase = ''
 	for c in phrase:
-		new_phrase += c if (c.isalpha() or unicodedata.combining(c)) else " "
+		new_phrase += c if (c.isalpha() or c in Options.config['unicode_combining_marks']) else " "
+	# normalize multiple, leading and trailing spaces
+	phrase = ' '.join(new_phrase.split())
+
+	return phrase
+
+def remove_digits(phrase):
+	# remove digits
+	phrase = "".join(["" if c.isdecimal() else c for c in phrase])
 	# normalize multiple, leading and trailing spaces
 	phrase = ' '.join(phrase.split())
 
@@ -61,7 +66,7 @@ def remove_non_alphabetic_characters(phrase, remove_digits=True):
 
 def remove_accents(phrase):
 	# strip accents (from http://nullege.com/codes/show/src@d@b@dbkit-0.2.2@examples@notary@notary.py/38/unicodedata.combining)
-	phrase = u''.join(c for c in unicodedata.normalize('NFKD', phrase) if not unicodedata.combining(c))
+	phrase = u''.join(c for c in unicodedata.normalize('NFKD', phrase) if c not in Options.config['unicode_combining_marks'])
 
 	return phrase
 
