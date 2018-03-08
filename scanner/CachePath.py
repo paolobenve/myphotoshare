@@ -56,6 +56,18 @@ def remove_non_alphabetic_characters(phrase):
 
 	return phrase
 
+def remove_non_alphanumeric_characters(phrase):
+	# normalize unicode, see https://stackoverflow.com/questions/16467479/normalizing-unicode
+	phrase = unicodedata.normalize('NFC', phrase)
+	# convert non-alphabetic characters to spaces
+	new_phrase = ''
+	for c in phrase:
+		new_phrase += c if (c in ['_', '-'] or c.isalpha() or c.isdecimal() or c in Options.config['unicode_combining_marks']) else " "
+	# normalize multiple, leading and trailing spaces
+	phrase = ' '.join(new_phrase.split())
+
+	return phrase
+
 def remove_digits(phrase):
 	# remove digits
 	phrase = "".join(["" if c.isdecimal() else c for c in phrase])
