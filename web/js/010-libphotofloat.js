@@ -9,7 +9,6 @@
 		PhotoFloat.searchAndSubalbumHash = '';
 		PhotoFloat.searchWordsFromJsonFile = this.searchWordsFromJsonFile;
 		PhotoFloat.searchAlbumCacheBaseFromJsonFile = this.searchAlbumCacheBaseFromJsonFile;
-		PhotoFloat.unicodeM = unicodeMn + unicodeMc;
 	}
 
 	/* public member functions */
@@ -285,8 +284,6 @@
 							wordHashes = [];
 							for (j = 0; j < PhotoFloat.searchWordsFromJsonFile.length; j ++) {
 								if (PhotoFloat.searchWordsFromJsonFile[j].some(function(word) {
-									console.log(word);
-									console.log(SearchWordsFromUserNormalized[i]);
 									return word.indexOf(SearchWordsFromUserNormalized[i]) > -1;
 								})) {
 								 	wordHashes.push(PhotoFloat.searchAlbumCacheBaseFromJsonFile[j]);
@@ -302,8 +299,6 @@
 						// whole words
 						for (i = 0; i <= lastIndex; i ++)
 							if (PhotoFloat.searchWordsFromJsonFile.some(function(words, index, searchWords) {
-								console.log(words[0]);
-								console.log(SearchWordsFromUserNormalized[i]);
 								if (words.indexOf(SearchWordsFromUserNormalized[i]) > -1) {
 									albumHashes.push([PhotoFloat.searchAlbumCacheBaseFromJsonFile[index]]);
 									return true;
