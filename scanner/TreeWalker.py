@@ -11,8 +11,6 @@ import re
 import time
 import random
 import math
-import unicodedata
-import unidecode
 from datetime import datetime
 
 from PIL import Image
