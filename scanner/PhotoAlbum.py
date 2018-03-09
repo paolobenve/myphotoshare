@@ -410,7 +410,6 @@ class Album(object):
 		# this method calculate the cache base for a subalbum or a media in self album
 		# for a media, the parameter media_file_name has to be given; in this case subalbum_or_media_path is the media file name without any path info
 		# result only has ascii characters
-		print(subalbum_or_media_path)
 
 		prefix = ''
 		if media_file_name is None:
@@ -468,7 +467,6 @@ class Album(object):
 
 		# restore the saved prefix
 		subalbum_or_media_path = prefix + subalbum_or_media_path
-		print(subalbum_or_media_path)
 
 		return subalbum_or_media_path
 
