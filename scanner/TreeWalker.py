@@ -11,6 +11,7 @@ import re
 import time
 import random
 import math
+
 from datetime import datetime
 
 from PIL import Image
@@ -604,7 +605,7 @@ class TreeWalker:
 		if json_file_exists:
 			json_file_mtime = file_mtime(json_file)
 		json_file_OK = False
-		album_ini_file = os.path.join(absolute_path, 'album.ini')
+		album_ini_file = os.path.join(absolute_path, Options.config['metadata_filename'])
 		album_ini_OK = True
 		cached_album = None
 		json_message = json_file + " (path: " + os.path.basename(absolute_path) + ")"
@@ -710,7 +711,7 @@ class TreeWalker:
 				back_level()
 				continue
 
-			if entry[0] == '.' or entry == "album.ini":
+			if entry[0] == '.' or entry == Options.config['metadata_filename']:
 				# skip hidden files and directories, or user's metadata file 'album.ini'
 				continue
 

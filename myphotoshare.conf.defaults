@@ -88,11 +88,14 @@ js_minifier = jsmin3
 
 
 ###########################################################
-# scanner option
+# scanner options
 ###########################################################
 
 # cache subfolder: where the album composite images will be saved
 cache_album_subdir = cache_album
+
+# Filename where user-defined metadata is stored in albums
+metadata_filename = album.ini
 
 # How many processors shouldn't be used when converting media?
 respected_processors = 1
