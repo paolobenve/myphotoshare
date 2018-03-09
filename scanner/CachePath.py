@@ -56,7 +56,7 @@ def remove_non_alphabetic_characters(phrase):
 
 	return phrase
 
-def remove_non_alphanumeric_characters(phrase):
+def remove_all_but_alphanumeric_chars_dashes_slashes_dots(phrase):
 	# normalize unicode, see https://stackoverflow.com/questions/16467479/normalizing-unicode
 	phrase = unicodedata.normalize('NFC', phrase)
 	# convert non-alphabetic characters to spaces
