@@ -410,10 +410,25 @@ class Album(object):
 		# this method calculate the cache base for a subalbum or a media in self album
 		# for a media, the parameter media_file_name has to be given; in this case subalbum_or_media_path is the media file name without any path info
 		# result only has ascii characters
+		print(subalbum_or_media_path)
+
+		prefix = ''
+		if media_file_name is None:
+			# save and remove the folders/date/gps/search prefix in order to respect it
+			for _prefix in [Options.config['folders_string'], Options.config['by_date_string'], Options.config['by_gps_string'], Options.config['by_search_string']]:
+				position = subalbum_or_media_path.find(_prefix)
+				if position == 0:
+					prefix = _prefix
+					subalbum_or_media_path = subalbum_or_media_path[len(prefix):]
+					break
 
 		# respect alphanumeric characters, substitute non-alphanumeric (but not slashes) with underscore
 		# subalbum_or_media_path = "".join([c if c.isalnum() or c in ['/', '-', '.'] else "_" for c in subalbum_or_media_path])
 		subalbum_or_media_path = switch_to_lowercase(remove_accents(remove_all_but_alphanumeric_chars_dashes_slashes_dots(subalbum_or_media_path)))
+
+		# subalbums: convert the character which is used as slash replacement
+		if media_file_name is None:
+			subalbum_or_media_path = subalbum_or_media_path.replace(Options.config['cache_folder_separator'], ' ')
 
 		# convert spaces to underscores
 		subalbum_or_media_path = subalbum_or_media_path.replace(' ', '_')
@@ -424,13 +439,15 @@ class Album(object):
 		# convert slashes to proper separator
 		subalbum_or_media_path = subalbum_or_media_path.replace('/', Options.config['cache_folder_separator'])
 
-		while subalbum_or_media_path.find("__") != -1:
+		while (
+			subalbum_or_media_path.find("__") != -1 or
+			subalbum_or_media_path.find(Options.config['cache_folder_separator'] + "_") != -1 or
+			subalbum_or_media_path.find("_" + Options.config['cache_folder_separator']) != -1 or
+			subalbum_or_media_path.find(Options.config['cache_folder_separator'] + Options.config['cache_folder_separator']) != -1
+		):
 			subalbum_or_media_path = subalbum_or_media_path.replace("__", "_")
-		while subalbum_or_media_path.find(Options.config['cache_folder_separator'] + "_") != -1:
 			subalbum_or_media_path = subalbum_or_media_path.replace(Options.config['cache_folder_separator'] + '_', Options.config['cache_folder_separator'])
-		while subalbum_or_media_path.find("_" + Options.config['cache_folder_separator']) != -1:
 			subalbum_or_media_path = subalbum_or_media_path.replace('_' + Options.config['cache_folder_separator'], Options.config['cache_folder_separator'])
-		while subalbum_or_media_path.find(Options.config['cache_folder_separator'] + Options.config['cache_folder_separator']) != -1:
 			subalbum_or_media_path = subalbum_or_media_path.replace(Options.config['cache_folder_separator'] + Options.config['cache_folder_separator'], Options.config['cache_folder_separator'])
 
 		if media_file_name is None and hasattr(self, "subalbums_list") or media_file_name is not None and hasattr(self, "media_list"):
@@ -448,6 +465,10 @@ class Album(object):
 				else:
 					subalbum_or_media_path = _path
 					break
+
+		# restore the saved prefix
+		subalbum_or_media_path = prefix + subalbum_or_media_path
+		print(subalbum_or_media_path)
 
 		return subalbum_or_media_path
 

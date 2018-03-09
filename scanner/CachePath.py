@@ -62,7 +62,7 @@ def remove_all_but_alphanumeric_chars_dashes_slashes_dots(phrase):
 	# convert non-alphabetic characters to spaces
 	new_phrase = ''
 	for c in phrase:
-		new_phrase += c if (c in ['_', '-'] or c.isalpha() or c.isdecimal() or c in Options.config['unicode_combining_marks']) else " "
+		new_phrase += c if (c in ['-', '/', '.'] or c.isalpha() or c.isdecimal() or c in Options.config['unicode_combining_marks']) else " "
 	# normalize multiple, leading and trailing spaces
 	phrase = ' '.join(new_phrase.split())
 

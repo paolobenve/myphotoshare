@@ -211,7 +211,7 @@ class TreeWalker:
 			word_path = os.path.join(by_search_path, str(word))
 			word_album = Album(word_path)
 			word_album.parent = by_search_album
-			word_album.cache_base = by_search_album.generate_cache_base(os.path.join(by_search_album.cache_base, word))
+			word_album.cache_base = by_search_album.generate_cache_base(os.path.join(by_search_album.path, word))
 			word_max_file_date = None
 			by_search_album.add_album(word_album)
 			for single_media in media_and_album_words["media_words"]:
@@ -267,7 +267,7 @@ class TreeWalker:
 			country_album = Album(country_path)
 			country_album.center = {}
 			country_album.parent = by_geonames_album
-			country_album.cache_base = by_geonames_album.generate_cache_base(os.path.join(by_geonames_album.cache_base, country_code))
+			country_album.cache_base = by_geonames_album.generate_cache_base(os.path.join(by_geonames_album.path, country_code))
 			country_max_file_date = None
 			by_geonames_album.add_album(country_album)
 			for region_code, _ in self.tree_by_geonames[country_code].items():
@@ -275,7 +275,7 @@ class TreeWalker:
 				region_album = Album(region_path)
 				region_album.center = {}
 				region_album.parent = country_album
-				region_album.cache_base = country_album.generate_cache_base(os.path.join(country_album.cache_base, region_code))
+				region_album.cache_base = country_album.generate_cache_base(os.path.join(country_album.path, region_code))
 				region_max_file_date = None
 				country_album.add_album(region_album)
 				for place_code, media_list in self.tree_by_geonames[country_code][region_code].items():
@@ -344,7 +344,7 @@ class TreeWalker:
 						place_album = Album(place_path)
 						place_album.center = {}
 						place_album.parent = region_album
-						place_album.cache_base = region_album.generate_cache_base(os.path.join(region_album.cache_base, place_code))
+						place_album.cache_base = region_album.generate_cache_base(os.path.join(region_album.path, place_code))
 						place_max_file_date = None
 						region_album.add_album(place_album)
 						for j, single_media in enumerate(cluster):
