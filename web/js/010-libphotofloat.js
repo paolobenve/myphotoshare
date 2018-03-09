@@ -214,7 +214,7 @@
 				$("ul#right-menu #search-field").attr("value", wordsStringOriginal);
 				wordsString = PhotoFloat.normalize(wordsString);
 				SearchWordsFromUser = wordsString.split('_');
-				SearchWordsFromUserNormalized = wordsStringNormalized.split('_');
+				SearchWordsFromUserNormalized = wordsStringNormalized.split(' ');
 				$("ul#right-menu").addClass("expand");
 
 				var searchResultsAlbumFinal = {};
