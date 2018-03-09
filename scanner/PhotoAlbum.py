@@ -214,9 +214,9 @@ class Album(object):
 		"""
 		self.album_ini = configparser.ConfigParser(allow_no_value=True)
 		message("reading album.ini...", "", 5)
-		self.album_ini.read(os.path.join(self.absolute_path, "album.ini"))
+		self.album_ini.read(os.path.join(self.absolute_path, Options.config['metadata_filename']))
 		next_level()
-		message("album.ini read", os.path.join(self.absolute_path, "album.ini"), 5)
+		message("album.ini read", os.path.join(self.absolute_path, Options.config['metadata_filename']), 5)
 		back_level()
 
 		Metadata.set_metadata_from_album_ini("album", self._attributes, self.album_ini)
@@ -1799,14 +1799,14 @@ class Metadata(object):
 			try:
 				attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.get(name, "date"), "%Y-%m-%d")
 			except ValueError:
-				message("ERROR", "Incorrect date in [" + name + "] in 'album.ini'", 1)
+				message("ERROR", "Incorrect date in [" + name + "] in '" + Options.config['metadata_filename'] + "'", 1)
 			except NoOptionError:
 				pass
 		elif "date" in album_ini.defaults():
 			try:
 				attributes["metadata"]["dateTime"] = datetime.strptime(album_ini.defaults()["date"], "%Y-%m-%d")
 			except ValueError:
-				message("ERROR", "Incorrect date in [DEFAULT] in 'album.ini'", 1)
+				message("ERROR", "Incorrect date in [DEFAULT] in '" + Options.config['metadata_filename'] + "'", 1)
 
 		# Latitude and longitude
 		gps_latitude = None
@@ -1818,7 +1818,7 @@ class Metadata(object):
 				gps_latitude = Metadata.create_gps_struct(abs(album_ini.getfloat(name, "latitude")))
 				gps_latitude_ref = "N" if album_ini.getfloat(name, "latitude") > 0.0 else "S"
 			except ValueError:
-				message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
+				message("ERROR", "Incorrect latitude in [" + name + "] in '" + Options.config['metadata_filename'] + "'", 1)
 			except NoOptionError:
 				pass
 		elif "latitude" in album_ini.defaults():
@@ -1826,13 +1826,13 @@ class Metadata(object):
 				gps_latitude = Metadata.create_gps_struct(abs(float(album_ini.defaults()["latitude"])))
 				gps_latitude_ref = "N" if float(album_ini.defaults()["latitude"]) > 0.0 else "S"
 			except ValueError:
-				message("ERROR", "Incorrect latitude in [" + name + "] in 'album.ini'", 1)
+				message("ERROR", "Incorrect latitude in [" + name + "] in '" + Options.config['metadata_filename'] + "'", 1)
 		if album_ini.has_section(name):
 			try:
 				gps_longitude = Metadata.create_gps_struct(abs(album_ini.getfloat(name, "longitude")))
 				gps_longitude_ref = "E" if album_ini.getfloat(name, "longitude") > 0.0 else "W"
 			except ValueError:
-				message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
+				message("ERROR", "Incorrect longitude in [" + name + "] in '" + Options.config['metadata_filename'] + "'", 1)
 			except NoOptionError:
 				pass
 		elif "longitude" in album_ini.defaults():
@@ -1840,7 +1840,7 @@ class Metadata(object):
 				gps_longitude = Metadata.create_gps_struct(abs(float(album_ini.defaults()["longitude"])))
 				gps_longitude_ref = "E" if float(album_ini.defaults()["longitude"]) > 0.0 else "W"
 			except ValueError:
-				message("ERROR", "Incorrect longitude in [" + name + "] in 'album.ini'", 1)
+				message("ERROR", "Incorrect longitude in [" + name + "] in '" + Options.config['metadata_filename'] + "'", 1)
 
 		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
 			attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
