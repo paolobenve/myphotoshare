@@ -142,8 +142,8 @@
 	};
 
 	PhotoFloat.prototype.parseHash = function(hash, callback, error) {
-		var hashParts, lastSlashPosition, slashCount, albumHash, albumHashes, mediaHash = null, foldersHash = null, media = null;
-		var SearchWordsFromUser, SearchWordsFromUserNormalized;
+		var self, hashParts, lastSlashPosition, slashCount, albumHash, albumHashToGet, albumHashes, mediaHash = null, foldersHash = null;
+		var SearchWordsFromUser, SearchWordsFromUserNormalized, SearchWordsFromUserNormalizedAccordingToOptions;
 		var indexWords, indexAlbums, wordsWithOptionsString;
 		// this vars are defined here and not at the beginning of the file because the options must have been read
 		PhotoFloat.foldersStringWithTrailingSeparator = Options.folders_string + Options.cache_folder_separator;
@@ -193,6 +193,7 @@
 		albumHashes = [];
 		SearchWordsFromUser = [];
 		SearchWordsFromUserNormalized = [];
+		SearchWordsFromUserNormalizedAccordingToOptions = [];
 		if (albumHash) {
 			albumHash = decodeURI(albumHash);
 			if (PhotoFloat.isSearchCacheBase(albumHash) || albumHash == Options.by_search_string) {
@@ -201,6 +202,7 @@
 				var wordsString = wordsAndOptions[wordsAndOptions.length - 1];
 				var wordsStringOriginal = wordsString.replace(/_/g, ' ');
 				// the normalized words are needed in order to compare with the search cache json files names, which are normalized
+				var wordsStringNormalizedAccordingToOptions = PhotoFloat.normalizeAccordingToOptions(wordsStringOriginal);
 				var wordsStringNormalized = PhotoFloat.removeAccents(wordsStringOriginal.toLowerCase());
 				if (wordsAndOptions.length > 1) {
 					var searchOptions = wordsAndOptions.slice(0, -1);
@@ -212,8 +214,9 @@
 				}
 
 				$("ul#right-menu #search-field").attr("value", wordsStringOriginal);
-				wordsString = PhotoFloat.normalize(wordsString);
+				wordsString = PhotoFloat.normalizeAccordingToOptions(wordsString);
 				SearchWordsFromUser = wordsString.split('_');
+				SearchWordsFromUserNormalizedAccordingToOptions = wordsStringNormalizedAccordingToOptions.split(' ');
 				SearchWordsFromUserNormalized = wordsStringNormalized.split(' ');
 				$("ul#right-menu").addClass("expand");
 
@@ -268,7 +271,7 @@
 				Options.by_search_string,
 				// success:
 				function(bySearchRootAlbum) {
-					var lastIndex, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0, normalizedWords, albumToGet;
+					var lastIndex, i, j, wordHashes, numSearchAlbumsReady = 0, numSubAlbumsToGet = 0, normalizedWords;
 					var searchResultsMedia = [];
 					var searchResultsSubalbums = [];
 					searchResultsAlbumFinal.ancestorsCacheBase = bySearchRootAlbum.ancestorsCacheBase.slice();
@@ -339,26 +342,26 @@
 										if (! Options.search_inside_words) {
 											// whole word
 											for (indexMedia = 0; indexMedia < theAlbum.media.length; indexMedia ++) {
-												if (PhotoFloat.normalize(theAlbum.media[indexMedia].words).indexOf(SearchWordsFromUser[thisIndexWords]) > -1)
+												if (PhotoFloat.normalizeAccordingToOptions(theAlbum.media[indexMedia].words).indexOf(SearchWordsFromUserNormalizedAccordingToOptions[thisIndexWords]) > -1)
 													matchingMedia.push(theAlbum.media[indexMedia]);
 											}
 											for (indexSubalbums = 0; indexSubalbums < theAlbum.subalbums.length; indexSubalbums ++) {
-												if (PhotoFloat.normalize(theAlbum.subalbums[indexSubalbums].words).indexOf(SearchWordsFromUser[thisIndexWords]) > -1)
+												if (PhotoFloat.normalizeAccordingToOptions(theAlbum.subalbums[indexSubalbums].words).indexOf(SearchWordsFromUserNormalizedAccordingToOptions[thisIndexWords]) > -1)
 													matchingSubalbums.push(theAlbum.subalbums[indexSubalbums]);
 											}
 										} else {
 											// inside words
 											for (indexMedia = 0; indexMedia < theAlbum.media.length; indexMedia ++) {
-												normalizedWords = PhotoFloat.normalize(theAlbum.media[indexMedia].words);
+												normalizedWords = PhotoFloat.normalizeAccordingToOptions(theAlbum.media[indexMedia].words);
 												if (normalizedWords.some(function(element) {
-													return element.indexOf(SearchWordsFromUser[thisIndexWords]) > -1;
+													return element.indexOf(SearchWordsFromUserNormalizedAccordingToOptions[thisIndexWords]) > -1;
 												}))
 													matchingMedia.push(theAlbum.media[indexMedia]);
 											}
 											for (indexSubalbums = 0; indexSubalbums < theAlbum.subalbums.length; indexSubalbums ++) {
-												normalizedWords = PhotoFloat.normalize(theAlbum.subalbums[indexSubalbums].words);
+												normalizedWords = PhotoFloat.normalizeAccordingToOptions(theAlbum.subalbums[indexSubalbums].words);
 												if (normalizedWords.some(function(element) {
-													return element.indexOf(SearchWordsFromUser[thisIndexWords]) > -1;
+													return element.indexOf(SearchWordsFromUserNormalizedAccordingToOptions[thisIndexWords]) > -1;
 												}))
 													matchingSubalbums.push(theAlbum.subalbums[indexSubalbums]);
 											}
@@ -403,17 +406,17 @@
 													match = true;
 													if (! Options.search_inside_words) {
 														// whole word
-														normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words);
-														if (SearchWordsFromUser.some(function(element, index) {
+														normalizedWords = PhotoFloat.normalizeAccordingToOptions(searchResultsAlbumFinal.media[indexMedia].words);
+														if (SearchWordsFromUserNormalizedAccordingToOptions.some(function(element, index) {
 															return index > lastIndex && normalizedWords.indexOf(element) == -1;
 														}))
 															match = false;
 													} else {
 														// inside words
 														for (indexWordsLeft = lastIndex + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
-															normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.media[indexMedia].words);
+															normalizedWords = PhotoFloat.normalizeAccordingToOptions(searchResultsAlbumFinal.media[indexMedia].words);
 															if (! normalizedWords.some(function(element) {
-																return element.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
+																return element.indexOf(SearchWordsFromUserNormalizedAccordingToOptions[indexWordsLeft]) > -1;
 															})) {
 																match = false;
 																break;
@@ -430,17 +433,17 @@
 													match = true;
 													if (! Options.search_inside_words) {
 														// whole word
-														normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
-														if (SearchWordsFromUser.some(function(element, index) {
+														normalizedWords = PhotoFloat.normalizeAccordingToOptions(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
+														if (SearchWordsFromUserNormalizedAccordingToOptions.some(function(element, index) {
 															return index > lastIndex && normalizedWords.indexOf(element) == -1;
 														}))
 															match = false;
 													} else {
 														// inside words
 														for (indexWordsLeft = lastIndex + 1; indexWordsLeft < SearchWordsFromUser.length; indexWordsLeft ++) {
-															normalizedWords = PhotoFloat.normalize(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
+															normalizedWords = PhotoFloat.normalizeAccordingToOptions(searchResultsAlbumFinal.subalbums[indexSubalbums].words);
 															if (! normalizedWords.some(function(element) {
-																return element.indexOf(SearchWordsFromUser[indexWordsLeft]) > -1;
+																return element.indexOf(SearchWordsFromUserNormalizedAccordingToOptions[indexWordsLeft]) > -1;
 															})) {
 																match = false;
 																break;
@@ -515,16 +518,18 @@
 		if (b.length > a.length) {
 			// indexOf to loop over shorter
 			var t;
-			t = b, b = a, a = t;
+			t = b;
+			b = a;
+			a = t;
 		}
-		property = 'albumName';
+		var property = 'albumName';
 		if (a.length && ! a[0].hasOwnProperty('albumName'))
 			// searched albums hasn't albumName property
 			property = 'path';
 
 		return a.filter(function (e) {
 			for (var i = 0; i < b.length; i ++) {
-				if (PhotoFloat.normalize(b[i][property]) == PhotoFloat.normalize(e[property]))
+				if (PhotoFloat.normalizeAccordingToOptions(b[i][property]) == PhotoFloat.normalizeAccordingToOptions(e[property]))
 					return true;
 			}
 			return false;
@@ -539,7 +544,7 @@
 		// begin cloning the first array
 		var union = a.slice(0);
 
-		property = 'albumName';
+		var property = 'albumName';
 		if (a.length && ! a[0].hasOwnProperty('albumName'))
 			// searched albums hasn't albumName property
 			property = 'path';
@@ -547,7 +552,7 @@
 		for (var i = 0; i < b.length; i ++) {
 			if (! a.some(
 				function (e) {
-					return PhotoFloat.normalize(b[i][property]) == PhotoFloat.normalize(e[property]);
+					return PhotoFloat.normalizeAccordingToOptions(b[i][property]) == PhotoFloat.normalizeAccordingToOptions(e[property]);
 				})
 			)
 				union.push(b[i]);
@@ -571,9 +576,9 @@
 			}
 			return hash.replace(/\./g, '_') + '_' + codedHash;
 		}
-	}
+	};
 
-	PhotoFloat.normalize = function(object) {
+	PhotoFloat.normalizeAccordingToOptions = function(object) {
 		var string = object;
 		if (typeof object  === "object")
 			string = string.join('|');

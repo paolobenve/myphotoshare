@@ -58,7 +58,6 @@ $(document).ready(function() {
 	var fromEscKey = false;
 	var firstEscKey = true;
 	var nextLink = "", prevLink = "", upLink = "", mediaLink = "", savedLink = "";
-	var enterSubalbumCacheBase = null;
 	var searchCacheBase = '', searchSubAlbum = '';
 
 	/* Displays */
@@ -508,7 +507,7 @@ $(document).ready(function() {
 	}
 
 	function setTitle() {
-		var title = "", titleAdd, documentTitle = "", components, i, isDateTitle, isGpsTitle, isSearchTitle, originalTitle, optionsAndSearchWords, searchWords;
+		var title = "", documentTitle = "", components, i, isDateTitle, isGpsTitle, isSearchTitle, originalTitle;
 		var titleAnchorClasses, hiddenTitle = "", beginLink, linksToLeave, numLinks, latitude, longitude, arrayCoordinates, numMediaInSubAlbums;
 		// gpsLevelNumber is the number of levels for the by gps tree
 		// current levels are country, region, place => 3
@@ -540,7 +539,6 @@ $(document).ready(function() {
 		var textComponents = components.slice();
 
 		// generate the title in the page top
-		var anchorOpened = false, spanOpened = false;
 		titleAnchorClasses = 'title-anchor';
 		if (isMobile.any())
 			titleAnchorClasses += ' mobile';
