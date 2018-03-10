@@ -1749,7 +1749,8 @@ class Media(object):
 		if self.gps_album_path:
 			media["gpsAlbum"] = self.gps_album_path
 			media["gpsAlbumCacheBase"] = self.gps_album_cache_base
-		media["words"] = self.words
+		if hasattr(media, "words"):
+			media["words"] = self.words
 		if Options.config['checksum']:
 			media["checksum"] = checksum(os.path.join(Options.config['album_path'], self.media_file_name))
 
