@@ -496,11 +496,11 @@ class TreeWalker:
 		return TreeWalker.lowercase_stopwords
 
 	def add_media_to_tree_by_search(self, media):
-		words_for_word_list, words_for_search_album_name = self.prepare_for_tree_by_search(media)
+		words_for_word_list, unicode_words, words_for_search_album_name = self.prepare_for_tree_by_search(media)
 		media.words = words_for_word_list
 		for word_index in range(len(words_for_search_album_name)):
 			word = words_for_search_album_name[word_index]
-			unicode_word = words_for_word_list[word_index]
+			unicode_word = unicode_words[word_index]
 			if word:
 				if word not in list(self.tree_by_search.keys()):
 					self.tree_by_search[word] = {"media_words": [], "album_words": [], "unicode_words": []}
@@ -510,11 +510,11 @@ class TreeWalker:
 					self.tree_by_search[word]["unicode_words"].append(unicode_word)
 
 	def add_album_to_tree_by_search(self, album):
-		words_for_word_list, words_for_search_album_name = self.prepare_for_tree_by_search(album)
+		words_for_word_list, unicode_words, words_for_search_album_name = self.prepare_for_tree_by_search(album)
 		album.words = words_for_word_list
 		for word_index in range(len(words_for_search_album_name)):
 			word = words_for_search_album_name[word_index]
-			unicode_word = words_for_word_list[word_index]
+			unicode_word = unicode_words[word_index]
 			if word:
 				if word not in list(self.tree_by_search.keys()):
 					self.tree_by_search[word] = {"media_words": [], "album_words": [], "unicode_words": []}
@@ -541,6 +541,7 @@ class TreeWalker:
 		search_normalized_phrase = remove_accents(lowercase_phrase)
 		ascii_phrase = convert_to_ascii_only(search_normalized_phrase)
 
+		alphabetic_words = phrase_to_words(alphabetic_phrase)
 		lowercase_words = phrase_to_words(lowercase_phrase)
 		search_normalized_words = phrase_to_words(search_normalized_phrase)
 		ascii_words = phrase_to_words(ascii_phrase)
@@ -549,7 +550,7 @@ class TreeWalker:
 			# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
 			search_normalized_words, ascii_words = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
 
-		return search_normalized_words, ascii_words
+		return alphabetic_words, search_normalized_words, ascii_words
 
 
 	def add_media_to_tree_by_geonames(self, media):
