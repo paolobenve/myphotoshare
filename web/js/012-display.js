@@ -461,12 +461,14 @@ $(document).ready(function() {
 			$("ul#right-menu li#inside-words").removeClass("hidden");
 			$("ul#right-menu li#any-word").removeClass("hidden");
 			$("ul#right-menu li#case-sensitive").removeClass("hidden");
+			$("ul#right-menu li#accent-sensitive").removeClass("hidden");
 			$("ul#right-menu li#regex-word").removeClass("hidden");
 			if (Options.search_regex) {
 				$("ul#right-menu li#regex-word").addClass("selected");
 				$("ul#right-menu li#inside-words").addClass("hidden");
 				$("ul#right-menu li#any-word").addClass("hidden");
 				$("ul#right-menu li#case-sensitive").addClass("hidden");
+				$("ul#right-menu li#accent-sensitive").addClass("hidden");
 			} else {
 				$("ul#right-menu li#regex-word").removeClass("selected");
 				if (Options.search_inside_words)
