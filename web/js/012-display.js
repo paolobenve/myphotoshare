@@ -332,22 +332,24 @@ $(document).ready(function() {
 
 			var modes = ["album", "media"];
 			for (var i in modes) {
-				albumOrMedia = modes[i];
-				if (currentAlbum[albumOrMedia + "NameSort"]) {
-					$("ul#right-menu li." + albumOrMedia + "-sort.by-name").removeClass("active").addClass("selected");
-					$("ul#right-menu li." + albumOrMedia + "-sort.by-date").addClass("active").removeClass("selected");
-				} else {
-					$("ul#right-menu li." + albumOrMedia + "-sort.by-date").removeClass("active").addClass("selected");
-					$("ul#right-menu li." + albumOrMedia + "-sort.by-name").addClass("active").removeClass("selected");
-				}
+				if (modes.hasOwnProperty(i)) {
+					albumOrMedia = modes[i];
+					if (currentAlbum[albumOrMedia + "NameSort"]) {
+						$("ul#right-menu li." + albumOrMedia + "-sort.by-name").removeClass("active").addClass("selected");
+						$("ul#right-menu li." + albumOrMedia + "-sort.by-date").addClass("active").removeClass("selected");
+					} else {
+						$("ul#right-menu li." + albumOrMedia + "-sort.by-date").removeClass("active").addClass("selected");
+						$("ul#right-menu li." + albumOrMedia + "-sort.by-name").addClass("active").removeClass("selected");
+					}
 
-				if (
-					currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "NameReverseSort"] ||
-				 	! currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "DateReverseSort"]
-				) {
-					$("#right-menu li." + albumOrMedia + "-sort.sort-reverse").removeClass("selected");
-				} else {
-					$("#right-menu li." + albumOrMedia + "-sort.sort-reverse").addClass("selected");
+					if (
+						currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "NameReverseSort"] ||
+					 	! currentAlbum[albumOrMedia + "NameSort"] && currentAlbum[albumOrMedia + "DateReverseSort"]
+					) {
+						$("#right-menu li." + albumOrMedia + "-sort.sort-reverse").removeClass("selected");
+					} else {
+						$("#right-menu li." + albumOrMedia + "-sort.sort-reverse").addClass("selected");
+					}
 				}
 			}
 		}
@@ -1020,7 +1022,7 @@ $(document).ready(function() {
 				return PhotoFloat.pathJoin([albumHash, [searchCacheBase, searchSubAlbum].join(Options.cache_folder_separator)]);
 			}
 		} else if (albumHash == Options.by_search_string) {
-			return Options.folders_string
+			return Options.folders_string;
 		}
 		return albumHash;
 	}
@@ -2541,7 +2543,7 @@ $(document).ready(function() {
 		// save current hash in order to come back there when exiting from search
 		savedLink = location.hash;
 		var searchTerms = encodeURIComponent($("#search-field").val().normalize().trim().replace(/  /g, ' ').replace(/ /g, '_'));
-		var bySearchViewLinkBase = "#!/" + Options.by_search_string
+		var bySearchViewLinkBase = "#!/" + Options.by_search_string;
 		if (searchTerms) {
 			var bySearchViewLink = bySearchViewLinkBase + Options.cache_folder_separator;
 			if (Options.search_inside_words)
