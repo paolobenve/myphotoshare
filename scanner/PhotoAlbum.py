@@ -105,7 +105,7 @@ class Album(object):
 		self.album_ini = None
 		self._attributes = {}
 		self._attributes["metadata"] = {}
-		self.json_version = {}
+		self.json_version = ""
 
 		if (
 			Options.config['subdir_method'] in ("md5", "folder") and
@@ -295,7 +295,7 @@ class Album(object):
 		else:
 			path = dictionary["path"]
 		# Don't use cache if version has changed
-		if Options.json_version == 0 or "jsonVersion" not in dictionary or float(dictionary["jsonVersion"]) != Options.json_version:
+		if Options.json_version == 0 or "jsonVersion" not in dictionary or dictionary["jsonVersion"] != Options.json_version:
 			return None
 		album = Album(os.path.join(Options.config['album_path'], path))
 		album.cache_base = album_cache_base
@@ -1789,7 +1789,7 @@ class Metadata(object):
 
 		# Initialize with album.ini defaults
 		next_level()
-		message("initialize album.ini metadata values", "", 5)
+		message("adding album.ini metadata values to albums...", "", 5)
 
 		# With Python2, section names are string. As we retrieve file names as unicode,
 		# we can't find them in the ConfigParser dictionary
@@ -1878,6 +1878,9 @@ class Metadata(object):
 		elif "tags" in album_ini.defaults():
 			attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.defaults()["tags"].split(",")]
 
+		next_level()
+		message("album.ini metadata values added to albums", "", 5)
+		back_level()
 		back_level()
 
 

@@ -2,8 +2,9 @@
 #
 # This file is imported through the ConfigParser standard module
 #       boolean values:
-#          1 = yes = YES = true = True = TRUE;
-#          0 = no = NO = false = False = FALSE;
+#          1 = yes = = true;
+#          0 = no;
+# Do not use uppercase letters, they won't be detected properly somewhere
 #
 # This file sets the default options: they are read by scanner/Options.py
 #

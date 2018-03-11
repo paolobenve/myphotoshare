@@ -442,20 +442,20 @@ class TreeWalker:
 		#~ if not media in self.tree_by_date[media.year][media.month][media.day]:
 			self.tree_by_date[media.year][media.month][media.day].append(media)
 
-	def remove_stopwords(self, lowercase_words, search_normalized_words, ascii_words):
-		# remove the stopwords in self.lowercase_stopwords from 2nd and 3rd argument according to their presence in the 1st
-		purged_lowercase_words = set(lowercase_words) - self.get_lowercase_stopwords()
+	def remove_stopwords(self, alphabetic_words, search_normalized_words, ascii_words):
+		# remove the stopwords found in alphabetic_words, from search_normalized_words and ascii_words
+		purged_alphabetic_words = set(alphabetic_words) - self.get_lowercase_stopwords()
 		purged_search_normalized_words = []
 		purged_ascii_words = []
-		lowercase_words = list(lowercase_words)
+		alphabetic_words = list(alphabetic_words)
 		search_normalized_words = list(search_normalized_words)
 		ascii_words = list(ascii_words)
-		for word_index in range(len(lowercase_words)):
-			if lowercase_words[word_index] in purged_lowercase_words:
+		for word_index in range(len(alphabetic_words)):
+			if alphabetic_words[word_index] in purged_alphabetic_words:
 				purged_search_normalized_words.append(search_normalized_words[word_index])
 				purged_ascii_words.append(ascii_words[word_index])
 
-		return purged_search_normalized_words, purged_ascii_words
+		return purged_alphabetic_words, purged_search_normalized_words, purged_ascii_words
 
 	# The dictionaries of stopwords for the user language
 	lowercase_stopwords = {}
@@ -547,7 +547,8 @@ class TreeWalker:
 
 		if (Options.config['use_stop_words']):
 			# remove stop words: do it according to the words in lower case, different words could be removed if performing remotion from every list
-			search_normalized_words, ascii_words = self.remove_stopwords(lowercase_words, search_normalized_words, ascii_words)
+			alphabetic_words, search_normalized_words, ascii_words = self.remove_stopwords(alphabetic_words, search_normalized_words, ascii_words)
+			alphabetic_words = list(alphabetic_words)
 
 		return alphabetic_words, search_normalized_words, ascii_words
 
@@ -681,10 +682,10 @@ class TreeWalker:
 		if not json_file_OK:
 			message("generating album...", absolute_path, 5)
 			album = Album(absolute_path)
-			album.read_album_ini()
 			next_level()
 			message("album generated", "", 5)
 			back_level()
+		album.read_album_ini()
 		if parent_album is not None:
 			album.parent = parent_album
 		album.cache_base = album_cache_base
