@@ -681,10 +681,10 @@ class TreeWalker:
 		if not json_file_OK:
 			message("generating album...", absolute_path, 5)
 			album = Album(absolute_path)
-			album.read_album_ini()
 			next_level()
 			message("album generated", "", 5)
 			back_level()
+		album.read_album_ini()
 		if parent_album is not None:
 			album.parent = parent_album
 		album.cache_base = album_cache_base
