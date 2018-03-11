@@ -95,6 +95,45 @@ DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
 ```
 It's recommended to have this directive only in the directory of MyPhotoShare gallery, not to break other web applications on the server.
 
+
+## Apache server configuration
+
+A default `.htaccess` file is provided in the `web` directory that can be used by Apache. If you're using a shared hosting, your Apache server is probably already configured to use `.htaccess` by default. But if that's not the case, you have to configure the web server yourself. The following instructions have been done on a Ubuntu 16.04 server:
+
+ * The server must read `.htaccess` files. Edit you domain configuration file in `/etc/apache2/sites-available` or `/etc/apache2/sites-available/000-default.conf` if you want to change the whole configuration.
+```bash
+$ sudo vi /etc/apache2/sites-available/000-default.conf
+```
+ Add the following lines in the `<VirtualHost>` section:
+```apache
+<VirtualHost *:80>
+	...
+
+        <Directory /var/www/html/myphotoshare>
+                Options Indexes FollowSymLinks
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+</VirtualHost>
+```
+
+ * Compression of files must be enabled with Mod_deflate.
+```bash
+$ sudo a2enmod deflate
+```
+
+ * Add support for Header directive to manage the browser cache correctly with Mod_header.
+```bash
+$ sudo a2enmod headers
+```
+
+ * Restart Apache to take into account the changes.
+```bash
+$ service apache2 restart
+```
+
+
 ## Updates
 
 When MyPhotoShare code is updated, update your `myphotoshare` directory.
