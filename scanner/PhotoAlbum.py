@@ -15,6 +15,7 @@ import sys
 from datetime import datetime
 from pprint import pprint
 import pprint
+import codecs
 
 # @python2
 try:
@@ -215,7 +216,7 @@ class Album(object):
 		"""
 		self.album_ini = configparser.ConfigParser(allow_no_value=True)
 		message("reading album.ini...", "", 5)
-		self.album_ini.read(os.path.join(self.absolute_path, Options.config['metadata_filename']))
+		self.album_ini.read(os.path.join(self.absolute_path, Options.config['metadata_filename']), encoding="utf8")
 		next_level()
 		message("album.ini read", os.path.join(self.absolute_path, Options.config['metadata_filename']), 5)
 		back_level()
@@ -262,7 +263,7 @@ class Album(object):
 		message("album sorted", self.absolute_path, 4)
 		back_level()
 		message("saving album...", "", 5)
-		with open(json_file_with_path, 'w') as filepath:
+		with codecs.open(json_file_with_path, 'w', 'utf8') as filepath:
 			json.dump(self, filepath, cls=PhotoAlbumEncoder)
 		next_level()
 		message("album saved", json_file_with_path, 3)
@@ -271,7 +272,7 @@ class Album(object):
 	@staticmethod
 	def from_cache(path, album_cache_base):
 		message("reading album...", "", 5)
-		with open(path, "r") as filepath:
+		with codecs.open(path, "r", "utf8") as filepath:
 			dictionary = json.load(filepath)
 		next_level()
 		message("album read", "", 5)

@@ -8,6 +8,8 @@ from flask_login import login_user, current_user
 from random import shuffle
 import os
 from mimetypes import guess_type
+import codecs
+
 
 cwd = os.path.dirname(os.path.abspath(__file__))
 
@@ -97,7 +99,7 @@ def accel_redirect(internal, real, relative_name):
 @app.route("/photos")
 @jsonp
 def photos():
-	f = open(os.path.join(app.config["CACHE_PATH"], "all_photos.json"), "r")
+	f = codecs.open(os.path.join(app.config["CACHE_PATH"], "all_photos.json"), "r", "utf8")
 	photos = json.load(f)
 	f.close()
 	if not is_authenticated():

@@ -8,9 +8,9 @@ import random
 import os
 import sys
 import json
-
 import numpy as np
 import requests
+import codecs
 
 import Options
 #pylint from CachePath import *
@@ -47,12 +47,12 @@ class Geonames(object):
 			countries_file = os.path.join(os.path.dirname(__file__), 'geonames/countries.json')
 			cities_file = os.path.join(os.path.dirname(__file__), 'geonames/cities1000.txt')
 
-			with open(territories_file, 'r') as territories_file_p:
+			with codecs.open(territories_file, 'r', 'utf8') as territories_file_p:
 				territories = json.load(territories_file_p)
-			with open(countries_file, 'r') as countries_file_p:
+			with codecs.open(countries_file, 'r', 'utf8') as countries_file_p:
 				countries = json.load(countries_file_p)
 
-			with open(cities_file, 'r') as all_cities:
+			with codecs.open(cities_file, 'r', 'utf8') as all_cities:
 				for line in all_cities:
 					col = line.split('\t')
 					country_code = col[8]

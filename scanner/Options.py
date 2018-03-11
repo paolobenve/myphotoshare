@@ -5,6 +5,7 @@ import os
 import sys
 import json
 import ast
+import codecs
 
 # @python2
 try:
@@ -52,10 +53,10 @@ json_version = 4
 
 def get_options():
 	from Utilities import message, next_level, back_level
-	project_dir = os.path.dirname(os.path.abspath(os.path.join(os.path.realpath(sys.argv[0]), "..")))
+	project_dir = os.path.dirname(os.path.realpath(os.path.join(__file__, "..")))
 	default_config_file = os.path.join(project_dir, "myphotoshare.conf.defaults")
 	default_config = configparser.ConfigParser()
-	default_config.readfp(open(default_config_file))
+	default_config.readfp(codecs.open(default_config_file, "r", "utf8"))
 	usr_config = configparser.ConfigParser()
 	usr_config.add_section("options")
 	for option in default_config.options('options'):
@@ -64,7 +65,7 @@ def get_options():
 	if len(sys.argv) == 2:
 		# 1 arguments: the config files
 		# which modifies the default options
-		usr_config.readfp(open(sys.argv[1]))
+		usr_config.readfp(codecs.open(sys.argv[1], "r", "utf8"))
 	else:
 		usr_config.set('options', 'album_path', sys.argv[1])
 		usr_config.set('options', 'cache_path', sys.argv[2])
@@ -288,7 +289,7 @@ def get_options():
 	# get old options: they are revised in order to decide whether to recreate something
 	json_options_file = os.path.join(config['index_html_path'], "cache/options.json")
 	try:
-		with open(json_options_file) as old_options_file:
+		with codecs.open(json_options_file, encoding="utf8") as old_options_file:
 			old_options = json.load(old_options_file)
 	except IOError:
 		old_options = config
