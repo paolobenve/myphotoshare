@@ -13,7 +13,6 @@ import requests, zipfile, io
 import json
 import os
 import sys
-import codecs
 
 zip_file = "alternateNames.zip"
 print()
@@ -33,7 +32,7 @@ else:
 	# get the languages defined in the translation js file
 	translations_file = "web/js/009-translations.js"
 	translations_structure = {}
-	with codecs.open(translations_file, "rt", "utf8") as translations_p:
+	with open(translations_file, "rt") as translations_p:
 		translations = translations_p.read().splitlines(True)
 		translations_json = ''.join(translations[1:])[:-1].replace("\t", "").replace(" ", "").replace("\n", "")[:-1]
 		translations_dict = json.loads(translations_json, encoding="utf8")
@@ -57,11 +56,11 @@ else:
 	file_languages = {}
 	for language in languages:
 		file_language = alt_file_ + language
-		file_languages[language] = codecs.open(file_language, "wt", "utf8")
-	file_ = codecs.open(alt_file_, "wt", "utf8")
+		file_languages[language] = open(file_language, "wt")
+	file_ = open(alt_file_, "wt")
 
 	print("generating local files...")
-	with codecs.open(alternate_names_file_name, 'rt', 'utf8') as alternate_names_file:
+	with open(alternate_names_file_name, 'rt') as alternate_names_file:
 		for line in alternate_names_file:
 			col = line.split('\t')
 			# only retain geoname id and name

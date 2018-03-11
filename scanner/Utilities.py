@@ -6,7 +6,6 @@ from __future__ import print_function
 
 from datetime import datetime
 import os
-import locale
 
 import Options
 
@@ -133,7 +132,7 @@ def report_times(final):
 		if time == 0:
 			_time = ""
 		elif time <= 1800:
-			_time = str(time) + (" μs" if locale.getdefaultlocale()[1] == 'UTF-8' else " mics")
+			_time = str(time) + " μs"
 		elif time <= 1800000:
 			_time = str(int(round(time / 1000))) + "    ms"
 		else:
@@ -147,7 +146,7 @@ def report_times(final):
 		if average_time == 0:
 			_average_time = ""
 		elif average_time <= 1800:
-			_average_time = str(average_time) + (" μs" if locale.getdefaultlocale()[1] == 'UTF-8' else " mics")
+			_average_time = str(average_time) + " μs"
 		elif average_time <= 1800000:
 			_average_time = str(int(round(average_time / 1000))) + "    ms"
 		else:

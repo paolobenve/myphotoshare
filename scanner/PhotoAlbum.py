@@ -15,7 +15,6 @@ import sys
 from datetime import datetime
 from pprint import pprint
 import pprint
-import codecs
 
 # @python2
 try:
@@ -263,7 +262,7 @@ class Album(object):
 		message("album sorted", self.absolute_path, 4)
 		back_level()
 		message("saving album...", "", 5)
-		with codecs.open(json_file_with_path, 'w', 'utf8') as filepath:
+		with open(json_file_with_path, 'w') as filepath:
 			json.dump(self, filepath, cls=PhotoAlbumEncoder)
 		next_level()
 		message("album saved", json_file_with_path, 3)
@@ -272,7 +271,7 @@ class Album(object):
 	@staticmethod
 	def from_cache(path, album_cache_base):
 		message("reading album...", "", 5)
-		with codecs.open(path, "r", "utf8") as filepath:
+		with open(path, "r") as filepath:
 			dictionary = json.load(filepath)
 		next_level()
 		message("album read", "", 5)

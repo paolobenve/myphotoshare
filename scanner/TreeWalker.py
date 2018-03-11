@@ -11,7 +11,6 @@ import re
 import time
 import random
 import math
-import codecs
 
 from datetime import datetime
 
@@ -473,7 +472,7 @@ class TreeWalker:
 		stopwords = []
 		stopwords_file = os.path.join(os.path.dirname(__file__), "resources/stopwords-iso.json")
 		message("loading stopwords...", stopwords_file, 4)
-		with codecs.open(stopwords_file, "r", "utf8") as stopwords_p:
+		with open(stopwords_file, "r") as stopwords_p:
 			stopwords = json.load(stopwords_p)
 
 		if language in stopwords:
@@ -1067,7 +1066,7 @@ class TreeWalker:
 		message("media path list built", "", 5)
 		back_level()
 		message("caching all media path list...", "", 4)
-		with codecs.open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w', 'utf8') as all_media_file:
+		with open(os.path.join(Options.config['cache_path'], "all_media.json"), 'w') as all_media_file:
 			json.dump(media_list, all_media_file, cls=PhotoAlbumEncoder)
 		next_level()
 		message("all media path list cached", "", 5)
@@ -1084,7 +1083,7 @@ class TreeWalker:
 			if key not in Options.options_not_to_be_saved:
 				options_to_save[key] = value
 
-		with codecs.open(json_options_file, 'w', 'utf8') as options_file:
+		with open(json_options_file, 'w') as options_file:
 			json.dump(options_to_save, options_file)
 		next_level()
 		message("saved json options file", "", 5)
