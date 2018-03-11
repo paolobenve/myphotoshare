@@ -31,7 +31,6 @@ class TreeWalker:
 		self.all_json_files = ["options.json"]
 		self.all_json_files_by_subdir = {}
 
-		message("method", "cascade thumbnail generation", 4)
 		# be sure reduced_sizes array is correctly sorted
 		Options.config['reduced_sizes'].sort(reverse=True)
 
@@ -115,7 +114,7 @@ class TreeWalker:
 		# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
 		self._save_json_options()
 		self.remove_stale()
-		message("complete", "", 4)
+		message("completed", "", 4)
 
 	def all_albums_to_json_file(self, album):
 		for sub_album in album.subalbums_list:
