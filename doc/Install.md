@@ -113,12 +113,12 @@ Obviously the scanner should be launched too.
 When you're done, run the static generator (you need Python3 or Python≥2.7 and the Python Imaging Library; for video something like `libav-conv` is required too):
 
 ```bash
-    $ /your/myphotoshare/installation/dir/bin/scanner /etc/myphotoshare/myproject.conf
+    $ /your/myphotoshare/installation/dir/bin/scanner /etc/myphotoshare/myproject.conf > /var/log/myphotoshare/myproject.log 2> /var/log/myphotoshare/myproject.error.log
 ```
 
 After it finishes, you will be all set. Simply have your web server serve pages out of your web directory. You may want to do the scanning step in a cronjob, if you don't use the deployment makefiles mentioned below.
 
-Note: The `albums` web folder and the `cache` one could be anywhere in the file system or in web, the only requierement is that the web server has access to them.
+Note: The `albums` web folder can be anywhere in the file system or in web, the only requirement is that the web server has access to it.
 
 
 ### Automatic scan `cron` file example
