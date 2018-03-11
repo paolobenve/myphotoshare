@@ -215,7 +215,7 @@ class Album(object):
 		"""
 		self.album_ini = configparser.ConfigParser(allow_no_value=True)
 		message("reading album.ini...", "", 5)
-		self.album_ini.read(os.path.join(self.absolute_path, Options.config['metadata_filename']), encoding="utf8")
+		self.album_ini.read(os.path.join(self.absolute_path, Options.config['metadata_filename']))
 		next_level()
 		message("album.ini read", os.path.join(self.absolute_path, Options.config['metadata_filename']), 5)
 		back_level()

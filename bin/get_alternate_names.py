@@ -35,7 +35,7 @@ else:
 	with open(translations_file, "rt") as translations_p:
 		translations = translations_p.read().splitlines(True)
 		translations_json = ''.join(translations[1:])[:-1].replace("\t", "").replace(" ", "").replace("\n", "")[:-1]
-		translations_dict = json.loads(translations_json, encoding="utf8")
+		translations_dict = json.loads(translations_json)
 
 	languages = []
 	for key, value in list(translations_dict.items()):

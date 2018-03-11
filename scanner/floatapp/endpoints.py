@@ -9,7 +9,6 @@ from random import shuffle
 import os
 from mimetypes import guess_type
 
-
 cwd = os.path.dirname(os.path.abspath(__file__))
 
 @app.route("/scan")
