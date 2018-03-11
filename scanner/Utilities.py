@@ -211,3 +211,4 @@ def report_times(final):
 		for photo in Options.photos_without_exif_date:
 			print("                                      - " + photo)
 	print()
+	message("    The end!    ", "", 3)
