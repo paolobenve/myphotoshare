@@ -5,7 +5,7 @@
 #          1 = yes = YES = true = True = TRUE;
 #          0 = no = NO = false = False = FALSE;
 #
-# This file sets the default options: they are read by scanner/ModOptions.py
+# This file sets the default options: they are read by scanner/Options.py
 #
 # Do not modify this file:
 # * copy it to any location on your disk (e.g. /etc/myphotoshare) and rename it removing the trailing ".defaults"
