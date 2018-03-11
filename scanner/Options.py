@@ -47,8 +47,7 @@ config['unicode_combining_marks'] = unicode_combining_marks_n + unicode_combinin
 # json_version = 2 since checksums have been added
 # json_version = 3 since geotag managing is optional
 # json_version = 4 since search feature added
-json_version = 4
-
+json_version = 3.9
 
 def get_options():
 	from Utilities import message, next_level, back_level
