@@ -1879,7 +1879,7 @@ class Metadata(object):
 			attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.defaults()["tags"].split(",")]
 
 		next_level()
-		message("album.ini metadata values adde to albums", "", 5)
+		message("album.ini metadata values added to albums", "", 5)
 		back_level()
 		back_level()
 
