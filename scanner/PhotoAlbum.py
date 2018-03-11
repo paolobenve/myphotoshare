@@ -1789,7 +1789,7 @@ class Metadata(object):
 
 		# Initialize with album.ini defaults
 		next_level()
-		message("initialize album.ini metadata values", "", 5)
+		message("adding album.ini metadata values to albums...", "", 5)
 
 		# With Python2, section names are string. As we retrieve file names as unicode,
 		# we can't find them in the ConfigParser dictionary
@@ -1878,6 +1878,9 @@ class Metadata(object):
 		elif "tags" in album_ini.defaults():
 			attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.defaults()["tags"].split(",")]
 
+		next_level()
+		message("album.ini metadata values adde to albums", "", 5)
+		back_level()
 		back_level()
 
 
