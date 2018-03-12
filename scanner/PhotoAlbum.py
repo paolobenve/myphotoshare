@@ -457,7 +457,7 @@ class Album(object):
 				if distinguish_suffix:
 					_path += "_" + str(distinguish_suffix)
 				if (
-					media_file_name is None     and any(_path == _album.cache_base and self.absolute_path != _album.absolute_path   for _album in self.subalbums_list) or
+					media_file_name is None     and any(_path == _subalbum.cache_base and self.absolute_path != _subalbum.absolute_path   for _subalbum in self.subalbums_list) or
 					media_file_name is not None and any(_path == _media.cache_base and media_file_name    != _media.media_file_name for _media in self.media_list)
 				):
 					distinguish_suffix += 1
