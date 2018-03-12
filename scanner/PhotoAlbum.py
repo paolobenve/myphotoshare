@@ -1524,7 +1524,7 @@ class Media(object):
 
 	@property
 	def is_video(self):
-		return "mediaType" in self._attributes["metadata"] and self._attributes["metadata"]["mediaType"] == "video"
+		return "mediaType" in self._attributes and self._attributes["mediaType"] == "video"
 
 	def __str__(self):
 		return self.name

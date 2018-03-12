@@ -51,10 +51,10 @@ json_version = "3.4beta5"
 
 def get_options():
 	from Utilities import message, next_level, back_level
-	project_dir = os.path.dirname(os.path.abspath(os.path.join(os.path.realpath(sys.argv[0]), "..")))
+	project_dir = os.path.dirname(os.path.realpath(os.path.join(__file__, "..")))
 	default_config_file = os.path.join(project_dir, "myphotoshare.conf.defaults")
 	default_config = configparser.ConfigParser()
-	default_config.readfp(open(default_config_file))
+	default_config.readfp(open(default_config_file, "r"))
 	usr_config = configparser.ConfigParser()
 	usr_config.add_section("options")
 	for option in default_config.options('options'):
@@ -63,7 +63,7 @@ def get_options():
 	if len(sys.argv) == 2:
 		# 1 arguments: the config files
 		# which modifies the default options
-		usr_config.readfp(open(sys.argv[1]))
+		usr_config.readfp(open(sys.argv[1], "r"))
 	else:
 		usr_config.set('options', 'album_path', sys.argv[1])
 		usr_config.set('options', 'cache_path', sys.argv[2])
