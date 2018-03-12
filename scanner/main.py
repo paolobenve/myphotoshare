@@ -31,6 +31,7 @@ def main():
 		os.umask(0o02)
 		TreeWalker()
 		report_times(True)
+		message("    The end!    ", "", 3)
 	except KeyboardInterrupt:
 		message("keyboard", "CTRL+C pressed, quitting.")
 		sys.exit(-97)
