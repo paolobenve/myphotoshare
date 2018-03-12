@@ -449,6 +449,9 @@ class Album(object):
 			subalbum_or_media_path = subalbum_or_media_path.replace('_' + Options.config['cache_folder_separator'], Options.config['cache_folder_separator'])
 			subalbum_or_media_path = subalbum_or_media_path.replace(Options.config['cache_folder_separator'] + Options.config['cache_folder_separator'], Options.config['cache_folder_separator'])
 
+		# restore the saved prefix
+		subalbum_or_media_path = prefix + subalbum_or_media_path
+
 		if media_file_name is None and hasattr(self, "subalbums_list") or media_file_name is not None and hasattr(self, "media_list"):
 			# let's avoid that different album/media with equivalent names have the same cache base
 			distinguish_suffix = 0
@@ -464,9 +467,6 @@ class Album(object):
 				else:
 					subalbum_or_media_path = _path
 					break
-
-		# restore the saved prefix
-		subalbum_or_media_path = prefix + subalbum_or_media_path
 
 		return subalbum_or_media_path
 
