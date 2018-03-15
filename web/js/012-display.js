@@ -845,14 +845,14 @@ $(document).ready(function() {
 		if (getBooleanCookie("albumNameSortRequested") === null)
 			setBooleanCookie("albumNameSortRequested", Options.default_album_name_sort);
 		if (getBooleanCookie("albumDateReverseSortRequested") === null)
-			setBooleanCookie("albumDateReverseSortRequested", Options.default_album_date_reverse_sort);
+			setBooleanCookie("albumDateReverseSortRequested", Options.default_album_reverse_sort);
 		if (getBooleanCookie("albumNameReverseSortRequested") === null)
 			setBooleanCookie("albumNameReverseSortRequested", false);
 
 		if (getBooleanCookie("mediaNameSortRequested") === null)
 			setBooleanCookie("mediaNameSortRequested", Options.default_media_name_sort);
 		if (getBooleanCookie("mediaDateReverseSortRequested") === null)
-			setBooleanCookie("mediaDateReverseSortRequested", Options.default_media_date_reverse_sort);
+			setBooleanCookie("mediaDateReverseSortRequested", Options.default_media_reverse_sort);
 		if (getBooleanCookie("mediaNameReverseSortRequested") === null)
 			setBooleanCookie("mediaNameReverseSortRequested", false);
 
