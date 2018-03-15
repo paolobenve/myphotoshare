@@ -866,7 +866,6 @@ $(document).ready(function() {
 
 		var m;
 
-		$("li.album-sort").removeClass("selected");
 		if (needAlbumNameSort()) {
 			currentAlbum.subalbums = sortByPath(currentAlbum.subalbums);
 			currentAlbum.albumNameSort = true;
@@ -886,7 +885,6 @@ $(document).ready(function() {
 				currentAlbum.albumDateReverseSort = ! currentAlbum.albumDateReverseSort;
 		}
 
-		$("li.media-sort").removeClass("selected");
 		if (needMediaNameSort()) {
 			currentAlbum.media = sortByName(currentAlbum.media);
 			currentAlbum.mediaNameSort = true;
