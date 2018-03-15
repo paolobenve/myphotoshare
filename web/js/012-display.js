@@ -812,7 +812,7 @@ $(document).ready(function() {
 		return;
 	}
 
-	function initializeMenu() {
+	function initializeSortPropertiesAndCookies() {
 		// this function applies the sorting on the media and subalbum lists
 		// and sets the album properties that attest the lists status
 
@@ -856,7 +856,6 @@ $(document).ready(function() {
 		if (getBooleanCookie("mediaNameReverseSortRequested") === null)
 			setBooleanCookie("mediaNameReverseSortRequested", false);
 
-		$("#menu-icon").attr("title", _t("#menu-icon-title"));
 	}
 
 	function sortAlbumsMedia() {
@@ -2213,7 +2212,8 @@ $(document).ready(function() {
 		if (currentMedia === null || typeof currentMedia === "object") {
 			setTitle();
 
-			initializeMenu();
+			initializeSortPropertiesAndCookies();
+			$("#menu-icon").attr("title", _t("#menu-icon-title"));
 			sortAlbumsMedia();
 			updateMenu();
 		}
