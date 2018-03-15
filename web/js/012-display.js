@@ -847,15 +847,14 @@ $(document).ready(function() {
 		if (getBooleanCookie("albumDateReverseSortRequested") === null)
 			setBooleanCookie("albumDateReverseSortRequested", Options.default_album_reverse_sort);
 		if (getBooleanCookie("albumNameReverseSortRequested") === null)
-			setBooleanCookie("albumNameReverseSortRequested", false);
+			setBooleanCookie("albumNameReverseSortRequested", Options.default_album_reverse_sort);
 
 		if (getBooleanCookie("mediaNameSortRequested") === null)
 			setBooleanCookie("mediaNameSortRequested", Options.default_media_name_sort);
 		if (getBooleanCookie("mediaDateReverseSortRequested") === null)
 			setBooleanCookie("mediaDateReverseSortRequested", Options.default_media_reverse_sort);
 		if (getBooleanCookie("mediaNameReverseSortRequested") === null)
-			setBooleanCookie("mediaNameReverseSortRequested", false);
-
+			setBooleanCookie("mediaNameReverseSortRequested", Options.default_media_reverse_sort);
 	}
 
 	function sortAlbumsMedia() {
