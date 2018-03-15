@@ -428,6 +428,9 @@
 												}
 												searchResultsAlbumFinal.media = matchingMedia;
 
+												// search albums need to conform to default behaviour of albums: json files have subalbums and media sorted by date not reversed
+												searchResultsAlbumFinal.media = sortByDate(searchResultsAlbumFinal.media);
+
 												matchingSubalbums = [];
 												for (indexSubalbums = 0; indexSubalbums < searchResultsAlbumFinal.subalbums.length; indexSubalbums ++) {
 													match = true;
@@ -454,6 +457,9 @@
 														matchingSubalbums.push(searchResultsAlbumFinal.subalbums[indexSubalbums]);
 												}
 												searchResultsAlbumFinal.subalbums = matchingSubalbums;
+
+												// search albums need to conform to default behaviour of albums: json files have subalbums and media sorted by date not reversed
+												searchResultsAlbumFinal.subalbums = sortByDate(searchResultsAlbumFinal.subalbums);
 											}
 											if (searchResultsAlbumFinal.media.length === 0 && searchResultsAlbumFinal.subalbums.length === 0) {
 												PhotoFloat.noResults();
