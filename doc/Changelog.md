@@ -28,8 +28,6 @@
 * Reduced images and thumbnail naming schema is now more robust
   * cache files names are now made of only lower case ascii characters
 
-
-
 ### version 3.3 (January 22, 2018)
 
 * new option `get_geonames_online`, if true, get country, state, place names from geonames.org (online), otherwise get it from the files in scanner/geonames/cities1000.txt (names are in english)

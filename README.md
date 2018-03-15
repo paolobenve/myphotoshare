@@ -1,4 +1,4 @@
-# MyPhotoShare v. 3.4
+# MyPhotoShare v. 3.4 (date)
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>), Pierre Métras (<p.metras@videotron.ca>)
 
@@ -38,7 +38,7 @@ Content (albums and media files) can be shared over some popular social plaforms
 - [x] Manages images and videos, and permits sharing them (single image or album).
 - [x] Media can be browsed by folder, by date or by geolocation. Switching among album, date and place views.
 - [x] Media and folders can be sorted ascending/descending by date or by name.
-- [x] Media can be searched by file/album name, title, description, tags; search may be whole word or inside words, considering accents and capitals or not.	
+- [x] Media can be searched by file/album name, title, description, tags; search may be whole word or inside words, considering accents and capitals or not.
 - [x] Thumbnails can be square (cropped, with optional face detection by [OpenCV](https://opencv.org/)) or full-content.
 
 ### For Photographers
