@@ -12,6 +12,7 @@ try:
 except ImportError:
 	import ConfigParser as configparser
 
+from Utilities import message, next_level, back_level, find, find_in_usr_share
 
 config = {}
 date_time_format = "%Y-%m-%d %H:%M:%S"
@@ -50,7 +51,6 @@ config['unicode_combining_marks'] = unicode_combining_marks_n + unicode_combinin
 json_version = "3.4beta5"
 
 def get_options():
-	from Utilities import message, next_level, back_level
 	project_dir = os.path.dirname(os.path.realpath(os.path.join(__file__, "..")))
 	default_config_file = os.path.join(project_dir, "myphotoshare.conf.defaults")
 	default_config = configparser.ConfigParser()

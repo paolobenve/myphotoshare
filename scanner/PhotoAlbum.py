@@ -29,7 +29,7 @@ except ImportError:
 import math
 import numpy as np
 
-from CachePath import remove_album_path, remove_folders_marker, trim_base_custom, checksum, thumbnail_types_and_sizes, file_mtime, photo_cache_name, video_cache_name, find, find_in_usr_share
+from CachePath import remove_album_path, remove_folders_marker, trim_base_custom, checksum, thumbnail_types_and_sizes, file_mtime, photo_cache_name, video_cache_name
 from Utilities import message, next_level, back_level
 from Geonames import Geonames
 from PIL import Image
