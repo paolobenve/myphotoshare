@@ -47,13 +47,15 @@ try:
 	message("importer", "opencv library available, using it!", 3)
 	next_level()
 	FACE_CONFIG_FILE = "haarcascade_frontalface_default.xml"
-	message("looking for file...", FACE_CONFIG_FILE, 5)
+	message("looking for file...", FACE_CONFIG_FILE + " in /usr/share", 5)
 	face_config_file_with_path = find_in_usr_share(FACE_CONFIG_FILE)
 	if not face_config_file_with_path:
+		message("file ", FACE_CONFIG_FILE + " not found in /usr/share", 5)
+		message("looking for file...", FACE_CONFIG_FILE + " in /", 5)
 		face_config_file_with_path = find(FACE_CONFIG_FILE)
 	if not face_config_file_with_path:
 		next_level()
-		message("face xml file not found", FACE_CONFIG_FILE, 5)
+		message("face xml file not found", FACE_CONFIG_FILE + " in /usr/share", 5)
 		back_level()
 		cv2_installed = False
 	else:
