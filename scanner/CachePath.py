@@ -22,22 +22,6 @@ def trim_base_custom(path, base):
 def remove_album_path(path):
 	return trim_base_custom(path, Options.config['album_path'])
 
-# find a file in file system, from https://stackoverflow.com/questions/1724693/find-a-file-in-python
-def find(name):
-	for root, dirnames, files in os.walk('/'):
-		dirnames[:] = [dir for dir in dirnames if not os.path.ismount(os.path.join(root, dir))]
-		if name in files:
-			return os.path.join(root, name)
-	return False
-
-def find_in_usr_share(name):
-	for root, dirnames, files in os.walk('/usr/share/'):
-		dirnames[:] = [dir for dir in dirnames if not os.path.ismount(os.path.join(root, dir))]
-		if name in files:
-			return os.path.join(root, name)
-	return False
-
-
 def remove_folders_marker(path):
 	marker_position = path.find(Options.config['folders_string'])
 	if marker_position == 0:

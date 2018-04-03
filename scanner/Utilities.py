@@ -92,6 +92,21 @@ def back_level(verbose=0):
 	if verbose <= message.max_verbose:
 		message.level -= 1
 
+# find a file in file system, from https://stackoverflow.com/questions/1724693/find-a-file-in-python
+def find(name):
+	for root, dirnames, files in os.walk('/'):
+		dirnames[:] = [dir for dir in dirnames if not os.path.ismount(os.path.join(root, dir))]
+		if name in files:
+			return os.path.join(root, name)
+	return False
+
+def find_in_usr_share(name):
+	for root, dirnames, files in os.walk('/usr/share/'):
+		dirnames[:] = [dir for dir in dirnames if not os.path.ismount(os.path.join(root, dir))]
+		if name in files:
+			return os.path.join(root, name)
+	return False
+
 
 def time_totals(time):
 	seconds = int(round(time / 1000000))
