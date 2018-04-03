@@ -16,6 +16,13 @@ from datetime import datetime
 from pprint import pprint
 import pprint
 
+try:
+	import cv2
+except:
+	pass
+
+
+
 # @python2
 try:
 	import configparser
@@ -994,7 +1001,7 @@ class Media(object):
 						# - minSize – Minimum possible object size. Objects smaller than that are ignored.
 						# - maxSize – Maximum possible object size. Objects larger than that are ignored.
 						# You should read the beginning of the page in order to understand the parameters
-						faces = face_cascade.detectMultiScale(gray_opencv_image, Options.config['face_cascade_scale_factor'], 5)
+						faces = Options.face_cascade.detectMultiScale(gray_opencv_image, Options.config['face_cascade_scale_factor'], 5)
 						if len(faces) and Options.config['show_faces']:
 							img = opencv_image
 							for (x, y, w, h) in faces:

@@ -45,6 +45,8 @@ config['unicode_combining_marks'] = unicode_combining_marks_n + unicode_combinin
 
 thumbnail_types_and_sizes_list = None
 config['cv2_installed'] = True
+face_cascade = None
+eye_cascade = None
 
 # set this variable to a new value (previously was a number, now it may include letters) whenever the json files structure changes, it can be the app version
 # json_version = 0 is debug mode: json files are always considered invalid
@@ -55,6 +57,7 @@ config['cv2_installed'] = True
 json_version = "3.4beta5"
 
 def initialize_opencv():
+	global face_cascade, eye_cascade
 
 	try:
 		import cv2
@@ -75,6 +78,7 @@ def initialize_opencv():
 			config['cv2_installed'] = False
 		else:
 			face_cascade = cv2.CascadeClassifier(face_config_file_with_path)
+
 			next_level()
 			message("face xml file found and initialized:", face_config_file_with_path, 5)
 			back_level()
