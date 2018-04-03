@@ -38,52 +38,6 @@ from VideoToolWrapper import VideoProbeWrapper, VideoTranscodeWrapper
 import Options
 from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, remove_all_but_alphanumeric_chars_dashes_slashes_dots, switch_to_lowercase
 
-
-cv2_installed = True
-thumbnail_types_and_sizes_list = None
-try:
-	import cv2
-
-	message("importer", "opencv library available, using it!", 3)
-	next_level()
-	FACE_CONFIG_FILE = "haarcascade_frontalface_default.xml"
-	message("looking for file...", FACE_CONFIG_FILE + " in /usr/share", 5)
-	face_config_file_with_path = find_in_usr_share(FACE_CONFIG_FILE)
-	if not face_config_file_with_path:
-		message("file ", FACE_CONFIG_FILE + " not found in /usr/share", 5)
-		message("looking for file...", FACE_CONFIG_FILE + " in /", 5)
-		face_config_file_with_path = find(FACE_CONFIG_FILE)
-	if not face_config_file_with_path:
-		next_level()
-		message("face xml file not found", FACE_CONFIG_FILE + " in /usr/share", 5)
-		back_level()
-		cv2_installed = False
-	else:
-		face_cascade = cv2.CascadeClassifier(face_config_file_with_path)
-		next_level()
-		message("found and initialized:", face_config_file_with_path, 5)
-		back_level()
-		EYE_CONFIG_FILE = "haarcascade_eye.xml"
-		message("looking for file...", EYE_CONFIG_FILE, 5)
-		eye_config_file_with_path = find_in_usr_share(EYE_CONFIG_FILE)
-		if not eye_config_file_with_path:
-			eye_config_file_with_path = find(EYE_CONFIG_FILE)
-		if not eye_config_file_with_path:
-			next_level()
-			message("eyes xml file not found", EYE_CONFIG_FILE, 5)
-			back_level()
-			cv2_installed = False
-		else:
-			eye_cascade = cv2.CascadeClassifier(eye_config_file_with_path)
-			next_level()
-			message("found and initialized:", eye_config_file_with_path, 5)
-			back_level()
-	back_level()
-except ImportError:
-	cv2_installed = False
-	message("importer", "No opencv library available, not using it", 2)
-
-
 class Album(object):
 	#~ def __init__(self, path, path_has_folder_marker):
 	def __init__(self, path):
@@ -839,11 +793,10 @@ class Media(object):
 
 
 	def generate_all_thumbnails(self, reduced_size_images, photo_path, thumbs_path):
-		global thumbnail_types_and_sizes_list
-		if thumbnail_types_and_sizes_list is None:
-			thumbnail_types_and_sizes_list = list(thumbnail_types_and_sizes().items())
+		if Options.thumbnail_types_and_sizes_list is None:
+			Options.thumbnail_types_and_sizes_list = list(thumbnail_types_and_sizes().items())
 
-		for thumb_type, thumb_sizes in thumbnail_types_and_sizes_list:
+		for thumb_type, thumb_sizes in Options.thumbnail_types_and_sizes_list:
 			thumbs_and_reduced_size_images = reduced_size_images[:]
 			for (thumb_size, mobile_bigger) in thumb_sizes:
 				index = -1
@@ -1002,7 +955,7 @@ class Media(object):
 				(max(start_image_width, start_image_height) >= actual_thumb_size)
 			):
 				must_crop = True
-				if cv2_installed:
+				if Options.config['cv2_installed']:
 					# if the reduced size images were generated in a previous scanner run, start_image is the original image,
 					# and detecting the faces is very very very time consuming, so resize it to an appropriate value before detecting the faces
 					smaller_size = int(Options.config['album_thumb_size'] * Options.config['mobile_thumbnail_factor'] * 1.5)
@@ -1078,7 +1031,7 @@ class Media(object):
 						bottom = start_image_height
 						left = int((start_image_width - start_image_height) / 2)
 						right = start_image_width - left
-						if cv2_installed and try_shifting:
+						if Options.config['cv2_installed'] and try_shifting:
 							# maybe the position of the square could be modified so that it includes more faces
 							# center on the faces
 							shift = int(x_center - start_image_width / 2)
@@ -1098,7 +1051,7 @@ class Media(object):
 						right = start_image_width
 						top = int((start_image_height - start_image_width) / 2)
 						bottom = start_image_height - top
-						if cv2_installed and try_shifting:
+						if Options.config['cv2_installed'] and try_shifting:
 							# maybe the position of the square could be modified so that it includes more faces
 							# center on the faces
 							shift = int(y_center - start_image_height / 2)
@@ -1122,7 +1075,7 @@ class Media(object):
 						bottom = start_image_height
 						left = int((start_image_width - actual_thumb_size) / 2)
 						right = left + actual_thumb_size
-						if cv2_installed and try_shifting:
+						if Options.config['cv2_installed'] and try_shifting:
 							# maybe the position of the crop could be modified so that it includes more faces
 							# center on the faces
 							shift = int(x_center - start_image_width / 2)
@@ -1143,7 +1096,7 @@ class Media(object):
 						right = start_image_width
 						top = int((start_image_height - actual_thumb_size) / 2)
 						bottom = top + actual_thumb_size
-						if cv2_installed and try_shifting:
+						if Options.config['cv2_installed'] and try_shifting:
 							# maybe the position of the crop could be modified so that it includes more faces
 							# center on the faces
 							shift = int(y_center - start_image_height / 2)
@@ -1537,9 +1490,8 @@ class Media(object):
 
 	@property
 	def image_caches(self):
-		global thumbnail_types_and_sizes_list
-		if thumbnail_types_and_sizes_list is None:
-			thumbnail_types_and_sizes_list = list(thumbnail_types_and_sizes().items())
+		if Options.thumbnail_types_and_sizes_list is None:
+			Options.thumbnail_types_and_sizes_list = list(thumbnail_types_and_sizes().items())
 
 		caches = []
 		album_prefix = remove_folders_marker(self.album.cache_base) + Options.config["cache_folder_separator"]
@@ -1559,7 +1511,7 @@ class Media(object):
 				)
 
 		# album and media thumbnail path
-		for thumb_type, thumb_sizes in thumbnail_types_and_sizes_list:
+		for thumb_type, thumb_sizes in Options.thumbnail_types_and_sizes_list:
 			for (thumb_size, mobile_bigger) in thumb_sizes:
 				caches.append(
 					os.path.join(

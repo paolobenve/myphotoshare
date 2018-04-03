@@ -25,6 +25,7 @@ def main():
 		print("usage: {0} ALBUM_PATH CACHE_PATH - or {1} CONFIG_FILE".format(sys.argv[0], sys.argv[0]))
 		return
 
+	Options.initialize_opencv()
 	Options.get_options()
 
 	try:
