@@ -114,26 +114,33 @@ class Geonames(object):
 			while True:
 				response = requests.get(Geonames._base_nearby_url.format(str(latitude), str(longitude)))
 				try:
-					# the json.loads() function insidi _decode_nearby_place() one time throwed the error:
-					# json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 					result = Geonames._decode_nearby_place(response.text)
-					got = True
-					next_level()
-					message("geonames got from geonames.org online", "", 5)
-					back_level()
-					break
+					if isinstance(result, dict):
+						got = True
+						next_level()
+						message("geonames got from geonames.org online", "", 5)
+						back_level()
+						break
+					else:
+						# result is a number, which means that the request to geonames.org produced  an error
+						try_number += 1
+						next_level()
+						message("geonames.org returned error code, retrying...", "try = " + str(try_number) + ", error code = " + str(result), 5)
+						back_level()
 				except json.decoder.JSONDecodeError:
-					# error decoding
+					# error when decoding
+					# once the json.loads() function inside _decode_nearby_place() throwed the error:
+					# json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 					try_number += 1
 					if try_number <= 3:
 						next_level()
-						message("geonames.org response decode error, retrying...", "", 5)
+						message("error deconding geonames.org response, retrying...", "try = " + str(try_number), 5)
 						back_level()
-					else:
-						next_level()
-						message("3 geonames.org response decode errors!", "", 5)
-						back_level()
-						break
+				if try_number == 3:
+					next_level()
+					message("three errors", "giving up", 5)
+					back_level()
+					break
 
 		if not got:
 			# get country, region (state for federal countries), and place
@@ -163,9 +170,14 @@ class Geonames(object):
 		returns the properties in a dict.
 		"""
 		raw_result = json.loads(response_text)
-		result = {}
 
-		if 'status' not in raw_result and len(raw_result['geonames']) > 0:
+		# the presence of the 'status' key denotes an error (see http://www.geonames.org/export/webservice-exception.html)
+		if 'status' in raw_result:
+			result = raw_result['status']['value']
+		else:
+			result = 0
+			if len(raw_result['geonames']) > 0:
+				result = {}
 				geoname = raw_result['geonames'][0]
 				correspondence = {
 					'country_name': 'countryName',
@@ -187,6 +199,7 @@ class Geonames(object):
 							result[index] = Options.config['unspecified_geonames_code']
 						else:
 							result[index] = ''
+		# in case of error result is a number, either 0 (len(raw_result['geonames']) == 0) or the error code got from geonames.org
 		return result
 
 	@staticmethod
