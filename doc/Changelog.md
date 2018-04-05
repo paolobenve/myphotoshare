@@ -21,6 +21,7 @@
   * new option `max_search_album_number`: the maximum number of search album that will be loaded
   * new option `use_stop_words`: whether to use stop words when generating the search albums
 * removed `server_album_path` option and hard code it to `albums`
+* force user to set `respected_processors` option, in order to avoid problems in servers
 * reorganization of documentation:
   * creation of `doc` and `doc/img` folders
   * `README.md` split into individual files

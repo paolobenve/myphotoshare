@@ -37,6 +37,19 @@ album_path =
 # WARNING: javascript code will always use 'cache' subfolder of web site, so assure yourself that this folder corresponds to or is moved to the correct web site path
 cache_path =
 
+##########################################################
+###########################################################
+# YOU MUST SET THIS OPTION TOO
+# It's not set here because it may produces problems on servers
+###########################################################
+##########################################################
+
+# How many processors shouldn't be used when converting media?
+# - on desktop computers 1 is probably ok, because the computer isn't supposed to perform important tasks
+# - on servers, set it to the cores number minus something,
+#   so that MyPhotoShare does not steal precious resources to normal server activity
+respected_processors = 
+
 
 
 ##########################################################
@@ -97,9 +110,6 @@ cache_album_subdir = cache_album
 
 # Filename where user-defined metadata is stored in albums
 metadata_filename = album.ini
-
-# How many processors shouldn't be used when converting media?
-respected_processors = 1
 
 # the method to use for generating cache 2-characters subdirs
 # permitted values:
