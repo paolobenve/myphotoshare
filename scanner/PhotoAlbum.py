@@ -439,7 +439,7 @@ class Media(object):
 		self.media_file_name = remove_album_path(media_path)
 		dirname = os.path.dirname(media_path)
 		self.folders = remove_album_path(dirname)
-		self.album_path = os.path.join(Options.config['server_album_path'], self.media_file_name)
+		self.album_path = os.path.join('albums', self.media_file_name)
 		self.cache_base = album.generate_cache_base(trim_base_custom(media_path, album.absolute_path), self.media_file_name)
 
 		self.is_valid = True
