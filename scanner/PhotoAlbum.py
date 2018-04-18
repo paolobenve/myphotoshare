@@ -564,23 +564,22 @@ class Media(object):
 		with open(self.media_path, 'rb') as f:
 			exif_all_tags = exifread.process_file(f)
 		exif = {}
+
 		for k in sorted(exif_all_tags.keys()):
 			# if k not in ['JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote']:
 			if k not in ['JPEGThumbnail', 'TIFFThumbnail'] and k[0:10] != 'Thumbnail ':
-				k_simple = k
-				# # exifread adds in front of the tags its category: remove it
-				# position = k_simple.find(' ')
-				# if position > -1:
-				# 	k_simple = k[position:]
-				# print('"'+k+'"', position, '"'+k_simple+'"')
-				exif[k_simple] = str(exif_all_tags[k])
-				# exifread returs some value as a fraction, convert it to a tuple of integers
-				position = exif[k_simple].find('/')
-				if position > -1:
-					first = exif[k_simple][0:position]
-					second = exif[k_simple][position + 1:]
-					if (first.isdigit() and second.isdigit()):
-						exif[k_simple] = (int(first), int(second))
+				try:
+					exif[k] = str(exif_all_tags[k])
+					# exifread returs some value as a fraction, convert it to a tuple of integers
+					position = exif[k].find('/')
+					if position > -1:
+						first = exif[k][0:position]
+						second = exif[k][position + 1:]
+						if (first.isdigit() and second.isdigit()):
+							exif[k] = (int(first), int(second))
+				except TypeError:
+					# TO DO: some value doesn't permit translation to string
+					pass
 
 		# except:
 		# 	# gif's make _getexif() produce an error
@@ -590,7 +589,7 @@ class Media(object):
 		# 	back_level()
 		# 	return
 
-		print(11111)
+		# print(11111)
 		pprint(exif)
 
 		if "Image Orientation" in exif:
@@ -613,7 +612,10 @@ class Media(object):
 			except IndexError:
 				self._attributes["metadata"]["aperture"] = int(exif["EXIF FNumber"])
 		if "EXIF FocalLength" in exif:
-			self._attributes["metadata"]["focalLength"] = (int(exif["EXIF FocalLength"][0]), int(exif["EXIF FocalLength"][1]))
+			try:
+				self._attributes["metadata"]["focalLength"] = (int(exif["EXIF FocalLength"][0]), int(exif["EXIF FocalLength"][1]))
+			except IndexError:
+				self._attributes["metadata"]["focalLength"] = int(exif["EXIF FocalLength"])
 		if "EXIF ISOSpeedRatings" in exif:
 			self._attributes["metadata"]["iso"] = exif["EXIF ISOSpeedRatings"]
 		if "MakerNote ISO" in exif:
@@ -621,7 +623,10 @@ class Media(object):
 		if "EXIF PhotographicSensitivity" in exif:
 			self._attributes["metadata"]["iso"] = exif["EXIF PhotographicSensitivity"]
 		if "EXIF ExposureTime" in exif:
-			self._attributes["metadata"]["exposureTime"] = (int(exif["EXIF ExposureTime"][0]), int(exif["EXIF ExposureTime"][1]))
+			try:
+				self._attributes["metadata"]["exposureTime"] = (int(exif["EXIF ExposureTime"][0]), int(exif["EXIF ExposureTime"][1]))
+			except IndexError:
+				self._attributes["metadata"]["exposureTime"] = int(exif["EXIF ExposureTime"])
 		if "EXIF Flash" in exif:
 			self._attributes["metadata"]["flash"] = exif["EXIF Flash"]
 		if "EXIF LightSource" in exif:
@@ -686,7 +691,7 @@ class Media(object):
 		if self.album.album_ini:
 			Metadata.set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
 
-		pprint(self._attributes)
+		# pprint(self._attributes)
 
 		next_level()
 		message("metadata extracted", "", 5)
