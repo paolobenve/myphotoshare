@@ -605,17 +605,17 @@ class Media(object):
 			try:
 				self._attributes["metadata"]["aperture"] = (int(exif["EXIF ApertureValue"][0]), int(exif["EXIF ApertureValue"][1]))
 			except IndexError:
-				self._attributes["metadata"]["aperture"] = int(exif["EXIF ApertureValue"])
+				self._attributes["metadata"]["aperture"] = (int(exif["EXIF ApertureValue"]), 1)
 		elif "EXIF FNumber" in exif:
 			try:
 				self._attributes["metadata"]["aperture"] = (int(exif["EXIF FNumber"][0]), int(exif["EXIF FNumber"][1]))
 			except IndexError:
-				self._attributes["metadata"]["aperture"] = int(exif["EXIF FNumber"])
+				self._attributes["metadata"]["aperture"] = (int(exif["EXIF FNumber"]), 1)
 		if "EXIF FocalLength" in exif:
 			try:
 				self._attributes["metadata"]["focalLength"] = (int(exif["EXIF FocalLength"][0]), int(exif["EXIF FocalLength"][1]))
 			except IndexError:
-				self._attributes["metadata"]["focalLength"] = int(exif["EXIF FocalLength"])
+				self._attributes["metadata"]["focalLength"] = (int(exif["EXIF FocalLength"]), 1)
 		if "EXIF ISOSpeedRatings" in exif:
 			self._attributes["metadata"]["iso"] = exif["EXIF ISOSpeedRatings"]
 		if "MakerNote ISO" in exif:
@@ -626,7 +626,7 @@ class Media(object):
 			try:
 				self._attributes["metadata"]["exposureTime"] = (int(exif["EXIF ExposureTime"][0]), int(exif["EXIF ExposureTime"][1]))
 			except IndexError:
-				self._attributes["metadata"]["exposureTime"] = int(exif["EXIF ExposureTime"])
+				self._attributes["metadata"]["exposureTime"] = (int(exif["EXIF ExposureTime"]), 1)
 		if "EXIF Flash" in exif:
 			self._attributes["metadata"]["flash"] = exif["EXIF Flash"]
 		if "EXIF LightSource" in exif:
