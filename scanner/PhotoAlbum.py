@@ -14,7 +14,6 @@ import unicodedata
 import sys
 from datetime import datetime
 from pprint import pprint
-import pprint
 
 try:
 	import cv2
@@ -591,9 +590,6 @@ class Media(object):
 		# 	back_level()
 		# 	return
 
-		import pprint
-		pprint.pprint(exif)
-
 		if "Image Orientation" in exif:
 			self._orientation = exif["Image Orientation"]
 			if self._orientation.find('otated 90 C') > -1:
@@ -668,7 +664,6 @@ class Media(object):
 		gps_longitude_ref = None
 		if "GPS GPSLongitudeRef" in exif:
 			gps_longitude_ref = exif["GPS GPSLongitudeRef"]
-		print(gps_latitude)
 
 		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
 			self._attributes["metadata"]["altitude"] = gps_altitude
