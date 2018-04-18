@@ -590,6 +590,9 @@ class Media(object):
 		# 	back_level()
 		# 	return
 
+		print(11111)
+		pprint(exif)
+
 		if "Image Orientation" in exif:
 			self._orientation = exif["Image Orientation"]
 			if self._orientation.find('otated 90 C') > -1:
@@ -600,11 +603,17 @@ class Media(object):
 		if "Image Model" in exif:
 			self._attributes["metadata"]["model"] = exif["Image Model"]
 		if "EXIF ApertureValue" in exif:
-			self._attributes["metadata"]["aperture"] = exif["EXIF ApertureValue"]
+			try:
+				self._attributes["metadata"]["aperture"] = (int(exif["EXIF ApertureValue"][0]), int(exif["EXIF ApertureValue"][1]))
+			except IndexError:
+				self._attributes["metadata"]["aperture"] = int(exif["EXIF ApertureValue"])
 		elif "EXIF FNumber" in exif:
-			self._attributes["metadata"]["aperture"] = exif["EXIF FNumber"]
+			try:
+				self._attributes["metadata"]["aperture"] = (int(exif["EXIF FNumber"][0]), int(exif["EXIF FNumber"][1]))
+			except IndexError:
+				self._attributes["metadata"]["aperture"] = int(exif["EXIF FNumber"])
 		if "EXIF FocalLength" in exif:
-			self._attributes["metadata"]["focalLength"] = exif["EXIF FocalLength"]
+			self._attributes["metadata"]["focalLength"] = (int(exif["EXIF FocalLength"][0]), int(exif["EXIF FocalLength"][1]))
 		if "EXIF ISOSpeedRatings" in exif:
 			self._attributes["metadata"]["iso"] = exif["EXIF ISOSpeedRatings"]
 		if "MakerNote ISO" in exif:
@@ -612,7 +621,7 @@ class Media(object):
 		if "EXIF PhotographicSensitivity" in exif:
 			self._attributes["metadata"]["iso"] = exif["EXIF PhotographicSensitivity"]
 		if "EXIF ExposureTime" in exif:
-			self._attributes["metadata"]["exposureTime"] = exif["EXIF ExposureTime"]
+			self._attributes["metadata"]["exposureTime"] = (int(exif["EXIF ExposureTime"][0]), int(exif["EXIF ExposureTime"][1]))
 		if "EXIF Flash" in exif:
 			self._attributes["metadata"]["flash"] = exif["EXIF Flash"]
 		if "EXIF LightSource" in exif:
@@ -677,8 +686,10 @@ class Media(object):
 		if self.album.album_ini:
 			Metadata.set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
 
+		pprint(self._attributes)
+
 		next_level()
-		message("extracted", "", 5)
+		message("metadata extracted", "", 5)
 		back_level()
 		back_level()
 
