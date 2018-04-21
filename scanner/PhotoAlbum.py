@@ -592,7 +592,8 @@ class Media(object):
 		# 	return
 
 		# print(11111)
-		pprint(exif)
+		# pprint(exif_all_tags)
+		# pprint(exif)
 
 		if "Image Orientation" in exif:
 			self._orientation = exif["Image Orientation"]
