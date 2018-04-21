@@ -598,6 +598,7 @@ class Media(object):
 			self._orientation = exif["Image Orientation"]
 			if self._orientation.find('otated 90 C') > -1:
 				self._attributes["metadata"]["size"] = (self._attributes["metadata"]["size"][1], self._attributes["metadata"]["size"][0])
+			self._attributes["metadata"]["orientation"] = exif["Image Orientation"]
 
 		if "Image Make" in exif:
 			self._attributes["metadata"]["make"] = exif["Image Make"]
