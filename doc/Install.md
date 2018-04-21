@@ -13,7 +13,8 @@ MyPhotoShare needs:
 * `python3-pil`
 * `python3-unidecode`
 * `avconv` / `ffmpeg` in order to be able to manage videos
-* `curl`, used by minify script.
+* `curl`, used by minify script
+* `python3-exif`
 
 ### Optional
 * `python-opencv` if found, face detection is used when cropping images to square.

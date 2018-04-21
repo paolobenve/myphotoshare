@@ -2,3 +2,5 @@
 .tags
 .tags_swap
 .idea
+venv/*
+.nfs*

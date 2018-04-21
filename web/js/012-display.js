@@ -1955,7 +1955,7 @@ $(document).ready(function() {
 		if (typeof currentMedia.metadata.exposureProgram !== "undefined")
 			text += "<tr><td id=\"metadata-data-exposureProgram\"></td><td>" + currentMedia.metadata.exposureProgram + "</td></tr>";
 		if (typeof currentMedia.metadata.exposureCompensation !== "undefined")
-			text += "<tr><td id=\"metadata-data-exposureCompensation\"></td><td>" + getDecimal(currentMedia.metadata.exposureCompensation) + "</td></tr>";
+			text += "<tr><td id=\"metadata-data-exposureCompensation\"></td><td>" + currentMedia.metadata.exposureCompensation + "</td></tr>";
 		if (typeof currentMedia.metadata.spectralSensitivity !== "undefined")
 			text += "<tr><td id=\"metadata-data-spectralSensitivity\"></td><td>" + currentMedia.metadata.spectralSensitivity + "</td></tr>";
 		if (typeof currentMedia.metadata.sensingMethod !== "undefined")
