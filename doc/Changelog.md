@@ -27,8 +27,9 @@
   * `README.md` split into individual files
   * explained how to use advanced features like geonames or face detection
   * created a gallery of screenshots
-* Reduced images and thumbnail naming schema is now more robust
+* reduced images and thumbnail naming schema is now more robust
   * cache files names are now made of only lower case ascii characters
+* reading photo metadata: switched from Pillow's getexif() to exifread because the former couldn't read the metadata from some old images
 
 ### version 3.3 (January 22, 2018)
 
