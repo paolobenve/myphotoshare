@@ -569,14 +569,16 @@ class Media(object):
 			# if k not in ['JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote']:
 			if k not in ['JPEGThumbnail', 'TIFFThumbnail'] and k[0:10] != 'Thumbnail ':
 				try:
-					exif[k] = str(exif_all_tags[k])
-					# exifread returs some value as a fraction, convert it to a tuple of integers
-					position = exif[k].find('/')
-					if position > -1:
-						first = exif[k][0:position]
-						second = exif[k][position + 1:]
-						if (first.isdigit() and second.isdigit()):
-							exif[k] = (int(first), int(second))
+					exifstring = str(exif_all_tags[k])
+					if exifstring != "Unknown":
+						exif[k] = str(exif_all_tags[k])
+						# exifread returs some value as a fraction, convert it to a tuple of integers
+						position = exif[k].find('/')
+						if position > -1:
+							first = exif[k][0:position]
+							second = exif[k][position + 1:]
+							if (first.isdigit() and second.isdigit()):
+								exif[k] = (int(first), int(second))
 				except TypeError:
 					# TO DO: some value doesn't permit translation to string
 					pass
