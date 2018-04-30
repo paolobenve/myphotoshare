@@ -429,7 +429,7 @@
 												searchResultsAlbumFinal.media = matchingMedia;
 
 												// search albums need to conform to default behaviour of albums: json files have subalbums and media sorted by date not reversed
-												searchResultsAlbumFinal.media = sortByDate(searchResultsAlbumFinal.media);
+												searchResultsAlbumFinal.media = PhotoFloat.sortByDate(searchResultsAlbumFinal.media);
 
 												matchingSubalbums = [];
 												for (indexSubalbums = 0; indexSubalbums < searchResultsAlbumFinal.subalbums.length; indexSubalbums ++) {
@@ -459,7 +459,7 @@
 												searchResultsAlbumFinal.subalbums = matchingSubalbums;
 
 												// search albums need to conform to default behaviour of albums: json files have subalbums and media sorted by date not reversed
-												searchResultsAlbumFinal.subalbums = sortByDate(searchResultsAlbumFinal.subalbums);
+												searchResultsAlbumFinal.subalbums = PhotoFloat.sortByDate(searchResultsAlbumFinal.subalbums);
 											}
 											if (searchResultsAlbumFinal.media.length === 0 && searchResultsAlbumFinal.subalbums.length === 0) {
 												PhotoFloat.noResults();
@@ -763,6 +763,36 @@
 		}
 		return hash;
 	};
+
+	// see https://stackoverflow.com/questions/1069666/sorting-javascript-object-by-property-value
+	PhotoFloat.sortBy = function(albumOrMediaList, field) {
+		return albumOrMediaList.sort(function(a,b) {
+			var aValue = a[field];
+			var bValue = b[field];
+			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+		});
+	}
+
+	 PhotoFloat.sortByName = function(mediaList) {
+		return PhotoFloat.sortBy(mediaList, 'name');
+	}
+
+	PhotoFloat.sortByPath = function(albumList) {
+		if (PhotoFloat.isByGpsCacheBase(albumList[0].cacheBase))
+			return PhotoFloat.sortBy(albumList, 'name');
+		else
+			return PhotoFloat.sortBy(albumList, 'path');
+	}
+
+	PhotoFloat.sortByDate = function (albumOrMediaList) {
+		return albumOrMediaList.sort(function(a,b) {
+			var aValue = new Date(a.date);
+			var bValue = new Date(b.date);
+			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+		});
+	}
+
+
 
 	/* make static methods callable as member functions */
 	PhotoFloat.prototype.cacheBase = PhotoFloat.cacheBase;

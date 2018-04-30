@@ -867,12 +867,12 @@ $(document).ready(function() {
 		var m;
 
 		if (needAlbumNameSort()) {
-			currentAlbum.subalbums = sortByPath(currentAlbum.subalbums);
+			currentAlbum.subalbums = PhotoFloat.sortByPath(currentAlbum.subalbums);
 			currentAlbum.albumNameSort = true;
 			currentAlbum.albumNameReverseSort = false;
 			// $("li.album-sort.by-name").addClass("selected");
 		} else if (needAlbumDateSort()) {
-			currentAlbum.subalbums = sortByDate(currentAlbum.subalbums);
+			currentAlbum.subalbums = PhotoFloat.sortByDate(currentAlbum.subalbums);
 			currentAlbum.albumNameSort = false;
 			currentAlbum.albumDateReverseSort = false;
 		}
@@ -886,7 +886,7 @@ $(document).ready(function() {
 		}
 
 		if (needMediaNameSort()) {
-			currentAlbum.media = sortByName(currentAlbum.media);
+			currentAlbum.media = PhotoFloat.sortByName(currentAlbum.media);
 			currentAlbum.mediaNameSort = true;
 			currentAlbum.mediaNameReverseSort = false;
 			if (currentMedia !== null) {
@@ -898,7 +898,7 @@ $(document).ready(function() {
 				}
 			}
 		} else if (needMediaDateSort()) {
-			currentAlbum.media = sortByDate(currentAlbum.media);
+			currentAlbum.media = PhotoFloat.sortByDate(currentAlbum.media);
 			currentAlbum.mediaNameSort = false;
 			currentAlbum.mediaDateReverseSort = false;
 			if (currentMedia !== null) {
@@ -921,38 +921,8 @@ $(document).ready(function() {
 		}
 	}
 
-
-	// see https://stackoverflow.com/questions/1069666/sorting-javascript-object-by-property-value
-	function sortByName(mediaList) {
-		return sortBy(mediaList, 'name');
-	}
-
-	function sortByPath(albumList) {
-		if (PhotoFloat.isByGpsCacheBase(albumList[0].cacheBase))
-			return sortBy(albumList, 'name');
-		else
-			return sortBy(albumList, 'path');
-	}
-
-	function sortBy(albumOrMediaList, field) {
-		return albumOrMediaList.sort(function(a,b) {
-			var aValue = a[field];
-			var bValue = b[field];
-			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-		});
-	}
-
-	function sortByDate(albumOrMediaList) {
-		return albumOrMediaList.sort(function(a,b) {
-			var aValue = new Date(a.date);
-			var bValue = new Date(b.date);
-			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-		});
-	}
-
 	function scrollToThumb() {
 		var media, thumb;
-
 
 		media = currentMedia;
 		if (media === null) {
