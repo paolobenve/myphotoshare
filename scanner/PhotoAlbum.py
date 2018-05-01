@@ -955,7 +955,7 @@ class Media(object):
 					width_for_detecting = start_image_width
 					height_for_detecting = start_image_height
 					if min(start_image_width, start_image_height) > smaller_size:
-						longer_size = int(smaller_size / min(start_image_width, start_image_height) * max(start_image_width, start_image_height))
+						longer_size = int(smaller_size * max(start_image_width, start_image_height) / min(start_image_width, start_image_height))
 						width_for_detecting = smaller_size if start_image_width < start_image_height else longer_size
 						height_for_detecting = longer_size if start_image_width < start_image_height else smaller_size
 						sizes_change = "from " + str(start_image_width) + "x" + str(start_image_height) + " to " + str(width_for_detecting) + "x" + str(height_for_detecting)
