@@ -64,9 +64,13 @@ def remove_digits(phrase):
 
 def remove_accents(phrase):
 	# strip accents (from http://nullege.com/codes/show/src@d@b@dbkit-0.2.2@examples@notary@notary.py/38/unicodedata.combining)
-	phrase = u''.join(c for c in unicodedata.normalize('NFKD', phrase) if c not in Options.config['unicode_combining_marks'])
+	normalized_phrase = unicodedata.normalize('NFKD', phrase)
+	accentless_phrase = ''
+	for c in normalized_phrase:
+		if c not in Options.config['unicode_combining_marks']:
+			accentless_phrase += c
 
-	return phrase
+	return accentless_phrase
 
 def switch_to_lowercase(phrase):
 	phrase = phrase.lower()
