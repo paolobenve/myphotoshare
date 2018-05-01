@@ -41,3 +41,7 @@ As a result of a pillow bug, exif data could not be read for some photos which h
 #### Oriental languages
 
 Oriental languages like chinese do not define easily word separation, so whole word search could thrown no results, try inside word search.
+
+#### python3-exif not present in debian Jessie
+
+Due to a bug in PIL `_getexif()`, `exifread` (`python3-exifread` package in `debian`) is used in order to get the exif metadata from the photos beginning with version 3.4beta9. However, `python3-exifread` is not packaged for `debian jessie`, so python2 is to be used instead of python3 for the scanner: simply change "python3" to "python2" in the first line of `scanner/main.py`.
