@@ -1348,7 +1348,6 @@ $(document).ready(function() {
 											// element = $("#album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
 											element = document.getElementById("album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
 											if (element.scrollHeight > element.clientHeight) {
-												console.log(element.scrollHeight, element.clientHeight);
 												// the element have overflow
 												overflow = true;
 												difference = element.scrollHeight - element.clientHeight;
