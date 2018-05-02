@@ -1084,7 +1084,7 @@ $(document).ready(function() {
 					imageLink.append(image);
 					media.push(imageLink);
 					(function(theLink, theImage) {
-						theImage.error(function() {
+						theImage.on("error", function() {
 							media.splice(media.indexOf(theLink), 1);
 							theLink.remove();
 							currentAlbum.media.splice(currentAlbum.media.indexOf(theImage.get(0).media), 1);
