@@ -88,7 +88,7 @@ a.title-anchor.mobile {
 
 .album-button-and-caption {
 	float: left;
-	height: 200px;
+	height: 250px;
 	width: 200px;
 }
 .album-button-and-caption.slide {
@@ -437,6 +437,7 @@ video {
 	overflow: hidden;
 	padding: 0 .2em;
 	margin-bottom: .2em;
+	clear: both;
 }
 
 .media-caption.hidden, .album-caption.hidden {
