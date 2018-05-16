@@ -54,7 +54,7 @@ class TreeWalker:
 			back_level()
 
 		self.origin_album = Album(Options.config['album_path'])
-		# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parente of the root physical tree and of the virtual albums
+		# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parent of the root physical tree and of the virtual albums
 		self.origin_album.cache_base = "root"
 		next_level()
 		[folders_album, num, _] = self.walk(Options.config['album_path'], Options.config['folders_string'], self.origin_album)
