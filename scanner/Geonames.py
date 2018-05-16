@@ -89,7 +89,7 @@ class Geonames(object):
 
 		next_level()
 		message("looking for geonames in cache...", "", 5)
-		for _ in range(len(Geonames.geonames_cache) -1, -1, -1):
+		for _ in range(len(Geonames.geonames_cache) - 1, -1, -1):
 			((c_latitude, c_longitude), result) = Geonames.geonames_cache[_]
 			distance = Geonames._distance_between_coordinates(c_latitude, c_longitude, latitude, longitude)
 			if distance < Geonames.MAX_DISTANCE_METERS:
