@@ -1397,6 +1397,8 @@ class Media(object):
 		message("transcoding...", info_string, 5)
 		tmp_transcode_cmd = transcode_cmd[:]
 		transcode_cmd.append(transcode_path)
+		# avoid ffmpeg/avconv stopping if the scanner is running interactively
+		transcode_cmd.append('< /dev/null')
 		try:
 			return_code = VideoTranscodeWrapper().call(*transcode_cmd)
 			if return_code != False:
