@@ -2250,15 +2250,15 @@ $(document).ready(function() {
 						Options.albums_slide_style = slideCookie;
 
 					if (Options.thumb_spacing)
-						Options.spacingSave = Options.thumb_spacing;
+						Options.spacingToggle = Options.thumb_spacing;
 					else
-						Options.spacingSave = Options.media_thumb_size * 0.03;
+						Options.spacingToggle = Options.media_thumb_size * 0.03;
 
 					var spacingCookie = getNumberCookie("spacing");
 					if (spacingCookie !== null) {
 						Options.spacing = spacingCookie;
 					} else {
-						Options.spacing = Options.spacingSave;
+						Options.spacing = Options.thumb_spacing;
 					}
 
 					var showAlbumNamesCookie = getBooleanCookie("show_album_names_below_thumbs");
@@ -2677,7 +2677,7 @@ $(document).ready(function() {
 			if (Options.spacing)
 				Options.spacing = 0;
 			else
-				Options.spacing = Options.spacingSave;
+				Options.spacing = Options.spacingToggle;
 			setCookie("spacing", Options.spacing);
 			updateMenu();
 			showAlbum("refreshBoth");
