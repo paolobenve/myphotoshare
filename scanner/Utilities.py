@@ -205,12 +205,12 @@ def report_times(final):
 	_num_video = str(Options.num_video)
 	_num_video_processed = str(Options.num_video_processed)
 	max_digit = len(_num_media)
-	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media + ' / ' + str(num_media_in_tree) + ' (' + str(int(num_media * 1000 / num_media_in_tree) / 10) + '%)')
+	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media + ' / ' + str(num_media_in_tree) + ' (' + str(int(num_media * 1000 / num_media_in_tree) / 10.0) + '%)')
 	if num_media:
-		print("                                                              " + str(int(time_till_now / num_media / 1000000 * 1000) / 1000) + " s/media")
+		print("                                                              " + str(int(time_till_now / num_media / 1000000 * 1000) / 1000.0) + " s/media")
 	print("                  processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed)
 	if num_media_processed and num_media_processed != num_media:
-		print("                                                              " + str(int(time_till_now / num_media_processed / 10000) / 100) + " s/processed media")
+		print("                                                              " + str(int(time_till_now / num_media_processed / 10000) / 100.0) + " s/processed media")
 	print("- Videos " + ((max_digit - len(_num_video)) * " ") + _num_video)
 	print("                  processed " + ((max_digit - len(_num_video_processed)) * " ") + _num_video_processed)
 	print("- Photos " + ((max_digit - len(_num_photo)) * " ") + _num_photo)
