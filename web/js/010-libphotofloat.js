@@ -778,9 +778,12 @@
 	}
 
 	PhotoFloat.sortByPath = function(albumList) {
-		if (PhotoFloat.isByGpsCacheBase(albumList[0].cacheBase))
-			return PhotoFloat.sortBy(albumList, 'name');
-		else
+		if (PhotoFloat.isByGpsCacheBase(albumList[0].cacheBase)) {
+			if (albumList[0].hasOwnProperty('alt_name'))
+				return PhotoFloat.sortBy(albumList, 'alt_name');
+			else
+				return PhotoFloat.sortBy(albumList, 'name');
+		} else
 			return PhotoFloat.sortBy(albumList, 'path');
 	}
 
