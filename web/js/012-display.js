@@ -984,6 +984,7 @@ $(document).ready(function() {
 		var tooBig = false, isVirtualAlbum = false;
 		var mapLinkIcon;
 		var element;
+		var captionHeight, captionFontSize, buttonAndCaptionHeight, albumButtonAndCaptionHtml;
 
 		PhotoFloat.subalbumIndex = 0;
 		numSubAlbumsReady = 0;
@@ -1158,9 +1159,49 @@ $(document).ready(function() {
 						} else {
 							subfolderHash = currentAlbum.subalbums[i].cacheBase;
 						}
+
+						captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
+						captionHeight = parseInt(captionFontSize * 1.1) + 1;
+						if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+							heightfactor = 0;
+						else if (! Options.show_album_media_count)
+							heightfactor = 1.1;
+						else
+							heightfactor = 2.8;
+						buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
+
 						// a dot could be present in a cache base, making $("#" + cacheBase) fail, beware...
-						linkContainer = $("<div id=\"" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "\" class=\"album-button-and-caption\"></div>");
-						image = $("<div class=\"album-button\"></div>");
+						albumButtonAndCaptionHtml =
+							"<div id='" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "' " +
+								"class='album-button-and-caption";
+						if (Options.albums_slide_style)
+							albumButtonAndCaptionHtml += " slide";
+						albumButtonAndCaptionHtml +=
+								"' " +
+								"style='" +
+									"margin-right: " + Options.spacing + "px; " +
+									"margin-top: " + Options.spacing + "px; " +
+									"height: " + buttonAndCaptionHeight + "px; " +
+									"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
+						if (Options.albums_slide_style)
+							albumButtonAndCaptionHtml += "background-color:" + Options.album_button_background_color + ";";
+						albumButtonAndCaptionHtml +=
+								"'" +
+							">" +
+							"</div>";
+						linkContainer = $(albumButtonAndCaptionHtml);
+
+						image = $(
+											"<div " +
+											 	"class='album-button' " +
+												"style='" +
+													"width:" + correctedAlbumThumbSize + "px; " +
+													"height:" + correctedAlbumThumbSize + "px; " +
+													"margin:" + margin + "px;" +
+												"'" +
+												">" +
+												"</div>"
+										);
 						linkContainer.append(image);
 						subalbumsElement.append(linkContainer);
 						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
@@ -1175,9 +1216,9 @@ $(document).ready(function() {
 							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,            subalbum);
 							photoFloat.pickRandomMedia(theSubalbum, currentAlbum, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
 								var htmlText, difference;
-								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
+								var folderArray, folder, html, titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size);
-								var heightfactor, captionColor, overflow;
+								var captionColor, overflow;
 
 								PhotoFloat.subalbumIndex ++;
 								mediaWidth = randomMedia.metadata.size[0];
@@ -1281,16 +1322,6 @@ $(document).ready(function() {
 								// $($el).appendTo('body');
 								// $($el).remove();
 
-								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
-								captionHeight = parseInt(captionFontSize * 1.1) + 1;
-								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
-									heightfactor = 0;
-								else if (! Options.show_album_media_count)
-									heightfactor = 1.1;
-								else
-									heightfactor = 2.8;
-								buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
-
 								html = "<div class='album-caption";
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									html += " hidden";
@@ -1312,19 +1343,6 @@ $(document).ready(function() {
 									// now all the subalbums random thumbnails has been loaded
 									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
-
-									$(".album-button-and-caption")
-										.css("margin-right", Options.spacing + "px")
-										.css("margin-top", Options.spacing + "px")
-										.css("height", buttonAndCaptionHeight + "px")
-										.css("width", albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px");
-									if (Options.albums_slide_style)
-										$(".album-button-and-caption").addClass("slide").css("background-color", Options.album_button_background_color);
-
-									$(".album-button")
-										.css("width", correctedAlbumThumbSize + "px")
-										.css("height", correctedAlbumThumbSize + "px")
-										.css("margin", margin + "px");
 
 									captionColor = Options.albums_slide_style ? Options.slide_album_caption_color : Options.album_caption_color;
 									$(".album-caption")
