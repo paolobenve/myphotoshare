@@ -1291,17 +1291,17 @@ $(document).ready(function() {
 									heightfactor = 2.8;
 								buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
 
-								html = "<div class=\"album-caption";
+								html = "<div class='album-caption";
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
 									html += " hidden";
-								html += "\" id=\"album-caption-" + PhotoFloat.hashCode(theSubalbum.cacheBase) + "\">" + folder + "</div>";
+								html += "' id='album-caption-" + PhotoFloat.hashCode(theSubalbum.cacheBase) + "'>" + folder + "</div>";
 
-								html += "<div class=\"album-caption-count";
+								html += "<div class='album-caption-count";
 								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
 									html += " hidden";
-								html += "\">(";
+								html += "'>(";
 								html +=		subalbum.numMediaInSubTree;
-								html +=		" <span class=\"title-media\">";
+								html +=		" <span class='title-media'>";
 								html +=		_t(".title-media");
 								html +=		"</span>";
 								html += ")</div>";
