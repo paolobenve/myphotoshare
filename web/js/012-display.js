@@ -1268,7 +1268,7 @@ $(document).ready(function() {
 																		"' title='" + folderName +
 																		"' target='_blank'" +
 																">" +
-															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/ic_place_white_24dp_2x' />" +
+															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/ic_place_white_24dp_2x.png' />" +
 														"</a>" +
 													"</span>";
 								}
