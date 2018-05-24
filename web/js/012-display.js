@@ -2353,12 +2353,12 @@ $(document).ready(function() {
 	$(document).on('keydown', function(e) {
 		if (e.target.tagName.toLowerCase() != 'input') {
 			if (! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-				if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
-					//            arrow right                  n
+				if (nextLink && (e.keyCode === 39 || e.keyCode === 78 || e.keyCode === 13 || e.keyCode === 32) && currentMedia !== null) {
+					//            arrow right                  n             return              space
 					swipeLeft(nextLink);
 					return false;
-				} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80) && currentMedia !== null) {
-					//                   arrow left                   p
+				} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80 || e.keyCode === 8) && currentMedia !== null) {
+					//                   arrow left                   p           backspace
 					swipeRight(prevLink);
 					return false;
 				} else if (e.keyCode === 27 && ! Modernizr.fullscreen && fullScreenStatus) {
