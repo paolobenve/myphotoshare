@@ -985,6 +985,7 @@ $(document).ready(function() {
 		var mapLinkIcon;
 		var element;
 		var captionHeight, captionFontSize, buttonAndCaptionHeight, albumButtonAndCaptionHtml;
+		var folderArray, folder, html;
 
 		PhotoFloat.subalbumIndex = 0;
 		numSubAlbumsReady = 0;
@@ -1170,6 +1171,69 @@ $(document).ready(function() {
 							heightfactor = 2.8;
 						buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
 
+						// generate the subalbum caption
+						if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase)) {
+							folderArray = currentAlbum.subalbums[i].cacheBase.split(Options.cache_folder_separator);
+							folder = "";
+							if (folderArray.length >= 2)
+								folder += folderArray[1];
+							if (folderArray.length >= 3)
+								folder += "-" + folderArray[2];
+							if (folderArray.length == 4)
+								folder += "-" + folderArray[3];
+						} else if (PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase)) {
+							var level = currentAlbum.subalbums[i].cacheBase.split(Options.cache_folder_separator).length - 2;
+							var folderName = '';
+							var folderTitle = '';
+							if (level === 0)
+								folderName = randomAlbum.media[0].geoname.country_name;
+							else if (level == 1)
+								folderName = randomAlbum.media[0].geoname.region_name;
+							else if (level == 2)
+								if (randomAlbum.media[0].geoname.alt_place_name !== undefined)
+									folderName = transformAltPlaceName(randomAlbum.media[0].geoname.alt_place_name);
+								else
+									folderName = randomAlbum.media[0].geoname.place_name;
+							if (folderName === '')
+								folderName = _t('.not-specified');
+							folderTitle = _t('#place-icon-title') + folderName;
+
+							folder = "<span class='gps-folder'>" +
+												folderName +
+												"<a href='" + mapLink(currentAlbum.subalbums[i].center.latitude, currentAlbum.subalbums[i].center.longitude, Options.map_zoom_levels[level]) +
+																"' title='" + folderName +
+																"' target='_blank'" +
+														">" +
+													"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/ic_place_white_24dp_2x.png' />" +
+												"</a>" +
+											"</span>";
+						}
+						else {
+							folder = currentAlbum.subalbums[i].path;
+						}
+
+						// // get the value in style sheet (element with that class doesn't exist in DOM)
+						// var $el = $('<div class="album-caption"></div>');
+						// $($el).appendTo('body');
+						// $($el).remove();
+
+						captionHtml = "<div class='album-caption";
+						if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+							captionHtml += " hidden";
+						captionHtml += "' id='album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "'>" + folder + "</div>";
+
+						captionHtml += "<div class='album-caption-count";
+						if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
+							captionHtml += " hidden";
+						captionHtml += "'>(";
+						captionHtml +=		currentAlbum.subalbums[i].numMediaInSubTree;
+						captionHtml +=		" <span class='title-media'>";
+						captionHtml +=		_t(".title-media");
+						captionHtml +=		"</span>";
+						captionHtml += ")</div>";
+						caption = $(captionHtml);
+
+
 						// a dot could be present in a cache base, making $("#" + cacheBase) fail, beware...
 						albumButtonAndCaptionHtml =
 							"<div id='" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "' " +
@@ -1203,6 +1267,8 @@ $(document).ready(function() {
 												"</div>"
 										);
 						linkContainer.append(image);
+						linkContainer.append(caption);
+
 						subalbumsElement.append(linkContainer);
 						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
 						// add the clicks
@@ -1216,7 +1282,7 @@ $(document).ready(function() {
 							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,            subalbum);
 							photoFloat.pickRandomMedia(theSubalbum, currentAlbum, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
 								var htmlText, difference;
-								var folderArray, folder, html, titleName, link, goTo, humanGeonames;
+								var titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size);
 								var captionColor, overflow;
 
@@ -1276,67 +1342,6 @@ $(document).ready(function() {
 												"\"" +
 										">";
 								theImage.html(htmlText);
-
-								if (PhotoFloat.isByDateCacheBase(theOriginalAlbumContainer.cacheBase)) {
-									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator);
-									folder = "";
-									if (folderArray.length >= 2)
-										folder += folderArray[1];
-									if (folderArray.length >= 3)
-										folder += "-" + folderArray[2];
-									if (folderArray.length == 4)
-										folder += "-" + folderArray[3];
-								} else if (PhotoFloat.isByGpsCacheBase(theOriginalAlbumContainer.cacheBase)) {
-									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
-									var folderName = '';
-									var folderTitle = '';
-									if (level === 0)
-										folderName = randomAlbum.media[0].geoname.country_name;
-									else if (level == 1)
-										folderName = randomAlbum.media[0].geoname.region_name;
-									else if (level == 2)
-										if (randomAlbum.media[0].geoname.alt_place_name !== undefined)
-											folderName = transformAltPlaceName(randomAlbum.media[0].geoname.alt_place_name);
-										else
-											folderName = randomAlbum.media[0].geoname.place_name;
-									if (folderName === '')
-										folderName = _t('.not-specified');
-									folderTitle = _t('#place-icon-title') + folderName;
-
-									folder = "<span class='gps-folder'>" +
-														folderName +
-														"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, Options.map_zoom_levels[level]) +
-																		"' title='" + folderName +
-																		"' target='_blank'" +
-																">" +
-															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/ic_place_white_24dp_2x.png' />" +
-														"</a>" +
-													"</span>";
-								}
-								else {
-									folder = subalbum.path;
-								}
-
-								// // get the value in style sheet (element with that class doesn't exist in DOM)
-								// var $el = $('<div class="album-caption"></div>');
-								// $($el).appendTo('body');
-								// $($el).remove();
-
-								html = "<div class='album-caption";
-								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
-									html += " hidden";
-								html += "' id='album-caption-" + PhotoFloat.hashCode(theSubalbum.cacheBase) + "'>" + folder + "</div>";
-
-								html += "<div class='album-caption-count";
-								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
-									html += " hidden";
-								html += "'>(";
-								html +=		subalbum.numMediaInSubTree;
-								html +=		" <span class='title-media'>";
-								html +=		_t(".title-media");
-								html +=		"</span>";
-								html += ")</div>";
-								theImage.parent().append(html);
 
 								numSubAlbumsReady ++;
 								if (numSubAlbumsReady >= theOriginalAlbumContainer.subalbums.length) {
