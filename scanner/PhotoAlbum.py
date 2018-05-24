@@ -562,7 +562,15 @@ class Media(object):
 		self._orientation = 1
 
 		with open(self.media_path, 'rb') as f:
-			exif_all_tags = exifread.process_file(f)
+			try:
+				exif_all_tags = exifread.process_file(f)
+			except TypeError:
+				next_level()
+				message("exifread error (bug) extracting metadata", ":-(", 5)
+				back_level()
+				back_level()
+				# here it would be wise to try using the code pre-exifread
+				return
 		exif = {}
 
 		for k in sorted(exif_all_tags.keys()):
