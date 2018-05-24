@@ -1224,7 +1224,7 @@ class Media(object):
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reduced size image saved ", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("album thumbnail salved", "", 4)
+				message("album thumbnail saved", "", 4)
 			else:
 				message("media thumbnail saved", "", 4)
 			back_level()
