@@ -339,12 +339,28 @@ class TreeWalker:
 						next_level()
 						if clustering_failed:
 							# we must split the big clusters into smaller ones
+							# but firts sort media in cluster by date, so that we get more homogeneus clusters
 							message("splitting big clusters into smaller ones...", "", 5)
 							cluster_list_new = list()
+							n = 0
 							for cluster in cluster_list:
+								n += 1
+								next_level()
+								message("working with cluster...", "n." + str(n), 5)
+
 								integer_ratio = len(cluster) // Options.config['big_virtual_folders_threshold']
 								if integer_ratio >= 1:
 									# big cluster
+
+									# sort the cluster by date
+									next_level()
+									message("sorting cluster by date...", "", 5)
+									cluster.sort()
+									next_level()
+									message("cluster sorted by date", "", 5)
+									back_level()
+
+									message("splitting cluster...", "", 5)
 									new_length = len(cluster) // (integer_ratio + 1)
 									for index in range(integer_ratio):
 										start = index * new_length
@@ -352,15 +368,23 @@ class TreeWalker:
 										cluster_list_new.append(cluster[start:end])
 									# the remaining is still to be appended
 									cluster_list_new.append(cluster[end:])
+									next_level()
+									message("cluster splitted", "", 5)
+									back_level()
+									back_level()
 								else:
+									next_level()
+									message("cluster is OK", "", 5)
+									back_level()
 									cluster_list_new.append(cluster)
+								back_level()
 							cluster_list = cluster_list_new[:]
 							max_cluster_length = max([len(cluster) for cluster in cluster_list])
 							next_level()
 							message("big clusters splitted into smaller ones", "biggest cluster lenght is now " + str(max_cluster_length), 5)
 							back_level()
 
-						message("clustering terminated", "clusters are " + str(len(cluster_list)), 5)
+						message("clustering terminated", "there are " + str(len(cluster_list)) + " clusters", 5)
 						back_level()
 						back_level()
 						back_level()
