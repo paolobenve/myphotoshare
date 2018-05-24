@@ -984,8 +984,8 @@ $(document).ready(function() {
 		var tooBig = false, isVirtualAlbum = false;
 		var mapLinkIcon;
 		var element;
-		var captionHeight, captionFontSize, buttonAndCaptionHeight, albumButtonAndCaptionHtml;
-		var folderArray, folder, html;
+		var caption, captionColor, captionHtml, captionHeight, captionFontSize, buttonAndCaptionHeight, albumButtonAndCaptionHtml, heightfactor;
+		var folderArray, folder;
 
 		PhotoFloat.subalbumIndex = 0;
 		numSubAlbumsReady = 0;
@@ -1211,16 +1211,30 @@ $(document).ready(function() {
 						// var $el = $('<div class="album-caption"></div>');
 						// $($el).appendTo('body');
 						// $($el).remove();
+						captionColor = Options.albums_slide_style ? Options.slide_album_caption_color : Options.album_caption_color;
 
 						captionHtml = "<div class='album-caption";
 						if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
 							captionHtml += " hidden";
-						captionHtml += "' id='album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "'>" + folder + "</div>";
+						captionHtml += "' id='album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "'" +
+													"style='" +
+														"width: " + correctedAlbumThumbSize + "px; " +
+														"font-size: " + captionFontSize + "px; " +
+														"height: " + captionHeight + "px; " +
+														"color: " + captionColor + ";" +
+													"'" +
+													">" + folder + "</div>";
 
 						captionHtml += "<div class='album-caption-count";
 						if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
 							captionHtml += " hidden";
-						captionHtml += "'>(";
+						captionHtml += "'" +
+									"style='" +
+										"font-size: " + Math.round((captionFontSize / 1.5)) + "px; " +
+										"height: " + captionHeight + "px; " +
+										"color: " + captionColor + ";" +
+									"'" +
+								">(";
 						captionHtml +=		currentAlbum.subalbums[i].numMediaInSubTree;
 						captionHtml +=		" <span class='title-media'>";
 						captionHtml +=		_t(".title-media");
@@ -1279,7 +1293,7 @@ $(document).ready(function() {
 								var htmlText, difference;
 								var titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size);
-								var captionColor, overflow;
+								var overflow;
 
 								PhotoFloat.subalbumIndex ++;
 								mediaWidth = randomMedia.metadata.size[0];
@@ -1343,18 +1357,6 @@ $(document).ready(function() {
 									// now all the subalbums random thumbnails has been loaded
 									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
-
-									captionColor = Options.albums_slide_style ? Options.slide_album_caption_color : Options.album_caption_color;
-									$(".album-caption")
-										.css("width", correctedAlbumThumbSize + "px")
-										.css("font-size",  captionFontSize + "px")
-										.css("height", captionHeight + "px")
-										.css("color", captionColor);
-
-									$(".album-caption-count")
-										.css("font-size", Math.round((captionFontSize / 1.5)) + "px")
-										.css("height", captionHeight + "px")
-										.css("color", captionColor);
 
 									$("#subalbums").show();
 
