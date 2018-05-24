@@ -106,8 +106,13 @@ class TreeWalker:
 
 			message("saving all albums to json files...", "", 4)
 			next_level()
-			for sub_album in self.origin_album.subalbums_list:
-				self.all_albums_to_json_file(sub_album)
+			self.all_albums_to_json_file(folders_album, True, True)
+			self.all_albums_to_json_file(by_date_album, True, True)
+			self.all_albums_to_json_file(by_geonames_album, True, True)
+
+			# search albums in by_search_album has the normal albums as subalbums,
+			# and they are saved when folders_album is saved, avoid saving them multiple times
+			self.all_albums_to_json_file(by_search_album, True, False)
 			message("all albums saved to json files", "", 5)
 			back_level()
 		# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
@@ -115,9 +120,10 @@ class TreeWalker:
 		self.remove_stale()
 		message("completed", "", 4)
 
-	def all_albums_to_json_file(self, album):
-		for sub_album in album.subalbums_list:
-			self.all_albums_to_json_file(sub_album)
+	def all_albums_to_json_file(self, album, save_subalbums, save_subsubalbums):
+		if save_subalbums:
+			for sub_album in album.subalbums_list:
+				self.all_albums_to_json_file(sub_album, save_subsubalbums, False)
 		album.to_json_file()
 
 	def generate_date_albums(self, origin_album):
