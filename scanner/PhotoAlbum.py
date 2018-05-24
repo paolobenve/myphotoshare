@@ -219,16 +219,16 @@ class Album(object):
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
 			message("FATAL ERROR", json_file_with_path + " not writable, quitting", 0)
 			sys.exit(-97)
-		message("sorting album...", "", 5)
+		message("sorting album...", self.absolute_path, 5)
 		self.sort_subalbums_and_media()
 		next_level()
-		message("album sorted", self.absolute_path, 4)
+		message("album sorted", "", 4)
 		back_level()
 		message("saving album...", "", 5)
 		with open(json_file_with_path, 'w') as filepath:
 			json.dump(self, filepath, cls=PhotoAlbumEncoder)
 		next_level()
-		message("album saved", json_file_with_path, 3)
+		message("album saved", "", 3)
 		back_level()
 
 	@staticmethod
