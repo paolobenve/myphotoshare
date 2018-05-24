@@ -295,27 +295,65 @@ class TreeWalker:
 					if len(media_list) > Options.config['big_virtual_folders_threshold']:
 						next_level()
 						K = 2
+						clustering_failed = False
+						# this array is used in order to detect when there is no convertion
+						max_cluster_length_list = [0, 0, 0]
 						message("big list found", str(len(media_list)) + " photos", 5)
 						next_level()
 						while True:
-							message("clustering with k-means algorithm...", "", 5)
+							message("clustering with k-means algorithm...", "K = " + str(K), 5)
 							cluster_list = Geonames.find_centers(media_list, K)
 							max_cluster_length = max([len(cluster) for cluster in cluster_list])
 							if max_cluster_length <= Options.config['big_virtual_folders_threshold']:
 								next_level()
-								message("clustered with k-means algorithm", "OK with K = " + str(K), 5)
+								message("clustered with k-means algorithm", "OK!", 5)
 								back_level()
 								break
+							# detect no convergence
+							max_cluster_length_list.append(max_cluster_length)
+							max_cluster_length_list.pop(0)
+							if max(max_cluster_length_list) > 0 and max(max_cluster_length_list) == min(max_cluster_length_list):
+								# three times the same value: no convergence
+								next_level()
+								message("clustering with k-means algorithm failed", "max cluster length doesn't converge, it's stuck at " + str(max_cluster_length), 5)
+								back_level()
+								clustering_failed = True
+								break
+
 							if K > len(media_list):
 								next_level()
-								message("clustered with k-means algorithm", "failed even with K = " + str(K) + ": clusters are too big (" + str(max_cluster_length) + " photos)", 5)
+								message("clustering with k-means algorithm failed", "clusters remain too big even with k > len(media_list)", 5)
 								back_level()
+								clustering_failed = true
 								break
 							next_level()
-							message("clustered with k-means algorithm", "not ok with K = " + str(K) + ": biggest cluster has " + str(max_cluster_length) + " photos", 5)
+							message("clustering with k-means algorithm not ok", "biggest cluster has " + str(max_cluster_length) + " photos", 5)
 							back_level()
 							K = K * 2
 						next_level()
+						if clustering_failed:
+							# we must split the big clusters into smaller ones
+							message("splitting big clusters into smaller ones...", "", 5)
+							cluster_list_new = list()
+							for cluster in cluster_list:
+								integer_ratio = len(cluster) // Options.config['big_virtual_folders_threshold']
+								if integer_ratio >= 1:
+									# big cluster
+									new_length = len(cluster) // (integer_ratio + 1)
+									for index in range(integer_ratio):
+										start = index * new_length
+										end = (index + 1) * new_length
+										cluster_list_new.append(cluster[start:end])
+									# the remaining is still to be appended
+									cluster_list_new.append(cluster[end:])
+								else:
+									cluster_list_new.append(cluster)
+							cluster_list = cluster_list_new[:]
+							max_cluster_length = max([len(cluster) for cluster in cluster_list])
+							next_level()
+							message("big clusters splitted into smaller ones", "biggest cluster lenght is now " + str(max_cluster_length), 5)
+							back_level()
+
 						message("clustering terminated", "clusters are " + str(len(cluster_list)), 5)
 						back_level()
 						back_level()
