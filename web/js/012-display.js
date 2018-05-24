@@ -1185,17 +1185,12 @@ $(document).ready(function() {
 							var level = currentAlbum.subalbums[i].cacheBase.split(Options.cache_folder_separator).length - 2;
 							var folderName = '';
 							var folderTitle = '';
-							if (level === 0)
-								folderName = currentAlbum.media[0].geoname.country_name;
-							else if (level == 1)
-								folderName = m.media[0].geoname.region_name;
-							else if (level == 2)
-								if (m.media[0].geoname.alt_place_name !== undefined)
-									folderName = transformAltPlaceName(m.media[0].geoname.alt_place_name);
-								else
-									folderName = m.media[0].geoname.place_name;
-							if (folderName === '')
+							if (currentAlbum.subalbums[i].name === '')
 								folderName = _t('.not-specified');
+							else if (level < 2)
+								folderName = currentAlbum.subalbums[i].name;
+							else
+								folderName = transformAltPlaceName(currentAlbum.subalbums[i].alt_name);
 							folderTitle = _t('#place-icon-title') + folderName;
 
 							folder = "<span class='gps-folder'>" +
