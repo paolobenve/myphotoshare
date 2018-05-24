@@ -1186,14 +1186,14 @@ $(document).ready(function() {
 							var folderName = '';
 							var folderTitle = '';
 							if (level === 0)
-								folderName = randomAlbum.media[0].geoname.country_name;
+								folderName = currentAlbum.media[0].geoname.country_name;
 							else if (level == 1)
-								folderName = randomAlbum.media[0].geoname.region_name;
+								folderName = m.media[0].geoname.region_name;
 							else if (level == 2)
-								if (randomAlbum.media[0].geoname.alt_place_name !== undefined)
-									folderName = transformAltPlaceName(randomAlbum.media[0].geoname.alt_place_name);
+								if (m.media[0].geoname.alt_place_name !== undefined)
+									folderName = transformAltPlaceName(m.media[0].geoname.alt_place_name);
 								else
-									folderName = randomAlbum.media[0].geoname.place_name;
+									folderName = m.media[0].geoname.place_name;
 							if (folderName === '')
 								folderName = _t('.not-specified');
 							folderTitle = _t('#place-icon-title') + folderName;
