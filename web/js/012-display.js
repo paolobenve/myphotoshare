@@ -1141,6 +1141,16 @@ $(document).ready(function() {
 					if (Options.albums_slide_style)
 						margin = Math.round(correctedAlbumThumbSize * 0.05);
 
+					captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
+					captionHeight = parseInt(captionFontSize * 1.1) + 1;
+					if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+						heightfactor = 0;
+					else if (! Options.show_album_media_count)
+						heightfactor = 1.1;
+					else
+						heightfactor = 2.8;
+					buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
+
 					// insert into DOM
 					subalbumsElement = $("#subalbums");
 					subalbumsElement.empty();
@@ -1160,16 +1170,6 @@ $(document).ready(function() {
 						} else {
 							subfolderHash = currentAlbum.subalbums[i].cacheBase;
 						}
-
-						captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
-						captionHeight = parseInt(captionFontSize * 1.1) + 1;
-						if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
-							heightfactor = 0;
-						else if (! Options.show_album_media_count)
-							heightfactor = 1.1;
-						else
-							heightfactor = 2.8;
-						buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
 
 						// generate the subalbum caption
 						if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase)) {
