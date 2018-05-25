@@ -135,7 +135,7 @@ class TreeWalker:
 	def all_albums_to_json_file(self, album, save_subalbums, save_subsubalbums):
 		if save_subalbums:
 			for sub_album in album.subalbums_list:
-				self.all_albums_to_json_file(sub_album, save_subsubalbums, False)
+				self.all_albums_to_json_file(sub_album, save_subsubalbums, True)
 		album.to_json_file()
 
 	def generate_date_albums(self, origin_album):
