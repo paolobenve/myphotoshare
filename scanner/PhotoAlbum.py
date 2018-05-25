@@ -43,8 +43,12 @@ import Options
 from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, remove_all_but_alphanumeric_chars_dashes_slashes_dots, switch_to_lowercase
 # WARNING: pyexiftool has been modified, do not overwrite with new versions unless you know what you are doing
 import PyExifTool
+# this is needed in order to avoid complains from exifread
+import logging
 
 locale.setlocale(locale.LC_ALL, '')
+# this is needed in order to avoid complains from exifread
+logging.basicConfig()
 
 class Album(object):
 	#~ def __init__(self, path, path_has_folder_marker):
