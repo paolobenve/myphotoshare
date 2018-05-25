@@ -591,6 +591,9 @@ class Media(object):
 
 		exif = {}
 		for key in all_keys:
+			if isinstance(key, int):
+				# integer keys aren't anyway useful
+				continue
 			# skip unuseful tags
 			if all(key[0:len(prefix)] != prefix for prefix in ['ExifInteroperabilityOffset', 'ExifTool:ExifToolVersion', 'Interoperability', 'MakerNote', 'Tag ', 'Thumbnail', 'Unknown']):
 				exif[key] = _exif[key]
