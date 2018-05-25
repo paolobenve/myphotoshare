@@ -2149,13 +2149,13 @@ $(document).ready(function() {
 				$("#powered-by").show();
 			} else {
 				$("#error-text-folder").stop().fadeIn(200);
-				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(2500);
-				$("#album-view").stop().fadeIn(3500);
-				$("#media-view").stop().fadeIn(3500);
+				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(3500);
+				$("#album-view").stop().fadeOut(100).fadeIn(3500);
+				$("#media-view").stop().fadeOut(100).fadeIn(3500);
 				window.location.href = rootLink;
 			}
 		}
-		$("#error-overlay").fadeTo(500, 0.8);
+		// $("#error-overlay").fadeTo(500, 0.8);
 		$("body, html").css("overflow", "hidden");
 	}
 
