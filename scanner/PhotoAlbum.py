@@ -561,51 +561,43 @@ class Media(object):
 		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
 
-		try:
-			message("extracting metadata by exiftool...", "", 5)
-			exif_by_exiftool = self._photo_metadata_by_exiftool(image)
-		except:
-			next_level()
-			message("UNMANAGED ERROR extracting metadata by exiftool", "", 5)
-			back_level()
-			exif_by_exiftool = {}
+		_exif = {}
+		used_tool = ""
+		previous = ''
+		for exif_tool in Options.config['metadata_tools_preference']:
+			try:
+				message("extracting metadata by "+ exif_tool + previous + "...", "", 5)
+				if exif_tool == 'exiftool':
+					_exif = self._photo_metadata_by_exiftool(image)
+				elif exif_tool == 'exifread':
+					_exif = self._photo_metadata_by_exifread(image)
+				elif exif_tool == 'PIL':
+					_exif = self._photo_metadata_by_PIL(image)
+				if _exif:
+					next_level()
+					message("metadata extracted by " + exif_tool, "", 5)
+					back_level()
+					used_tool = exif_tool
+					previous = ''
+					break
+				else:
+					previous = ', ' + exif_tool + ' -> {}'
+			except:
+				next_level()
+				message("UNMANAGED ERROR extracting metadata by " + exif_tool, "", 5)
+				back_level()
 
-		try:
-			message("extracting metadata by exifread...", "", 5)
-			exif_by_exifread = self._photo_metadata_by_exifread(image)
-		except:
-			next_level()
-			message("UNMANAGED ERROR extracting metadata by exifread", "", 5)
-			back_level()
-			exif_by_exifread = {}
+		all_keys = list(_exif.keys())
 
-		try:
-			message("extracting metadata by PIL...", "", 5)
-			exif_by_PIL = self._photo_metadata_by_PIL(image)
-		except:
-			next_level()
-			message("UNMANAGED ERROR extracting metadata by PIL", "", 5)
-			back_level()
-			exif_by_PIL = {}
-
-		exiftool_keys = list(exif_by_exiftool.keys())
-		exifread_keys = list(exif_by_exifread.keys())
-		pil_keys = list(exif_by_PIL.keys())
-		all_keys = list(set(exifread_keys + exiftool_keys + pil_keys))
 		exif = {}
 		for key in all_keys:
 			# skip unuseful tags
 			if all(key[0:len(prefix)] != prefix for prefix in ['ExifInteroperabilityOffset', 'ExifTool:ExifToolVersion', 'Interoperability', 'MakerNote', 'Tag ', 'Thumbnail', 'Unknown']):
 				# prefer exiftool, then exifread value
-				if key in exiftool_keys:
-					exif[key] = exif_by_exiftool[key]
-				elif key in exifread_keys:
-					exif[key] = exif_by_exifread[key]
-				elif key in pil_keys:
-					exif[key] = exif_by_PIL[key]
+				exif[key] = _exif[key]
 
 		if exif:
-			message("setting metadata", "exiftool, exifread values preferred", 5)
+			message("setting metadata extracted with " + used_tool, "", 5)
 			self._set_photo_metadata(exif)
 			next_level()
 			message("metadata set!", "", 5)
@@ -758,6 +750,8 @@ class Media(object):
 			else:
 				_exif[decoded] = value
 				exif[decoded] = _exif[decoded]
+				if "Orientation" in _exif and _exif["Orientation"] < len(self._photo_metadata.orientation_list):
+					exif["Orientation"] = self._photo_metadata.orientation_list[_exif["Orientation"]]
 				if "ExposureProgram" in _exif and _exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
 					exif["ExposureProgram"] = self._photo_metadata.exposure_list[_exif["ExposureProgram"]]
 				if "SpectralSensitivity" in _exif:
@@ -773,9 +767,6 @@ class Media(object):
 
 		# PIL returns the keys as 'AFAreaXPositions', i.e. it removes the prefix that exifread and pyexiftool leave
 
-		next_level()
-		message("metadata extracted by PIL", "", 5)
-		back_level()
 		return exif
 
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired", 0x5: "Fired, Return not detected", 0x7: "Fired, Return detected",
@@ -810,10 +801,6 @@ class Media(object):
 			else:
 				exif[k] = exif_all_tags_values[k]
 
-
-		next_level()
-		message("metadata extracted by exiftool", "", 5)
-		back_level()
 		return exif
 
 	def _photo_metadata_by_exifread(self, image):
@@ -844,9 +831,6 @@ class Media(object):
 					# TO DO: some value doesn't permit translation to string
 					pass
 
-		next_level()
-		message("metadata extracted by exifread", "", 5)
-		back_level()
 		return exif
 
 
