@@ -176,7 +176,7 @@ def report_times(final):
 
 	try:
 		num_media_in_tree
-	except NameError:
+	except UnboundLocalError:
 		# calculate the number of media in the album tree: it will be used in order to guess the execution time
 		special_files = [Options.config['exclude_tree_marker'], Options.config['exclude_files_marker'], Options.config['metadata_filename']]
 		num_media_in_tree = sum([len([file for file in files if file[:1] != '.' and file not in special_files]) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
