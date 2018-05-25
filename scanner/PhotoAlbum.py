@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division
 
 # gps code got from https://gist.github.com/erans/983821
 
 import locale
-locale.setlocale(locale.LC_ALL, '')
-
 import json
 import os
 import os.path
@@ -20,8 +18,6 @@ try:
 	import cv2
 except:
 	pass
-
-
 
 # @python2
 try:
@@ -45,6 +41,14 @@ from PIL.ExifTags import TAGS, GPSTAGS
 from VideoToolWrapper import VideoProbeWrapper, VideoTranscodeWrapper
 import Options
 from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, remove_all_but_alphanumeric_chars_dashes_slashes_dots, switch_to_lowercase
+# WARNING: pyexiftool has been modified, do not overwrite with new versions unless you know what you are doing
+import PyExifTool
+# this is needed in order to avoid complains from exifread
+import logging
+
+locale.setlocale(locale.LC_ALL, '')
+# this is needed in order to avoid complains from exifread
+logging.basicConfig()
 
 class Album(object):
 	#~ def __init__(self, path, path_has_folder_marker):
@@ -557,148 +561,143 @@ class Media(object):
 
 
 	def _photo_metadata(self, image):
-		next_level()
-		message("extracting metadata with exifread...", "", 5)
+
 		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
 
-		with open(self.media_path, 'rb') as f:
+		_exif = {}
+		used_tool = ""
+		previous = ''
+		for exif_tool in Options.config['metadata_tools_preference']:
 			try:
-				exif_all_tags = exifread.process_file(f)
-			except TypeError:
+				message("extracting metadata by "+ exif_tool + previous + "...", "", 5)
+				if exif_tool == 'exiftool':
+					_exif = self._photo_metadata_by_exiftool(image)
+				elif exif_tool == 'exifread':
+					_exif = self._photo_metadata_by_exifread(image)
+				elif exif_tool == 'PIL':
+					_exif = self._photo_metadata_by_PIL(image)
+				if _exif:
+					next_level()
+					message("metadata extracted by " + exif_tool, "", 5)
+					back_level()
+					used_tool = exif_tool
+					previous = ''
+					break
+				else:
+					previous = ', ' + exif_tool + ' -> {}'
+			except:
 				next_level()
-				message("exifread error (bug) extracting metadata", ":-(", 5)
+				message("UNMANAGED ERROR extracting metadata by " + exif_tool, "", 5)
 				back_level()
-				back_level()
-				# here it would be wise to try using the code pre-exifread
-				return
+
+		all_keys = list(_exif.keys())
+
 		exif = {}
+		for key in all_keys:
+			if isinstance(key, int):
+				# integer keys aren't anyway useful
+				continue
+			# skip unuseful tags
+			if all(key[0:len(prefix)] != prefix for prefix in ['ExifInteroperabilityOffset', 'ExifTool:ExifToolVersion', 'Interoperability', 'MakerNote', 'Tag ', 'Thumbnail', 'Unknown']):
+				exif[key] = _exif[key]
 
-		for k in sorted(exif_all_tags.keys()):
-			# if k not in ['JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote']:
-			if k not in ['JPEGThumbnail', 'TIFFThumbnail'] and k[0:10] != 'Thumbnail ':
-				try:
-					exifstring = str(exif_all_tags[k])
-					if exifstring != "Unknown":
-						exif[k] = str(exif_all_tags[k])
-						# exifread returs some value as a fraction, convert it to a tuple of integers
-						position = exif[k].find('/')
-						if position > -1:
-							first = exif[k][0:position]
-							second = exif[k][position + 1:]
-							if (first.isdigit() and second.isdigit()):
-								exif[k] = (int(first), int(second))
-				except TypeError:
-					# TO DO: some value doesn't permit translation to string
-					pass
+		if exif:
+			message("setting metadata extracted with " + used_tool, "", 5)
+			self._set_photo_metadata(exif)
+			next_level()
+			message("metadata set!", "", 5)
+			back_level()
 
-		# except:
-		# 	# gif's make _getexif() produce an error
-		# 	next_level()
-		# 	message("unknown error extracting metadata", "", 5)
-		# 	back_level()
-		# 	back_level()
-		# 	return
-
-		# print(11111)
-		# pprint(exif_all_tags)
-		# pprint(exif)
-
-		if "Image Orientation" in exif:
-			self._orientation = exif["Image Orientation"]
+	def _set_photo_metadata(self, exif):
+		if "Orientation" in exif:
+			self._orientation = exif["Orientation"]
 			if self._orientation.find('otated 90 C') > -1:
 				self._attributes["metadata"]["size"] = (self._attributes["metadata"]["size"][1], self._attributes["metadata"]["size"][0])
-			self._attributes["metadata"]["orientation"] = exif["Image Orientation"]
+			self._attributes["metadata"]["orientation"] = exif["Orientation"]
 
-		if "Image Make" in exif:
-			self._attributes["metadata"]["make"] = exif["Image Make"]
-		if "Image Model" in exif:
-			self._attributes["metadata"]["model"] = exif["Image Model"]
-		if "EXIF ApertureValue" in exif:
-			try:
-				self._attributes["metadata"]["aperture"] = (int(exif["EXIF ApertureValue"][0]), int(exif["EXIF ApertureValue"][1]))
-			except IndexError:
-				self._attributes["metadata"]["aperture"] = (int(exif["EXIF ApertureValue"]), 1)
-		elif "EXIF FNumber" in exif:
-			try:
-				self._attributes["metadata"]["aperture"] = (int(exif["EXIF FNumber"][0]), int(exif["EXIF FNumber"][1]))
-			except IndexError:
-				self._attributes["metadata"]["aperture"] = (int(exif["EXIF FNumber"]), 1)
-		if "EXIF FocalLength" in exif:
-			try:
-				self._attributes["metadata"]["focalLength"] = (int(exif["EXIF FocalLength"][0]), int(exif["EXIF FocalLength"][1]))
-			except IndexError:
-				self._attributes["metadata"]["focalLength"] = (int(exif["EXIF FocalLength"]), 1)
-		if "EXIF ISOSpeedRatings" in exif:
-			self._attributes["metadata"]["iso"] = exif["EXIF ISOSpeedRatings"]
+		if "Make" in exif:
+			self._attributes["metadata"]["make"] = exif["Make"]
+		if "Model" in exif:
+			self._attributes["metadata"]["model"] = exif["Model"]
+		if "ApertureValue" in exif:
+			self._attributes["metadata"]["aperture"] = exif["ApertureValue"]
+		elif "FNumber" in exif:
+			self._attributes["metadata"]["aperture"] = exif["FNumber"]
+		if "FocalLength" in exif:
+			self._attributes["metadata"]["focalLength"] = exif["FocalLength"]
+		if "ISOSpeedRatings" in exif:
+			self._attributes["metadata"]["iso"] = exif["ISOSpeedRatings"]
 		if "MakerNote ISO" in exif:
 			self._attributes["metadata"]["iso"] = exif["MakerNote ISO"]
-		if "EXIF PhotographicSensitivity" in exif:
-			self._attributes["metadata"]["iso"] = exif["EXIF PhotographicSensitivity"]
-		if "EXIF ExposureTime" in exif:
+		if "PhotographicSensitivity" in exif:
+			self._attributes["metadata"]["iso"] = exif["PhotographicSensitivity"]
+		if "ExposureTime" in exif:
+			self._attributes["metadata"]["exposureTime"] = exif["ExposureTime"]
+		if "Flash" in exif:
+			self._attributes["metadata"]["flash"] = exif["Flash"]
+		if "LightSource" in exif:
+			self._attributes["metadata"]["lightSource"] = exif["LightSource"]
+		if "ExposureProgram" in exif:
+			self._attributes["metadata"]["exposureProgram"] = exif["ExposureProgram"]
+		if "SpectralSensitivity" in exif:
+			self._attributes["metadata"]["spectralSensitivity"] = exif["SpectralSensitivity"]
+		if "MeteringMode" in exif:
+			self._attributes["metadata"]["meteringMode"] = exif["MeteringMode"]
+		if "SensingMethod" in exif:
+			self._attributes["metadata"]["sensingMethod"] = exif["SensingMethod"]
+		if "SceneCaptureType" in exif:
+			self._attributes["metadata"]["sceneCaptureType"] = exif["SceneCaptureType"]
+		if "SubjectDistanceRange" in exif:
+			self._attributes["metadata"]["subjectDistanceRange"] = exif["SubjectDistanceRange"]
+		if "ExposureCompensation" in exif:
+			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureCompensation"]
+		if "ExposureBiasValue" in exif:
+			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureBiasValue"]
+		if "DateTimeOriginal" in exif:
 			try:
-				self._attributes["metadata"]["exposureTime"] = (int(exif["EXIF ExposureTime"][0]), int(exif["EXIF ExposureTime"][1]))
-			except IndexError:
-				self._attributes["metadata"]["exposureTime"] = (int(exif["EXIF ExposureTime"]), 1)
-		if "EXIF Flash" in exif:
-			self._attributes["metadata"]["flash"] = exif["EXIF Flash"]
-		if "EXIF LightSource" in exif:
-			self._attributes["metadata"]["lightSource"] = exif["EXIF LightSource"]
-		if "EXIF ExposureProgram" in exif:
-			self._attributes["metadata"]["exposureProgram"] = exif["EXIF ExposureProgram"]
-		if "EXIF SpectralSensitivity" in exif:
-			self._attributes["metadata"]["spectralSensitivity"] = exif["EXIF SpectralSensitivity"]
-		if "EXIF MeteringMode" in exif:
-			self._attributes["metadata"]["meteringMode"] = exif["EXIF MeteringMode"]
-		if "EXIF SensingMethod" in exif:
-			self._attributes["metadata"]["sensingMethod"] = exif["EXIF SensingMethod"]
-		if "EXIF SceneCaptureType" in exif:
-			self._attributes["metadata"]["sceneCaptureType"] = exif["EXIF SceneCaptureType"]
-		if "EXIF SubjectDistanceRange" in exif:
-			self._attributes["metadata"]["subjectDistanceRange"] = exif["EXIF SubjectDistanceRange"]
-		if "EXIF ExposureCompensation" in exif:
-			self._attributes["metadata"]["exposureCompensation"] = exif["EXIF ExposureCompensation"]
-		if "EXIF ExposureBiasValue" in exif:
-			self._attributes["metadata"]["exposureCompensation"] = exif["EXIF ExposureBiasValue"]
-		if "EXIF DateTimeOriginal" in exif:
-			try:
-				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["EXIF DateTimeOriginal"], Options.exif_date_time_format)
+				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTimeOriginal"], Options.exif_date_time_format)
 			except ValueError:
-				# value isn't usable, forget it
-				pass
-		elif "Image DateTime" in exif:
-			try:
-				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["Image DateTime"], Options.exif_date_time_format)
-			except ValueError:
-				# value isn't usable, forget it
-				pass
+				if "DateTimeDigitized" in exif:
+					try:
+						self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTimeDigitized"], Options.exif_date_time_format)
+					except ValueError:
+						# value isn't usable, forget it
+						if "DateTime" in exif:
+							try:
+								self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], Options.exif_date_time_format)
+							except ValueError:
+								# value isn't usable, forget it
+								pass
 
 		gps_altitude = None
-		if "GPS GPSAltitude" in exif:
-			gps_altitude = exif["GPS GPSAltitude"]
+		if "GPSAltitude" in exif:
+			gps_altitude = exif["GPSAltitude"]
 		gps_altitude_ref = None
-		if "GPS GPSAltitudeRef" in exif:
-			gps_altitude_ref = exif["GPS GPSAltitudeRef"]
+		if "GPSAltitudeRef" in exif:
+			gps_altitude_ref = exif["GPSAltitudeRef"]
 		gps_latitude = None
-		if "GPS GPSLatitude" in exif:
-			gps_latitude = eval(exif["GPS GPSLatitude"])
+		if "GPSLatitude" in exif:
+			gps_latitude = exif["GPSLatitude"]
 		gps_latitude_ref = None
-		if "GPS GPSLatitudeRef" in exif:
-			gps_latitude_ref = exif["GPS GPSLatitudeRef"]
+		if "GPSLatitudeRef" in exif:
+			gps_latitude_ref = exif["GPSLatitudeRef"]
 		gps_longitude = None
-		if "GPS GPSLongitude" in exif:
-			gps_longitude = eval(exif["GPS GPSLongitude"])
+		if "GPSLongitude" in exif:
+			gps_longitude = exif["GPSLongitude"]
 		gps_longitude_ref = None
-		if "GPS GPSLongitudeRef" in exif:
-			gps_longitude_ref = exif["GPS GPSLongitudeRef"]
+		if "GPSLongitudeRef" in exif:
+			gps_longitude_ref = exif["GPSLongitudeRef"]
 
 		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
 			self._attributes["metadata"]["altitude"] = gps_altitude
 			self._attributes["metadata"]["altitudeRef"] = gps_altitude_ref
-			self._attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
-			self._attributes["metadata"]["latitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
-			self._attributes["metadata"]["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
-			self._attributes["metadata"]["longitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["latitude"] = gps_latitude
+			# self._attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["latitudeMS"] = Metadata.convert_decimal_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["longitude"] = gps_longitude
+			# self._attributes["metadata"]["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["longitudeMS"] = Metadata.convert_decimal_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 
 		# Overwrite with album.ini values when it has been read from file
 		if self.album.album_ini:
@@ -706,10 +705,140 @@ class Media(object):
 
 		# pprint(self._attributes)
 
-		next_level()
-		message("metadata extracted", "", 5)
-		back_level()
-		back_level()
+
+	def _photo_metadata_by_PIL(self, image):
+		try:
+			info = image._getexif()
+		except KeyboardInterrupt:
+			raise
+		except AttributeError:
+			next_level()
+			message("AttributeError extracting metadata", "", 5)
+			back_level()
+			return {}
+
+		if not info:
+			next_level()
+			message("empty metadata", "", 5)
+			back_level()
+			return {}
+
+		_exif = {}
+		exif = {}
+		for tag, value in list(info.items()):
+			decoded = TAGS.get(tag, tag)
+			if (isinstance(value, tuple) or isinstance(value, list)) and (isinstance(decoded, str) or isinstance(decoded, str)) and decoded.startswith("DateTime") and len(value) >= 1:
+				value = value[0]
+			elif isinstance(value, tuple):
+				value = value[0] / value[1]
+
+			if decoded == "GPSInfo":
+				gps_data = {}
+				for gps_tag in value:
+					sub_decoded = GPSTAGS.get(gps_tag, gps_tag)
+					gps_data[sub_decoded] = value[gps_tag]
+					_exif[decoded] = gps_data
+
+				gps_latitude = None
+				gps_latitude_ref = None
+				gps_longitude = None
+				gps_longitude_ref = None
+				gps_latitude = _exif["GPSInfo"].get("GPSLatitude", None)
+				gps_latitude_ref = _exif["GPSInfo"].get("GPSLatitudeRef", None)
+				gps_longitude = _exif["GPSInfo"].get("GPSLongitude", None)
+				gps_longitude_ref = _exif["GPSInfo"].get("GPSLongitudeRef", None)
+
+				if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
+					exif["GPSLatitude"] = Metadata.convert_tuple_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+					# exif["GPSLatitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+					exif["GPSLongitude"] = Metadata.convert_tuple_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+					# exif["GPSLongitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+			else:
+				_exif[decoded] = value
+				exif[decoded] = _exif[decoded]
+				if "Orientation" in _exif and _exif["Orientation"] < len(self._photo_metadata.orientation_list):
+					exif["Orientation"] = self._photo_metadata.orientation_list[_exif["Orientation"]]
+				if "ExposureProgram" in _exif and _exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
+					exif["ExposureProgram"] = self._photo_metadata.exposure_list[_exif["ExposureProgram"]]
+				if "SpectralSensitivity" in _exif:
+					exif["SpectralSensitivity"] = _exif["SpectralSensitivity"]
+				if "MeteringMode" in _exif and _exif["MeteringMode"] < len(self._photo_metadata.metering_list):
+					exif["MeteringMode"] = self._photo_metadata.metering_list[_exif["MeteringMode"]]
+				if "SensingMethod" in _exif and _exif["SensingMethod"] < len(self._photo_metadata.sensing_method_list):
+					exif["SensingMethod"] = self._photo_metadata.sensing_method_list[_exif["SensingMethod"]]
+				if "SceneCaptureType" in _exif and _exif["SceneCaptureType"] < len(self._photo_metadata.scene_capture_type_list):
+					exif["SceneCaptureType"] = self._photo_metadata.scene_capture_type_list[_exif["SceneCaptureType"]]
+				if "SubjectDistanceRange" in _exif and _exif["SubjectDistanceRange"] < len(self._photo_metadata.subject_distance_range_list):
+					exif["SubjectDistanceRange"] = self._photo_metadata.subject_distance_range_list[_exif["SubjectDistanceRange"]]
+
+		# PIL returns the keys as 'AFAreaXPositions', i.e. it removes the prefix that exifread and pyexiftool leave
+
+		return exif
+
+	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired", 0x5: "Fired, Return not detected", 0x7: "Fired, Return detected",
+		0x8: "On, Did not fire", 0x9: "On, Fired", 0xd: "On, Return not detected", 0xf: "On, Return detected", 0x10: "Off, Did not fire",
+		0x14: "Off, Did not fire, Return not detected", 0x18: "Auto, Did not fire", 0x19: "Auto, Fired", 0x1d: "Auto, Fired, Return not detected",
+		0x1f: "Auto, Fired, Return detected", 0x20: "No flash function", 0x30: "Off, No flash function", 0x41: "Fired, Red-eye reduction",
+		0x45: "Fired, Red-eye reduction, Return not detected", 0x47: "Fired, Red-eye reduction, Return detected", 0x49: "On, Red-eye reduction",
+		0x4d: "On, Red-eye reduction, Return not detected", 0x4f: "On, Red-eye reduction, Return detected", 0x50: "Off, Red-eye reduction",
+		0x58: "Auto, Did not fire, Red-eye reduction", 0x59: "Auto, Fired, Red-eye reduction", 0x5d: "Auto, Fired, Red-eye reduction, Return not detected",
+		0x5f: "Auto, Fired, Red-eye reduction, Return detected"}
+	_photo_metadata.light_source_dictionary = {0: "Unknown", 1: "Daylight", 2: "Fluorescent", 3: "Tungsten (incandescent light)", 4: "Flash", 9: "Fine weather", 10: "Cloudy weather", 11: "Shade", 12: "Daylight fluorescent (D 5700 - 7100K)", 13: "Day white fluorescent (N 4600 - 5400K)", 14: "Cool white fluorescent (W 3900 - 4500K)", 15: "White fluorescent (WW 3200 - 3700K)", 17: "Standard light A", 18: "Standard light B", 19: "Standard light C", 20: "D55", 21: "D65", 22: "D75", 23: "D50", 24: "ISO studio tungsten"}
+	_photo_metadata.metering_list = ["Unknown", "Average", "Center-weighted average", "Spot", "Multi-spot", "Multi-segment", "Partial"]
+	_photo_metadata.exposure_list = ["Not Defined", "Manual", "Program AE", "Aperture-priority AE", "Shutter speed priority AE", "Creative (Slow speed)", "Action (High speed)", "Portrait", "Landscape", "Bulb"]
+	_photo_metadata.orientation_list = ["Horizontal (normal)", "Mirror horizontal", "Rotate 180", "Mirror vertical", "Mirror horizontal and rotate 270 CW", "Rotate 90 CW", "Mirror horizontal and rotate 90 CW", "Rotate 270 CW"]
+	_photo_metadata.sensing_method_list = ["Not defined", "One-chip color area sensor", "Two-chip color area sensor", "Three-chip color area sensor", "Color sequential area sensor", "Trilinear sensor", "Color sequential linear sensor"]
+	_photo_metadata.scene_capture_type_list = ["Standard", "Landscape", "Portrait", "Night scene"]
+	_photo_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
+
+
+	def _photo_metadata_by_exiftool(self, image):
+		exif = {}
+		with PyExifTool.ExifTool() as et:
+			exif_all_tags_codes = et.get_metadata_codes(self.media_path)
+			exif_all_tags_values = et.get_metadata_values(self.media_path)
+
+		# pyexiftool has been set to return the keys without any prefix
+
+		for k in sorted(exif_all_tags_values.keys()):
+			if k in ['GPSAltitude', 'GPSAltitudeRef', 'GPSLatitude', 'GPSLatitudeRef', 'GPSLongitude', 'GPSLongitudeRef']:
+				# The output of "exiftool -n" for gps isn't easy to manage, better use the "raw" value
+				exif[k] = exif_all_tags_codes[k]
+			else:
+				exif[k] = exif_all_tags_values[k]
+
+		return exif
+
+	def _photo_metadata_by_exifread(self, image):
+		exif = {}
+		with open(self.media_path, 'rb') as f:
+			exif_all_tags = exifread.process_file(f)
+		# exifread returns the keys as 'MakerNotes AFAreaXPositions'
+
+		for k in sorted(exif_all_tags.keys()):
+			# if k not in ['JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote']:
+			if k not in ['JPEGThumbnail', 'TIFFThumbnail'] and k[0:10] != 'Thumbnail ':
+				# remove the first word in the key, so that the key has no prefix as with PIL
+				k_modified = unicode(k)
+				for prefix in ['EXIF ', 'GPS ', 'Image ', 'Interoperability ', 'MakerNote ']:
+					if k[0:len(prefix)] == prefix:
+						k_modified = unicode(k[len(prefix):])
+						break
+				try:
+					exif[k_modified] = unicode(exif_all_tags[k])
+					# exifread returs some value as a fraction, convert it to a float
+					position = exif[k_modified].find('/')
+					if position > -1:
+						first = exif[k_modified][0:position]
+						second = exif[k_modified][position + 1:]
+						if (first.isdigit() and second.isdigit()):
+							exif[k_modified] = int(first) / int(second)
+				except TypeError:
+					# TO DO: some value doesn't permit translation to string
+					pass
+
+		return exif
+
 
 	def _video_metadata(self, path, original=True):
 		return_code = VideoProbeWrapper().call('-show_format', '-show_streams', '-of', 'json', '-loglevel', '0', path)
@@ -1915,7 +2044,41 @@ class Metadata(object):
 		# Minutes
 		m = value[1]
 		# Seconds
-		s = int(value[2] * 1000) / 1000.0
+		s = int(value[2] * 1000) / 1000
+
+		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
+
+		return result
+
+	@staticmethod
+	def convert_decimal_to_degrees_minutes_seconds(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds.
+		"""
+
+		# Degrees
+		d = int(value)
+		# Minutes
+		m = int((value - d) * 60)
+		# Seconds
+		s = int((value - d - m / 60) * 1000) / 1000
+
+		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
+
+		return result
+
+	@staticmethod
+	def convert_tuple_to_degrees_minutes_seconds(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds.
+		"""
+
+		# Degrees
+		d = value[0][0] / value[0][1]
+		# Minutes
+		m = value[1][0] / value[1][1]
+		# Seconds
+		s = int(value[2][0] / value[2][1] * 1000) / 1000
 
 		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
 
@@ -1934,10 +2097,33 @@ class Metadata(object):
 		# Seconds
 		s = float(value[2])
 
-		result = d + (m / 60.0) + (s / 3600.0)
+		result = d + (m / 60) + (s / 3600)
 
 		# limit decimal digits to what is needed by openstreetmap
-		six_zeros = 1000000.0
+		six_zeros = 1000000
+		result = int(result * six_zeros) / six_zeros
+		if ref == "S" or ref == "W":
+			result = - result
+
+		return result
+
+	@staticmethod
+	def convert_tuple_to_degrees_decimal(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees in float format.
+		"""
+
+		# Degrees
+		d = value[0][0] / value[0][1]
+		# Minutes
+		m = value[1][0] / value[1][1]
+		# Seconds
+		s = value[2][0] / value[2][1]
+
+		result = d + m / 60 + s / 3600
+
+		# limit decimal digits to what is needed by openstreetmap
+		six_zeros = 1000000
 		result = int(result * six_zeros) / six_zeros
 		if ref == "S" or ref == "W":
 			result = - result

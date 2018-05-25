@@ -1639,6 +1639,7 @@ $(document).ready(function() {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
 		var prevMedia, nextMedia, text, thumbnailSize, i, linkTag, triggerLoad, videoOK = true;
 		var nextReducedPhoto, prevReducedPhoto;
+		var exposureTime;
 
 		mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentMedia);
 		firstEscKey = true;
@@ -1930,17 +1931,24 @@ $(document).ready(function() {
 		if (typeof currentMedia.metadata.model !== "undefined")
 			text += "<tr><td id=\"metadata-data-model\"></td><td>" + currentMedia.metadata.model + "</td></tr>";
 		if (typeof currentMedia.metadata.aperture !== "undefined")
-			text += "<tr><td id=\"metadata-data-aperture\"></td><td> f/" + getDecimal(currentMedia.metadata.aperture) + "</td></tr>";
+			text += "<tr><td id=\"metadata-data-aperture\"></td><td> f/" + currentMedia.metadata.aperture + "</td></tr>";
 		if (typeof currentMedia.metadata.focalLength !== "undefined")
-			text += "<tr><td id=\"metadata-data-focalLength\"></td><td>" + getDecimal(currentMedia.metadata.focalLength) + " mm</td></tr>";
+			text += "<tr><td id=\"metadata-data-focalLength\"></td><td>" + currentMedia.metadata.focalLength + " mm</td></tr>";
 		if (typeof currentMedia.metadata.subjectDistanceRange !== "undefined")
 			text += "<tr><td id=\"metadata-data-subjectDistanceRange\"></td><td>" + currentMedia.metadata.subjectDistanceRange + "</td></tr>";
 		if (typeof currentMedia.metadata.iso !== "undefined")
 			text += "<tr><td id=\"metadata-data-iso\"></td><td>" + currentMedia.metadata.iso + "</td></tr>";
 		if (typeof currentMedia.metadata.sceneCaptureType !== "undefined")
 			text += "<tr><td id=\"metadata-data-sceneCaptureType\"></td><td>" + currentMedia.metadata.sceneCaptureType + "</td></tr>";
-		if (typeof currentMedia.metadata.exposureTime !== "undefined")
-			text += "<tr><td id=\"metadata-data-exposureTime\"></td><td>" + getDecimal(currentMedia.metadata.exposureTime) + " sec</td></tr>";
+		if (typeof currentMedia.metadata.exposureTime !== "undefined") {
+			if (typeof currentMedia.metadata.exposureTime === "string")
+				exposureTime = currentMedia.metadata.exposureTime;
+			else if (currentMedia.metadata.exposureTime > 0.3)
+				exposureTime = Math.round(currentMedia.metadata.exposureTime * 10 ) / 10;
+			else
+				exposureTime = "1/" + Math.round(1 / currentMedia.metadata.exposureTime);
+			text += "<tr><td id=\"metadata-data-exposureTime\"></td><td>" + exposureTime + " sec</td></tr>";
+		}
 		if (typeof currentMedia.metadata.exposureProgram !== "undefined")
 			text += "<tr><td id=\"metadata-data-exposureProgram\"></td><td>" + currentMedia.metadata.exposureProgram + "</td></tr>";
 		if (typeof currentMedia.metadata.exposureCompensation !== "undefined")

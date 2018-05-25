@@ -160,6 +160,16 @@ max_album_share_thumbnails_number = 16
 # for a small set of media/albums it's not needed, while perhaps it's necessary if working with many media
 use_stop_words = true
 
+# What prefence order do you want for the metadata extractors?
+# The first tool will be used, the second will be used in case of no success, and so on
+# Available tools are 'PIL', 'exifread', 'exiftool'
+# - exiftool is the most affordable, but the slowest
+# - exifread sometimes crashes if the metadata are corrupted
+# - PIL doesn't find the metadata on some old image
+# If you don't worry with execution time you can set this option to ['exiftool', 'exifread', 'PIL']
+# The default is the best in term of execution time
+metadata_tools_preference = ['PIL', 'exifread', 'exiftool']
+
 ###########################################################
 # scanner and ui options
 ###########################################################

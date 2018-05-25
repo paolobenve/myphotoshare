@@ -176,7 +176,7 @@ def get_options():
 				message("WARNING: option " + option + " in user config file", "is not boolean, using default value", 2)
 				back_level()
 				config[option] = default_config.getboolean('options', option)
-		elif option in ('reduced_sizes', 'map_zoom_levels'):
+		elif option in ('reduced_sizes', 'map_zoom_levels', 'metadata_tools_preference'):
 			config[option] = ast.literal_eval(usr_config.get('options', option))
 		elif option in ('mobile_thumbnail_factor', 'face_cascade_scale_factor'):
 			config[option] = usr_config.getfloat('options', option)
