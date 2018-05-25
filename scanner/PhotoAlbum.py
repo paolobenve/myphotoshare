@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division
 
 # gps code got from https://gist.github.com/erans/983821
 
 import locale
-locale.setlocale(locale.LC_ALL, '')
-
 import json
 import os
 import os.path
@@ -20,8 +18,6 @@ try:
 	import cv2
 except:
 	pass
-
-
 
 # @python2
 try:
@@ -47,6 +43,8 @@ import Options
 from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, remove_all_but_alphanumeric_chars_dashes_slashes_dots, switch_to_lowercase
 # WARNING: pyexiftool has been modified, do not overwrite with new versions unless you know what you are doing
 import PyExifTool
+
+locale.setlocale(locale.LC_ALL, '')
 
 class Album(object):
 	#~ def __init__(self, path, path_has_folder_marker):
