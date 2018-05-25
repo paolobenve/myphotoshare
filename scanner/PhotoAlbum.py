@@ -562,6 +562,10 @@ class Media(object):
 		self._orientation = 1
 
 		try:
+			exif_by_exiftool = self._photo_metadata_by_exiftool(image)
+		except:
+			exif_by_exiftool = {}
+		try:
 			exif_by_exifread = self._photo_metadata_by_exifread(image)
 		except:
 			exif_by_exifread = {}
@@ -570,23 +574,22 @@ class Media(object):
 		except:
 			exif_by_PIL = {}
 
+		exiftool_keys = list(exif_by_exiftool.keys())
 		exifread_keys = list(exif_by_exifread.keys())
 		pil_keys = list(exif_by_PIL.keys())
-		all_keys = exifread_keys + list(set(exifread_keys) - set(pil_keys))
+		all_keys = list(set(exifread_keys + exiftool_keys + pil_keys))
 		exif = {}
 		for key in all_keys:
-			# prepare for skipping unuseful tags
-			skip = False
-			for prefix in ['Tag ', 'Thumbnail', 'Unknown', 'Interoperability', 'MakerNote', 'ExifInteroperabilityOffset', 'MakerNote']:
-				if key[0:len(prefix)] == prefix:
-					skip = True
-					break
-			if not skip:
-				# prefer exifread value
-				if key in exifread_keys:
+			# skip unuseful tags
+			if all(key[0:len(prefix)] != prefix for prefix in ['ExifInteroperabilityOffset', 'ExifTool:ExifToolVersion', 'Interoperability', 'MakerNote', 'Tag ', 'Thumbnail', 'Unknown']):
+				# prefer exiftool, then exifread value
+				if key in exiftool_keys:
+					exif[key] = exif_by_exiftool[key]
+				elif key in exifread_keys:
 					exif[key] = exif_by_exifread[key]
 				elif key in pil_keys:
 					exif[key] = exif_by_PIL[key]
+				break
 
 		if exif:
 			message("setting metadata", "exifread values preferred", 5)
@@ -667,30 +670,32 @@ class Media(object):
 
 		gps_altitude = None
 		if "GPS GPSAltitude" in exif:
-			gps_altitude = exif["GPS GPSAltitude"]
+			gps_altitude = exif["GPSAltitude"]
 		gps_altitude_ref = None
 		if "GPS GPSAltitudeRef" in exif:
-			gps_altitude_ref = exif["GPS GPSAltitudeRef"]
+			gps_altitude_ref = exif["GPSAltitudeRef"]
 		gps_latitude = None
 		if "GPS GPSLatitude" in exif:
-			gps_latitude = eval(exif["GPS GPSLatitude"])
+			gps_latitude = eval(exif["GPSLatitude"])
 		gps_latitude_ref = None
 		if "GPS GPSLatitudeRef" in exif:
-			gps_latitude_ref = exif["GPS GPSLatitudeRef"]
+			gps_latitude_ref = exif["GPSLatitudeRef"]
 		gps_longitude = None
 		if "GPS GPSLongitude" in exif:
-			gps_longitude = eval(exif["GPS GPSLongitude"])
+			gps_longitude = eval(exif["GPSLongitude"])
 		gps_longitude_ref = None
 		if "GPS GPSLongitudeRef" in exif:
-			gps_longitude_ref = exif["GPS GPSLongitudeRef"]
+			gps_longitude_ref = exif["GPSLongitudeRef"]
 
 		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
 			self._attributes["metadata"]["altitude"] = gps_altitude
 			self._attributes["metadata"]["altitudeRef"] = gps_altitude_ref
-			self._attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
-			self._attributes["metadata"]["latitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
-			self._attributes["metadata"]["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
-			self._attributes["metadata"]["longitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["latitude"] = gps_latitude
+			# self._attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["latitudeMS"] = Metadata.convert_decimal_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["longitude"] = gps_longitude
+			# self._attributes["metadata"]["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["longitudeMS"] = Metadata.convert_decimal_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 
 		# Overwrite with album.ini values when it has been read from file
 		if self.album.album_ini:
@@ -723,16 +728,8 @@ class Media(object):
 			decoded = TAGS.get(tag, tag)
 			if (isinstance(value, tuple) or isinstance(value, list)) and (isinstance(decoded, str) or isinstance(decoded, str)) and decoded.startswith("DateTime") and len(value) >= 1:
 				value = value[0]
-			# if isinstance(value, str) or isinstance(value, str):
-			# 	value = value.strip().partition("\x00")[0]
-				#~ # the following lines (commented out) seem unuseful
-				#~ if (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime"):
-					#~ try:
-						#~ value = datetime.strptime(value, Options.exif_date_time_format)
-					#~ except KeyboardInterrupt:
-						#~ raise
-					#~ except ValueError:
-						#~ pass
+			elif isinstance(value, tuple):
+				value = value[0] / value[1]
 
 			if decoded == "GPSInfo":
 				gps_data = {}
@@ -751,10 +748,10 @@ class Media(object):
 				gps_longitude_ref = _exif["GPSInfo"].get("GPSLongitudeRef", None)
 
 				if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
-					exif["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
-					exif["latitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
-					exif["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
-					exif["longitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+					exif["GPSLatitude"] = Metadata.convert_tuple_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+					# exif["GPSLatitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+					exif["GPSLongitude"] = Metadata.convert_tuple_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+					# exif["GPSLongitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 			else:
 				_exif[decoded] = value
 				exif[decoded] = _exif[decoded]
@@ -771,6 +768,7 @@ class Media(object):
 				if "SubjectDistanceRange" in _exif and _exif["SubjectDistanceRange"] < len(self._photo_metadata.subject_distance_range_list):
 					exif["SubjectDistanceRange"] = self._photo_metadata.subject_distance_range_list[_exif["SubjectDistanceRange"]]
 
+		# PIL returns the keys as 'AFAreaXPositions', i.e. it removes the prefix that exifread and pyexiftool leave
 
 		next_level()
 		message("metadata extracted by PIL", "", 5)
@@ -862,33 +860,55 @@ class Media(object):
 	_photo_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
 
 
+	def _photo_metadata_by_exiftool(self, image):
+		message("extracting metadata by exiftool...", "", 5)
+
+		exif = {}
+		with PyExifTool.ExifTool() as et:
+			exif_all_tags_codes = et.get_metadata_codes(self.media_path)
+			exif_all_tags_values = et.get_metadata_values(self.media_path)
+
+		# pyexiftool has been set to return the keys without any prefix
+
+		for k in sorted(exif_all_tags_values.keys()):
+			if k in ['GPSAltitude', 'GPSAltitudeRef', 'GPSLatitude', 'GPSLatitudeRef', 'GPSLongitude', 'GPSLongitudeRef']:
+				# The output of "exiftool -n" for gps isn't easy to manage, better use the "raw" value
+				exif[k] = exif_all_tags_codes[k]
+			else:
+				exif[k] = exif_all_tags_values[k]
+
+
+		next_level()
+		message("metadata extracted by exiftool", "", 5)
+		back_level()
+		return exif
+
 	def _photo_metadata_by_exifread(self, image):
 		message("extracting metadata by exifread...", "", 5)
 
 		exif = {}
 		with open(self.media_path, 'rb') as f:
 			exif_all_tags = exifread.process_file(f)
+		# exifread returns the keys as 'MakerNotes AFAreaXPositions'
 
 		for k in sorted(exif_all_tags.keys()):
 			# if k not in ['JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote']:
 			if k not in ['JPEGThumbnail', 'TIFFThumbnail'] and k[0:10] != 'Thumbnail ':
-				# remove the first word in the key, so that the output is like that of PIL
-				k_modified = k
+				# remove the first word in the key, so that the key has no prefix as with PIL
+				k_modified = unicode(k)
 				for prefix in ['EXIF ', 'GPS ', 'Image ', 'Interoperability ', 'MakerNote ']:
 					if k[0:len(prefix)] == prefix:
-						k_modified = k[len(prefix):]
+						k_modified = unicode(k[len(prefix):])
 						break
 				try:
-					exifstring = str(exif_all_tags[k])
-					if exifstring != "Unknown":
-						exif[k_modified] = str(exif_all_tags[k])
-						# exifread returs some value as a fraction, convert it to a tuple of integers
-						position = exif[k_modified].find('/')
-						if position > -1:
-							first = exif[k_modified][0:position]
-							second = exif[k_modified][position + 1:]
-							if (first.isdigit() and second.isdigit()):
-								exif[k_modified] = (int(first), int(second))
+					exif[k_modified] = unicode(exif_all_tags[k])
+					# exifread returs some value as a fraction, convert it to a float
+					position = exif[k_modified].find('/')
+					if position > -1:
+						first = exif[k_modified][0:position]
+						second = exif[k_modified][position + 1:]
+						if (first.isdigit() and second.isdigit()):
+							exif[k_modified] = int(first) / int(second)
 				except TypeError:
 					# TO DO: some value doesn't permit translation to string
 					pass
@@ -2103,7 +2123,41 @@ class Metadata(object):
 		# Minutes
 		m = value[1]
 		# Seconds
-		s = int(value[2] * 1000) / 1000.0
+		s = int(value[2] * 1000) / 1000
+
+		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
+
+		return result
+
+	@staticmethod
+	def convert_decimal_to_degrees_minutes_seconds(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds.
+		"""
+
+		# Degrees
+		d = int(value)
+		# Minutes
+		m = int((value - d) * 60)
+		# Seconds
+		s = int((value - d - m / 60) * 1000) / 1000
+
+		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
+
+		return result
+
+	@staticmethod
+	def convert_tuple_to_degrees_minutes_seconds(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds.
+		"""
+
+		# Degrees
+		d = value[0][0] / value[0][1]
+		# Minutes
+		m = value[1][0] / value[1][1]
+		# Seconds
+		s = int(value[2][0] / value[2][1] * 1000) / 1000
 
 		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
 
@@ -2122,10 +2176,33 @@ class Metadata(object):
 		# Seconds
 		s = float(value[2])
 
-		result = d + (m / 60.0) + (s / 3600.0)
+		result = d + (m / 60) + (s / 3600)
 
 		# limit decimal digits to what is needed by openstreetmap
-		six_zeros = 1000000.0
+		six_zeros = 1000000
+		result = int(result * six_zeros) / six_zeros
+		if ref == "S" or ref == "W":
+			result = - result
+
+		return result
+
+	@staticmethod
+	def convert_tuple_to_degrees_decimal(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees in float format.
+		"""
+
+		# Degrees
+		d = value[0][0] / value[0][1]
+		# Minutes
+		m = value[1][0] / value[1][1]
+		# Seconds
+		s = value[2][0] / value[2][1]
+
+		result = d + m / 60 + s / 3600
+
+		# limit decimal digits to what is needed by openstreetmap
+		six_zeros = 1000000
 		result = int(result * six_zeros) / six_zeros
 		if ref == "S" or ref == "W":
 			result = - result
