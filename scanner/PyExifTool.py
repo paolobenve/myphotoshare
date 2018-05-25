@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# WARNING: pyexiftool has been modified, do not overwrite with new versions unless you know what you are doing
+
 # PyExifTool <http://github.com/smarnach/pyexiftool>
 # Copyright 2012 Sven Marnach
 
