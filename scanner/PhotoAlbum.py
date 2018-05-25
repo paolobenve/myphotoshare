@@ -592,7 +592,7 @@ class Media(object):
 				break
 
 		if exif:
-			message("setting metadata", "exifread values preferred", 5)
+			message("setting metadata", "exiftool, exifread values preferred", 5)
 			self._set_photo_metadata(exif)
 			next_level()
 			message("metadata set!", "", 5)
