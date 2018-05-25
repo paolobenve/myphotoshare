@@ -106,13 +106,25 @@ class TreeWalker:
 
 			message("saving all albums to json files...", "", 4)
 			next_level()
-			self.all_albums_to_json_file(folders_album, True, True)
-			self.all_albums_to_json_file(by_date_album, True, True)
-			self.all_albums_to_json_file(by_geonames_album, True, True)
+			try:
+				self.all_albums_to_json_file(folders_album, True, True)
+			except UnboundLocalError:
+				pass
+			try:
+				self.all_albums_to_json_file(by_date_album, True, True)
+			except UnboundLocalError:
+				pass
+			try:
+				self.all_albums_to_json_file(by_geonames_album, True, True)
+			except UnboundLocalError:
+				pass
 
 			# search albums in by_search_album has the normal albums as subalbums,
 			# and they are saved when folders_album is saved, avoid saving them multiple times
-			self.all_albums_to_json_file(by_search_album, True, False)
+			try:
+				self.all_albums_to_json_file(by_search_album, True, False)
+			except UnboundLocalError:
+				pass
 			message("all albums saved to json files", "", 5)
 			back_level()
 		# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
