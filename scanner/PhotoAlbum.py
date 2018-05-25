@@ -593,7 +593,6 @@ class Media(object):
 		for key in all_keys:
 			# skip unuseful tags
 			if all(key[0:len(prefix)] != prefix for prefix in ['ExifInteroperabilityOffset', 'ExifTool:ExifToolVersion', 'Interoperability', 'MakerNote', 'Tag ', 'Thumbnail', 'Unknown']):
-				# prefer exiftool, then exifread value
 				exif[key] = _exif[key]
 
 		if exif:
