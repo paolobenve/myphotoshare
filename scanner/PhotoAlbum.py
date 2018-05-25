@@ -562,16 +562,30 @@ class Media(object):
 		self._orientation = 1
 
 		try:
+			message("extracting metadata by exiftool...", "", 5)
 			exif_by_exiftool = self._photo_metadata_by_exiftool(image)
 		except:
+			next_level()
+			message("UNMANAGED ERROR extracting metadata by exiftool", "", 5)
+			back_level()
 			exif_by_exiftool = {}
+
 		try:
+			message("extracting metadata by exifread...", "", 5)
 			exif_by_exifread = self._photo_metadata_by_exifread(image)
 		except:
+			next_level()
+			message("UNMANAGED ERROR extracting metadata by exifread", "", 5)
+			back_level()
 			exif_by_exifread = {}
+
 		try:
+			message("extracting metadata by PIL...", "", 5)
 			exif_by_PIL = self._photo_metadata_by_PIL(image)
 		except:
+			next_level()
+			message("UNMANAGED ERROR extracting metadata by PIL", "", 5)
+			back_level()
 			exif_by_PIL = {}
 
 		exiftool_keys = list(exif_by_exiftool.keys())
@@ -695,7 +709,6 @@ class Media(object):
 
 
 	def _photo_metadata_by_PIL(self, image):
-		message("extracting metadata by PIL...", "", 5)
 		try:
 			info = image._getexif()
 		except KeyboardInterrupt:
@@ -783,8 +796,6 @@ class Media(object):
 
 
 	def _photo_metadata_by_exiftool(self, image):
-		message("extracting metadata by exiftool...", "", 5)
-
 		exif = {}
 		with PyExifTool.ExifTool() as et:
 			exif_all_tags_codes = et.get_metadata_codes(self.media_path)
@@ -806,8 +817,6 @@ class Media(object):
 		return exif
 
 	def _photo_metadata_by_exifread(self, image):
-		message("extracting metadata by exifread...", "", 5)
-
 		exif = {}
 		with open(self.media_path, 'rb') as f:
 			exif_all_tags = exifread.process_file(f)
