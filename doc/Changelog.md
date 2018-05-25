@@ -33,6 +33,7 @@
   * `Pillow's \_getexif()`, heritage of photofloat: good, but doesn't read the metadata of some old image
   * `exifread`: good tool, but crashes with some image which has exif data corrupted
   * `pyexiftool`, an `exiftool` wrapper: the most affordable, but the slowest
+  The preference order for the tools is managed by the new option `metadata_tools_preference`
 
 ### version 3.3 (January 22, 2018)
 
