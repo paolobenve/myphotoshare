@@ -168,8 +168,9 @@ class ExifTool(object):
             return
         with open(os.devnull, "w") as devnull:
             self._process = subprocess.Popen(
-                [self.executable, "-stay_open", "True",  "-@", "-",
-                 "-common_args", "-G", "-n"],
+                [self.executable, "-stay_open", "True",  "-@", "-"],
+                # [self.executable, "-stay_open", "True",  "-@", "-",
+                #  "-common_args", "-G", "-n"],
                 stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                 stderr=devnull)
         self.running = True
@@ -226,7 +227,32 @@ class ExifTool(object):
             output += os.read(fd, block_size)
         return output.strip()[:-len(sentinel)]
 
-    def execute_json(self, *params):
+    def execute_json_codes(self, *params):
+        """Execute the given batch of parameters and parse the JSON output.
+
+        This method is similar to :py:meth:`execute()`.  It
+        automatically adds the parameter ``-j`` to request JSON output
+        from ``exiftool`` and parses the output.  The return value is
+        a list of dictionaries, mapping tag names to the corresponding
+        values.  All keys are Unicode strings with the tag names
+        including the ExifTool group name in the format <group>:<tag>.
+        The values can have multiple types.  All strings occurring as
+        values will be Unicode strings.  Each dictionary contains the
+        name of the file it corresponds to in the key ``"SourceFile"``.
+
+        The parameters to this function must be either raw strings
+        (type ``str`` in Python 2.x, type ``bytes`` in Python 3.x) or
+        Unicode strings (type ``unicode`` in Python 2.x, type ``str``
+        in Python 3.x).  Unicode strings will be encoded using
+        system's filesystem encoding.  This behaviour means you can
+        pass in filenames according to the convention of the
+        respective Python version – as raw strings in Python 2.x and
+        as Unicode strings in Python 3.x.
+        """
+        params = map(fsencode, params)
+        return json.loads(self.execute(b"-j", b"-n", *params).decode("utf-8"))
+
+    def execute_json_values(self, *params):
         """Execute the given batch of parameters and parse the JSON output.
 
         This method is similar to :py:meth:`execute()`.  It
@@ -259,13 +285,21 @@ class ExifTool(object):
         """
         return self.execute_json(*filenames)
 
-    def get_metadata(self, filename):
+    def get_metadata_codes(self, filename):
         """Return meta-data for a single file.
 
         The returned dictionary has the format described in the
         documentation of :py:meth:`execute_json()`.
         """
-        return self.execute_json(filename)[0]
+        return self.execute_json_codes(filename)[0]
+
+    def get_metadata_values(self, filename):
+        """Return meta-data for a single file.
+
+        The returned dictionary has the format described in the
+        documentation of :py:meth:`execute_json()`.
+        """
+        return self.execute_json_values(filename)[0]
 
     def get_tags_batch(self, tags, filenames):
         """Return only specified tags for the given files.
