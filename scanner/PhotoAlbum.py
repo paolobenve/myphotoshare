@@ -763,75 +763,7 @@ class Media(object):
 		next_level()
 		message("metadata extracted by PIL", "", 5)
 		back_level()
-
 		return exif
-
-
-
-
-		exif = {}
-		if "Orientation" in _exif:
-			exif["Orientation"] = _exif["Orientation"]
-			if self._orientation in range(5, 9):
-				exif["size"] = (self._attributes["metadata"]["size"][1], self._attributes["metadata"]["size"][0])
-			if self._orientation - 1 < len(self._photo_metadata.orientation_list):
-				exif["orientation"] = self._photo_metadata.orientation_list[self._orientation - 1]
-		if "Make" in _exif:
-			exif["make"] = _exif["Make"]
-		if "Model" in _exif:
-			exif["model"] = _exif["Model"]
-		if "ApertureValue" in _exif:
-			exif["aperture"] = _exif["ApertureValue"]
-		elif "FNumber" in _exif:
-			exif["aperture"] = _exif["FNumber"]
-		if "FocalLength" in _exif:
-			exif["focalLength"] = _exif["FocalLength"]
-		if "ISOSpeedRatings" in _exif:
-			exif["iso"] = _exif["ISOSpeedRatings"]
-		if "ISO" in _exif:
-			exif["iso"] = _exif["ISO"]
-		if "PhotographicSensitivity" in _exif:
-			exif["iso"] = _exif["PhotographicSensitivity"]
-		if "ExposureTime" in _exif:
-			exif["exposureTime"] = _exif["ExposureTime"]
-		if "ExposureCompensation" in _exif:
-			exif["ExposureCompensation"] = _exif["ExposureCompensation"]
-		if "ExposureBiasValue" in _exif:
-			exif["ExposureCompensation"] = _exif["ExposureBiasValue"]
-		if "Flash" in _exif and _exif["Flash"] in self._photo_metadata.flash_dictionary:
-			try:
-				exif["flash"] = self._photo_metadata.flash_dictionary[_exif["Flash"]]
-			except KeyboardInterrupt:
-				raise
-			#~ except:
-				#~ pass
-		if "LightSource" in _exif and _exif["LightSource"] in self._photo_metadata.light_source_dictionary:
-			try:
-				exif["lightSource"] = self._photo_metadata.light_source_dictionary[_exif["LightSource"]]
-			except KeyboardInterrupt:
-				raise
-			#~ except:
-				#~ pass
-		if "DateTimeOriginal" in _exif:
-			try:
-				exif["dateTime"] = datetime.strptime(_exif["DateTimeOriginal"], Options.exif_date_time_format)
-			except KeyboardInterrupt:
-				raise
-			except ValueError:
-				# value isn't usable, forget it
-				pass
-		elif "DateTime" in _exif:
-			try:
-				exif["dateTime"] = datetime.strptime(_exif["DateTime"], Options.exif_date_time_format)
-			except KeyboardInterrupt:
-				raise
-			except ValueError:
-				# value isn't usable, forget it
-				pass
-
-
-
-
 
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired", 0x5: "Fired, Return not detected", 0x7: "Fired, Return detected",
 		0x8: "On, Did not fire", 0x9: "On, Fired", 0xd: "On, Return not detected", 0xf: "On, Return detected", 0x10: "Off, Did not fire",
