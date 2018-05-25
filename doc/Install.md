@@ -7,14 +7,15 @@ MyPhotoShare needs:
 * a working web server (e.g. `apache`, `nginx`, etc.)
 * the web server `php` module installed (optional if accepting degraded mode, see below)
 * `php5-gd` in order to create albums share images (optional if accepting degraded mode, see below)
-* `python3` (running it with Python 2 is possible, replace `python3` by `python2` in the first line in `scanner/main.py` and install the corresponding Python 2 dependencies).
-* `python3-numpy`
-* `python3-requests`
-* `python3-pil`
-* `python3-unidecode`
+* `python2`; running it with Python 3 is possible, replace `python2` by `python3` in the first line in `scanner/main.py` and install the corresponding Python 3 dependencies; on debian jessie and stretch systems, however, python3-opencv isn't available yet, so you won't get face detection
+* `python-numpy`
+* `python-requests`
+* `python-pil`
+* `python-unidecode`
 * `avconv` / `ffmpeg` in order to be able to manage videos
 * `curl`, used by minify script
-* `python3-exif`
+* `python-exif`
+* `exiftool`
 
 ### Optional
 * `python-opencv` if found, face detection is used when cropping images to square.
