@@ -29,7 +29,10 @@
   * created a gallery of screenshots
 * reduced images and thumbnail naming schema is now more robust
   * cache files names are now made of only lower case ascii characters
-* reading photo metadata: switched from Pillow's getexif() to exifread because the former couldn't read the metadata from some old images
+* now photo metadata are read with three tools:
+  * `Pillow's \_getexif()`, heritage of photofloat: good, but doesn't read the metadata of some old image
+  * `exifread`: good tool, but crashes with some image which has exif data corrupted
+  * `pyexiftool`, an `exiftool` wrapper: the most affordable, but the slowest
 
 ### version 3.3 (January 22, 2018)
 

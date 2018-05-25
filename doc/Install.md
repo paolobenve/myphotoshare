@@ -15,6 +15,7 @@ MyPhotoShare needs:
 * `avconv` / `ffmpeg` in order to be able to manage videos
 * `curl`, used by minify script
 * `python3-exif`
+* `exiftool`
 
 ### Optional
 * `python-opencv` if found, face detection is used when cropping images to square.
