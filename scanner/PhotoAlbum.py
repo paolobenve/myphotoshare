@@ -589,7 +589,6 @@ class Media(object):
 					exif[key] = exif_by_exifread[key]
 				elif key in pil_keys:
 					exif[key] = exif_by_PIL[key]
-				break
 
 		if exif:
 			message("setting metadata", "exiftool, exifread values preferred", 5)
@@ -610,20 +609,11 @@ class Media(object):
 		if "Model" in exif:
 			self._attributes["metadata"]["model"] = exif["Model"]
 		if "ApertureValue" in exif:
-			try:
-				self._attributes["metadata"]["aperture"] = (int(exif["ApertureValue"][0]), int(exif["ApertureValue"][1]))
-			except IndexError:
-				self._attributes["metadata"]["aperture"] = (int(exif["ApertureValue"]), 1)
+			self._attributes["metadata"]["aperture"] = exif["ApertureValue"]
 		elif "FNumber" in exif:
-			try:
-				self._attributes["metadata"]["aperture"] = (int(exif["FNumber"][0]), int(exif["FNumber"][1]))
-			except IndexError:
-				self._attributes["metadata"]["aperture"] = (int(exif["FNumber"]), 1)
+			self._attributes["metadata"]["aperture"] = exif["FNumber"]
 		if "FocalLength" in exif:
-			try:
-				self._attributes["metadata"]["focalLength"] = (int(exif["FocalLength"][0]), int(exif["FocalLength"][1]))
-			except IndexError:
-				self._attributes["metadata"]["focalLength"] = (int(exif["FocalLength"]), 1)
+			self._attributes["metadata"]["focalLength"] = exif["FocalLength"]
 		if "ISOSpeedRatings" in exif:
 			self._attributes["metadata"]["iso"] = exif["ISOSpeedRatings"]
 		if "MakerNote ISO" in exif:
@@ -631,10 +621,7 @@ class Media(object):
 		if "PhotographicSensitivity" in exif:
 			self._attributes["metadata"]["iso"] = exif["PhotographicSensitivity"]
 		if "ExposureTime" in exif:
-			try:
-				self._attributes["metadata"]["exposureTime"] = (int(exif["ExposureTime"][0]), int(exif["ExposureTime"][1]))
-			except IndexError:
-				self._attributes["metadata"]["exposureTime"] = (int(exif["ExposureTime"]), 1)
+			self._attributes["metadata"]["exposureTime"] = exif["ExposureTime"]
 		if "Flash" in exif:
 			self._attributes["metadata"]["flash"] = exif["Flash"]
 		if "LightSource" in exif:
@@ -659,32 +646,35 @@ class Media(object):
 			try:
 				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTimeOriginal"], Options.exif_date_time_format)
 			except ValueError:
-				# value isn't usable, forget it
-				pass
-		elif "DateTime" in exif:
-			try:
-				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], Options.exif_date_time_format)
-			except ValueError:
-				# value isn't usable, forget it
-				pass
+				if "DateTimeDigitized" in exif:
+					try:
+						self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTimeDigitized"], Options.exif_date_time_format)
+					except ValueError:
+						# value isn't usable, forget it
+						if "DateTime" in exif:
+							try:
+								self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], Options.exif_date_time_format)
+							except ValueError:
+								# value isn't usable, forget it
+								pass
 
 		gps_altitude = None
-		if "GPS GPSAltitude" in exif:
+		if "GPSAltitude" in exif:
 			gps_altitude = exif["GPSAltitude"]
 		gps_altitude_ref = None
-		if "GPS GPSAltitudeRef" in exif:
+		if "GPSAltitudeRef" in exif:
 			gps_altitude_ref = exif["GPSAltitudeRef"]
 		gps_latitude = None
-		if "GPS GPSLatitude" in exif:
-			gps_latitude = eval(exif["GPSLatitude"])
+		if "GPSLatitude" in exif:
+			gps_latitude = exif["GPSLatitude"]
 		gps_latitude_ref = None
-		if "GPS GPSLatitudeRef" in exif:
+		if "GPSLatitudeRef" in exif:
 			gps_latitude_ref = exif["GPSLatitudeRef"]
 		gps_longitude = None
-		if "GPS GPSLongitude" in exif:
-			gps_longitude = eval(exif["GPSLongitude"])
+		if "GPSLongitude" in exif:
+			gps_longitude = exif["GPSLongitude"]
 		gps_longitude_ref = None
-		if "GPS GPSLongitudeRef" in exif:
+		if "GPSLongitudeRef" in exif:
 			gps_longitude_ref = exif["GPSLongitudeRef"]
 
 		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
