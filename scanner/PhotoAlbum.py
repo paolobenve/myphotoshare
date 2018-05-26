@@ -1058,8 +1058,13 @@ class Media(object):
 			message("reduction/thumbnail older than media date time", thumb_path, 5)
 		elif not json_file_exists:
 			message("unexistent json file", json_file, 5)
-		elif file_mtime(thumb_path) > file_mtime(json_file):
+		elif file_mtime(thumb_path) >= file_mtime(json_file):
 			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
+		elif not (
+			not _is_thumbnail and not Options.config['recreate_reduced_photos'] or
+			_is_thumbnail and not Options.config['recreate_thumbnails']
+		):
+			message("some option change requests recreation", "", 5)
 		back_level()
 
 		original_thumb_size = actual_thumb_size
