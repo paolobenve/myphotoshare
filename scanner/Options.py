@@ -136,7 +136,7 @@ def get_options():
 				'big_virtual_folders_threshold',
 				'max_search_album_number',
 				# the following option will be converted to integer further on
-				# 'respected_processors',
+				'num_processors',
 				'max_album_share_thumbnails_number',
 				'min_album_thumbnail',
 				'piwik_id'
@@ -325,12 +325,6 @@ def get_options():
 		except OSError:
 			message("FATAL ERROR", config['cache_path'] + " inexistent and couldn't be created, quitting", 0)
 			sys.exit(-97)
-
-	if not config['respected_processors']:
-		message("FATAL ERROR", "respected_processors option must be set", 3)
-		sys.exit(-97)
-	else:
-		config['respected_processors'] = int(config['respected_processors'])
 
 	# create the directory where php will put album composite images
 	album_cache_dir = os.path.join(config['cache_path'], config['cache_album_subdir'])

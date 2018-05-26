@@ -1494,7 +1494,6 @@ class Media(object):
 
 		transcode_path = os.path.join(album_cache_path, album_prefix + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
-		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
 		transcode_cmd = [
 			'-i', original_path,					# original file to be encoded
 			'-c:v', 'libx264',					# set h264 as videocodec
@@ -1510,7 +1509,7 @@ class Media(object):
 			'-maxrate', '10000000',					# limits max rate, will degrade CRF if needed
 			'-bufsize', '10000000',					# define how much the client should buffer
 			'-f', 'mp4',						# fileformat mp4
-			'-threads', str(num_of_cores),				# number of cores (all minus respected_processors)
+			'-threads', str(Options.config['num_processors']),				# number of cores to use
 			'-loglevel', 'quiet',					# don't display anything
 			'-y' 							# don't prompt for overwrite
 		]
