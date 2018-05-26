@@ -50,7 +50,7 @@ class TreeWalker:
 			message("creating still unexistent album cache subdir", self.album_cache_path, 4)
 			os.makedirs(self.album_cache_path)
 			next_level()
-			message("created still unexistent subdir", "", 5)
+			message("still unexistent subdir created", "", 5)
 			back_level()
 
 		self.origin_album = Album(Options.config['album_path'])
