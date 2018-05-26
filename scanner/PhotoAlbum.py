@@ -2066,7 +2066,7 @@ class Metadata(object):
 		# Minutes
 		m = int((value - d) * 60)
 		# Seconds
-		s = int((value - d - m / 60) * 1000) / 1000
+		s = int((value - d - m / 60) * 3600 * 100) / 100
 
 		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
 
