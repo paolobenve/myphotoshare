@@ -1489,7 +1489,7 @@ class Media(object):
 			message("creating still unexistent album cache subdir", "", 5)
 			os.makedirs(album_cache_path)
 			next_level()
-			message("created still unexistent subdir", album_cache_path, 4)
+			message("still unexistent subdir created", album_cache_path, 4)
 			back_level()
 
 		transcode_path = os.path.join(album_cache_path, album_prefix + video_cache_name(self))
