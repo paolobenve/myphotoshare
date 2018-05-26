@@ -837,6 +837,10 @@ class Media(object):
 					# TO DO: some value doesn't permit translation to string
 					pass
 
+				if k_modified in ('GPSLatitude', 'GPSLongitude'):
+					# exifread returns this values like u'[44, 25, 26495533/1000000]'
+					exif[k_modified] = convert_array_degrees_minutes_seconds_to_degrees_decimal(exif[k_modified])
+
 		return exif
 
 
@@ -2132,5 +2136,18 @@ class Metadata(object):
 		result = int(result * six_zeros) / six_zeros
 		if ref == "S" or ref == "W":
 			result = - result
+
+		return result
+
+
+	@staticmethod
+	def convert_array_degrees_minutes_seconds_to_degrees_decimal(array_string):
+		# the argument is like u'[44, 25, 26495533/1000000]'
+
+		array = array_string[1:-1].split(', ')
+		d = array[0]
+		m = array[1]
+		s = eval(array[2])
+		result = d + m / 60 + s / 3600
 
 		return result
