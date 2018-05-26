@@ -568,27 +568,27 @@ class Media(object):
 		_exif = {}
 		used_tool = ""
 		previous = ''
-		for exif_tool in Options.config['metadata_tools_preference']:
+		for _tool in Options.config['metadata_tools_preference']:
 			try:
-				message("extracting metadata by "+ exif_tool + previous + "...", "", 5)
-				if exif_tool == 'exiftool':
+				message("extracting metadata by "+ _tool + previous + "...", "", 5)
+				if _tool == 'exiftool':
 					_exif = self._photo_metadata_by_exiftool(image)
-				elif exif_tool == 'exifread':
+				elif _tool == 'exifread':
 					_exif = self._photo_metadata_by_exifread(image)
-				elif exif_tool == 'PIL':
+				elif _tool == 'PIL':
 					_exif = self._photo_metadata_by_PIL(image)
 				if _exif:
 					next_level()
-					message("metadata extracted by " + exif_tool, "", 5)
+					message("metadata extracted by " + _tool, "", 5)
 					back_level()
-					used_tool = exif_tool
+					used_tool = _tool
 					previous = ''
 					break
 				else:
-					previous = ', ' + exif_tool + ' -> {}'
+					previous = ', ' + _tool + ' -> {}'
 			except:
 				next_level()
-				message("UNMANAGED ERROR extracting metadata by " + exif_tool, "", 5)
+				message("UNMANAGED ERROR extracting metadata by " + _tool, "", 5)
 				back_level()
 
 		all_keys = list(_exif.keys())
