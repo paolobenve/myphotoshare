@@ -739,6 +739,9 @@ class Media(object):
 					gps_data[sub_decoded] = value[gps_tag]
 					_exif[decoded] = gps_data
 
+
+				exif['GPSAltitude'] = _exif['GPSAltitude']
+				exif['GPSAltitudeRef'] = _exif['GPSAltitudeRef']
 				gps_latitude = None
 				gps_latitude_ref = None
 				gps_longitude = None
