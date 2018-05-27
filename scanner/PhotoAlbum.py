@@ -641,6 +641,8 @@ class Media(object):
 			self._attributes["metadata"]["orientation"] = exif["Orientation"]
 			if exif["Orientation"] - 1 < len(self._photo_metadata.orientation_list):
 				self._attributes["metadata"]["orientationText"] = self._photo_metadata.orientation_list[exif["Orientation"] - 1]
+			# this property will be used in self._photo_thumbnails() in order to properly transpore the image
+			self._orientation = exif["Orientation"]
 
 		if "Make" in exif:
 			self._attributes["metadata"]["make"] = exif["Make"]
