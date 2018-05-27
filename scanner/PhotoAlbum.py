@@ -565,6 +565,26 @@ class Media(object):
 		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
 
+		# try:
+		# 	_exif_exiftool = self._photo_metadata_by_exiftool(image)
+		# 	print('exiftool')
+		# 	print(json.dumps(_exif_exiftool, indent = 2))
+		# except:
+		# 	pass
+		#
+		# try:
+		# 	print('exifread')
+		# 	_exif_exifread = self._photo_metadata_by_exifread(image)
+		# 	print(json.dumps(_exif_exifread, indent = 2))
+		# except:
+		# 	pass
+		#
+		#
+		# _exif_PIL = self._photo_metadata_by_PIL(image)
+		# print('PIL')
+		# _exif_PIL["MakerNote"] = ""
+		# print(json.dumps(_exif_PIL, indent = 2))
+
 		_exif = {}
 		used_tool = ""
 		previous = ''
