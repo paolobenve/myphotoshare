@@ -848,14 +848,6 @@ class Media(object):
 			else:
 				exif[k] = exif_all_tags_values[k]
 
-		if 'GPSLatitude' in exif:
-			# exiftool by code returns the latitude/longitude with the minus sign is latitude is south or longitude is west
-			if exif['GPSLatitudeRef'] == 'S':
-				exif['GPSLatitude'] = - exif['GPSLatitude']
-			if exif['GPSLongitudeRef'] == 'W':
-				exif['GPSLongitude'] = - exif['GPSLongitude']
-
-
 		return exif
 
 	def _photo_metadata_by_exifread(self, image):
