@@ -1961,8 +1961,8 @@ $(document).ready(function() {
 			text += "<tr><td id=\"metadata-data-lightSource\"></td><td>" + currentMedia.metadata.lightSource + "</td></tr>";
 		if (typeof currentMedia.metadata.flash !== "undefined")
 			text += "<tr><td id=\"metadata-data-flash\"></td><td>" + currentMedia.metadata.flash + "</td></tr>";
-		if (typeof currentMedia.metadata.orientation !== "undefined")
-			text += "<tr><td id=\"metadata-data-orientation\"></td><td>" + currentMedia.metadata.orientation + "</td></tr>";
+		if (typeof currentMedia.metadata.orientationText !== "undefined")
+			text += "<tr><td id=\"metadata-data-orientation\"></td><td>" + currentMedia.metadata.orientationText + "</td></tr>";
 		if (typeof currentMedia.metadata.duration !== "undefined")
 			text += "<tr><td id=\"metadata-data-duration\"></td><td>" + currentMedia.metadata.duration + " sec</td></tr>";
 		if (typeof currentMedia.metadata.latitude !== "undefined")

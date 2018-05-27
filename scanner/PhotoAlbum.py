@@ -611,10 +611,16 @@ class Media(object):
 
 	def _set_photo_metadata(self, exif):
 		if "Orientation" in exif:
-			self._orientation = exif["Orientation"]
-			if self._orientation.find('otated 90 C') > -1:
+
+			if exif["Orientation"] not in [1, 2, 3, 4, 5, 6, 7, 8]:
+				# since we are using internally the numeric (1-8) orientation value, exifread text value must be reverse-numerized
+				exif["Orientation"] = self._photo_metadata.reverse_orientation_dict_for_exifread[exif["Orientation"]]
+
+			if exif["Orientation"] in [5, 6, 7, 8]:
 				self._attributes["metadata"]["size"] = (self._attributes["metadata"]["size"][1], self._attributes["metadata"]["size"][0])
 			self._attributes["metadata"]["orientation"] = exif["Orientation"]
+			if exif["Orientation"] - 1 < len(self._photo_metadata.orientation_list):
+				self._attributes["metadata"]["orientationText"] = self._photo_metadata.orientation_list[exif["Orientation"] - 1]
 
 		if "Make" in exif:
 			self._attributes["metadata"]["make"] = exif["Make"]
@@ -761,8 +767,8 @@ class Media(object):
 			else:
 				_exif[decoded] = value
 				exif[decoded] = _exif[decoded]
-				if "Orientation" in _exif and _exif["Orientation"] - 1 < len(self._photo_metadata.orientation_list):
-					exif["Orientation"] = self._photo_metadata.orientation_list[_exif["Orientation"] - 1]
+				# if "Orientation" in _exif and _exif["Orientation"] - 1 < len(self._photo_metadata.orientation_list):
+				# 	exif["Orientation"] = self._photo_metadata.orientation_list[_exif["Orientation"] - 1]
 				if "ExposureProgram" in _exif and _exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
 					exif["ExposureProgram"] = self._photo_metadata.exposure_list[_exif["ExposureProgram"]]
 				if "SpectralSensitivity" in _exif:
@@ -795,6 +801,7 @@ class Media(object):
 	_photo_metadata.sensing_method_list = ["Not defined", "One-chip color area sensor", "Two-chip color area sensor", "Three-chip color area sensor", "Color sequential area sensor", "Trilinear sensor", "Color sequential linear sensor"]
 	_photo_metadata.scene_capture_type_list = ["Standard", "Landscape", "Portrait", "Night scene"]
 	_photo_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
+	_photo_metadata.reverse_orientation_dict_for_exifread = {'Horizontal (normal)': 1, 'Mirrored horizontal': 2, 'Rotated 180': 3, 'Mirrored vertical': 4, 'Mirrored horizontal then rotated 90 CCW': 5, 'Rotated 90 CW': 6, 'Mirrored horizontal then rotated 90 CW': 7, 'Rotated 90 CCW': 8}
 
 
 	def _photo_metadata_by_exiftool(self, image):
@@ -806,7 +813,7 @@ class Media(object):
 		# pyexiftool has been set to return the keys without any prefix
 
 		for k in sorted(exif_all_tags_values.keys()):
-			if k in ['GPSAltitude', 'GPSAltitudeRef', 'GPSLatitude', 'GPSLatitudeRef', 'GPSLongitude', 'GPSLongitudeRef']:
+			if k in ['GPSAltitude', 'GPSAltitudeRef', 'GPSLatitude', 'GPSLatitudeRef', 'GPSLongitude', 'GPSLongitudeRef', 'Orientation']:
 				# The output of "exiftool -n" for gps isn't easy to manage, better use the "raw" value
 				exif[k] = exif_all_tags_codes[k]
 			else:
