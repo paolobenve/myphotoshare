@@ -635,7 +635,12 @@ class Media(object):
 
 			if exif["Orientation"] not in [1, 2, 3, 4, 5, 6, 7, 8]:
 				# since we are using internally the numeric (1-8) orientation value, exifread text value must be reverse-numerized
-				exif["Orientation"] = self._photo_metadata.reverse_orientation_dict_for_exifread[exif["Orientation"]]
+				try:
+					exif["Orientation"] = self._photo_metadata.reverse_orientation_dict_for_exifread[exif["Orientation"]]
+				except KeyError:
+					# I've found some image having as Orientation code a localized string...
+					# I can't find anything better than setting orientation to normal
+					exif["Orientation"] = 1
 
 			if exif["Orientation"] in [5, 6, 7, 8]:
 				self._attributes["metadata"]["size"] = (self._attributes["metadata"]["size"][1], self._attributes["metadata"]["size"][0])
