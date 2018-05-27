@@ -753,8 +753,10 @@ class Media(object):
 
 				if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
 					exif["GPSLatitude"] = Metadata.convert_tuple_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+					exif["GPSLatitudeRef"] = gps_latitude_ref
 					# exif["GPSLatitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
 					exif["GPSLongitude"] = Metadata.convert_tuple_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+					exif["GPSLongitudeRef"] = gps_longitude_ref
 					# exif["GPSLongitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 			else:
 				_exif[decoded] = value
