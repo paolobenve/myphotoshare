@@ -152,9 +152,10 @@ use_stop_words = true
 # - exiftool is the most affordable, but the slowest
 # - exifread sometimes crashes if the metadata are corrupted
 # - PIL doesn't find the metadata on some old image
-# If you don't worry with execution time you can set this option to ['exiftool', 'exifread', 'PIL']
-# The default is the best in term of execution time
-metadata_tools_preference = ['PIL', 'exifread', 'exiftool']
+# If you don't worry with execution time you can let this option to ['exiftool', 'exifread', 'PIL']
+# If you prefer shorter execution times set it to ['PIL', 'exifread', 'exiftool']
+# The default is the best in term of affordability
+metadata_tools_preference = ['exiftool', 'exifread', 'PIL']
 
 
 # How many processors should be used when converting videos? 1 is always a safe value, but you could need more power:
