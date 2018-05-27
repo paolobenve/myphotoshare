@@ -761,8 +761,8 @@ class Media(object):
 			else:
 				_exif[decoded] = value
 				exif[decoded] = _exif[decoded]
-				if "Orientation" in _exif and _exif["Orientation"] < len(self._photo_metadata.orientation_list):
-					exif["Orientation"] = self._photo_metadata.orientation_list[_exif["Orientation"]]
+				if "Orientation" in _exif and _exif["Orientation"] - 1 < len(self._photo_metadata.orientation_list):
+					exif["Orientation"] = self._photo_metadata.orientation_list[_exif["Orientation"] - 1]
 				if "ExposureProgram" in _exif and _exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
 					exif["ExposureProgram"] = self._photo_metadata.exposure_list[_exif["ExposureProgram"]]
 				if "SpectralSensitivity" in _exif:
