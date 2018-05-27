@@ -2105,6 +2105,9 @@ class Metadata(object):
 		Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds.
 		"""
 
+		if value < 0:
+			value = - value
+
 		# Degrees
 		d = int(value)
 		# Minutes
