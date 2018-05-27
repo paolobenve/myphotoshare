@@ -597,6 +597,7 @@ class Media(object):
 					_exif = self._photo_metadata_by_exifread(image)
 				elif _tool == 'PIL':
 					_exif = self._photo_metadata_by_PIL(image)
+
 				if _exif:
 					next_level()
 					message("metadata extracted by " + _tool, "", 5)
@@ -682,6 +683,7 @@ class Media(object):
 			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureCompensation"]
 		if "ExposureBiasValue" in exif:
 			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureBiasValue"]
+
 		if "DateTimeOriginal" in exif:
 			try:
 				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTimeOriginal"], Options.exif_date_time_format)
