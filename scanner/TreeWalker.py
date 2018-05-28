@@ -687,7 +687,16 @@ class TreeWalker:
 			json_file_mtime = file_mtime(json_file)
 		json_file_OK = False
 		album_ini_file = os.path.join(absolute_path, Options.config['metadata_filename'])
-		album_ini_OK = True
+		album_ini_already_embedded_in_json_file = True
+		album_ini_useful = False
+		if os.path.exists(album_ini_file):
+			if not os.access(album_ini_file, os.R_OK):
+				message("album.ini file unreadable", "", 2)
+			elif os.path.getsize(album_ini_file) == 0:
+				message("album.ini file has zero lenght", "", 2)
+			else:
+				album_ini_useful = True
+
 		cached_album = None
 		json_message = json_file + " (path: " + os.path.basename(absolute_path) + ")"
 		if Options.config['recreate_json_files']:
@@ -700,17 +709,13 @@ class TreeWalker:
 					elif not os.access(json_file, os.W_OK):
 						message("json file unwritable", json_file, 1)
 					else:
-						if os.path.exists(album_ini_file):
-							if not os.access(album_ini_file, os.R_OK):
-								message("album.ini file unreadable", "", 2)
-								album_ini_OK = False
-							else:
-								if file_mtime(album_ini_file) > json_file_mtime:
-									# a check on album_ini_file would be necessary too
-									# execution comes here even if album.ini hasn't anything significant
-									message("album.ini newer than json file", "recreating json file taking into account album.ini", 4)
-									album_ini_OK = False
-						if album_ini_OK:
+						if album_ini_useful:
+							if file_mtime(album_ini_file) > json_file_mtime:
+								# a check on album_ini_file would be necessary too
+								# execution comes here even if album.ini hasn't anything significant
+								message("album.ini newer than json file", "recreating json file taking into account album.ini", 4)
+								album_ini_already_embedded_in_json_file = False
+						if album_ini_already_embedded_in_json_file:
 							message("reading json file to import album...", json_file, 5)
 							# the following is the instruction which could raise the error
 							cached_album = Album.from_cache(json_file, album_cache_base)
@@ -766,7 +771,13 @@ class TreeWalker:
 			next_level()
 			message("album generated", "", 5)
 			back_level()
-		album.read_album_ini()
+
+		if album_ini_useful:
+			if album_ini_already_embedded_in_json_file:
+				message("album.ini values already in json file", "", 2)
+			else:
+				album.read_album_ini(album_ini_file)
+
 		if parent_album is not None:
 			album.parent = parent_album
 		album.cache_base = album_cache_base

@@ -177,15 +177,15 @@ class Album(object):
 			return True
 
 
-	def read_album_ini(self):
+	def read_album_ini(self, file_name):
 		"""Read the 'album.ini' file in the directory 'self.absolute_path' to
 		get user defined metadata for the album and pictures.
 		"""
 		self.album_ini = configparser.ConfigParser(allow_no_value=True)
 		message("reading album.ini...", "", 5)
-		self.album_ini.read(os.path.join(self.absolute_path, Options.config['metadata_filename']))
+		self.album_ini.read(file_name)
 		next_level()
-		message("album.ini read", os.path.join(self.absolute_path, Options.config['metadata_filename']), 5)
+		message("album.ini read", file_name, 5)
 		back_level()
 
 		Metadata.set_metadata_from_album_ini("album", self._attributes, self.album_ini)
