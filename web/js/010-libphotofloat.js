@@ -651,7 +651,7 @@
 
 	PhotoFloat.mediaHashURIEncoded = function(album, media) {
 		var hash;
-		if (PhotoFloat.isByDateCacheBase(album.cacheBase) || PhotoFloat.isByGpsCacheBase(album.cacheBase))
+		if (PhotoFloat.isByDateCacheBase(album.cacheBase) || PhotoFloat.isByGpsCacheBase(album.cacheBase) || PhotoFloat.isSearchCacheBase(album.cacheBase) && ! PhotoFloat.searchAndSubalbumHash)
 			hash = PhotoFloat.pathJoin([
 				album.cacheBase,
 				media.foldersCacheBase,
