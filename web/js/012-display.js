@@ -930,11 +930,12 @@ $(document).ready(function() {
 			if (media === null)
 				return;
 		}
-		$("#thumbs img").each(function() {
+		$("#thumbs img.thumbnail").each(function() {
 			if (
-				(PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
+				(PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.albumName ||
 				PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase) && this.title === media.albumName ||
-				PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase) && this.title === media.albumName
+				PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase) && this.title === media.albumName ||
+				PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase) && this.title === media.albumName
 			) {
 				thumb = $(this);
 				return false;
@@ -1040,11 +1041,12 @@ $(document).ready(function() {
 						// }
 						calculatedWidth = Options.media_thumb_size;
 					}
-					if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase) || PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase) || PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-						imgTitle = currentAlbum.media[i].albumName;
-						imgTitle = imgTitle.substr(imgTitle.indexOf('/') + 1);
-					} else
-						imgTitle = currentAlbum.media[i].name;
+					// if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase) || PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase) || PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+					// 	imgTitle = currentAlbum.media[i].albumName;
+					// 	imgTitle = imgTitle.substr(imgTitle.indexOf('/') + 1);
+					// } else
+					// 	imgTitle = currentAlbum.media[i].name;
+					imgTitle = currentAlbum.media[i].albumName;
 
 					mapLinkIcon = "";
 					if (hasGpsData(currentAlbum.media[i])) {
