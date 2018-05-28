@@ -1082,7 +1082,7 @@ $(document).ready(function() {
 
 					image.get(0).media = currentAlbum.media[i];
 					hash = photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[i]);
-					imageLink = $("<a href=\"#!/" + hash + "\"></a>");
+					imageLink = $("<a id='link-" + hash + "' href='#!/" + hash + "'></a>");
 					imageLink.append(image);
 					media.push(imageLink);
 					(function(theLink, theImage) {
