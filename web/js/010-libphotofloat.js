@@ -162,6 +162,7 @@
 			hashParts = hash.split("/");
 			slashCount = hashParts.length -1;
 			lastSlashPosition = hash.lastIndexOf("/");
+			PhotoFloat.searchAndSubalbumHash = "";
 
 			if (slashCount === 0) {
 				// folders only or root of a virtual folders: album only
