@@ -1472,12 +1472,6 @@ $(document).ready(function() {
 		setTimeout(scrollToThumb, 1);
 	}
 
-	function getDecimal(fraction) {
-		if (fraction[0] < fraction[1])
-			return fraction[0] + "/" + fraction[1];
-		return (fraction[0] / fraction[1]).toString();
-	}
-
 	function lateralSocialButtons() {
 		return $(".ssk-group").css("display") == "block";
 	}
