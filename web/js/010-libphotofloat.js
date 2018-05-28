@@ -772,11 +772,11 @@
 			var bValue = b[field];
 			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
 		});
-	}
+	};
 
 	 PhotoFloat.sortByName = function(mediaList) {
 		return PhotoFloat.sortBy(mediaList, 'name');
-	}
+	};
 
 	PhotoFloat.sortByPath = function(albumList) {
 		if (PhotoFloat.isByGpsCacheBase(albumList[0].cacheBase)) {
@@ -786,7 +786,7 @@
 				return PhotoFloat.sortBy(albumList, 'name');
 		} else
 			return PhotoFloat.sortBy(albumList, 'path');
-	}
+	};
 
 	PhotoFloat.sortByDate = function (albumOrMediaList) {
 		return albumOrMediaList.sort(function(a,b) {
@@ -794,7 +794,7 @@
 			var bValue = new Date(b.date);
 			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
 		});
-	}
+	};
 
 
 
