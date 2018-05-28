@@ -188,7 +188,14 @@ class Album(object):
 		message("album.ini read", file_name, 5)
 		back_level()
 
+		next_level()
+		message("adding album.ini metadata values to album...", "", 5)
 		Metadata.set_metadata_from_album_ini("album", self._attributes, self.album_ini)
+		next_level()
+		message("metadata values from album.ini added to album...", "", 5)
+		back_level()
+		back_level()
+
 
 
 	def add_media(self, media):
@@ -737,7 +744,13 @@ class Media(object):
 
 		# Overwrite with album.ini values when it has been read from file
 		if self.album.album_ini:
+			next_level()
+			message("adding album.ini metadata values to photo...", "", 5)
 			Metadata.set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+			next_level()
+			message("metadata values from album.ini added to photo...", "", 5)
+			back_level()
+			back_level()
 
 		# pprint(self._attributes)
 
@@ -913,7 +926,14 @@ class Media(object):
 
 		# Video should also contain metadata like GPS information, at least in QuickTime and MP4 files...
 		if self.album.album_ini:
+			next_level()
+			message("adding album.ini metadata values to video...", "", 5)
 			Metadata.set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+			next_level()
+			message("metadata values from album.ini added to video...", "", 5)
+			back_level()
+			back_level()
+
 
 
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
@@ -1924,8 +1944,6 @@ class Metadata(object):
 		"""
 
 		# Initialize with album.ini defaults
-		next_level()
-		message("adding album.ini metadata values to albums...", "", 5)
 
 		# With Python2, section names are string. As we retrieve file names as unicode,
 		# we can't find them in the ConfigParser dictionary
@@ -2013,11 +2031,6 @@ class Metadata(object):
 				pass
 		elif "tags" in album_ini.defaults():
 			attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.defaults()["tags"].split(",")]
-
-		next_level()
-		message("album.ini metadata values added to albums", "", 5)
-		back_level()
-		back_level()
 
 
 	@staticmethod
