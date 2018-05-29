@@ -1361,6 +1361,7 @@ $(document).ready(function() {
 									socialButtons();
 
 									$("#subalbums").show();
+									$("#album-view").removeClass("media-view-container");
 
 									// check for overflow in album-caption class in order to adapt album caption height to the string length
 									// when diving into search subalbum, the whole album path is showed and it can be lengthy
