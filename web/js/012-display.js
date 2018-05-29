@@ -867,12 +867,12 @@ $(document).ready(function() {
 		var m;
 
 		if (needAlbumNameSort()) {
-			currentAlbum.subalbums = sortByPath(currentAlbum.subalbums);
+			currentAlbum.subalbums = PhotoFloat.sortByPath(currentAlbum.subalbums);
 			currentAlbum.albumNameSort = true;
 			currentAlbum.albumNameReverseSort = false;
 			// $("li.album-sort.by-name").addClass("selected");
 		} else if (needAlbumDateSort()) {
-			currentAlbum.subalbums = sortByDate(currentAlbum.subalbums);
+			currentAlbum.subalbums = PhotoFloat.sortByDate(currentAlbum.subalbums);
 			currentAlbum.albumNameSort = false;
 			currentAlbum.albumDateReverseSort = false;
 		}
@@ -886,7 +886,7 @@ $(document).ready(function() {
 		}
 
 		if (needMediaNameSort()) {
-			currentAlbum.media = sortByName(currentAlbum.media);
+			currentAlbum.media = PhotoFloat.sortByName(currentAlbum.media);
 			currentAlbum.mediaNameSort = true;
 			currentAlbum.mediaNameReverseSort = false;
 			if (currentMedia !== null) {
@@ -898,7 +898,7 @@ $(document).ready(function() {
 				}
 			}
 		} else if (needMediaDateSort()) {
-			currentAlbum.media = sortByDate(currentAlbum.media);
+			currentAlbum.media = PhotoFloat.sortByDate(currentAlbum.media);
 			currentAlbum.mediaNameSort = false;
 			currentAlbum.mediaDateReverseSort = false;
 			if (currentMedia !== null) {
@@ -921,38 +921,8 @@ $(document).ready(function() {
 		}
 	}
 
-
-	// see https://stackoverflow.com/questions/1069666/sorting-javascript-object-by-property-value
-	function sortByName(mediaList) {
-		return sortBy(mediaList, 'name');
-	}
-
-	function sortByPath(albumList) {
-		if (PhotoFloat.isByGpsCacheBase(albumList[0].cacheBase))
-			return sortBy(albumList, 'name');
-		else
-			return sortBy(albumList, 'path');
-	}
-
-	function sortBy(albumOrMediaList, field) {
-		return albumOrMediaList.sort(function(a,b) {
-			var aValue = a[field];
-			var bValue = b[field];
-			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-		});
-	}
-
-	function sortByDate(albumOrMediaList) {
-		return albumOrMediaList.sort(function(a,b) {
-			var aValue = new Date(a.date);
-			var bValue = new Date(b.date);
-			return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-		});
-	}
-
 	function scrollToThumb() {
 		var media, thumb;
-
 
 		media = currentMedia;
 		if (media === null) {
@@ -960,11 +930,12 @@ $(document).ready(function() {
 			if (media === null)
 				return;
 		}
-		$("#thumbs img").each(function() {
+		$("#thumbs img.thumbnail").each(function() {
 			if (
-				(PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.name ||
+				(PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) || currentAlbum.cacheBase == Options.folders_string) && this.title === media.albumName ||
 				PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase) && this.title === media.albumName ||
-				PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase) && this.title === media.albumName
+				PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase) && this.title === media.albumName ||
+				PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase) && this.title === media.albumName
 			) {
 				thumb = $(this);
 				return false;
@@ -1014,6 +985,8 @@ $(document).ready(function() {
 		var tooBig = false, isVirtualAlbum = false;
 		var mapLinkIcon;
 		var element;
+		var caption, captionColor, captionHtml, captionHeight, captionFontSize, buttonAndCaptionHeight, albumButtonAndCaptionHtml, heightfactor;
+		var folderArray, folder;
 
 		PhotoFloat.subalbumIndex = 0;
 		numSubAlbumsReady = 0;
@@ -1068,11 +1041,12 @@ $(document).ready(function() {
 						// }
 						calculatedWidth = Options.media_thumb_size;
 					}
-					if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase) || PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase) || PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
-						imgTitle = currentAlbum.media[i].albumName;
-						imgTitle = imgTitle.substr(imgTitle.indexOf('/') + 1);
-					} else
-						imgTitle = currentAlbum.media[i].name;
+					// if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase) || PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase) || PhotoFloat.isSearchCacheBase(currentAlbum.cacheBase)) {
+					// 	imgTitle = currentAlbum.media[i].albumName;
+					// 	imgTitle = imgTitle.substr(imgTitle.indexOf('/') + 1);
+					// } else
+					// 	imgTitle = currentAlbum.media[i].name;
+					imgTitle = currentAlbum.media[i].albumName;
 
 					mapLinkIcon = "";
 					if (hasGpsData(currentAlbum.media[i])) {
@@ -1110,11 +1084,11 @@ $(document).ready(function() {
 
 					image.get(0).media = currentAlbum.media[i];
 					hash = photoFloat.mediaHashURIEncoded(currentAlbum, currentAlbum.media[i]);
-					imageLink = $("<a href=\"#!/" + hash + "\"></a>");
+					imageLink = $("<a id='link-" + hash + "' href='#!/" + hash + "'></a>");
 					imageLink.append(image);
 					media.push(imageLink);
 					(function(theLink, theImage) {
-						theImage.error(function() {
+						theImage.on("error", function() {
 							media.splice(media.indexOf(theLink), 1);
 							theLink.remove();
 							currentAlbum.media.splice(currentAlbum.media.indexOf(theImage.get(0).media), 1);
@@ -1169,6 +1143,16 @@ $(document).ready(function() {
 					if (Options.albums_slide_style)
 						margin = Math.round(correctedAlbumThumbSize * 0.05);
 
+					captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
+					captionHeight = parseInt(captionFontSize * 1.1) + 1;
+					if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+						heightfactor = 0;
+					else if (! Options.show_album_media_count)
+						heightfactor = 1.1;
+					else
+						heightfactor = 2.8;
+					buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
+
 					// insert into DOM
 					subalbumsElement = $("#subalbums");
 					subalbumsElement.empty();
@@ -1188,10 +1172,114 @@ $(document).ready(function() {
 						} else {
 							subfolderHash = currentAlbum.subalbums[i].cacheBase;
 						}
+
+						// generate the subalbum caption
+						if (PhotoFloat.isByDateCacheBase(currentAlbum.cacheBase)) {
+							folderArray = currentAlbum.subalbums[i].cacheBase.split(Options.cache_folder_separator);
+							folder = "";
+							if (folderArray.length >= 2)
+								folder += folderArray[1];
+							if (folderArray.length >= 3)
+								folder += "-" + folderArray[2];
+							if (folderArray.length == 4)
+								folder += "-" + folderArray[3];
+						} else if (PhotoFloat.isByGpsCacheBase(currentAlbum.cacheBase)) {
+							var level = currentAlbum.subalbums[i].cacheBase.split(Options.cache_folder_separator).length - 2;
+							var folderName = '';
+							var folderTitle = '';
+							if (currentAlbum.subalbums[i].name === '')
+								folderName = _t('.not-specified');
+							else if (level < 2)
+								folderName = currentAlbum.subalbums[i].name;
+							else
+								folderName = transformAltPlaceName(currentAlbum.subalbums[i].alt_name);
+							folderTitle = _t('#place-icon-title') + folderName;
+
+							folder = "<span class='gps-folder'>" +
+												folderName +
+												"<a href='" + mapLink(currentAlbum.subalbums[i].center.latitude, currentAlbum.subalbums[i].center.longitude, Options.map_zoom_levels[level]) +
+																"' title='" + folderName +
+																"' target='_blank'" +
+														">" +
+													"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/ic_place_white_24dp_2x.png' />" +
+												"</a>" +
+											"</span>";
+						}
+						else {
+							folder = currentAlbum.subalbums[i].path;
+						}
+
+						// // get the value in style sheet (element with that class doesn't exist in DOM)
+						// var $el = $('<div class="album-caption"></div>');
+						// $($el).appendTo('body');
+						// $($el).remove();
+						captionColor = Options.albums_slide_style ? Options.slide_album_caption_color : Options.album_caption_color;
+
+						captionHtml = "<div class='album-caption";
+						if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs)
+							captionHtml += " hidden";
+						captionHtml += "' id='album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "'" +
+													"style='" +
+														"width: " + correctedAlbumThumbSize + "px; " +
+														"font-size: " + captionFontSize + "px; " +
+														"height: " + captionHeight + "px; " +
+														"color: " + captionColor + ";" +
+													"'" +
+													">" + folder + "</div>";
+
+						captionHtml += "<div class='album-caption-count";
+						if (PhotoFloat.isFolderCacheBase(currentAlbum.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
+							captionHtml += " hidden";
+						captionHtml += "'" +
+									"style='" +
+										"font-size: " + Math.round((captionFontSize / 1.5)) + "px; " +
+										"height: " + captionHeight + "px; " +
+										"color: " + captionColor + ";" +
+									"'" +
+								">(";
+						captionHtml +=		currentAlbum.subalbums[i].numMediaInSubTree;
+						captionHtml +=		" <span class='title-media'>";
+						captionHtml +=		_t(".title-media");
+						captionHtml +=		"</span>";
+						captionHtml += ")</div>";
+						caption = $(captionHtml);
+
+
 						// a dot could be present in a cache base, making $("#" + cacheBase) fail, beware...
-						linkContainer = $("<div id=\"" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "\" class=\"album-button-and-caption\"></div>");
-						image = $("<div class=\"album-button\"></div>");
+						albumButtonAndCaptionHtml =
+							"<div id='" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase) + "' " +
+								"class='album-button-and-caption";
+						if (Options.albums_slide_style)
+							albumButtonAndCaptionHtml += " slide";
+						albumButtonAndCaptionHtml +=
+								"' " +
+								"style='" +
+									"margin-right: " + Options.spacing + "px; " +
+									"margin-top: " + Options.spacing + "px; " +
+									"height: " + buttonAndCaptionHeight + "px; " +
+									"width: " + albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px; ";
+						if (Options.albums_slide_style)
+							albumButtonAndCaptionHtml += "background-color:" + Options.album_button_background_color + ";";
+						albumButtonAndCaptionHtml +=
+								"'" +
+							">" +
+							"</div>";
+						linkContainer = $(albumButtonAndCaptionHtml);
+
+						image = $(
+											"<div " +
+											 	"class='album-button' " +
+												"style='" +
+													"width:" + correctedAlbumThumbSize + "px; " +
+													"height:" + correctedAlbumThumbSize + "px; " +
+													"margin:" + margin + "px;" +
+												"'" +
+												">" +
+												"</div>"
+										);
 						linkContainer.append(image);
+						linkContainer.append(caption);
+
 						subalbumsElement.append(linkContainer);
 						container = $("#" + PhotoFloat.hashCode(currentAlbum.subalbums[i].cacheBase));
 						// add the clicks
@@ -1205,9 +1293,9 @@ $(document).ready(function() {
 							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,            subalbum);
 							photoFloat.pickRandomMedia(theSubalbum, currentAlbum, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
 								var htmlText, difference;
-								var folderArray, folder, captionHeight, captionFontSize, buttonAndCaptionHeight, html, titleName, link, goTo, humanGeonames;
+								var titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size);
-								var heightfactor, captionColor, overflow;
+								var overflow;
 
 								PhotoFloat.subalbumIndex ++;
 								mediaWidth = randomMedia.metadata.size[0];
@@ -1266,133 +1354,25 @@ $(document).ready(function() {
 										">";
 								theImage.html(htmlText);
 
-								if (PhotoFloat.isByDateCacheBase(theOriginalAlbumContainer.cacheBase)) {
-									folderArray = subalbum.cacheBase.split(Options.cache_folder_separator);
-									folder = "";
-									if (folderArray.length >= 2)
-										folder += folderArray[1];
-									if (folderArray.length >= 3)
-										folder += "-" + folderArray[2];
-									if (folderArray.length == 4)
-										folder += "-" + folderArray[3];
-								} else if (PhotoFloat.isByGpsCacheBase(theOriginalAlbumContainer.cacheBase)) {
-									var level = subalbum.cacheBase.split(Options.cache_folder_separator).length - 2;
-									var folderName = '';
-									var folderTitle = '';
-									if (level === 0)
-										folderName = randomAlbum.media[0].geoname.country_name;
-									else if (level == 1)
-										folderName = randomAlbum.media[0].geoname.region_name;
-									else if (level == 2)
-										if (randomAlbum.media[0].geoname.alt_place_name !== undefined)
-											folderName = transformAltPlaceName(randomAlbum.media[0].geoname.alt_place_name);
-										else
-											folderName = randomAlbum.media[0].geoname.place_name;
-									if (folderName === '')
-										folderName = _t('.not-specified');
-									folderTitle = _t('#place-icon-title') + folderName;
-
-									folder = "<span class='gps-folder'>" +
-														folderName +
-														"<a href='" + mapLink(subalbum.center.latitude, subalbum.center.longitude, Options.map_zoom_levels[level]) +
-																		"' title='" + folderName +
-																		"' target='_blank'" +
-																">" +
-															"<img class='title-img' title='" + folderTitle + "'  alt='" + folderTitle + "' height='15px' src='img/ic_place_white_24dp_2x' />" +
-														"</a>" +
-													"</span>";
-								}
-								else {
-									folder = subalbum.path;
-								}
-
-								// // get the value in style sheet (element with that class doesn't exist in DOM)
-								// var $el = $('<div class="album-caption"></div>');
-								// $($el).appendTo('body');
-								// $($el).remove();
-
-								captionFontSize = Math.round(em2px("body", 1) * correctedAlbumThumbSize / Options.album_thumb_size);
-								captionHeight = parseInt(captionFontSize * 1.1) + 1;
-								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
-									heightfactor = 0;
-								else if (! Options.show_album_media_count)
-									heightfactor = 1.1;
-								else
-									heightfactor = 2.8;
-								buttonAndCaptionHeight = albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + captionHeight * heightfactor;
-
-								html = "<div class=\"album-caption";
-								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs)
-									html += " hidden";
-								html += "\" id=\"album-caption-" + PhotoFloat.hashCode(theSubalbum.cacheBase) + "\">" + folder + "</div>";
-
-								html += "<div class=\"album-caption-count";
-								if (PhotoFloat.isFolderCacheBase(theOriginalAlbumContainer.cacheBase) && ! Options.show_album_names_below_thumbs || ! Options.show_album_media_count)
-									html += " hidden";
-								html += "\">(";
-								html +=		subalbum.numMediaInSubTree;
-								html +=		" <span class=\"title-media\">";
-								html +=		_t(".title-media");
-								html +=		"</span>";
-								html += ")</div>";
-								theImage.parent().append(html);
-
 								numSubAlbumsReady ++;
 								if (numSubAlbumsReady >= theOriginalAlbumContainer.subalbums.length) {
 									// now all the subalbums random thumbnails has been loaded
 									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
 
-									$(".album-button-and-caption")
-										.css("margin-right", Options.spacing + "px")
-										.css("margin-top", Options.spacing + "px")
-										.css("height", buttonAndCaptionHeight + "px")
-										.css("width", albumButtonWidth(correctedAlbumThumbSize, buttonBorder) + "px");
-									if (Options.albums_slide_style)
-										$(".album-button-and-caption").addClass("slide").css("background-color", Options.album_button_background_color);
-
-									$(".album-button")
-										.css("width", correctedAlbumThumbSize + "px")
-										.css("height", correctedAlbumThumbSize + "px")
-										.css("margin", margin + "px");
-
-									captionColor = Options.albums_slide_style ? Options.slide_album_caption_color : Options.album_caption_color;
-									$(".album-caption")
-										.css("width", correctedAlbumThumbSize + "px")
-										.css("font-size",  captionFontSize + "px")
-										.css("height", captionHeight + "px")
-										.css("color", captionColor);
-
-									$(".album-caption-count")
-										.css("font-size", Math.round((captionFontSize / 1.5)) + "px")
-										.css("height", captionHeight + "px")
-										.css("color", captionColor);
-
 									$("#subalbums").show();
+									$("#album-view").removeClass("media-view-container");
 
 									// check for overflow in album-caption class in order to adapt album caption height to the string length
 									// when diving into search subalbum, the whole album path is showed and it can be lengthy
-									while (true) {
-										overflow = false;
-										for (var indexSubalbums = 0; indexSubalbums < currentAlbum.subalbums.length; indexSubalbums ++) {
-											// element = $("#album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
-											element = document.getElementById("album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
-											if (element.scrollHeight > element.clientHeight) {
-												console.log(element.scrollHeight, element.clientHeight);
-												// the element have overflow
-												overflow = true;
-												difference = element.scrollHeight - element.clientHeight;
-												if (! Options.show_album_media_count)
-													difference += 10;
-												$(".album-caption").css("height", (parseInt($(".album-caption").css("height")) + difference) + 'px');
-												$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + difference) + 'px');
-												break;
-											}
-										}
-										if (! overflow)
-											break;
-									}
-
+									var maxHeight = null;
+									$('.album-caption').each(function() {
+										var thisHeight = $(this)[0].scrollHeight;
+										maxHeight = (thisHeight > maxHeight) ? thisHeight : maxHeight;
+									});
+									difference = maxHeight - parseFloat($(".album-caption").css("height"));
+									$(".album-caption").css("height", maxHeight + 'px');
+									$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + difference) + 'px');
 								}
 							}, function error() {
 								currentAlbum.subalbums.splice(currentAlbum.subalbums.indexOf(theSubalbum), 1);
@@ -1479,12 +1459,6 @@ $(document).ready(function() {
 		setOptions();
 
 		setTimeout(scrollToThumb, 1);
-	}
-
-	function getDecimal(fraction) {
-		if (fraction[0] < fraction[1])
-			return fraction[0] + "/" + fraction[1];
-		return (fraction[0] / fraction[1]).toString();
 	}
 
 	function lateralSocialButtons() {
@@ -1650,6 +1624,7 @@ $(document).ready(function() {
 		var width = currentMedia.metadata.size[0], height = currentMedia.metadata.size[1];
 		var prevMedia, nextMedia, text, thumbnailSize, i, linkTag, triggerLoad, videoOK = true;
 		var nextReducedPhoto, prevReducedPhoto;
+		var exposureTime;
 
 		mediaLink = "#!/" + photoFloat.mediaHashURIEncoded(currentAlbum, currentMedia);
 		firstEscKey = true;
@@ -1941,21 +1916,28 @@ $(document).ready(function() {
 		if (typeof currentMedia.metadata.model !== "undefined")
 			text += "<tr><td id=\"metadata-data-model\"></td><td>" + currentMedia.metadata.model + "</td></tr>";
 		if (typeof currentMedia.metadata.aperture !== "undefined")
-			text += "<tr><td id=\"metadata-data-aperture\"></td><td> f/" + getDecimal(currentMedia.metadata.aperture) + "</td></tr>";
+			text += "<tr><td id=\"metadata-data-aperture\"></td><td> f/" + currentMedia.metadata.aperture + "</td></tr>";
 		if (typeof currentMedia.metadata.focalLength !== "undefined")
-			text += "<tr><td id=\"metadata-data-focalLength\"></td><td>" + getDecimal(currentMedia.metadata.focalLength) + " mm</td></tr>";
+			text += "<tr><td id=\"metadata-data-focalLength\"></td><td>" + currentMedia.metadata.focalLength + " mm</td></tr>";
 		if (typeof currentMedia.metadata.subjectDistanceRange !== "undefined")
 			text += "<tr><td id=\"metadata-data-subjectDistanceRange\"></td><td>" + currentMedia.metadata.subjectDistanceRange + "</td></tr>";
 		if (typeof currentMedia.metadata.iso !== "undefined")
 			text += "<tr><td id=\"metadata-data-iso\"></td><td>" + currentMedia.metadata.iso + "</td></tr>";
 		if (typeof currentMedia.metadata.sceneCaptureType !== "undefined")
 			text += "<tr><td id=\"metadata-data-sceneCaptureType\"></td><td>" + currentMedia.metadata.sceneCaptureType + "</td></tr>";
-		if (typeof currentMedia.metadata.exposureTime !== "undefined")
-			text += "<tr><td id=\"metadata-data-exposureTime\"></td><td>" + getDecimal(currentMedia.metadata.exposureTime) + " sec</td></tr>";
+		if (typeof currentMedia.metadata.exposureTime !== "undefined") {
+			if (typeof currentMedia.metadata.exposureTime === "string")
+				exposureTime = currentMedia.metadata.exposureTime;
+			else if (currentMedia.metadata.exposureTime > 0.3)
+				exposureTime = Math.round(currentMedia.metadata.exposureTime * 10 ) / 10;
+			else
+				exposureTime = "1/" + Math.round(1 / currentMedia.metadata.exposureTime);
+			text += "<tr><td id=\"metadata-data-exposureTime\"></td><td>" + exposureTime + " sec</td></tr>";
+		}
 		if (typeof currentMedia.metadata.exposureProgram !== "undefined")
 			text += "<tr><td id=\"metadata-data-exposureProgram\"></td><td>" + currentMedia.metadata.exposureProgram + "</td></tr>";
 		if (typeof currentMedia.metadata.exposureCompensation !== "undefined")
-			text += "<tr><td id=\"metadata-data-exposureCompensation\"></td><td>" + getDecimal(currentMedia.metadata.exposureCompensation) + "</td></tr>";
+			text += "<tr><td id=\"metadata-data-exposureCompensation\"></td><td>" + currentMedia.metadata.exposureCompensation + "</td></tr>";
 		if (typeof currentMedia.metadata.spectralSensitivity !== "undefined")
 			text += "<tr><td id=\"metadata-data-spectralSensitivity\"></td><td>" + currentMedia.metadata.spectralSensitivity + "</td></tr>";
 		if (typeof currentMedia.metadata.sensingMethod !== "undefined")
@@ -1964,8 +1946,8 @@ $(document).ready(function() {
 			text += "<tr><td id=\"metadata-data-lightSource\"></td><td>" + currentMedia.metadata.lightSource + "</td></tr>";
 		if (typeof currentMedia.metadata.flash !== "undefined")
 			text += "<tr><td id=\"metadata-data-flash\"></td><td>" + currentMedia.metadata.flash + "</td></tr>";
-		if (typeof currentMedia.metadata.orientation !== "undefined")
-			text += "<tr><td id=\"metadata-data-orientation\"></td><td>" + currentMedia.metadata.orientation + "</td></tr>";
+		if (typeof currentMedia.metadata.orientationText !== "undefined")
+			text += "<tr><td id=\"metadata-data-orientation\"></td><td>" + currentMedia.metadata.orientationText + "</td></tr>";
 		if (typeof currentMedia.metadata.duration !== "undefined")
 			text += "<tr><td id=\"metadata-data-duration\"></td><td>" + currentMedia.metadata.duration + " sec</td></tr>";
 		if (typeof currentMedia.metadata.latitude !== "undefined")
@@ -2160,13 +2142,13 @@ $(document).ready(function() {
 				$("#powered-by").show();
 			} else {
 				$("#error-text-folder").stop().fadeIn(200);
-				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(2500);
-				$("#album-view").stop().fadeIn(3500);
-				$("#media-view").stop().fadeIn(3500);
+				$("#error-text-folder, #error-overlay, #auth-text").fadeOut(3500);
+				$("#album-view").stop().fadeOut(100).fadeIn(3500);
+				$("#media-view").stop().fadeOut(100).fadeIn(3500);
 				window.location.href = rootLink;
 			}
 		}
-		$("#error-overlay").fadeTo(500, 0.8);
+		// $("#error-overlay").fadeTo(500, 0.8);
 		$("body, html").css("overflow", "hidden");
 	}
 
@@ -2281,15 +2263,15 @@ $(document).ready(function() {
 						Options.albums_slide_style = slideCookie;
 
 					if (Options.thumb_spacing)
-						Options.spacingSave = Options.thumb_spacing;
+						Options.spacingToggle = Options.thumb_spacing;
 					else
-						Options.spacingSave = Options.media_thumb_size * 0.03;
+						Options.spacingToggle = Options.media_thumb_size * 0.03;
 
 					var spacingCookie = getNumberCookie("spacing");
 					if (spacingCookie !== null) {
 						Options.spacing = spacingCookie;
 					} else {
-						Options.spacing = Options.spacingSave;
+						Options.spacing = Options.thumb_spacing;
 					}
 
 					var showAlbumNamesCookie = getBooleanCookie("show_album_names_below_thumbs");
@@ -2364,12 +2346,12 @@ $(document).ready(function() {
 	$(document).on('keydown', function(e) {
 		if (e.target.tagName.toLowerCase() != 'input') {
 			if (! e.ctrlKey && ! e.shiftKey && ! e.altKey) {
-				if (nextLink && (e.keyCode === 39 || e.keyCode === 78) && currentMedia !== null) {
-					//            arrow right                  n
+				if (nextLink && (e.keyCode === 39 || e.keyCode === 78 || e.keyCode === 13 || e.keyCode === 32) && currentMedia !== null) {
+					//            arrow right                  n             return              space
 					swipeLeft(nextLink);
 					return false;
-				} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80) && currentMedia !== null) {
-					//                   arrow left                   p
+				} else if (prevLink && (e.keyCode === 37 || e.keyCode === 80 || e.keyCode === 8) && currentMedia !== null) {
+					//                   arrow left                   p           backspace
 					swipeRight(prevLink);
 					return false;
 				} else if (e.keyCode === 27 && ! Modernizr.fullscreen && fullScreenStatus) {
@@ -2708,7 +2690,7 @@ $(document).ready(function() {
 			if (Options.spacing)
 				Options.spacing = 0;
 			else
-				Options.spacing = Options.spacingSave;
+				Options.spacing = Options.spacingToggle;
 			setCookie("spacing", Options.spacing);
 			updateMenu();
 			showAlbum("refreshBoth");

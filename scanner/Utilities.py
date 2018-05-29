@@ -3,6 +3,7 @@
 
 # @python2
 from __future__ import print_function
+from __future__ import division
 
 from datetime import datetime
 import os
@@ -174,14 +175,15 @@ def report_times(final):
 	num_media = Options.num_video + Options.num_photo
 
 	try:
-		num_media_in_tree
-	except NameError:
+		# detect uninitialized variable
+		report_times.num_media_in_tree
+	except AttributeError:
 		# calculate the number of media in the album tree: it will be used in order to guess the execution time
 		special_files = [Options.config['exclude_tree_marker'], Options.config['exclude_files_marker'], Options.config['metadata_filename']]
-		num_media_in_tree = sum([len([file for file in files if file[:1] != '.' and file not in special_files]) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
+		report_times.num_media_in_tree = sum([len([file for file in files if file[:1] != '.' and file not in special_files]) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
 
 	try:
-		time_missing = time_till_now / num_media * num_media_in_tree - time_till_now
+		time_missing = time_till_now / num_media * report_times.num_media_in_tree - time_till_now
 		if time_missing >= 0:
 			(_time_missing, _time_missing_unfolded) = time_totals(time_missing)
 			print((50 - len("total time missing")) * " ", "total time missing", (18 - len(_time_missing)) * " ", _time_missing, "     ", _time_missing_unfolded)
@@ -205,12 +207,14 @@ def report_times(final):
 	_num_video = str(Options.num_video)
 	_num_video_processed = str(Options.num_video_processed)
 	max_digit = len(_num_media)
-	print("Media    " + ((max_digit - len(_num_media)) * " ") + _num_media + ' / ' + str(num_media_in_tree) + ' (' + str(int(num_media / num_media_in_tree * 1000) / 10) + '%)')
+	media_count_and_time = "Media    " + ((max_digit - len(_num_media)) * " ") + _num_media + ' / ' + str(report_times.num_media_in_tree) + ' (' + str(int(num_media * 1000 / report_times.num_media_in_tree) / 10) + '%)'
 	if num_media:
-		print("                                                              " + str(int(time_till_now / num_media / 1000000 * 1000) / 1000) + " s/media")
-	print("                  processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed)
+		media_count_and_time += ",      " + str(int(time_till_now / 1000000 / num_media * 1000) / 1000) + " s/media"
+	print(media_count_and_time)
+	media_count_and_time = "                  processed " + ((max_digit - len(_num_media_processed)) * " ") + _num_media_processed
 	if num_media_processed and num_media_processed != num_media:
-		print("                                                              " + str(int(time_till_now / num_media_processed / 10000) / 100) + " s/processed media")
+		media_count_and_time += ",      " + str(int(time_till_now / num_media_processed / 10000) / 100) + " s/processed media"
+	print(media_count_and_time)
 	print("- Videos " + ((max_digit - len(_num_video)) * " ") + _num_video)
 	print("                  processed " + ((max_digit - len(_num_video_processed)) * " ") + _num_video_processed)
 	print("- Photos " + ((max_digit - len(_num_photo)) * " ") + _num_photo)

@@ -16,7 +16,7 @@ from datetime import datetime
 
 from PIL import Image
 
-from CachePath import remove_album_path, file_mtime, trim_base_custom, remove_folders_marker
+from CachePath import remove_album_path, file_mtime, last_modification_time, trim_base_custom, remove_folders_marker
 from Utilities import message, next_level, back_level, report_times
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from Geonames import Geonames
@@ -25,99 +25,135 @@ from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabet
 
 class TreeWalker:
 	def __init__(self):
-		random.seed()
-		geonames = Geonames()
-		self.all_json_files = ["options.json"]
-		self.all_json_files_by_subdir = {}
-
-		# be sure reduced_sizes array is correctly sorted
-		Options.config['reduced_sizes'].sort(reverse=True)
-
-		message("Browsing", "start!", 3)
-		self.all_albums = list()
-		self.tree_by_date = {}
-		self.tree_by_geonames = {}
-		self.tree_by_search = {}
-		self.media_with_geonames_list = list()
-		self.all_media = list()
-		self.all_album_composite_images = list()
-		self.album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
-		if os.path.exists(self.album_cache_path):
-			if not os.access(self.album_cache_path, os.W_OK):
-				message("FATAL ERROR", self.album_cache_path + " not writable, quitting")
-				sys.exit(-97)
+		# check whether the albums or the cache has been modified after the last run, actually comparing with options file modification time
+		# use the same method as in file_mtime:
+		# datetime.fromtimestamp(int(os.path.getmtime(path)))
+		last_album_modification_time = last_modification_time(Options.config['album_path'])
+		last_cache_modification_time = last_modification_time(Options.config['cache_path'])
+		# If the albums haven't been modified after the last run, we can avoid something
+		# No one is supposed to change the cache manually
+		if (
+			last_album_modification_time < last_cache_modification_time and
+			not Options.config['recreate_json_files'] and
+			not Options.config['recreate_reduced_photos'] and
+			not Options.config['recreate_thumbnails']
+		):
+			message("no albums modification, no refresh needed", "We can safely end here", 4)
 		else:
-			message("creating still unexistent album cache subdir", self.album_cache_path, 4)
-			os.makedirs(self.album_cache_path)
-			next_level()
-			message("created still unexistent subdir", "", 5)
-			back_level()
+			message("Browsing", "start!", 3)
 
-		self.origin_album = Album(Options.config['album_path'])
-		# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parente of the root physical tree and of the virtual albums
-		self.origin_album.cache_base = "root"
-		next_level()
-		[folders_album, num, _] = self.walk(Options.config['album_path'], Options.config['folders_string'], self.origin_album)
-		back_level()
-		if folders_album is None:
-			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
-		else:
-			message("saving all media json file...", "", 4)
-			next_level()
-			self.save_all_media_json()
-			back_level()
-			next_level()
-			message("all media json file saved", "", 5)
-			back_level()
+			random.seed()
+			self.all_json_files = ["options.json"]
+			self.all_json_files_by_subdir = {}
 
-			self.all_json_files.append("all_media.json")
+			# be sure reduced_sizes array is correctly sorted
+			Options.config['reduced_sizes'].sort(reverse=True)
 
-			folders_album.num_media_in_sub_tree = num
-			self.origin_album.add_album(folders_album)
-			self.all_json_files.append(Options.config['folders_string'] + ".json")
-
-			message("generating by date albums...", "", 4)
-			by_date_album = self.generate_date_albums(self.origin_album)
-			next_level()
-			message("by date albums generated", "", 5)
-			back_level()
-			if by_date_album is not None and not by_date_album.empty:
-				self.all_json_files.append(Options.config['by_date_string'] + ".json")
-				self.origin_album.add_album(by_date_album)
-
-			if self.tree_by_geonames:
-				message("generating by geonames albums...", "", 4)
-				by_geonames_album = self.generate_geonames_albums(self.origin_album)
+			geonames = Geonames()
+			self.all_albums = list()
+			self.tree_by_date = {}
+			self.tree_by_geonames = {}
+			self.tree_by_search = {}
+			self.media_with_geonames_list = list()
+			self.all_media = list()
+			self.all_album_composite_images = list()
+			self.album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
+			if os.path.exists(self.album_cache_path):
+				if not os.access(self.album_cache_path, os.W_OK):
+					message("FATAL ERROR", self.album_cache_path + " not writable, quitting")
+					sys.exit(-97)
+			else:
+				message("creating still unexistent album cache subdir", self.album_cache_path, 4)
+				os.makedirs(self.album_cache_path)
 				next_level()
-				message("by geonames albums generated", "", 5)
+				message("still unexistent subdir created", "", 5)
 				back_level()
-				if by_geonames_album is not None and not by_geonames_album.empty:
-					self.all_json_files.append(Options.config['by_gps_string'] + ".json")
-					self.origin_album.add_album(by_geonames_album)
 
-			message("generating by search albums...", "", 4)
-			by_search_album = self.generate_by_search_albums(self.origin_album)
+			self.origin_album = Album(Options.config['album_path'])
+			# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parent of the root physical tree and of the virtual albums
+			self.origin_album.cache_base = "root"
 			next_level()
-			message("by search albums generated", "", 5)
+			[folders_album, num, _] = self.walk(Options.config['album_path'], Options.config['folders_string'], self.origin_album)
 			back_level()
-			if by_search_album is not None and not by_search_album.empty:
-				self.all_json_files.append(Options.config['by_search_string'] + ".json")
-				self.origin_album.add_album(by_search_album)
+			if folders_album is None:
+				message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
+			else:
+				message("saving all media json file...", "", 4)
+				next_level()
+				self.save_all_media_json()
+				back_level()
+				next_level()
+				message("all media json file saved", "", 5)
+				back_level()
 
-			message("saving all albums to json files...", "", 4)
-			next_level()
-			for sub_album in self.origin_album.subalbums_list:
-				self.all_albums_to_json_file(sub_album)
-			message("all albums saved to json files", "", 5)
-			back_level()
-		# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
-		self._save_json_options()
-		self.remove_stale()
+				self.all_json_files.append("all_media.json")
+
+				folders_album.num_media_in_sub_tree = num
+				self.origin_album.add_album(folders_album)
+				self.all_json_files.append(Options.config['folders_string'] + ".json")
+
+				message("generating by date albums...", "", 4)
+				by_date_album = self.generate_date_albums(self.origin_album)
+				next_level()
+				message("by date albums generated", "", 5)
+				back_level()
+				if by_date_album is not None and not by_date_album.empty:
+					self.all_json_files.append(Options.config['by_date_string'] + ".json")
+					self.origin_album.add_album(by_date_album)
+
+				if self.tree_by_geonames:
+					message("generating by geonames albums...", "", 4)
+					by_geonames_album = self.generate_geonames_albums(self.origin_album)
+					next_level()
+					message("by geonames albums generated", "", 5)
+					back_level()
+					if by_geonames_album is not None and not by_geonames_album.empty:
+						self.all_json_files.append(Options.config['by_gps_string'] + ".json")
+						self.origin_album.add_album(by_geonames_album)
+
+				message("generating by search albums...", "", 4)
+				by_search_album = self.generate_by_search_albums(self.origin_album)
+				next_level()
+				message("by search albums generated", "", 5)
+				back_level()
+				if by_search_album is not None and not by_search_album.empty:
+					self.all_json_files.append(Options.config['by_search_string'] + ".json")
+					self.origin_album.add_album(by_search_album)
+
+				message("saving all albums to json files...", "", 4)
+				next_level()
+				try:
+					self.all_albums_to_json_file(folders_album, True, True)
+				except UnboundLocalError:
+					pass
+
+				try:
+					self.all_albums_to_json_file(by_date_album, True, True)
+				except UnboundLocalError:
+					pass
+				try:
+					self.all_albums_to_json_file(by_geonames_album, True, True)
+				except UnboundLocalError:
+					pass
+
+				# search albums in by_search_album has the normal albums as subalbums,
+				# and they are saved when folders_album is saved, avoid saving them multiple times
+				try:
+					self.all_albums_to_json_file(by_search_album, True, False)
+				except UnboundLocalError:
+					pass
+
+				message("all albums saved to json files", "", 5)
+				back_level()
+			# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
+			self._save_json_options()
+			self.remove_stale()
 		message("completed", "", 4)
 
-	def all_albums_to_json_file(self, album):
-		for sub_album in album.subalbums_list:
-			self.all_albums_to_json_file(sub_album)
+	def all_albums_to_json_file(self, album, save_subalbums, save_subsubalbums):
+		if save_subalbums:
+			for sub_album in album.subalbums_list:
+				self.all_albums_to_json_file(sub_album, save_subsubalbums, True)
 		album.to_json_file()
 
 	def generate_date_albums(self, origin_album):
@@ -295,28 +331,90 @@ class TreeWalker:
 					if len(media_list) > Options.config['big_virtual_folders_threshold']:
 						next_level()
 						K = 2
+						clustering_failed = False
+						# this array is used in order to detect when there is no convertion
+						max_cluster_length_list = [0, 0, 0]
 						message("big list found", str(len(media_list)) + " photos", 5)
 						next_level()
 						while True:
-							message("clustering with k-means algorithm...", "", 5)
+							message("clustering with k-means algorithm...", "K = " + str(K), 5)
 							cluster_list = Geonames.find_centers(media_list, K)
 							max_cluster_length = max([len(cluster) for cluster in cluster_list])
 							if max_cluster_length <= Options.config['big_virtual_folders_threshold']:
 								next_level()
-								message("clustered with k-means algorithm", "OK with K = " + str(K), 5)
+								message("clustered with k-means algorithm", "OK!", 5)
 								back_level()
 								break
+							# detect no convergence
+							max_cluster_length_list.append(max_cluster_length)
+							max_cluster_length_list.pop(0)
+							if max(max_cluster_length_list) > 0 and max(max_cluster_length_list) == min(max_cluster_length_list):
+								# three times the same value: no convergence
+								next_level()
+								message("clustering with k-means algorithm failed", "max cluster length doesn't converge, it's stuck at " + str(max_cluster_length), 5)
+								back_level()
+								clustering_failed = True
+								break
+
 							if K > len(media_list):
 								next_level()
-								message("clustered with k-means algorithm", "failed even with K = " + str(K) + ": clusters are too big (" + str(max_cluster_length) + " photos)", 5)
+								message("clustering with k-means algorithm failed", "clusters remain too big even with k > len(media_list)", 5)
 								back_level()
+								clustering_failed = true
 								break
 							next_level()
-							message("clustered with k-means algorithm", "not ok with K = " + str(K) + ": biggest cluster has " + str(max_cluster_length) + " photos", 5)
+							message("clustering with k-means algorithm not ok", "biggest cluster has " + str(max_cluster_length) + " photos", 5)
 							back_level()
 							K = K * 2
 						next_level()
-						message("clustering terminated", "clusters are " + str(len(cluster_list)), 5)
+						if clustering_failed:
+							# we must split the big clusters into smaller ones
+							# but firts sort media in cluster by date, so that we get more homogeneus clusters
+							message("splitting big clusters into smaller ones...", "", 5)
+							cluster_list_new = list()
+							n = 0
+							for cluster in cluster_list:
+								n += 1
+								next_level()
+								message("working with cluster...", "n." + str(n), 5)
+
+								integer_ratio = len(cluster) // Options.config['big_virtual_folders_threshold']
+								if integer_ratio >= 1:
+									# big cluster
+
+									# sort the cluster by date
+									next_level()
+									message("sorting cluster by date...", "", 5)
+									cluster.sort()
+									next_level()
+									message("cluster sorted by date", "", 5)
+									back_level()
+
+									message("splitting cluster...", "", 5)
+									new_length = len(cluster) // (integer_ratio + 1)
+									for index in range(integer_ratio):
+										start = index * new_length
+										end = (index + 1) * new_length
+										cluster_list_new.append(cluster[start:end])
+									# the remaining is still to be appended
+									cluster_list_new.append(cluster[end:])
+									next_level()
+									message("cluster splitted", "", 5)
+									back_level()
+									back_level()
+								else:
+									next_level()
+									message("cluster is OK", "", 5)
+									back_level()
+									cluster_list_new.append(cluster)
+								back_level()
+							cluster_list = cluster_list_new[:]
+							max_cluster_length = max([len(cluster) for cluster in cluster_list])
+							next_level()
+							message("big clusters splitted into smaller ones", "biggest cluster lenght is now " + str(max_cluster_length), 5)
+							back_level()
+
+						message("clustering terminated", "there are " + str(len(cluster_list)) + " clusters", 5)
 						back_level()
 						back_level()
 						back_level()
@@ -607,7 +705,17 @@ class TreeWalker:
 			json_file_mtime = file_mtime(json_file)
 		json_file_OK = False
 		album_ini_file = os.path.join(absolute_path, Options.config['metadata_filename'])
-		album_ini_OK = True
+		can_use_existing_json_file = True
+		album_ini_good = False
+		must_process_album_ini = False
+		if os.path.exists(album_ini_file):
+			if not os.access(album_ini_file, os.R_OK):
+				message("album.ini file unreadable", "", 2)
+			elif os.path.getsize(album_ini_file) == 0:
+				message("album.ini file has zero lenght", "", 2)
+			else:
+				album_ini_good = True
+
 		cached_album = None
 		json_message = json_file + " (path: " + os.path.basename(absolute_path) + ")"
 		if Options.config['recreate_json_files']:
@@ -620,17 +728,13 @@ class TreeWalker:
 					elif not os.access(json_file, os.W_OK):
 						message("json file unwritable", json_file, 1)
 					else:
-						if os.path.exists(album_ini_file):
-							if not os.access(album_ini_file, os.R_OK):
-								message("album.ini file unreadable", "", 2)
-								album_ini_OK = False
-							else:
-								if file_mtime(album_ini_file) > json_file_mtime:
-									# a check on album_ini_file would be necessary too
-									# execution comes here even if album.ini hasn't anything significant
-									message("album.ini newer than json file", "recreating json file taking into account album.ini", 4)
-									album_ini_OK = False
-						if album_ini_OK:
+						if album_ini_good and file_mtime(album_ini_file) > json_file_mtime:
+							# a check on album_ini_file content would have been good:
+							# execution comes here even if album.ini hasn't anything significant
+							message("album.ini newer than json file", "recreating json file taking into account album.ini", 4)
+							can_use_existing_json_file = False
+							must_process_album_ini = True
+						if can_use_existing_json_file:
 							message("reading json file to import album...", json_file, 5)
 							# the following is the instruction which could raise the error
 							cached_album = Album.from_cache(json_file, album_cache_base)
@@ -656,6 +760,7 @@ class TreeWalker:
 										if media.has_gps_data:
 											self.add_media_to_tree_by_geonames(media)
 										self.add_media_to_tree_by_search(media)
+
 										self.all_media.append(media)
 								next_level()
 								message("added media to big lists", "", 5)
@@ -665,6 +770,8 @@ class TreeWalker:
 								message("json file invalid (old or invalid path)", "", 4)
 								back_level()
 								cached_album = None
+				else:
+					must_process_album_ini = True
 			except KeyboardInterrupt:
 				raise
 			except IOError:
@@ -686,7 +793,13 @@ class TreeWalker:
 			next_level()
 			message("album generated", "", 5)
 			back_level()
-		album.read_album_ini()
+
+		if album_ini_good:
+			if not must_process_album_ini:
+				message("album.ini values already in json file", "", 2)
+			else:
+				album.read_album_ini(album_ini_file)
+
 		if parent_album is not None:
 			album.parent = parent_album
 		album.cache_base = album_cache_base

@@ -1,4 +1,4 @@
-### version 3.4
+### version 3.4beta10 (May 22, 2018)
 
 * moved scripts into bin directory. Create `scanner` as a link to `main.py`. Added `make_album_ini.sh`to create a default `album.ini` file in a directory.
 * add options `social`, `social_size` and `social_color` for tuning display of social icons.
@@ -21,14 +21,19 @@
   * new option `max_search_album_number`: the maximum number of search album that will be loaded
   * new option `use_stop_words`: whether to use stop words when generating the search albums
 * removed `server_album_path` option and hard code it to `albums`
-* force user to set `respected_processors` option, in order to avoid problems in servers
+* removed options `respected_processors` and substituded by `num_processors` option, defaults to 1: better for the user, does not oblige to set the value
 * reorganization of documentation:
   * creation of `doc` and `doc/img` folders
   * `README.md` split into individual files
   * explained how to use advanced features like geonames or face detection
   * created a gallery of screenshots
-* Reduced images and thumbnail naming schema is now more robust
+* reduced images and thumbnail naming schema is now more robust
   * cache files names are now made of only lower case ascii characters
+* now photo metadata are read with three tools:
+  * `Pillow's \_getexif()`, heritage of photofloat: good, but doesn't read the metadata of some old image
+  * `exifread`: good tool, but crashes with some image which has exif data corrupted
+  * `pyexiftool`, an `exiftool` wrapper: the most affordable, but the slowest
+  The preference order for the tools is managed by the new option `metadata_tools_preference`
 
 ### version 3.3 (January 22, 2018)
 

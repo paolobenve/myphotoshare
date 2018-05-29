@@ -37,20 +37,6 @@ album_path =
 # WARNING: javascript code will always use 'cache' subfolder of web site, so assure yourself that this folder corresponds to or is moved to the correct web site path
 cache_path =
 
-##########################################################
-###########################################################
-# YOU MUST SET THIS OPTION TOO
-# It's not set here because it may produces problems on servers
-###########################################################
-##########################################################
-
-# How many processors shouldn't be used when converting media?
-# - on desktop computers 1 is probably ok, because the computer isn't supposed to perform important tasks
-# - on servers, set it to the cores number minus something,
-#   so that MyPhotoShare does not steal precious resources to normal server activity
-respected_processors = 
-
-
 
 ##########################################################
 ##########################################################
@@ -159,6 +145,26 @@ max_album_share_thumbnails_number = 16
 # should stop words be used?
 # for a small set of media/albums it's not needed, while perhaps it's necessary if working with many media
 use_stop_words = true
+
+# What prefence order do you want for the metadata extractors?
+# The first tool will be used, the second will be used in case of no success, and so on
+# Available tools are 'PIL', 'exifread', 'exiftool'
+# - exiftool is the most affordable, but the slowest
+# - exifread sometimes crashes if the metadata are corrupted
+# - PIL doesn't find the metadata on some old image
+# If you don't worry with execution time you can let this option to ['exiftool', 'exifread', 'PIL']
+# If you prefer shorter execution times set it to ['PIL', 'exifread', 'exiftool']
+# The default is the best in term of affordability
+metadata_tools_preference = ['exiftool', 'exifread', 'PIL']
+
+
+# How many processors should be used when converting videos? 1 is always a safe value, but you could need more power:
+# - on desktop computers the number of core minus 1 is probably ok, because the computer isn't supposed to perform important tasks
+# - on servers, set it to a value which leave to the current tasks the cores they need,
+#   so that MyPhotoShare does not steal precious resources to normal server activity;
+#   e.g., with 8 cores, you could set it to 4 or 2
+num_processors = 1
+
 
 ###########################################################
 # scanner and ui options

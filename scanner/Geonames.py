@@ -39,7 +39,7 @@ class Geonames(object):
 	def __init__(self):
 		if Options.config['get_geonames_online']:
 			Geonames._base_nearby_url = "{}findNearbyJSON?lat={{}}&lng={{}}&featureClass=P&username={}&lang={}".format(self.GEONAMES_API, Options.config['geonames_user'], Options.config['geonames_language'])
-		elif self.cities == []:
+		if self.cities == []:
 			next_level()
 			message("reading and processing local geonames files", "", 5)
 			territories_file = os.path.join(os.path.dirname(__file__), 'geonames/territories.json')
@@ -89,7 +89,7 @@ class Geonames(object):
 
 		next_level()
 		message("looking for geonames in cache...", "", 5)
-		for _ in range(len(Geonames.geonames_cache) -1, -1, -1):
+		for _ in range(len(Geonames.geonames_cache) - 1, -1, -1):
 			((c_latitude, c_longitude), result) = Geonames.geonames_cache[_]
 			distance = Geonames._distance_between_coordinates(c_latitude, c_longitude, latitude, longitude)
 			if distance < Geonames.MAX_DISTANCE_METERS:

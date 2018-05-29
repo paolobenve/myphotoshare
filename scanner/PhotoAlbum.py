@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, division
 
 # gps code got from https://gist.github.com/erans/983821
 
 import locale
-locale.setlocale(locale.LC_ALL, '')
-
 import json
 import os
 import os.path
@@ -14,14 +13,11 @@ import unicodedata
 import sys
 from datetime import datetime
 from pprint import pprint
-import pprint
 
 try:
 	import cv2
 except:
 	pass
-
-
 
 # @python2
 try:
@@ -35,6 +31,7 @@ except ImportError:
 
 import math
 import numpy as np
+import exifread
 
 from CachePath import remove_album_path, remove_folders_marker, trim_base_custom, checksum, thumbnail_types_and_sizes, file_mtime, photo_cache_name, video_cache_name
 from Utilities import message, next_level, back_level
@@ -44,6 +41,14 @@ from PIL.ExifTags import TAGS, GPSTAGS
 from VideoToolWrapper import VideoProbeWrapper, VideoTranscodeWrapper
 import Options
 from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabetic_characters, remove_all_but_alphanumeric_chars_dashes_slashes_dots, switch_to_lowercase
+# WARNING: pyexiftool has been modified, do not overwrite with new versions unless you know what you are doing
+import PyExifTool
+# this is needed in order to avoid complains from exifread
+import logging
+
+locale.setlocale(locale.LC_ALL, '')
+# this is needed in order to avoid complains from exifread
+logging.basicConfig()
 
 class Album(object):
 	#~ def __init__(self, path, path_has_folder_marker):
@@ -172,18 +177,25 @@ class Album(object):
 			return True
 
 
-	def read_album_ini(self):
+	def read_album_ini(self, file_name):
 		"""Read the 'album.ini' file in the directory 'self.absolute_path' to
 		get user defined metadata for the album and pictures.
 		"""
 		self.album_ini = configparser.ConfigParser(allow_no_value=True)
 		message("reading album.ini...", "", 5)
-		self.album_ini.read(os.path.join(self.absolute_path, Options.config['metadata_filename']))
+		self.album_ini.read(file_name)
 		next_level()
-		message("album.ini read", os.path.join(self.absolute_path, Options.config['metadata_filename']), 5)
+		message("album.ini read", file_name, 5)
 		back_level()
 
+		next_level()
+		message("adding album.ini metadata values to album...", "", 5)
 		Metadata.set_metadata_from_album_ini("album", self._attributes, self.album_ini)
+		next_level()
+		message("metadata values from album.ini added to album...", "", 5)
+		back_level()
+		back_level()
+
 
 
 	def add_media(self, media):
@@ -219,16 +231,16 @@ class Album(object):
 		if os.path.exists(json_file_with_path) and not os.access(json_file_with_path, os.W_OK):
 			message("FATAL ERROR", json_file_with_path + " not writable, quitting", 0)
 			sys.exit(-97)
-		message("sorting album...", "", 5)
+		message("sorting album...", self.absolute_path, 5)
 		self.sort_subalbums_and_media()
 		next_level()
-		message("album sorted", self.absolute_path, 4)
+		message("album sorted", "", 4)
 		back_level()
 		message("saving album...", "", 5)
 		with open(json_file_with_path, 'w') as filepath:
 			json.dump(self, filepath, cls=PhotoAlbumEncoder)
 		next_level()
-		message("album saved", json_file_with_path, 3)
+		message("album saved", "", 3)
 		back_level()
 
 	@staticmethod
@@ -436,6 +448,7 @@ class Album(object):
 class Media(object):
 	def __init__(self, album, media_path, thumbs_path=None, attributes=None):
 		self.album = album
+		self.media_path = media_path
 		self.media_file_name = remove_album_path(media_path)
 		dirname = os.path.dirname(media_path)
 		self.folders = remove_album_path(dirname)
@@ -555,59 +568,96 @@ class Media(object):
 
 
 	def _photo_metadata(self, image):
-		next_level()
-		message("extracting metadata...", "", 5)
+
 		self._attributes["metadata"]["size"] = image.size
 		self._orientation = 1
-		try:
-			info = image._getexif()
-		except KeyboardInterrupt:
-			raise
-		except:
-			next_level()
-			message("unknown error extracting metadata", "", 5)
-			back_level()
-			back_level()
-			return
 
-		if not info:
-			next_level()
-			message("empty metadata", "", 5)
-			back_level()
-			back_level()
-			return
+		# try:
+		# 	_exif_exiftool = self._photo_metadata_by_exiftool(image)
+		# 	print('exiftool')
+		# 	print(json.dumps(_exif_exiftool, indent = 2))
+		# except:
+		# 	pass
+		#
+		# try:
+		# 	print('exifread')
+		# 	_exif_exifread = self._photo_metadata_by_exifread(image)
+		# 	print(json.dumps(_exif_exifread, indent = 2))
+		# except:
+		# 	pass
+		#
+		#
+		# _exif_PIL = self._photo_metadata_by_PIL(image)
+		# print('PIL')
+		# _exif_PIL["MakerNote"] = ""
+		# print(json.dumps(_exif_PIL, indent = 2))
+
+		_exif = {}
+		used_tool = ""
+		previous = ''
+		for _tool in Options.config['metadata_tools_preference']:
+			try:
+				message("extracting metadata by "+ _tool + previous + "...", "", 5)
+				if _tool == 'exiftool':
+					_exif = self._photo_metadata_by_exiftool(image)
+				elif _tool == 'exifread':
+					_exif = self._photo_metadata_by_exifread(image)
+				elif _tool == 'PIL':
+					_exif = self._photo_metadata_by_PIL(image)
+
+				if _exif:
+					next_level()
+					message("metadata extracted by " + _tool, "", 5)
+					back_level()
+					used_tool = _tool
+					previous = ''
+					break
+				else:
+					previous = ', ' + _tool + ' -> {}'
+			except:
+				next_level()
+				message("UNMANAGED ERROR extracting metadata by " + _tool, "", 5)
+				back_level()
+
+		all_keys = list(_exif.keys())
 
 		exif = {}
-		for tag, value in list(info.items()):
-			decoded = TAGS.get(tag, tag)
-			if (isinstance(value, tuple) or isinstance(value, list)) and (isinstance(decoded, str) or isinstance(decoded, str)) and decoded.startswith("DateTime") and len(value) >= 1:
-				value = value[0]
-			if isinstance(value, str) or isinstance(value, str):
-				value = value.strip().partition("\x00")[0]
-				#~ # the following lines (commented out) seem unuseful
-				#~ if (isinstance(decoded, str) or isinstance(decoded, unicode)) and decoded.startswith("DateTime"):
-					#~ try:
-						#~ value = datetime.strptime(value, Options.exif_date_time_format)
-					#~ except KeyboardInterrupt:
-						#~ raise
-					#~ except ValueError:
-						#~ pass
+		for key in all_keys:
+			if isinstance(key, int):
+				# integer keys aren't anyway useful
+				continue
+			# skip unuseful tags
+			if all(key[0:len(prefix)] != prefix for prefix in ['ExifInteroperabilityOffset', 'ExifTool:ExifToolVersion', 'Interoperability', 'MakerNote', 'Tag ', 'Thumbnail', 'Unknown']):
+				exif[key] = _exif[key]
 
-			if decoded == "GPSInfo":
-				gps_data = {}
-				for gps_tag in value:
-					sub_decoded = GPSTAGS.get(gps_tag, gps_tag)
-					gps_data[sub_decoded] = value[gps_tag]
-					exif[decoded] = gps_data
-			else:
-				exif[decoded] = value
+		if exif:
+			message("setting metadata extracted with " + used_tool, "", 5)
+			self._set_photo_metadata(exif)
+			next_level()
+			message("metadata set!", "", 5)
+			back_level()
 
+	def _set_photo_metadata(self, exif):
 		if "Orientation" in exif:
-			self._orientation = exif["Orientation"]
-			if self._orientation in range(5, 9):
+
+			if exif["Orientation"] not in [1, 2, 3, 4, 5, 6, 7, 8]:
+				# since we are using internally the numeric (1-8) orientation value, exifread text value must be reverse-numerized
+				try:
+					exif["Orientation"] = self._photo_metadata.reverse_orientation_dict_for_exifread[exif["Orientation"]]
+				except KeyError:
+					# I've found some image having as Orientation code a localized string...
+					# I can't find anything better than setting orientation to normal
+					exif["Orientation"] = 1
+
+			if exif["Orientation"] in [5, 6, 7, 8]:
 				self._attributes["metadata"]["size"] = (self._attributes["metadata"]["size"][1], self._attributes["metadata"]["size"][0])
-			if self._orientation - 1 < len(self._photo_metadata.orientation_list):
-				self._attributes["metadata"]["orientation"] = self._photo_metadata.orientation_list[self._orientation - 1]
+			self._attributes["metadata"]["orientation"] = exif["Orientation"]
+			if exif["Orientation"] - 1 < len(self._photo_metadata.orientation_list):
+				self._attributes["metadata"]["orientationText"] = self._photo_metadata.orientation_list[exif["Orientation"] - 1]
+
+			# this property will be used in self._photo_thumbnails() in order to properly transpore the image
+			self._orientation = exif["Orientation"]
+
 		if "Make" in exif:
 			self._attributes["metadata"]["make"] = exif["Make"]
 		if "Model" in exif:
@@ -620,85 +670,164 @@ class Media(object):
 			self._attributes["metadata"]["focalLength"] = exif["FocalLength"]
 		if "ISOSpeedRatings" in exif:
 			self._attributes["metadata"]["iso"] = exif["ISOSpeedRatings"]
-		if "ISO" in exif:
-			self._attributes["metadata"]["iso"] = exif["ISO"]
+		if "MakerNote ISO" in exif:
+			self._attributes["metadata"]["iso"] = exif["MakerNote ISO"]
 		if "PhotographicSensitivity" in exif:
 			self._attributes["metadata"]["iso"] = exif["PhotographicSensitivity"]
 		if "ExposureTime" in exif:
 			self._attributes["metadata"]["exposureTime"] = exif["ExposureTime"]
-		if "Flash" in exif and exif["Flash"] in self._photo_metadata.flash_dictionary:
-			try:
-				self._attributes["metadata"]["flash"] = self._photo_metadata.flash_dictionary[exif["Flash"]]
-			except KeyboardInterrupt:
-				raise
-			#~ except:
-				#~ pass
-		if "LightSource" in exif and exif["LightSource"] in self._photo_metadata.light_source_dictionary:
-			try:
-				self._attributes["metadata"]["lightSource"] = self._photo_metadata.light_source_dictionary[exif["LightSource"]]
-			except KeyboardInterrupt:
-				raise
-			#~ except:
-				#~ pass
-		if "ExposureProgram" in exif and exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
-			self._attributes["metadata"]["exposureProgram"] = self._photo_metadata.exposure_list[exif["ExposureProgram"]]
+		if "Flash" in exif:
+			self._attributes["metadata"]["flash"] = exif["Flash"]
+		if "LightSource" in exif:
+			self._attributes["metadata"]["lightSource"] = exif["LightSource"]
+		if "ExposureProgram" in exif:
+			self._attributes["metadata"]["exposureProgram"] = exif["ExposureProgram"]
 		if "SpectralSensitivity" in exif:
 			self._attributes["metadata"]["spectralSensitivity"] = exif["SpectralSensitivity"]
-		if "MeteringMode" in exif and exif["MeteringMode"] < len(self._photo_metadata.metering_list):
-			self._attributes["metadata"]["meteringMode"] = self._photo_metadata.metering_list[exif["MeteringMode"]]
-		if "SensingMethod" in exif and exif["SensingMethod"] < len(self._photo_metadata.sensing_method_list):
-			self._attributes["metadata"]["sensingMethod"] = self._photo_metadata.sensing_method_list[exif["SensingMethod"]]
-		if "SceneCaptureType" in exif and exif["SceneCaptureType"] < len(self._photo_metadata.scene_capture_type_list):
-			self._attributes["metadata"]["sceneCaptureType"] = self._photo_metadata.scene_capture_type_list[exif["SceneCaptureType"]]
-		if "SubjectDistanceRange" in exif and exif["SubjectDistanceRange"] < len(self._photo_metadata.subject_distance_range_list):
-			self._attributes["metadata"]["subjectDistanceRange"] = self._photo_metadata.subject_distance_range_list[exif["SubjectDistanceRange"]]
+		if "MeteringMode" in exif:
+			self._attributes["metadata"]["meteringMode"] = exif["MeteringMode"]
+		if "SensingMethod" in exif:
+			self._attributes["metadata"]["sensingMethod"] = exif["SensingMethod"]
+		if "SceneCaptureType" in exif:
+			self._attributes["metadata"]["sceneCaptureType"] = exif["SceneCaptureType"]
+		if "SubjectDistanceRange" in exif:
+			self._attributes["metadata"]["subjectDistanceRange"] = exif["SubjectDistanceRange"]
 		if "ExposureCompensation" in exif:
 			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureCompensation"]
 		if "ExposureBiasValue" in exif:
 			self._attributes["metadata"]["exposureCompensation"] = exif["ExposureBiasValue"]
+
 		if "DateTimeOriginal" in exif:
 			try:
 				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTimeOriginal"], Options.exif_date_time_format)
-			except KeyboardInterrupt:
-				raise
 			except ValueError:
-				# value isn't usable, forget it
-				pass
-		elif "DateTime" in exif:
-			try:
-				self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], Options.exif_date_time_format)
-			except KeyboardInterrupt:
-				raise
-			except ValueError:
-				# value isn't usable, forget it
-				pass
+				if "DateTimeDigitized" in exif:
+					try:
+						self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTimeDigitized"], Options.exif_date_time_format)
+					except ValueError:
+						# value isn't usable, forget it
+						if "DateTime" in exif:
+							try:
+								self._attributes["metadata"]["dateTime"] = datetime.strptime(exif["DateTime"], Options.exif_date_time_format)
+							except ValueError:
+								# value isn't usable, forget it
+								pass
 
+		gps_altitude = None
+		if "GPSAltitude" in exif:
+			gps_altitude = exif["GPSAltitude"]
+		gps_altitude_ref = None
+		if "GPSAltitudeRef" in exif:
+			gps_altitude_ref = exif["GPSAltitudeRef"]
 		gps_latitude = None
+		if "GPSLatitude" in exif:
+			gps_latitude = exif["GPSLatitude"]
 		gps_latitude_ref = None
+		if "GPSLatitudeRef" in exif:
+			gps_latitude_ref = exif["GPSLatitudeRef"]
 		gps_longitude = None
+		if "GPSLongitude" in exif:
+			gps_longitude = exif["GPSLongitude"]
 		gps_longitude_ref = None
-		if "GPSInfo" in exif:
-			gps_latitude = exif["GPSInfo"].get("GPSLatitude", None)
-			gps_latitude_ref = exif["GPSInfo"].get("GPSLatitudeRef", None)
-			gps_longitude = exif["GPSInfo"].get("GPSLongitude", None)
-			gps_longitude_ref = exif["GPSInfo"].get("GPSLongitudeRef", None)
+		if "GPSLongitudeRef" in exif:
+			gps_longitude_ref = exif["GPSLongitudeRef"]
 
 		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
-			self._attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
-			self._attributes["metadata"]["latitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
-			self._attributes["metadata"]["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
-			self._attributes["metadata"]["longitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["altitude"] = gps_altitude
+			self._attributes["metadata"]["altitudeRef"] = gps_altitude_ref
+			self._attributes["metadata"]["latitude"] = gps_latitude
+			# self._attributes["metadata"]["latitude"] = Metadata.convert_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["latitudeMS"] = Metadata.convert_decimal_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+			self._attributes["metadata"]["longitude"] = gps_longitude
+			# self._attributes["metadata"]["longitude"] = Metadata.convert_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+			self._attributes["metadata"]["longitudeMS"] = Metadata.convert_decimal_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
 
 		# Overwrite with album.ini values when it has been read from file
 		if self.album.album_ini:
+			next_level()
+			message("adding album.ini metadata values to photo...", "", 5)
 			Metadata.set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+			next_level()
+			message("metadata values from album.ini added to photo...", "", 5)
+			back_level()
+			back_level()
 
-		next_level()
-		message("extracted", "", 5)
-		back_level()
-		back_level()
+		# pprint(self._attributes)
 
 
+	def _photo_metadata_by_PIL(self, image):
+		try:
+			info = image._getexif()
+		except KeyboardInterrupt:
+			raise
+		except AttributeError:
+			next_level()
+			message("AttributeError extracting metadata", "", 5)
+			back_level()
+			return {}
+
+		if not info:
+			next_level()
+			message("empty metadata", "", 5)
+			back_level()
+			return {}
+
+		_exif = {}
+		exif = {}
+		for tag, value in list(info.items()):
+			decoded = TAGS.get(tag, tag)
+			if (isinstance(value, tuple) or isinstance(value, list)) and (isinstance(decoded, str) or isinstance(decoded, str)) and decoded.startswith("DateTime") and len(value) >= 1:
+				value = value[0]
+			elif isinstance(value, tuple):
+				value = value[0] / value[1]
+
+			if decoded == "GPSInfo":
+				gps_data = {}
+				for gps_tag in value:
+					sub_decoded = GPSTAGS.get(gps_tag, gps_tag)
+					gps_data[sub_decoded] = value[gps_tag]
+					_exif[decoded] = gps_data
+
+
+				exif['GPSAltitude'] = _exif['GPSAltitude']
+				exif['GPSAltitudeRef'] = _exif['GPSAltitudeRef']
+				gps_latitude = None
+				gps_latitude_ref = None
+				gps_longitude = None
+				gps_longitude_ref = None
+				gps_latitude = _exif["GPSInfo"].get("GPSLatitude", None)
+				gps_latitude_ref = _exif["GPSInfo"].get("GPSLatitudeRef", None)
+				gps_longitude = _exif["GPSInfo"].get("GPSLongitude", None)
+				gps_longitude_ref = _exif["GPSInfo"].get("GPSLongitudeRef", None)
+
+				if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
+					exif["GPSLatitude"] = Metadata.convert_tuple_to_degrees_decimal(gps_latitude, gps_latitude_ref)
+					exif["GPSLatitudeRef"] = gps_latitude_ref
+					# exif["GPSLatitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_latitude, gps_latitude_ref)
+					exif["GPSLongitude"] = Metadata.convert_tuple_to_degrees_decimal(gps_longitude, gps_longitude_ref)
+					exif["GPSLongitudeRef"] = gps_longitude_ref
+					# exif["GPSLongitudeMS"] = Metadata.convert_to_degrees_minutes_seconds(gps_longitude, gps_longitude_ref)
+			else:
+				_exif[decoded] = value
+				exif[decoded] = _exif[decoded]
+				# if "Orientation" in _exif and _exif["Orientation"] - 1 < len(self._photo_metadata.orientation_list):
+				# 	exif["Orientation"] = self._photo_metadata.orientation_list[_exif["Orientation"] - 1]
+				if "ExposureProgram" in _exif and _exif["ExposureProgram"] < len(self._photo_metadata.exposure_list):
+					exif["ExposureProgram"] = self._photo_metadata.exposure_list[_exif["ExposureProgram"]]
+				if "SpectralSensitivity" in _exif:
+					exif["SpectralSensitivity"] = _exif["SpectralSensitivity"]
+				if "MeteringMode" in _exif and _exif["MeteringMode"] < len(self._photo_metadata.metering_list):
+					exif["MeteringMode"] = self._photo_metadata.metering_list[_exif["MeteringMode"]]
+				if "SensingMethod" in _exif and _exif["SensingMethod"] < len(self._photo_metadata.sensing_method_list):
+					exif["SensingMethod"] = self._photo_metadata.sensing_method_list[_exif["SensingMethod"]]
+				if "SceneCaptureType" in _exif and _exif["SceneCaptureType"] < len(self._photo_metadata.scene_capture_type_list):
+					exif["SceneCaptureType"] = self._photo_metadata.scene_capture_type_list[_exif["SceneCaptureType"]]
+				if "SubjectDistanceRange" in _exif and _exif["SubjectDistanceRange"] < len(self._photo_metadata.subject_distance_range_list):
+					exif["SubjectDistanceRange"] = self._photo_metadata.subject_distance_range_list[_exif["SubjectDistanceRange"]]
+
+		# PIL returns the keys as 'AFAreaXPositions', i.e. it removes the prefix that exifread and pyexiftool leave
+
+		return exif
 
 	_photo_metadata.flash_dictionary = {0x0: "No Flash", 0x1: "Fired", 0x5: "Fired, Return not detected", 0x7: "Fired, Return detected",
 		0x8: "On, Did not fire", 0x9: "On, Fired", 0xd: "On, Return not detected", 0xf: "On, Return detected", 0x10: "Off, Did not fire",
@@ -715,6 +844,59 @@ class Media(object):
 	_photo_metadata.sensing_method_list = ["Not defined", "One-chip color area sensor", "Two-chip color area sensor", "Three-chip color area sensor", "Color sequential area sensor", "Trilinear sensor", "Color sequential linear sensor"]
 	_photo_metadata.scene_capture_type_list = ["Standard", "Landscape", "Portrait", "Night scene"]
 	_photo_metadata.subject_distance_range_list = ["Unknown", "Macro", "Close view", "Distant view"]
+	_photo_metadata.reverse_orientation_dict_for_exifread = {'Horizontal (normal)': 1, 'Mirrored horizontal': 2, 'Rotated 180': 3, 'Mirrored vertical': 4, 'Mirrored horizontal then rotated 90 CCW': 5, 'Rotated 90 CW': 6, 'Mirrored horizontal then rotated 90 CW': 7, 'Rotated 90 CCW': 8}
+
+
+	def _photo_metadata_by_exiftool(self, image):
+		exif = {}
+		with PyExifTool.ExifTool() as et:
+			exif_all_tags_codes = et.get_metadata_codes(self.media_path)
+			exif_all_tags_values = et.get_metadata_values(self.media_path)
+
+		# pyexiftool has been set to return the keys without any prefix
+
+		for k in sorted(exif_all_tags_values.keys()):
+			if k in ['GPSAltitude', 'GPSAltitudeRef', 'GPSLatitude', 'GPSLatitudeRef', 'GPSLongitude', 'GPSLongitudeRef', 'Orientation']:
+				# The output of "exiftool -n" for gps isn't easy to manage, better use the "raw" value
+				exif[k] = exif_all_tags_codes[k]
+			else:
+				exif[k] = exif_all_tags_values[k]
+
+		return exif
+
+	def _photo_metadata_by_exifread(self, image):
+		exif = {}
+		with open(self.media_path, 'rb') as f:
+			exif_all_tags = exifread.process_file(f)
+		# exifread returns the keys as 'MakerNotes AFAreaXPositions'
+
+		for k in sorted(exif_all_tags.keys()):
+			# if k not in ['JPEGThumbnail', 'TIFFThumbnail', 'Filename', 'EXIF MakerNote']:
+			if k not in ['JPEGThumbnail', 'TIFFThumbnail'] and k[0:10] != 'Thumbnail ':
+				# remove the first word in the key, so that the key has no prefix as with PIL
+				k_modified = unicode(k)
+				for prefix in ['EXIF ', 'GPS ', 'Image ', 'Interoperability ', 'MakerNote ']:
+					if k[0:len(prefix)] == prefix:
+						k_modified = unicode(k[len(prefix):])
+						break
+				try:
+					exif[k_modified] = unicode(exif_all_tags[k])
+					# exifread returs some value as a fraction, convert it to a float
+					position = exif[k_modified].find('/')
+					if position > -1:
+						first = exif[k_modified][0:position]
+						second = exif[k_modified][position + 1:]
+						if (first.isdigit() and second.isdigit()):
+							exif[k_modified] = int(first) / int(second)
+				except TypeError:
+					# TO DO: some value doesn't permit translation to string
+					pass
+
+				if k_modified in ('GPSLatitude', 'GPSLongitude'):
+					# exifread returns this values like u'[44, 25, 26495533/1000000]'
+					exif[k_modified] = convert_array_degrees_minutes_seconds_to_degrees_decimal(exif[k_modified])
+
+		return exif
 
 
 	def _video_metadata(self, path, original=True):
@@ -744,7 +926,14 @@ class Media(object):
 
 		# Video should also contain metadata like GPS information, at least in QuickTime and MP4 files...
 		if self.album.album_ini:
+			next_level()
+			message("adding album.ini metadata values to video...", "", 5)
 			Metadata.set_metadata_from_album_ini(self.name, self._attributes, self.album.album_ini)
+			next_level()
+			message("metadata values from album.ini added to video...", "", 5)
+			back_level()
+			back_level()
+
 
 
 	def _photo_thumbnails(self, image, photo_path, thumbs_path):
@@ -935,8 +1124,13 @@ class Media(object):
 			message("reduction/thumbnail older than media date time", thumb_path, 5)
 		elif not json_file_exists:
 			message("unexistent json file", json_file, 5)
-		elif file_mtime(thumb_path) > file_mtime(json_file):
+		elif file_mtime(thumb_path) >= file_mtime(json_file):
 			message("reduction/thumbnail newer than json file", thumb_path + ", " + json_file, 5)
+		elif not (
+			not _is_thumbnail and not Options.config['recreate_reduced_photos'] or
+			_is_thumbnail and not Options.config['recreate_thumbnails']
+		):
+			message("some option change requests recreation", "", 5)
 		back_level()
 
 		original_thumb_size = actual_thumb_size
@@ -970,7 +1164,7 @@ class Media(object):
 					width_for_detecting = start_image_width
 					height_for_detecting = start_image_height
 					if min(start_image_width, start_image_height) > smaller_size:
-						longer_size = int(smaller_size / min(start_image_width, start_image_height) * max(start_image_width, start_image_height))
+						longer_size = int(smaller_size * max(start_image_width, start_image_height) / min(start_image_width, start_image_height))
 						width_for_detecting = smaller_size if start_image_width < start_image_height else longer_size
 						height_for_detecting = longer_size if start_image_width < start_image_height else smaller_size
 						sizes_change = "from " + str(start_image_width) + "x" + str(start_image_height) + " to " + str(width_for_detecting) + "x" + str(height_for_detecting)
@@ -1239,7 +1433,7 @@ class Media(object):
 			if original_thumb_size > Options.config['album_thumb_size']:
 				message("reduced size image saved ", "", 4)
 			elif original_thumb_size == Options.config['album_thumb_size']:
-				message("album thumbnail salved", "", 4)
+				message("album thumbnail saved", "", 4)
 			else:
 				message("media thumbnail saved", "", 4)
 			back_level()
@@ -1357,12 +1551,11 @@ class Media(object):
 			message("creating still unexistent album cache subdir", "", 5)
 			os.makedirs(album_cache_path)
 			next_level()
-			message("created still unexistent subdir", album_cache_path, 4)
+			message("still unexistent subdir created", album_cache_path, 4)
 			back_level()
 
 		transcode_path = os.path.join(album_cache_path, album_prefix + video_cache_name(self))
 		# get number of cores on the system, and use all minus one
-		num_of_cores = os.sysconf('SC_NPROCESSORS_ONLN') - Options.config['respected_processors']
 		transcode_cmd = [
 			'-i', original_path,					# original file to be encoded
 			'-c:v', 'libx264',					# set h264 as videocodec
@@ -1378,7 +1571,7 @@ class Media(object):
 			'-maxrate', '10000000',					# limits max rate, will degrade CRF if needed
 			'-bufsize', '10000000',					# define how much the client should buffer
 			'-f', 'mp4',						# fileformat mp4
-			'-threads', str(num_of_cores),				# number of cores (all minus respected_processors)
+			'-threads', str(Options.config['num_processors']),				# number of cores to use
 			'-loglevel', 'quiet',					# don't display anything
 			'-y' 							# don't prompt for overwrite
 		]
@@ -1412,6 +1605,8 @@ class Media(object):
 		message("transcoding...", info_string, 5)
 		tmp_transcode_cmd = transcode_cmd[:]
 		transcode_cmd.append(transcode_path)
+		# avoid ffmpeg/avconv stopping if the scanner is running interactively
+		transcode_cmd.append('< /dev/null')
 		try:
 			return_code = VideoTranscodeWrapper().call(*transcode_cmd)
 			if return_code != False:
@@ -1749,8 +1944,6 @@ class Metadata(object):
 		"""
 
 		# Initialize with album.ini defaults
-		next_level()
-		message("adding album.ini metadata values to albums...", "", 5)
 
 		# With Python2, section names are string. As we retrieve file names as unicode,
 		# we can't find them in the ConfigParser dictionary
@@ -1839,11 +2032,6 @@ class Metadata(object):
 		elif "tags" in album_ini.defaults():
 			attributes["metadata"]["tags"] = [tag.strip() for tag in album_ini.defaults()["tags"].split(",")]
 
-		next_level()
-		message("album.ini metadata values added to albums", "", 5)
-		back_level()
-		back_level()
-
 
 	@staticmethod
 	def set_geoname_from_album_ini(name, attributes, album_ini):
@@ -1915,17 +2103,48 @@ class Metadata(object):
 		"""
 
 		# Degrees
-		d0 = value[0][0]
-		d1 = value[0][1]
-		d = int(float(d0) / float(d1))
+		d = value[0]
 		# Minutes
-		m0 = value[1][0]
-		m1 = value[1][1]
-		m = int(float(m0) / float(m1))
+		m = value[1]
 		# Seconds
-		s0 = value[2][0]
-		s1 = value[2][1]
-		s = int((float(s0) / float(s1)) * 1000) / 1000.0
+		s = int(value[2] * 1000) / 1000
+
+		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
+
+		return result
+
+	@staticmethod
+	def convert_decimal_to_degrees_minutes_seconds(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds.
+		"""
+
+		if value < 0:
+			value = - value
+
+		# Degrees
+		d = int(value)
+		# Minutes
+		m = int((value - d) * 60)
+		# Seconds
+		s = int((value - d - m / 60) * 3600 * 100) / 100
+
+		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
+
+		return result
+
+	@staticmethod
+	def convert_tuple_to_degrees_minutes_seconds(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees, minutes and seconds.
+		"""
+
+		# Degrees
+		d = value[0][0] / value[0][1]
+		# Minutes
+		m = value[1][0] / value[1][1]
+		# Seconds
+		s = int(value[2][0] / value[2][1] * 1000) / 1000
 
 		result = str(d) + "º " + str(m) + "' " + str(s) + '" ' + ref
 
@@ -1938,24 +2157,54 @@ class Metadata(object):
 		"""
 
 		# Degrees
-		d0 = value[0][0]
-		d1 = value[0][1]
-		d = float(d0) / float(d1)
+		d = float(value[0])
 		# Minutes
-		m0 = value[1][0]
-		m1 = value[1][1]
-		m = float(m0) / float(m1)
+		m = float(value[1])
 		# Seconds
-		s0 = value[2][0]
-		s1 = value[2][1]
-		s = float(s0) / float(s1)
+		s = float(value[2])
 
-		result = d + (m / 60.0) + (s / 3600.0)
+		result = d + (m / 60) + (s / 3600)
 
 		# limit decimal digits to what is needed by openstreetmap
-		six_zeros = 1000000.0
+		six_zeros = 1000000
 		result = int(result * six_zeros) / six_zeros
 		if ref == "S" or ref == "W":
 			result = - result
+
+		return result
+
+	@staticmethod
+	def convert_tuple_to_degrees_decimal(value, ref):
+		"""
+		Helper function to convert the GPS coordinates stored in the EXIF to degrees in float format.
+		"""
+
+		# Degrees
+		d = value[0][0] / value[0][1]
+		# Minutes
+		m = value[1][0] / value[1][1]
+		# Seconds
+		s = value[2][0] / value[2][1]
+
+		result = d + m / 60 + s / 3600
+
+		# limit decimal digits to what is needed by openstreetmap
+		six_zeros = 1000000
+		result = int(result * six_zeros) / six_zeros
+		if ref == "S" or ref == "W":
+			result = - result
+
+		return result
+
+
+	@staticmethod
+	def convert_array_degrees_minutes_seconds_to_degrees_decimal(array_string):
+		# the argument is like u'[44, 25, 26495533/1000000]'
+
+		array = array_string[1:-1].split(', ')
+		d = array[0]
+		m = array[1]
+		s = eval(array[2])
+		result = d + m / 60 + s / 3600
 
 		return result

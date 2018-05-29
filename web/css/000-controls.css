@@ -88,8 +88,8 @@ a.title-anchor.mobile {
 
 .album-button-and-caption {
 	float: left;
-	height: 200px;
-	width: 240px;
+	height: 250px;
+	width: 200px;
 }
 .album-button-and-caption.slide {
 	border: 3px solid gray;
@@ -123,6 +123,7 @@ a.title-anchor.mobile {
 	text-align: center;
 	opacity: 0.7;
 	filter: alpha(opacity=70); /* For IE8 and earlier */
+	font-size: 70%;
 }
 
 .album-caption-count.hidden {
@@ -437,6 +438,7 @@ video {
 	overflow: hidden;
 	padding: 0 .2em;
 	margin-bottom: .2em;
+	clear: both;
 }
 
 .media-caption.hidden, .album-caption.hidden {
