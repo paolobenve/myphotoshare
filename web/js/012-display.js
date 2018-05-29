@@ -1364,26 +1364,14 @@ $(document).ready(function() {
 
 									// check for overflow in album-caption class in order to adapt album caption height to the string length
 									// when diving into search subalbum, the whole album path is showed and it can be lengthy
-									while (true) {
-										overflow = false;
-										for (var indexSubalbums = 0; indexSubalbums < currentAlbum.subalbums.length; indexSubalbums ++) {
-											// element = $("#album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
-											element = document.getElementById("album-caption-" + PhotoFloat.hashCode(currentAlbum.subalbums[indexSubalbums].cacheBase));
-											if (element.scrollHeight > element.clientHeight) {
-												// the element have overflow
-												overflow = true;
-												difference = element.scrollHeight - element.clientHeight;
-												if (! Options.show_album_media_count)
-													difference += 10;
-												$(".album-caption").css("height", (parseInt($(".album-caption").css("height")) + difference) + 'px');
-												$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + difference) + 'px');
-												break;
-											}
-										}
-										if (! overflow)
-											break;
-									}
-
+									var maxHeight = null;
+									$('.album-caption').each(function() {
+										var thisHeight = $(this)[0].scrollHeight;
+										maxHeight = (thisHeight > maxHeight) ? thisHeight : maxHeight;
+									});
+									difference = maxHeight - parseFloat($(".album-caption").css("height"));
+									$(".album-caption").css("height", maxHeight + 'px');
+									$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + difference) + 'px');
 								}
 							}, function error() {
 								currentAlbum.subalbums.splice(currentAlbum.subalbums.indexOf(theSubalbum), 1);
