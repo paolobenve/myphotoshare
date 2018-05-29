@@ -16,7 +16,7 @@ from datetime import datetime
 
 from PIL import Image
 
-from CachePath import remove_album_path, file_mtime, trim_base_custom, remove_folders_marker
+from CachePath import remove_album_path, file_mtime, last_modification_time, trim_base_custom, remove_folders_marker
 from Utilities import message, next_level, back_level, report_times
 from PhotoAlbum import Media, Album, PhotoAlbumEncoder
 from Geonames import Geonames
@@ -25,111 +25,129 @@ from CachePath import convert_to_ascii_only, remove_accents, remove_non_alphabet
 
 class TreeWalker:
 	def __init__(self):
-		random.seed()
-		geonames = Geonames()
-		self.all_json_files = ["options.json"]
-		self.all_json_files_by_subdir = {}
-
-		# be sure reduced_sizes array is correctly sorted
-		Options.config['reduced_sizes'].sort(reverse=True)
-
-		message("Browsing", "start!", 3)
-		self.all_albums = list()
-		self.tree_by_date = {}
-		self.tree_by_geonames = {}
-		self.tree_by_search = {}
-		self.media_with_geonames_list = list()
-		self.all_media = list()
-		self.all_album_composite_images = list()
-		self.album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
-		if os.path.exists(self.album_cache_path):
-			if not os.access(self.album_cache_path, os.W_OK):
-				message("FATAL ERROR", self.album_cache_path + " not writable, quitting")
-				sys.exit(-97)
+		# check whether the albums or the cache has been modified after the last run, actually comparing with options file modification time
+		# use the same method as in file_mtime:
+		# datetime.fromtimestamp(int(os.path.getmtime(path)))
+		last_album_modification_time = last_modification_time(Options.config['album_path'])
+		last_cache_modification_time = last_modification_time(Options.config['cache_path'])
+		# If the albums haven't been modified after the last run, we can avoid something
+		# No one is supposed to change the cache manually
+		if (
+			last_album_modification_time < last_cache_modification_time and
+			not Options.config['recreate_json_files'] and
+			not Options.config['recreate_reduced_photos'] and
+			not Options.config['recreate_thumbnails']
+		):
+			message("no albums modification, no refresh needed", "We can safely end here", 4)
 		else:
-			message("creating still unexistent album cache subdir", self.album_cache_path, 4)
-			os.makedirs(self.album_cache_path)
-			next_level()
-			message("still unexistent subdir created", "", 5)
-			back_level()
+			message("Browsing", "start!", 3)
 
-		self.origin_album = Album(Options.config['album_path'])
-		# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parent of the root physical tree and of the virtual albums
-		self.origin_album.cache_base = "root"
-		next_level()
-		[folders_album, num, _] = self.walk(Options.config['album_path'], Options.config['folders_string'], self.origin_album)
-		back_level()
-		if folders_album is None:
-			message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
-		else:
-			message("saving all media json file...", "", 4)
-			next_level()
-			self.save_all_media_json()
-			back_level()
-			next_level()
-			message("all media json file saved", "", 5)
-			back_level()
+			random.seed()
+			self.all_json_files = ["options.json"]
+			self.all_json_files_by_subdir = {}
 
-			self.all_json_files.append("all_media.json")
+			# be sure reduced_sizes array is correctly sorted
+			Options.config['reduced_sizes'].sort(reverse=True)
 
-			folders_album.num_media_in_sub_tree = num
-			self.origin_album.add_album(folders_album)
-			self.all_json_files.append(Options.config['folders_string'] + ".json")
-
-			message("generating by date albums...", "", 4)
-			by_date_album = self.generate_date_albums(self.origin_album)
-			next_level()
-			message("by date albums generated", "", 5)
-			back_level()
-			if by_date_album is not None and not by_date_album.empty:
-				self.all_json_files.append(Options.config['by_date_string'] + ".json")
-				self.origin_album.add_album(by_date_album)
-
-			if self.tree_by_geonames:
-				message("generating by geonames albums...", "", 4)
-				by_geonames_album = self.generate_geonames_albums(self.origin_album)
+			geonames = Geonames()
+			self.all_albums = list()
+			self.tree_by_date = {}
+			self.tree_by_geonames = {}
+			self.tree_by_search = {}
+			self.media_with_geonames_list = list()
+			self.all_media = list()
+			self.all_album_composite_images = list()
+			self.album_cache_path = os.path.join(Options.config['cache_path'], Options.config['cache_album_subdir'])
+			if os.path.exists(self.album_cache_path):
+				if not os.access(self.album_cache_path, os.W_OK):
+					message("FATAL ERROR", self.album_cache_path + " not writable, quitting")
+					sys.exit(-97)
+			else:
+				message("creating still unexistent album cache subdir", self.album_cache_path, 4)
+				os.makedirs(self.album_cache_path)
 				next_level()
-				message("by geonames albums generated", "", 5)
+				message("still unexistent subdir created", "", 5)
 				back_level()
-				if by_geonames_album is not None and not by_geonames_album.empty:
-					self.all_json_files.append(Options.config['by_gps_string'] + ".json")
-					self.origin_album.add_album(by_geonames_album)
 
-			message("generating by search albums...", "", 4)
-			by_search_album = self.generate_by_search_albums(self.origin_album)
+			self.origin_album = Album(Options.config['album_path'])
+			# self.origin_album.read_album_ini() # origin_album is not a physical one, it's the parent of the root physical tree and of the virtual albums
+			self.origin_album.cache_base = "root"
 			next_level()
-			message("by search albums generated", "", 5)
+			[folders_album, num, _] = self.walk(Options.config['album_path'], Options.config['folders_string'], self.origin_album)
 			back_level()
-			if by_search_album is not None and not by_search_album.empty:
-				self.all_json_files.append(Options.config['by_search_string'] + ".json")
-				self.origin_album.add_album(by_search_album)
+			if folders_album is None:
+				message("WARNING", "ALBUMS ROOT EXCLUDED BY MARKER FILE", 2)
+			else:
+				message("saving all media json file...", "", 4)
+				next_level()
+				self.save_all_media_json()
+				back_level()
+				next_level()
+				message("all media json file saved", "", 5)
+				back_level()
 
-			message("saving all albums to json files...", "", 4)
-			next_level()
-			try:
-				self.all_albums_to_json_file(folders_album, True, True)
-			except UnboundLocalError:
-				pass
-			try:
-				self.all_albums_to_json_file(by_date_album, True, True)
-			except UnboundLocalError:
-				pass
-			try:
-				self.all_albums_to_json_file(by_geonames_album, True, True)
-			except UnboundLocalError:
-				pass
+				self.all_json_files.append("all_media.json")
 
-			# search albums in by_search_album has the normal albums as subalbums,
-			# and they are saved when folders_album is saved, avoid saving them multiple times
-			try:
-				self.all_albums_to_json_file(by_search_album, True, False)
-			except UnboundLocalError:
-				pass
-			message("all albums saved to json files", "", 5)
-			back_level()
-		# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
-		self._save_json_options()
-		self.remove_stale()
+				folders_album.num_media_in_sub_tree = num
+				self.origin_album.add_album(folders_album)
+				self.all_json_files.append(Options.config['folders_string'] + ".json")
+
+				message("generating by date albums...", "", 4)
+				by_date_album = self.generate_date_albums(self.origin_album)
+				next_level()
+				message("by date albums generated", "", 5)
+				back_level()
+				if by_date_album is not None and not by_date_album.empty:
+					self.all_json_files.append(Options.config['by_date_string'] + ".json")
+					self.origin_album.add_album(by_date_album)
+
+				if self.tree_by_geonames:
+					message("generating by geonames albums...", "", 4)
+					by_geonames_album = self.generate_geonames_albums(self.origin_album)
+					next_level()
+					message("by geonames albums generated", "", 5)
+					back_level()
+					if by_geonames_album is not None and not by_geonames_album.empty:
+						self.all_json_files.append(Options.config['by_gps_string'] + ".json")
+						self.origin_album.add_album(by_geonames_album)
+
+				message("generating by search albums...", "", 4)
+				by_search_album = self.generate_by_search_albums(self.origin_album)
+				next_level()
+				message("by search albums generated", "", 5)
+				back_level()
+				if by_search_album is not None and not by_search_album.empty:
+					self.all_json_files.append(Options.config['by_search_string'] + ".json")
+					self.origin_album.add_album(by_search_album)
+
+				message("saving all albums to json files...", "", 4)
+				next_level()
+				try:
+					self.all_albums_to_json_file(folders_album, True, True)
+				except UnboundLocalError:
+					pass
+
+				try:
+					self.all_albums_to_json_file(by_date_album, True, True)
+				except UnboundLocalError:
+					pass
+				try:
+					self.all_albums_to_json_file(by_geonames_album, True, True)
+				except UnboundLocalError:
+					pass
+
+				# search albums in by_search_album has the normal albums as subalbums,
+				# and they are saved when folders_album is saved, avoid saving them multiple times
+				try:
+					self.all_albums_to_json_file(by_search_album, True, False)
+				except UnboundLocalError:
+					pass
+
+				message("all albums saved to json files", "", 5)
+				back_level()
+			# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
+			self._save_json_options()
+			self.remove_stale()
 		message("completed", "", 4)
 
 	def all_albums_to_json_file(self, album, save_subalbums, save_subsubalbums):
@@ -742,6 +760,7 @@ class TreeWalker:
 										if media.has_gps_data:
 											self.add_media_to_tree_by_geonames(media)
 										self.add_media_to_tree_by_search(media)
+
 										self.all_media.append(media)
 								next_level()
 								message("added media to big lists", "", 5)

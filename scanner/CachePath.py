@@ -129,6 +129,9 @@ def video_cache_name(video):
 def file_mtime(path):
 	return datetime.fromtimestamp(int(os.path.getmtime(path)))
 
+def last_modification_time(path):
+	return datetime.fromtimestamp(int(max(os.path.getmtime(root) for root,_,_ in os.walk(path))))
+
 def checksum(path):
 	block_size = 65536
 	hasher = hashlib.md5()
