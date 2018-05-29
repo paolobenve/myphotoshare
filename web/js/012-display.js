@@ -1292,7 +1292,7 @@ $(document).ready(function() {
 						(function(theSubalbum, theImage, theLink) {
 							// function(subalbum, container, callback, error)  ---  callback(album,   album.media[index], container,            subalbum);
 							photoFloat.pickRandomMedia(theSubalbum, currentAlbum, function(randomAlbum, randomMedia, theOriginalAlbumContainer, subalbum) {
-								var htmlText, difference;
+								var htmlText, maxHeight, difference;
 								var titleName, link, goTo, humanGeonames;
 								var mediaSrc = chooseThumbnail(randomAlbum, randomMedia, Options.album_thumb_size);
 								var overflow;
@@ -1359,20 +1359,6 @@ $(document).ready(function() {
 									// now all the subalbums random thumbnails has been loaded
 									// we can run the function that prepare the stuffs for sharing
 									socialButtons();
-
-									$("#subalbums").show();
-									$("#album-view").removeClass("media-view-container");
-
-									// check for overflow in album-caption class in order to adapt album caption height to the string length
-									// when diving into search subalbum, the whole album path is showed and it can be lengthy
-									var maxHeight = null;
-									$('.album-caption').each(function() {
-										var thisHeight = $(this)[0].scrollHeight;
-										maxHeight = (thisHeight > maxHeight) ? thisHeight : maxHeight;
-									});
-									difference = maxHeight - parseFloat($(".album-caption").css("height"));
-									$(".album-caption").css("height", maxHeight + 'px');
-									$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + difference) + 'px');
 								}
 							}, function error() {
 								currentAlbum.subalbums.splice(currentAlbum.subalbums.indexOf(theSubalbum), 1);
@@ -1383,6 +1369,20 @@ $(document).ready(function() {
 						})(currentAlbum.subalbums[i], image, container);
 						//////////////////// end anonymous function /////////////////////
 					}
+
+					$("#subalbums").show();
+					$("#album-view").removeClass("media-view-container");
+
+					// check for overflow in album-caption class in order to adapt album caption height to the string length
+					// when diving into search subalbum, the whole album path is showed and it can be lengthy
+					maxHeight = null;
+					$('.album-caption').each(function() {
+						var thisHeight = $(this)[0].scrollHeight;
+						maxHeight = (thisHeight > maxHeight) ? thisHeight : maxHeight;
+					});
+					difference = maxHeight - parseFloat($(".album-caption").css("height"));
+					$(".album-button-and-caption").css("height", (parseInt($(".album-button-and-caption").css("height")) + difference) + 'px');
+					$(".album-caption").css("height", maxHeight + 'px');
 
 					if (Options.albums_slide_style)
 						$(".album-button").css("background-color", Options.album_button_background_color);
