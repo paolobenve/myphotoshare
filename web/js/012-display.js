@@ -557,6 +557,7 @@ $(document).ready(function() {
 		titleAnchorClasses = 'title-anchor';
 		if (isMobile.any())
 			titleAnchorClasses += ' mobile';
+		titleAnchorClassesItalics = titleAnchorClasses + ' italic';
 
 		if (isDateTitle) {
 			title = "<a class='" + titleAnchorClasses + "' href='#!/" + "'>" + components[0] + "</a>";
@@ -672,14 +673,16 @@ $(document).ready(function() {
 		} else if (isSearchTitle) {
 			// i=0: title
 			// i=1: Options.by_search_string
-			// (optional) i=2: image cache
+			// (optional) i=2: image cache or folder
+			// (optional) i=3 up: folder or image
+			// (optional) i=n: image
 			title = "<a class='" + titleAnchorClasses + "' href='#!/" + "'>" + components[0] + "</a>&raquo;";
 
 			if (currentMedia === null)
 				title += "<span class='title-no-anchor'";
 			else
-				title += "<a class='" + titleAnchorClasses + "' href='#!/" + currentAlbum.cacheBase + "'";
-			title += " style='font-style: italic;'>(" + _t("#by-search") + ")";
+				title += "<a class='" + titleAnchorClassesItalics + "' href='#!/" + currentAlbum.cacheBase + "'";
+			title += ">(" + _t("#by-search") + ")";
 			if (currentMedia === null)
 				title += "</span>";
 			else
@@ -702,10 +705,12 @@ $(document).ready(function() {
 				title += "&raquo;";
 
 			if (searchCacheBase) {
-				title += "<a class='" + titleAnchorClasses + "' href='#!/" + searchCacheBase + "'>";
-				title += _t("#by-search");
+				title += "<a class='" + titleAnchorClassesItalics + "' href='#!/" + searchCacheBase + "'>";
+				title += "(" + _t("#by-search") + ")";
 				title += "</a>";
 				title += "&raquo;";
+
+				documentTitle = " (" + _t("#by-search") + ") \u00ab " + documentTitle;
 			}
 
 			documentTitle += components[0];
