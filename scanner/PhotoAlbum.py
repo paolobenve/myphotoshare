@@ -245,19 +245,21 @@ class Album(object):
 
 	@staticmethod
 	def from_cache(path, album_cache_base):
+		next_level()
 		message("reading album...", "", 5)
 		with open(path, "r") as filepath:
 			dictionary = json.load(filepath)
 		next_level()
 		message("album read", "", 5)
 		back_level()
+		back_level()
 		# generate the album from the json file loaded
 		# subalbums are not generated yet
-		message("converting album to dictionary...", "", 5)
-		dictionary = Album.from_dict(dictionary, album_cache_base)
+		message("converting album to dict from json file...", "", 5)
 		next_level()
+		dictionary = Album.from_dict(dictionary, album_cache_base)
 		if dictionary is not None:
-			message("album converted to dictionary", "", 4)
+			message("album converted to dict from json file", "", 4)
 		else:
 			message("json version unexistent or old", "", 4)
 		back_level()
@@ -457,6 +459,8 @@ class Media(object):
 
 		self.is_valid = True
 
+		message("working with media", self.media_path, 5)
+		next_level()
 		image = None
 		try:
 			mtime = file_mtime(media_path)
@@ -468,6 +472,7 @@ class Media(object):
 			message("could not read file or dir mtime", media_path, 5)
 			back_level()
 			self.is_valid = False
+			back_level()
 			return
 
 		if Options.config['checksum']:
@@ -487,6 +492,7 @@ class Media(object):
 			self._attributes = attributes
 			self._attributes["dateTimeDir"] = dir_mtime
 			# self.cache_base = attributes["cacheBase"]
+			back_level()
 			return
 
 		self._attributes = {}
@@ -515,7 +521,7 @@ class Media(object):
 				self._photo_metadata(image)
 				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
 				if self.has_gps_data:
-					message("looking for geonames...", media_path, 5)
+					message("looking for geonames...", "", 5)
 					self.get_geonames()
 
 			else:
@@ -527,13 +533,14 @@ class Media(object):
 						self._video_thumbnails(thumbs_path, media_path)
 
 						if self.has_gps_data:
-							message("looking for geonames...", media_path, 5)
+							message("looking for geonames...", "", 5)
 							self.get_geonames()
 				else:
 					next_level()
 					message("error transcodind, not a video?", "", 5)
 					back_level()
 					self.is_valid = False
+		back_level()
 		return
 
 
