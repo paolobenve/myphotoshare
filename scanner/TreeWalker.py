@@ -38,8 +38,11 @@ class TreeWalker:
 		last_cache_modification_time = last_modification_time(Options.config['cache_path'])
 		next_level()
 		message("cache last mtime got", str(last_cache_modification_time), 4)
-		options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
-		message("options file mtime is", str(options_file_modification_time), 4)
+		json_options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
+		message("json options file mtime is", str(json_options_file_modification_time), 4)
+		if len(sys.argv) == 2:
+			options_file_modification_time = file_mtime(sys.argv[1])
+			message("options file mtime is", str(options_file_modification_time), 4)
 		back_level()
 
 		if (Options.config['use_stop_words']):
@@ -49,8 +52,12 @@ class TreeWalker:
 		# and if sensitive options haven't changed,
 		# we can avoid browsing the albums
 		if (
-			last_album_modification_time < options_file_modification_time and
+			# the cache must be newer than albums
+			last_album_modification_time < json_options_file_modification_time and
+			# the json options file must be newer than albums
 			last_album_modification_time < last_cache_modification_time and
+			# the cache must be newer than the supplied options file too: physical paths could have been changed
+			(len(sys.argv) == 2 and options_file_modification_time < last_cache_modification_time) and
 			not Options.config['recreate_json_files'] and
 			not Options.config['recreate_reduced_photos'] and
 			not Options.config['recreate_thumbnails']
