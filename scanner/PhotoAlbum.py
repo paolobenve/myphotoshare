@@ -1011,11 +1011,20 @@ class Media(object):
 		# so that the thumbnail doesn't get blurred
 		reduced_size_image = image
 		reduced_size_images = []
+
+		message("checking reduced sizes", "", 5)
 		for thumb_size in Options.config['reduced_sizes']:
 			reduced_size_image = self.reduce_size_or_make_thumbnail(reduced_size_image, photo_path, thumbs_path, thumb_size)
 			reduced_size_images = [reduced_size_image] + reduced_size_images
+		next_level()
+		message("reduced sizes checked!", "", 5)
+		back_level()
 
+		message("checking thumbnails", "", 5)
 		self.generate_all_thumbnails(reduced_size_images, photo_path, thumbs_path)
+		next_level()
+		message("thumbnails checked!", "", 5)
+		back_level()
 
 
 	@staticmethod
