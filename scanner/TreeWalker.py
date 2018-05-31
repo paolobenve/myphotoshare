@@ -47,7 +47,7 @@ class TreeWalker:
 		# we can avoid browsing the albums
 		if (
 			last_album_modification_time < options_file_modification_time and
-			last_cache_modification_time < options_file_modification_time and
+			last_album_modification_time < last_cache_modification_time and
 			not Options.config['recreate_json_files'] and
 			not Options.config['recreate_reduced_photos'] and
 			not Options.config['recreate_thumbnails']
