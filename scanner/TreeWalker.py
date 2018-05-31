@@ -30,7 +30,7 @@ class TreeWalker:
 		# datetime.fromtimestamp(int(os.path.getmtime(path)))
 		last_album_modification_time = last_modification_time(Options.config['album_path'])
 		last_cache_modification_time = last_modification_time(Options.config['cache_path'])
-		options_file_modification_time = file_mtime(os.path.join(config['index_html_path'], "cache/options.json"))
+		options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
 		# If nor the albums nor the cache have been modified after the last run,
 		# and if sensitive options haven't changed,
 		# we can avoid browsing the albums
