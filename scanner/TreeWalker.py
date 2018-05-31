@@ -148,7 +148,7 @@ class TreeWalker:
 			# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
 			self._save_json_options()
 			self.remove_stale()
-		message("completed", "", 4)
+			message("completed", "", 4)
 
 	def all_albums_to_json_file(self, album, save_subalbums, save_subsubalbums):
 		if save_subalbums:
