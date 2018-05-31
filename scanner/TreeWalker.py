@@ -38,16 +38,26 @@ class TreeWalker:
 		last_cache_modification_time = last_modification_time(Options.config['cache_path'])
 		next_level()
 		message("cache last mtime got", str(last_cache_modification_time), 4)
-		options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
-		message("options file mtime is", str(options_file_modification_time), 4)
+		json_options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
+		message("json options file mtime is", str(json_options_file_modification_time), 4)
+		if len(sys.argv) == 2:
+			options_file_modification_time = file_mtime(sys.argv[1])
+			message("options file mtime is", str(options_file_modification_time), 4)
 		back_level()
+
+		if (Options.config['use_stop_words']):
+			self.get_lowercase_stopwords()
 
 		# If nor the albums nor the cache have been modified after the last run,
 		# and if sensitive options haven't changed,
 		# we can avoid browsing the albums
 		if (
-			last_album_modification_time < options_file_modification_time and
-			last_cache_modification_time < options_file_modification_time and
+			# the cache must be newer than albums
+			last_album_modification_time < json_options_file_modification_time and
+			# the json options file must be newer than albums
+			last_album_modification_time < last_cache_modification_time and
+			# the cache must be newer than the supplied options file too: physical paths could have been changed
+			(len(sys.argv) == 2 and options_file_modification_time < last_cache_modification_time) and
 			not Options.config['recreate_json_files'] and
 			not Options.config['recreate_reduced_photos'] and
 			not Options.config['recreate_thumbnails']
@@ -556,7 +566,7 @@ class TreeWalker:
 
 	def remove_stopwords(self, alphabetic_words, search_normalized_words, ascii_words):
 		# remove the stopwords found in alphabetic_words, from search_normalized_words and ascii_words
-		purged_alphabetic_words = set(alphabetic_words) - self.get_lowercase_stopwords()
+		purged_alphabetic_words = set(alphabetic_words) - TreeWalker.lowercase_stopwords
 		purged_search_normalized_words = []
 		purged_ascii_words = []
 		alphabetic_words = list(alphabetic_words)
@@ -579,20 +589,24 @@ class TreeWalker:
 		The list of stopwords comes from https://github.com/stopwords-iso/stopwords-iso
 		"""
 		language = Options.config['language'] if Options.config['language'] != '' else os.getenv('LANG')[:2]
-		message("stopwords", "Using language " + language, 4)
+		message("working with stopwords", "Using language " + language, 4)
 
 		stopwords = []
 		stopwords_file = os.path.join(os.path.dirname(__file__), "resources/stopwords-iso.json")
+		next_level()
 		message("loading stopwords...", stopwords_file, 4)
 		with open(stopwords_file, "r") as stopwords_p:
 			stopwords = json.load(stopwords_p)
 
+		next_level()
 		if language in stopwords:
 			phrase = " ".join(stopwords[language])
 			TreeWalker.lowercase_stopwords = frozenset(switch_to_lowercase(phrase).split())
 			message("stopwords loaded", "", 4)
 		else:
 			message("stopwords: no stopwords for language", language, 4)
+		back_level()
+		back_level()
 		return
 
 	@staticmethod
@@ -603,8 +617,6 @@ class TreeWalker:
 		"""
 		if TreeWalker.lowercase_stopwords == {}:
 			TreeWalker.load_stopwords()
-
-		return TreeWalker.lowercase_stopwords
 
 	def add_media_to_tree_by_search(self, media):
 		words_for_word_list, unicode_words, words_for_search_album_name = self.prepare_for_tree_by_search(media)
@@ -731,7 +743,7 @@ class TreeWalker:
 				album_ini_good = True
 
 		cached_album = None
-		json_message = json_file + " (path: " + os.path.basename(absolute_path) + ")"
+		json_message = json_file
 		if Options.config['recreate_json_files']:
 			message("forced json file recreation", "some sensible option has changed", 3)
 		else:
@@ -802,10 +814,10 @@ class TreeWalker:
 				cached_album = None
 
 		if not json_file_OK:
-			message("generating album...", absolute_path, 5)
+			message("generating void album...", "", 5)
 			album = Album(absolute_path)
 			next_level()
-			message("album generated", "", 5)
+			message("void album generated", "", 5)
 			back_level()
 
 		if album_ini_good:
@@ -821,7 +833,7 @@ class TreeWalker:
 		message("subdir for cache files", " " + album.subdir, 3)
 
 		#~ for entry in sorted(os.listdir(absolute_path)):
-		message("reading directory...", absolute_path, 5)
+		message("reading directory", absolute_path, 5)
 		num_photo_in_dir = 0
 		photos_without_geotag_in_dir = []
 		photos_without_exif_date_in_dir = []
@@ -861,10 +873,12 @@ class TreeWalker:
 			elif os.path.isdir(entry_with_path):
 				trimmed_path = trim_base_custom(absolute_path, Options.config['album_path'])
 				entry_for_cache_base = os.path.join(Options.config['folders_string'], trimmed_path, entry)
+				next_level()
 				message("determining cache base...", "", 5)
 				next_album_cache_base = album.generate_cache_base(entry_for_cache_base)
 				next_level()
 				message("cache base determined", "", 5)
+				back_level()
 				back_level()
 				[next_walked_album, num, sub_max_file_date] = self.walk(entry_with_path, next_album_cache_base, album)
 				if next_walked_album is not None:
@@ -927,22 +941,22 @@ class TreeWalker:
 						#~ else:
 							#~ absolute_cache_file = ""
 				if not cache_hit:
-					message("processing file", entry_with_path, 4)
+					message("not a cache hit, processing file", entry_with_path, 4)
 					next_level()
 					if not json_file_OK:
-						message("json file not OK", "  " + json_message, 4)
+						message("reason: json file not OK", "  " + json_message, 4)
 					else:
 						if cached_media is None:
-							message("media not cached", "", 4)
+							message("reason: media not cached", "", 4)
 						# TODO: We can't execute the code below as cache_hit = False...
 						elif cache_hit:
 							if not absolute_cache_file_exists:
-								message("unexistent reduction/thumbnail", "", 4)
+								message("reason: unexistent reduction/thumbnail", "", 4)
 							else:
 								if file_mtime(absolute_cache_file) < cached_media.datetime_file:
-									message("reduction/thumbnail older than cached media", "", 4)
+									message("reason: reduct/thumbn older than cached media", "", 4)
 								elif file_mtime(absolute_cache_file) > json_file_mtime:
-									message("reduction/thumbnail newer than json file", "", 4)
+									message("reason: reduct/thumbn newer than json file", "", 4)
 
 					if Options.config['recreate_reduced_photos']:
 						message("reduced photo recreation requested", "", 4)
@@ -972,6 +986,7 @@ class TreeWalker:
 						else:
 							photos_without_geotag_in_dir.append(entry_with_path)
 
+					next_level()
 					message("adding media to by date tree...", "", 5)
 					# the following function has a check on media already present
 					self.add_media_to_tree_by_date(media)
@@ -1005,6 +1020,8 @@ class TreeWalker:
 						self.all_media.append(media)
 					next_level()
 					message("media added to big list", "", 5)
+					back_level()
+
 					back_level()
 
 				elif not media.is_valid:
