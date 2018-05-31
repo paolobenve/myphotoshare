@@ -139,6 +139,18 @@ def report_times(final):
 	albums where media is not geotagged or has no EXIF.
 	"""
 
+	try:
+		# detect uninitialized variable
+		report_times.num_media_in_tree
+	except AttributeError:
+		# calculate the number of media in the album tree: it will be used in order to guess the execution time
+		special_files = [Options.config['exclude_tree_marker'], Options.config['exclude_files_marker'], Options.config['metadata_filename']]
+		message("counting media in albums...", "", 4)
+		report_times.num_media_in_tree = sum([len([file for file in files if file[:1] != '.' and file not in special_files]) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
+		next_level()
+		message("media in albums counted", str(report_times.num_media_in_tree), 4)
+		back_level()
+
 	print()
 	print((50 - len("message")) * " ", "message", (15 - len("total time")) * " ", "total time", (15 - len("counter")) * " ", "counter", (20 - len("average time")) * " ", "average time")
 	print()
@@ -173,18 +185,6 @@ def report_times(final):
 	print()
 	print((50 - len("time taken till now")) * " ", "time taken till now", (18 - len(_time_till_now)) * " ", _time_till_now, "     ", _time_till_now_unfolded)
 	num_media = Options.num_video + Options.num_photo
-
-	try:
-		# detect uninitialized variable
-		report_times.num_media_in_tree
-	except AttributeError:
-		# calculate the number of media in the album tree: it will be used in order to guess the execution time
-		special_files = [Options.config['exclude_tree_marker'], Options.config['exclude_files_marker'], Options.config['metadata_filename']]
-		message("counting media in albums...", "", 4)
-		report_times.num_media_in_tree = sum([len([file for file in files if file[:1] != '.' and file not in special_files]) for dirpath, dirs, files in os.walk(Options.config['album_path']) if dirpath.find('/.') == -1])
-		next_level()
-		message("media in albums counted", str(report_times.num_media_in_tree), 4)
-		back_level()
 
 	_num_media = str(num_media)
 	if num_media == 0 and report_times.num_media_in_tree > 0:
