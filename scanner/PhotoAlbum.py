@@ -515,10 +515,8 @@ class Media(object):
 				self._photo_metadata(image)
 				self._photo_thumbnails(image, media_path, Options.config['cache_path'])
 				if self.has_gps_data:
-					next_level()
 					message("looking for geonames...", media_path, 5)
 					self.get_geonames()
-					back_level()
 
 			else:
 				# try with video detection
@@ -529,10 +527,8 @@ class Media(object):
 						self._video_thumbnails(thumbs_path, media_path)
 
 						if self.has_gps_data:
-							next_level()
 							message("looking for geonames...", media_path, 5)
 							self.get_geonames()
-							back_level()
 				else:
 					next_level()
 					message("error transcodind, not a video?", "", 5)
