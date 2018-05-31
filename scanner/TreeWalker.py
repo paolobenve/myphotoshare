@@ -34,13 +34,14 @@ class TreeWalker:
 		message("albums last mtime got", str(last_album_modification_time), 4)
 		back_level()
 
-		message("getting cache last mtime...", "be even more patient, 12x time is needed!", 4)
+		message("getting cache last mtime...", "be even more patient, 12x time could be needed!", 4)
 		last_cache_modification_time = last_modification_time(Options.config['cache_path'])
 		next_level()
 		message("cache last mtime got", str(last_cache_modification_time), 4)
+		options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
+		message("options file mtime is", str(options_file_modification_time), 4)
 		back_level()
 
-		options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
 		# If nor the albums nor the cache have been modified after the last run,
 		# and if sensitive options haven't changed,
 		# we can avoid browsing the albums

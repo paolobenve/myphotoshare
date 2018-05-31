@@ -187,12 +187,8 @@ def report_times(final):
 	num_media = Options.num_video + Options.num_photo
 
 	_num_media = str(num_media)
-	if num_media == 0 and report_times.num_media_in_tree > 0:
-		# We have avoided browsing, and therefore we haven't any info of photos, videos, geotags, exif dates
-		# print a simplified report
-		media_count_and_time = _num_media + "media in albums"
-		print(media_count_and_time)
-	else:
+	# do not print the report if browsing hasn't been done
+	if num_media > 0 and report_times.num_media_in_tree > 0:
 		# normal run, print final report about photos, videos, geotags, exif dates
 		try:
 			time_missing = time_till_now / num_media * report_times.num_media_in_tree - time_till_now
