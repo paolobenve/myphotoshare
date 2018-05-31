@@ -28,12 +28,26 @@ class TreeWalker:
 		# check whether the albums or the cache has been modified after the last run, actually comparing with options file modification time
 		# use the same method as in file_mtime:
 		# datetime.fromtimestamp(int(os.path.getmtime(path)))
+		message("getting albums last mtime...", "be patient, x time is needed!", 4)
 		last_album_modification_time = last_modification_time(Options.config['album_path'])
+		next_level()
+		message("albums last mtime got", str(last_album_modification_time), 4)
+		back_level()
+
+		message("getting cache last mtime...", "be even more patient, 12x time could be needed!", 4)
 		last_cache_modification_time = last_modification_time(Options.config['cache_path'])
-		# If the albums haven't been modified after the last run, we can avoid something
-		# No one is supposed to change the cache manually
+		next_level()
+		message("cache last mtime got", str(last_cache_modification_time), 4)
+		options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
+		message("options file mtime is", str(options_file_modification_time), 4)
+		back_level()
+
+		# If nor the albums nor the cache have been modified after the last run,
+		# and if sensitive options haven't changed,
+		# we can avoid browsing the albums
 		if (
-			last_album_modification_time < last_cache_modification_time and
+			last_album_modification_time < options_file_modification_time and
+			last_cache_modification_time < options_file_modification_time and
 			not Options.config['recreate_json_files'] and
 			not Options.config['recreate_reduced_photos'] and
 			not Options.config['recreate_thumbnails']
@@ -148,7 +162,7 @@ class TreeWalker:
 			# options must be saved when json files have been saved, otherwise in case of error they may not reflect the json files situation
 			self._save_json_options()
 			self.remove_stale()
-		message("completed", "", 4)
+			message("completed", "", 4)
 
 	def all_albums_to_json_file(self, album, save_subalbums, save_subsubalbums):
 		if save_subalbums:

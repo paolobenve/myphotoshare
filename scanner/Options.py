@@ -340,7 +340,7 @@ def get_options():
 			sys.exit(-97)
 
 	# get old options: they are revised in order to decide whether to recreate something
-	json_options_file = os.path.join(config['index_html_path'], "cache/options.json")
+	json_options_file = os.path.join(config['cache_path'], "options.json")
 	try:
 		with open(json_options_file) as old_options_file:
 			old_options = json.load(old_options_file)
