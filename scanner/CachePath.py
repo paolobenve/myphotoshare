@@ -127,10 +127,16 @@ def video_cache_name(video):
 	return video.cache_base + Options.config['cache_folder_separator'] + "transcoded_" + Options.config['video_transcode_bitrate'] + "_" + str(Options.config['video_crf']) + ".mp4"
 
 def file_mtime(path):
-	return datetime.fromtimestamp(int(os.path.getmtime(path)))
+	return datetime.fromtimestamp(os.path.getmtime(path))
 
 def last_modification_time(path):
-	return datetime.fromtimestamp(int(max(os.path.getmtime(root) for root,_,_ in os.walk(path))))
+	maximum = 0
+	for root, dirs, files in os.walk(path):
+		maximum = max(maximum, os.path.getmtime(root))
+		if files:
+			maximum = max(maximum, max(os.path.getmtime(os.path.join(root, file)) for file in files))
+	last_mtime = datetime.fromtimestamp(maximum)
+	return last_mtime
 
 def checksum(path):
 	block_size = 65536
