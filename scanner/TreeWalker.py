@@ -42,6 +42,9 @@ class TreeWalker:
 		message("options file mtime is", str(options_file_modification_time), 4)
 		back_level()
 
+		if (Options.config['use_stop_words']):
+			self.get_lowercase_stopwords()
+
 		# If nor the albums nor the cache have been modified after the last run,
 		# and if sensitive options haven't changed,
 		# we can avoid browsing the albums
@@ -556,7 +559,7 @@ class TreeWalker:
 
 	def remove_stopwords(self, alphabetic_words, search_normalized_words, ascii_words):
 		# remove the stopwords found in alphabetic_words, from search_normalized_words and ascii_words
-		purged_alphabetic_words = set(alphabetic_words) - self.get_lowercase_stopwords()
+		purged_alphabetic_words = set(alphabetic_words) - TreeWalker.lowercase_stopwords
 		purged_search_normalized_words = []
 		purged_ascii_words = []
 		alphabetic_words = list(alphabetic_words)
@@ -603,8 +606,6 @@ class TreeWalker:
 		"""
 		if TreeWalker.lowercase_stopwords == {}:
 			TreeWalker.load_stopwords()
-
-		return TreeWalker.lowercase_stopwords
 
 	def add_media_to_tree_by_search(self, media):
 		words_for_word_list, unicode_words, words_for_search_album_name = self.prepare_for_tree_by_search(media)
