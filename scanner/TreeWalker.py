@@ -28,8 +28,18 @@ class TreeWalker:
 		# check whether the albums or the cache has been modified after the last run, actually comparing with options file modification time
 		# use the same method as in file_mtime:
 		# datetime.fromtimestamp(int(os.path.getmtime(path)))
+		message("getting albums last mtime...", "be patient, x time is needed!", 4)
 		last_album_modification_time = last_modification_time(Options.config['album_path'])
+		next_level()
+		message("albums last mtime got", str(last_album_modification_time), 4)
+		back_level()
+
+		message("getting cache last mtime...", "be even more patient, 12x time is needed!", 4)
 		last_cache_modification_time = last_modification_time(Options.config['cache_path'])
+		next_level()
+		message("cache last mtime got", str(last_cache_modification_time), 4)
+		back_level()
+
 		options_file_modification_time = file_mtime(os.path.join(Options.config['cache_path'], "options.json"))
 		# If nor the albums nor the cache have been modified after the last run,
 		# and if sensitive options haven't changed,
