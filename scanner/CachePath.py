@@ -127,7 +127,7 @@ def video_cache_name(video):
 	return video.cache_base + Options.config['cache_folder_separator'] + "transcoded_" + Options.config['video_transcode_bitrate'] + "_" + str(Options.config['video_crf']) + ".mp4"
 
 def file_mtime(path):
-	return datetime.fromtimestamp(os.path.getmtime(path))
+	return datetime.fromtimestamp(int(os.path.getmtime(path)))
 
 def last_modification_time(path):
 	maximum = 0
