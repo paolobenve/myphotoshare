@@ -459,7 +459,6 @@ class Media(object):
 
 		self.is_valid = True
 
-		message("working with media", self.media_path, 5)
 		next_level()
 		image = None
 		try:
@@ -1898,6 +1897,7 @@ class Media(object):
 							raise
 						except ValueError:
 							pass
+		message("processing media from cached album", media_path, 5)
 		return Media(album, media_path, None, dictionary)
 
 

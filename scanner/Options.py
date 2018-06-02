@@ -30,7 +30,7 @@ num_video = 0
 num_video_processed = 0
 photos_without_geotag = []
 photos_without_exif_date = []
-options_not_to_be_saved = ['cache_path', 'index_html_path', 'album_path', 'unicode_combining_marks']
+options_not_to_be_saved = ['cache_path', 'index_html_path', 'album_path']
 options_requiring_json_regeneration = ['geonames_language', 'unspecified_geonames_code', 'get_geonames_online', 'metadata_tools_preference']
 options_requiring_reduced_images_regeneration = ['jpeg_quality']
 options_requiring_thumbnails_regeneration = ['face_cascade_scale_factor', 'small_square_crops_background_color', 'cv2_installed']
@@ -56,7 +56,7 @@ eye_cascade = None
 # json_version = 2 since checksums have been added
 # json_version = 3 since geotag managing is optional
 # json_version = 4 since search feature added
-json_version = "3.4beta10"
+json_version = "3.4beta11"
 
 def initialize_opencv():
 	global face_cascade, eye_cascade
