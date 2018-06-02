@@ -941,7 +941,7 @@ class TreeWalker:
 						#~ else:
 							#~ absolute_cache_file = ""
 				if not cache_hit:
-					message("not a cache hit, processing file", entry_with_path, 4)
+					message("not a cache hit", entry_with_path, 4)
 					next_level()
 					if not json_file_OK:
 						message("reason: json file not OK", "  " + json_message, 4)
@@ -963,6 +963,7 @@ class TreeWalker:
 					if Options.config['recreate_thumbnails']:
 						message("thumbnail recreation requested", "", 4)
 					back_level()
+					message("processing media from file", entry_with_path, 5)
 					media = Media(album, entry_with_path, Options.config['cache_path'])
 
 				if media.is_valid:
