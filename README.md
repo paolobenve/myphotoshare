@@ -1,3 +1,5 @@
+WARNING: THIS PROJECT HAS MOVED TO GITLAB.COM: https://gitlab.com/paolobenve/myphotoshare
+
 # MyPhotoShare v. 3.4beta19 (May 22, 2018)
 ### A Web Photo Gallery Done Right via Static JSON & Dynamic Javascript
 #### by Jason A. Donenfeld (<Jason@zx2c4.com>), Jerome Charaoui (jerome@riseup.net)  Joachim Tingvold (joachim@tingvold.com), Paolo Benvenuto (<paolobenve@gmail.com>), Pierre Métras (<p.metras@videotron.ca>)
